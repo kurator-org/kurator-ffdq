@@ -1,4 +1,4 @@
-package org.kurator.data.ffdq;
+package org.kurator.data.ffdq.assertions;
 
 /**
  * Created by lowery on 3/30/16.

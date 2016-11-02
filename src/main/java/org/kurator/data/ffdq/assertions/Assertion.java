@@ -1,10 +1,10 @@
-package org.kurator.data.ffdq;
+package org.kurator.data.ffdq.assertions;
 
 import java.util.List;
 import java.util.Map;
 
-// TODO: Move to DQReport inside "data" directory
 public abstract class Assertion {
+  private String namedContext;
   private Map<String, String> dataResource;
   private String specification;
   private String mechanism;
@@ -22,6 +22,10 @@ public abstract class Assertion {
     return this.mechanism;
   }
 
+  public String getNamedContext() {
+    return namedContext;
+  }
+
   public void setDataResource(Map<String, String> dataResource) {
     this.dataResource = dataResource;
   }
@@ -32,5 +36,9 @@ public abstract class Assertion {
 
   public void setMechanism(String mechanism) {
     this.mechanism = mechanism;
+  }
+
+  public void setNamedContext(String namedContext) {
+    this.namedContext = namedContext;
   }
 }
