@@ -33,7 +33,7 @@ public class AssertionsConfig {
 
     private void mapAssertions(List<? extends Assertion> assertions) {
         for (Assertion assertion : assertions) {
-            assertionMap.put(assertion.getNamedContext(), assertion);
+            assertionMap.put(assertion.getContext().getName(), assertion);
         }
     }
 

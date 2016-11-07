@@ -1,34 +1,27 @@
 package org.kurator.data.ffdq.assertions;
 
+import org.kurator.data.provenance.NamedContext;
+
 import java.util.Map;
 
 public class Validation extends Assertion{
   private String criterion;
-  private Result<ValidationState> result;
-  private Improvement improvement;
 
   public Validation() {} // default constructor for Jackson
 
-  public Validation (Map<String,String> dataResource, String criterion, String specification, String mechanism, Result<ValidationState> result){
-    super.setDataResource(dataResource);
+  public Validation (String criterion, String specification, String mechanism, Context context, Result result){
     this.criterion = criterion;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
-    this.result = result;
+    super.setContext(context);
+    super.setResult(result);
   }
+
   public String getCriterion(){
     return this.criterion;
   }
 
-  public Result<ValidationState>  getResult() {
-    return result;
-  }
-
-  public Improvement getImprovement() {
-    return improvement;
-  }
-
-  public void setImprovement(Improvement improvement) {
-    this.improvement = improvement;
+  public void setCriterion(String criterion) {
+    this.criterion = criterion;
   }
 }

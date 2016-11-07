@@ -1,26 +1,27 @@
 package org.kurator.data.ffdq.assertions;
 
+import org.kurator.data.provenance.NamedContext;
+
 import java.util.Map;
 
 public class Improvement extends Assertion{
   private String enhancement;
-  private Map<String,String> result;
 
   public Improvement() {} // default constructor for Jackson
 
-  public Improvement (Map<String,String> dataResource, String enhancement, String specification, String mechanism, Map<String,String> result) {
-    super.setDataResource(dataResource);
+  public Improvement (String enhancement, String specification, String mechanism, Context context, Result result){
     this.enhancement = enhancement;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
-    this.result = result;
+    super.setContext(context);
+    super.setResult(result);
   }
+
   public String getEnhancement(){
     return this.enhancement;
   }
 
-
-  public Map<String, String> getResult() {
-    return result;
+  public void setEnhancement(String enhancement) {
+    this.enhancement = enhancement;
   }
 }

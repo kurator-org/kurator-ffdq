@@ -17,10 +17,7 @@
 
 package org.kurator.data.provenance;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CurationStep {
     /**
@@ -58,31 +55,22 @@ public class CurationStep {
      */
     private NamedContext curationContext;
 
-    public CurationStep(Map<String, String> initialElementValues, Map<String, String> finalElementValues,
-                        NamedContext context, List<String> comments, List<String> sources,
-                        CurationStatus status) {
+    public CurationStep(Map<String, String> initialValues, Map<String, String> updatedValues,
+                        NamedContext context, CurationStatus status, List<String> comments) {
+        // Create copies
+        Map<String, String> initialElementValues = new HashMap<>(initialValues);
+        Map<String, String> finalElementValues = new HashMap<>();
+
+        if (updatedValues != null) {
+            finalElementValues.putAll(initialValues);
+            finalElementValues.putAll(updatedValues);
+        }
+
         this.initialElementValues = initialElementValues;
         this.finalElementValues = finalElementValues;
         this.curationContext = context;
         this.curationComments = comments;
-        this.sourcesConsulted = sources;
         this.recordStatus = status;
-    }
-
-    public CurationStep(Map<String, String> curatedValues, String comment) {
-        this(curatedValues, curatedValues, null, Collections.singletonList(comment), null, null);
-    }
-
-    public CurationStep(Map<String, String> curatedValues, CurationStatus status, List<String> comments) {
-        this(curatedValues, curatedValues, null, comments, null, status);
-    }
-
-    public CurationStep(Map<String, String> curatedValues, NamedContext context, String comment) {
-        this(curatedValues, curatedValues, context, Collections.singletonList(comment), null, null);
-    }
-
-    public CurationStep(Map<String, String> curatedValues, NamedContext context, CurationStatus status, List<String> comments) {
-        this(curatedValues, curatedValues, context, comments, null, status);
     }
 
     public void addCurationComment(String curationComment) {
@@ -137,6 +125,18 @@ public class CurationStep {
 
     public NamedContext getContext() {
         return curationContext;
+    }
+
+    @Override
+    public String toString() {
+        return "CurationStep{" +
+                "initialElementValues=" + initialElementValues +
+                ", finalElementValues=" + finalElementValues +
+                ", curationComments=" + curationComments +
+                ", sourcesConsulted=" + sourcesConsulted +
+                ", recordStatus=" + recordStatus +
+                ", curationContext=" + curationContext +
+                '}';
     }
 }
 

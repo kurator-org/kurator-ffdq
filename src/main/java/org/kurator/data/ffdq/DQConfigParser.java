@@ -3,13 +3,12 @@ package org.kurator.data.ffdq;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.kurator.data.ffdq.assertions.*;
-import org.kurator.data.provenance.BaseRecord;
-import org.kurator.data.provenance.CurationStep;
-import org.kurator.data.provenance.GlobalContext;
-import org.kurator.data.provenance.NamedContext;
+import org.kurator.data.provenance.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,67 +42,80 @@ public class DQConfigParser {
     public DQReport generateReport(BaseRecord result) {
         DQReport report = new DQReport();
 
-        GlobalContext globalContext = result.getGlobalContext();
-        StrSubstitutor contextProps = new StrSubstitutor(globalContext.getProperties());
-
         Map<NamedContext, List<CurationStep>> curationStepMap =
-                result.getCurationHistoryContexts();
+                result.getCurationHistory();
 
         for (NamedContext context : curationStepMap.keySet()) {
+
+            // Add context properties
+            Map<String, String> contextProps = new HashMap<>();
+            GlobalContext globalContext = result.getGlobalContext();
+            contextProps.putAll(globalContext.getProperties());
+
             Assertion assertion = assertions.forContext(context.getName());
+            contextProps.putAll(context.getProperties());
+
+            // String substitution
+            StrSubstitutor sub = new StrSubstitutor(contextProps);
+
+            String specification = sub.replace(assertion.getSpecification());
+            String mechanism = sub.replace(assertion.getMechanism());
+
+            assertion.setSpecification(specification);
+            assertion.setMechanism(mechanism);
+
+            // Set context
+            assertion.setContext(new Context(context.getName(), context.getFieldsActedUpon(), context.getFieldsConsulted()));
+
+            // Combine curation steps
+            List<CurationStep> curationSteps = curationStepMap.get(context);
+
+            Map<String, String> initialValues = curationSteps.get(0).getInitialElementValues();
+            Map<String, String> curatedValues = new HashMap<>();
+            List<String> comments = new ArrayList<>();
+            CurationStatus status = curationSteps.get(curationSteps.size()-1).getCurationStatus();
+
+            for (CurationStep step : curationSteps) {
+                curatedValues.putAll(step.getFinalElementValues());
+                comments.addAll(step.getCurationComments());
+            }
 
             if (assertion instanceof Measure) {
                 Measure measure = (Measure) assertion;
 
-                String parsedMechanism = contextProps.replace(measure.getMechanism());
-                measure.setMechanism(parsedMechanism);
+                String dimension = sub.replace(measure.getDimension());
+                measure.setDimension(dimension);
 
-                System.out.println("MEASURE: ");
-                System.out.println("    dimension : " + measure.getDimension() + "\n    specification : "
-                        + measure.getSpecification() + "\n    mechanism : " + measure.getMechanism());
+                // Create result
+                Result dataResource = new Result(initialValues, curatedValues, comments, status.toString());
+                assertion.setResult(dataResource);
+
+                for (CurationStep step : curationSteps) {
+                    System.out.println(step);
+                }
 
                 report.pushMeasure(measure);
             } else if (assertion instanceof Validation) {
                 Validation validation = (Validation) assertion;
 
-                String parsedMechanism = contextProps.replace(validation.getMechanism());
-                validation.setMechanism(parsedMechanism);
+                String criterion = sub.replace(validation.getCriterion());
+                validation.setCriterion(criterion);
 
-                System.out.println("VALIDATION: ");
-                System.out.println("    criterion : " + validation.getCriterion() + "\n    specification : "
-                        + validation.getSpecification() + "\n    mechanism : " + validation.getMechanism());
+                // Create result
+                Result dataResource = new Result(initialValues, curatedValues, comments, status.toString());
+                assertion.setResult(dataResource);
 
                 report.pushValidation(validation);
             } else if (assertion instanceof Improvement) {
                 Improvement improvement = (Improvement) assertion;
 
-                String parsedMechanism = contextProps.replace(improvement.getMechanism());
-                improvement.setMechanism(parsedMechanism);
+                String enhancement = sub.replace(improvement.getEnhancement());
+                improvement.setEnhancement(enhancement);
 
-                System.out.println("IMPROVEMENT: ");
-                System.out.println("    enhancement : " + improvement.getEnhancement() + "\n    specification : "
-                        + improvement.getSpecification() + "\n    mechanism : " + improvement.getMechanism());
+                Result dataResource = new Result(initialValues, curatedValues, comments, status.toString());
+                assertion.setResult(dataResource);
 
                 report.pushImprovement(improvement);
-            }
-            System.out.println();
-
-            System.out.println("    context : " + context.getName());
-            if (!context.getFieldsActedUpon().isEmpty()) {
-                System.out.println("    fieldsActedUpon : " + context.getFieldsActedUpon());
-            }
-            if (!context.getFieldsConsulted().isEmpty()) {
-                System.out.println("    fieldsConsulted : " + context.getFieldsConsulted());
-            }
-
-            System.out.println();
-
-            List<CurationStep> steps = curationStepMap.get(context);
-
-            for (CurationStep step : steps) {
-                System.out.print("    state: " + step.getCurationStatus() + "\n    comments: " + step.getCurationComments());
-                System.out.println();
-                System.out.println();
             }
         }
 

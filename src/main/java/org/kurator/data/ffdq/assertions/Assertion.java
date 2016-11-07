@@ -1,18 +1,16 @@
 package org.kurator.data.ffdq.assertions;
 
+import org.kurator.data.provenance.NamedContext;
+
 import java.util.List;
 import java.util.Map;
 
 public abstract class Assertion {
-  private String namedContext;
-  private Map<String, String> dataResource;
+  private Context context;
   private String specification;
   private String mechanism;
+  private Result result;
   private List<String> sources;
-
-  public Map<String, String> getDataResource() {
-    return this.dataResource;
-  }
 
   public String getSpecification() {
     return this.specification;
@@ -22,12 +20,12 @@ public abstract class Assertion {
     return this.mechanism;
   }
 
-  public String getNamedContext() {
-    return namedContext;
+  public Context getContext() {
+    return context;
   }
 
-  public void setDataResource(Map<String, String> dataResource) {
-    this.dataResource = dataResource;
+  public void setContext(Context context) {
+    this.context = context;
   }
 
   public void setSpecification(String specification) {
@@ -38,7 +36,11 @@ public abstract class Assertion {
     this.mechanism = mechanism;
   }
 
-  public void setNamedContext(String namedContext) {
-    this.namedContext = namedContext;
+  public Result getResult() {
+    return result;
+  }
+
+  public void setResult(Result result) {
+    this.result = result;
   }
 }

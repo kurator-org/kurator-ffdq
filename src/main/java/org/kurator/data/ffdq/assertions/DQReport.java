@@ -1,5 +1,9 @@
 package org.kurator.data.ffdq.assertions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,5 +35,11 @@ public class DQReport {
   }
   public List<Improvement> getImprovements(){
     return this.improvements;
+  }
+
+  public void write(Writer writer) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+
+    mapper.writerWithDefaultPrettyPrinter().writeValue(writer, this);
   }
 }

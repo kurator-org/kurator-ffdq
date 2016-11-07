@@ -26,6 +26,7 @@ public class BaseRecord {
     private Map<String, String> curatedValues;
 
     private Stack<CurationStep> updateHistory = new Stack<>();
+    private Map<NamedContext, List<CurationStep>> curationHistory = new HashMap<>();
 
     private CurationStatus currentStatus;
 
@@ -41,66 +42,66 @@ public class BaseRecord {
     }
 
     public void update(NamedContext context, String comment) {
-        updateHistory.push(new CurationStep(curatedValues, context, comment));
+        CurationStep update = new CurationStep(curatedValues, null, context, currentStatus, Collections.singletonList(comment));
+        addCurationStep(update, context);
+    }
+
+    private void addCurationStep(CurationStep update, NamedContext context) {
+        updateHistory.push(update);
+        List<CurationStep> bucket = curationHistory.get(context);
+
+        if (bucket == null) {
+            bucket = new ArrayList<>();
+            curationHistory.put(context, bucket);
+        }
+
+        bucket.add(update);
+    }
+
+    private void addCurationStep(CurationStep update) {
+        updateHistory.push(update);
     }
 
     public void update(NamedContext context, CurationStatus status, String... comment) {
-        updateHistory.push(new CurationStep(curatedValues, context, status, Arrays.asList(comment)));
+        CurationStep update = new CurationStep(curatedValues, null, context, status, Arrays.asList(comment));
+        addCurationStep(update, context);
+
         currentStatus = status;
     }
 
     public void update(NamedContext context, String field, String value, CurationStatus status, String... comment) {
-        updateHistory.push(new CurationStep(Collections.singletonMap(field, value), context, status, Arrays.asList(comment)));
+        CurationStep update = new CurationStep(curatedValues, Collections.singletonMap(field, value), context, status, Arrays.asList(comment));
+        addCurationStep(update, context);
+
         curatedValues.put(field, value);
         currentStatus = status;
     }
 
     public void update(String comment) {
-        updateHistory.push(new CurationStep(curatedValues, comment));
+        CurationStep update = new CurationStep(curatedValues, null, null, currentStatus, Collections.singletonList(comment));
+        addCurationStep(update);
     }
 
     public void update(CurationStatus status, String... comment) {
-        updateHistory.push(new CurationStep(curatedValues, status, Arrays.asList(comment)));
+        CurationStep update = new CurationStep(curatedValues, null, null, status, Arrays.asList(comment));
+        addCurationStep(update);
+
         currentStatus = status;
     }
 
     public void update(String field, String value, CurationStatus status, String... comment) {
-        updateHistory.push(new CurationStep(Collections.singletonMap(field, value), status, Arrays.asList(comment)));
+        CurationStep update = new CurationStep(curatedValues, Collections.singletonMap(field, value), null, status, Arrays.asList(comment));
+        addCurationStep(update);
+
         curatedValues.put(field, value);
         currentStatus = status;
     }
 
     public List<CurationStep> getCurationHistory(NamedContext context) {
-        List<CurationStep> historyForContext = new ArrayList<>();
-
-        for (CurationStep curationStep : updateHistory) {
-            if (curationStep.getContext() != null && curationStep.getContext().equals(context))
-                historyForContext.add(curationStep);
-        }
-
-        return historyForContext;
+        return curationHistory.get(context);
     }
 
-    public List<CurationStep> getCurationHistory() {
-        return updateHistory;
-    }
-
-    public Map<NamedContext, List<CurationStep>> getCurationHistoryContexts() {
-        Map<NamedContext, List<CurationStep>> curationHistory = new HashMap<>();
-
-        for (CurationStep curationStep : updateHistory) {
-            if (curationStep.getContext() != null) {
-                List<CurationStep> curationSteps = curationHistory.get(curationStep.getContext());
-
-                if (curationSteps == null) {
-                    curationSteps = new LinkedList<>();
-                    curationHistory.put(curationStep.getContext(), curationSteps);
-                }
-
-                curationSteps.add(curationStep);
-            }
-        }
-
+    public Map<NamedContext, List<CurationStep>> getCurationHistory() {
         return curationHistory;
     }
 

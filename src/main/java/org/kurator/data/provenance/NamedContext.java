@@ -18,7 +18,9 @@
 package org.kurator.data.provenance;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NamedContext {
     private String context;
@@ -51,6 +53,16 @@ public class NamedContext {
 
     public List<String> getFieldsActedUpon() {
         return fieldsActedUpon;
+    }
+
+
+    public Map<String, String> getProperties() {
+        Map<String, String> props = new HashMap<>();
+
+        props.put("context.fieldsActedUpon", getFieldsActedUpon().toString());
+        props.put("context.fieldsConsulted", getFieldsConsulted().toString());
+
+        return props;
     }
 
     @Override
