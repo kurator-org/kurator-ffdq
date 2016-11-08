@@ -30,11 +30,13 @@ public class BaseRecord {
     private Map<String, CurationStage> curationStages = new HashMap<>();
     private CurationStage currentStage;
 
-    public BaseRecord(Map<String, String> initialValues, GlobalContext globalContext) {
-        this.initialValues.putAll(initialValues);
-        this.currentValues.putAll(initialValues);
+    public BaseRecord() {
 
-        this.globalContext = globalContext;
+    }
+
+    public BaseRecord(Map<String, String> initialValues, GlobalContext globalContext) {
+        setInitialValues(initialValues);
+        setGlobalContext(globalContext);
     }
 
     public BaseRecord(Map<String, String> initialValues) {
@@ -132,5 +134,18 @@ public class BaseRecord {
     public void startStage(String stage) {
         currentStage = new CurationStage(currentValues, stage);
         curationStages.put(stage, currentStage);
+    }
+
+    public String get(String field) {
+        return currentValues.get(field);
+    }
+
+    public void setInitialValues(Map<String, String> initialValues) {
+        this.initialValues.putAll(initialValues);
+        this.currentValues.putAll(initialValues);
+    }
+
+    public void setGlobalContext(GlobalContext context) {
+        this.globalContext = context;
     }
 }

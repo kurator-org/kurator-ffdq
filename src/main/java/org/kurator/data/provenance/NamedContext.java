@@ -17,52 +17,35 @@
 
 package org.kurator.data.provenance;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NamedContext {
-    private String context;
-    private List<String> fieldsActedUpon = new ArrayList<>();
-    private List<String> fieldsConsulted = new ArrayList<>();
+    private String name;
+    private FieldContext fields;
 
-    public NamedContext(String context, List<String> fieldsActedUpon, List<String> fieldsConsulted) {
-        this.context = context;
-        this.fieldsConsulted = fieldsConsulted;
-        this.fieldsActedUpon = fieldsActedUpon;
+    public NamedContext(String name, FieldContext fields) {
+        this.name = name;
+        this.fields = fields;
     }
 
-    public NamedContext(String context, List<String> fieldsActedUpon) {
-        this.context = context;
-        this.fieldsActedUpon = fieldsActedUpon;
-    }
-
-
-    public NamedContext(String context) {
-        this.context = context;
+    public NamedContext(String name) {
+        this.name = name;
     }
 
     public String getName() {
-        return context;
+        return name;
     }
 
     public List<String> getFieldsConsulted() {
-        return fieldsConsulted;
+        return fields.getConsulted();
     }
 
     public List<String> getFieldsActedUpon() {
-        return fieldsActedUpon;
+        return fields.getActedUpon();
     }
 
-
     public Map<String, String> getProperties() {
-        Map<String, String> props = new HashMap<>();
-
-        props.put("context.fieldsActedUpon", getFieldsActedUpon().toString());
-        props.put("context.fieldsConsulted", getFieldsConsulted().toString());
-
-        return props;
+        return fields.getProperties();
     }
 
     @Override
@@ -72,12 +55,12 @@ public class NamedContext {
 
         NamedContext that = (NamedContext) o;
 
-        return context != null ? context.equals(that.context) : that.context == null;
+        return name != null ? name.equals(that.name) : that.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        return context != null ? context.hashCode() : 0;
+        return name != null ? name.hashCode() : 0;
     }
 }

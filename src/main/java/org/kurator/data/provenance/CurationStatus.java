@@ -56,7 +56,7 @@ public enum CurationStatus {
      */
     DATA_PREREQUISITES_NOT_MET,
 
-    SOLVE_WITH_MORE_DATA,
+    DATA_PREREQUISITES_AMBIGUOUS,
 
     /**
      * Some prerequisite for performing the tests in the specification was not met.  This could
