@@ -8,11 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DQReport {
+  private String stage;
+
   private List<Measure> measures;
   private List<Validation> validations;
   private List<Improvement> improvements;
 
-  public DQReport() {
+  public DQReport(String stage) {
+    this.stage = stage;
+
     this.measures = new ArrayList<Measure>();
     this.validations = new ArrayList<Validation>();
     this.improvements = new ArrayList<Improvement>();
@@ -35,6 +39,10 @@ public class DQReport {
   }
   public List<Improvement> getImprovements(){
     return this.improvements;
+  }
+
+  public String getStage() {
+    return stage;
   }
 
   public void write(Writer writer) throws IOException {

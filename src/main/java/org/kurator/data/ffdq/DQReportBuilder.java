@@ -15,21 +15,12 @@ import java.util.Map;
 /**
  * Created by lowery on 11/2/16.
  */
-public class DQConfigParser {
+public class DQReportBuilder {
     private AssertionsConfig assertions;
-    private static DQConfigParser instance;
+    private BaseRecord result;
+    private List<DQReport> reports = new ArrayList<>();
 
-    private DQConfigParser() { }
-
-    public static DQConfigParser getInstance() {
-        if (instance == null) {
-            instance = new DQConfigParser();
-        }
-
-        return instance;
-    }
-
-    public void load(InputStream config) throws IOException {
+    public DQReportBuilder(InputStream config) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         assertions = mapper.readValue(config, AssertionsConfig.class);
@@ -39,11 +30,22 @@ public class DQConfigParser {
         return assertions;
     }
 
-    public DQReport generateReport(BaseRecord result) {
-        DQReport report = new DQReport();
+    public List<DQReport> createReport(BaseRecord result) {
+        this.result = result;
+
+        for (CurationStage stage : result.getCurationStages().values()) {
+            DQReport report = processStage(stage);
+            reports.add(report);
+        }
+
+        return reports;
+    }
+
+    private DQReport processStage(CurationStage stage) {
+        DQReport report = new DQReport(stage.getStageClassifier());
 
         Map<NamedContext, List<CurationStep>> curationStepMap =
-                result.getCurationHistory();
+                stage.getCurationHistory();
 
         for (NamedContext context : curationStepMap.keySet()) {
 
@@ -120,12 +122,6 @@ public class DQConfigParser {
         }
 
         return report;
-    }
 
-    public static void main(String[] args) throws IOException {
-        DQConfigParser configParser = DQConfigParser.getInstance();
-
-        configParser.load(DQConfigParser.class.getResourceAsStream("/ffdq-assertions.json"));
-        System.out.println(configParser.getAssertions().getValidations());
     }
 }
