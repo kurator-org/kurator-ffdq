@@ -25,9 +25,17 @@
             <organization>Research Center on Biodiversity and Computing, University of Sao Paulo</organization>
             <organizationUrl>http://www.biocomp.org.br/</organizationUrl>
         </developer>
+
         <developer>
             <name>David B. Lowery</name>
             <email>lowerydb@gmail.com</email>
+            <organization>Museum of Comparative Zoology, Harvard University</organization>
+            <organizationUrl>https://www.mcz.harvard.edu/</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>Paul J. Morris</name>
+            <email>mole@morris.net</email>
             <organization>Museum of Comparative Zoology, Harvard University</organization>
             <organizationUrl>https://www.mcz.harvard.edu/</organizationUrl>
         </developer>

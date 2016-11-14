@@ -21,27 +21,27 @@ package org.datakurator.data.provenance;
  * Constants for marking the outcome of the application of a mechanism that
  * implements some specification.
  *
- * See discussion on: http://wiki.filteredpush.org/wiki/AnalysisPostProcessing
  */
 public enum CurationStatus {
 
     /**
-     * Indicates that no issues were found in the data per the specification.
+     * Indicates whether or not issues were found in the data per the specification.
      */
     COMPLIANT,
-
     NOT_COMPLIANT,
 
 
-
+    /**
+     * Indicates whether or not a measurement is considered complete.
+     */
     COMPLETE,
-
     NOT_COMPLETE,
 
     /**
      * Indicates that a change to the data has been proposed.
      */
     CURATED,
+
     /**
      * Indicates that one or more terms which were blank in the input have been
      * filled in with some non-blank value in the output.
@@ -52,10 +52,8 @@ public enum CurationStatus {
     /**
      * Indicates that it was possible to perform the tests of the specification on the
      * data, but that it was not possible to validate the provided data to the specification.
-     * This tends to indicate a Solve_With_More_Data outcome.
      */
     DATA_PREREQUISITES_NOT_MET,
-
     DATA_PREREQUISITES_AMBIGUOUS,
 
     /**
@@ -64,6 +62,4 @@ public enum CurationStatus {
      * was down and unable to be consulted).
      */
     EXTERNAL_PREREQUISITES_NOT_MET,
-
-
 }

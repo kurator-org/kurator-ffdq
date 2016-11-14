@@ -19,6 +19,13 @@ package org.datakurator.data.provenance;
 
 import java.util.*;
 
+/**
+ * Represents a single update applied to the state of a record. Keeps track of comments, status and any changes to
+ * field values performed as part of the update.
+ *
+ * @author lowery
+ * @author mole
+ */
 public class CurationStep {
     /**
      * Key value pairs representing data elements provided to the method as input.
@@ -55,6 +62,15 @@ public class CurationStep {
      */
     private NamedContext curationContext;
 
+    /**
+     * Constructs a curation step from arguments
+     *
+     * @param initialValues
+     * @param updatedValues
+     * @param context
+     * @param status
+     * @param comments
+     */
     public CurationStep(Map<String, String> initialValues, Map<String, String> updatedValues,
                         NamedContext context, CurationStatus status, List<String> comments) {
         // Create copies
@@ -73,6 +89,63 @@ public class CurationStep {
         this.recordStatus = status;
     }
 
+    /**
+     * Get the list of fields acted upon during this step.
+     *
+     * @return list of fields
+     */
+    public List<String> getFieldsActedUpon() {
+        ArrayList<String> fieldsActedUpon = new ArrayList<String>();
+
+        if (finalElementValues != null) {
+            fieldsActedUpon.addAll(finalElementValues.keySet());
+        }
+
+        return fieldsActedUpon;
+    }
+
+    /**
+     * Get the list of any additional fields consulted during this step.
+     *
+     * @return list of fields
+     */
+    public List<String> getFieldsConsulted() {
+        ArrayList<String> fieldsConsulted = new ArrayList<>();
+
+        if (curationContext != null) {
+            fieldsConsulted.addAll(curationContext.getFieldsConsulted());
+        }
+
+        return fieldsConsulted;
+    }
+
+    /**
+     * Get the current status of the record at the time of the update.
+     *
+     * @return the record curation status
+     */
+    public CurationStatus getCurationStatus() {
+        return recordStatus;
+    }
+
+    /**
+     * Get a list of any sources consulted during this step.
+     *
+     * @return a copy of the sourcesConsulted list
+     */
+    public List<String> getSourcesConsulted() {
+        return new ArrayList<String>(sourcesConsulted);
+    }
+
+    /**
+     * Get the named context that corresponds to this step.
+     *
+     * @return named context
+     */
+    public NamedContext getContext() {
+        return curationContext;
+    }
+
     public void addCurationComment(String curationComment) {
         curationComments.add(curationComment);
     }
@@ -89,43 +162,6 @@ public class CurationStep {
         return finalElementValues;
     }
 
-    public List<String> getFieldsActedUpon() {
-        ArrayList<String> fieldsActedUpon = new ArrayList<String>();
-
-        if (finalElementValues != null) {
-            fieldsActedUpon.addAll(finalElementValues.keySet());
-        }
-
-        return fieldsActedUpon;
-    }
-
-    public List<String> getFieldsConsulted() {
-        ArrayList<String> fieldsConsulted = new ArrayList<>();
-
-        if (curationContext != null) {
-            fieldsConsulted.addAll(curationContext.getFieldsConsulted());
-        }
-
-        return fieldsConsulted;
-    }
-
-    /**
-     * @return the record curation status
-     */
-    public CurationStatus getCurationStatus() {
-        return recordStatus;
-    }
-
-    /**
-     * @return a copy of the sourcesConsulted list
-     */
-    public List<String> getSourcesConsulted() {
-        return new ArrayList<String>(sourcesConsulted);
-    }
-
-    public NamedContext getContext() {
-        return curationContext;
-    }
 
     @Override
     public String toString() {

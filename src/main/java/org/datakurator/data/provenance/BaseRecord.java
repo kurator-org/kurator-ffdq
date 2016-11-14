@@ -19,6 +19,12 @@ package org.datakurator.data.provenance;
 
 import java.util.*;
 
+/**
+ * Generic record that maintains a list of stage changes to the record data. Used for capturing provenance and to query
+ * the curation history of a record.
+ *
+ * @author lowery
+ */
 public class BaseRecord {
     private GlobalContext globalContext;
 
@@ -30,19 +36,46 @@ public class BaseRecord {
     private Map<String, CurationStage> curationStages = new HashMap<>();
     private CurationStage currentStage;
 
-    public BaseRecord() {
+    public BaseRecord() { }
 
-    }
-
+    /**
+     * Initialize the record using the values provided and set the global context.
+     *
+     * @param initialValues
+     * @param globalContext
+     */
     public BaseRecord(Map<String, String> initialValues, GlobalContext globalContext) {
         setInitialValues(initialValues);
         setGlobalContext(globalContext);
     }
 
+    /**
+     * Initialize the record using the values provided.
+     *
+     * @param initialValues
+     */
     public BaseRecord(Map<String, String> initialValues) {
         this(initialValues, null);
     }
 
+    /**
+     * Contextual update of record state that appends a comment without changes to field values and status.
+     *
+     * @param context
+     * @param comment
+     */
+    public void update(NamedContext context, String comment) {
+        CurationStep update = new CurationStep(currentValues, null, context, currentStatus, Collections.singletonList(comment));
+        addCurationStep(update, context);
+    }
+
+    /**
+     * Contextual update of record state that involves change of curation status and one or more comments.
+     *
+     * @param context
+     * @param status
+     * @param comment
+     */
     public void update(NamedContext context, CurationStatus status, String... comment) {
         CurationStep update = new CurationStep(currentValues, null, context, status, Arrays.asList(comment));
         addCurationStep(update, context);
@@ -50,6 +83,16 @@ public class BaseRecord {
         currentStatus = status;
     }
 
+    /**
+     * Contextual update of record state that involves updates to a field, change of curation status and
+     * one or more comments.
+     *
+     * @param context
+     * @param field
+     * @param value
+     * @param status
+     * @param comment
+     */
     public void update(NamedContext context, String field, String value, CurationStatus status, String... comment) {
         CurationStep update = new CurationStep(currentValues, Collections.singletonMap(field, value), context, status, Arrays.asList(comment));
         addCurationStep(update, context);
@@ -58,11 +101,22 @@ public class BaseRecord {
         currentStatus = status;
     }
 
+    /**
+     * Update of record state that appends a comment without changes to field values and status.
+     *
+     * @param comment
+     */
     public void update(String comment) {
         CurationStep update = new CurationStep(currentValues, null, null, currentStatus, Collections.singletonList(comment));
         addCurationStep(update);
     }
 
+    /**
+     * Update of record state that involves updates to curation status and one or more comments.
+     *
+     * @param status
+     * @param comment
+     */
     public void update(CurationStatus status, String... comment) {
         CurationStep update = new CurationStep(currentValues, null, null, status, Arrays.asList(comment));
         addCurationStep(update);
@@ -70,6 +124,15 @@ public class BaseRecord {
         currentStatus = status;
     }
 
+    /**
+     * Update of record state that involves updates to a field, change of curation status and
+     * one or more comments.
+     *
+     * @param field
+     * @param value
+     * @param status
+     * @param comment
+     */
     public void update(String field, String value, CurationStatus status, String... comment) {
         CurationStep update = new CurationStep(currentValues, Collections.singletonMap(field, value), null, status, Arrays.asList(comment));
         addCurationStep(update);
@@ -77,12 +140,6 @@ public class BaseRecord {
         currentValues.put(field, value);
         currentStatus = status;
     }
-
-    public void update(NamedContext context, String comment) {
-        CurationStep update = new CurationStep(currentValues, null, context, currentStatus, Collections.singletonList(comment));
-        addCurationStep(update, context);
-    }
-
 
     private void addCurationStep(CurationStep update) {
         if (currentStage == null) {

@@ -21,7 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lowery on 11/7/16.
+ * Encapsulates information about the global context of changes made to a record. This level of context is intended to
+ * be used to describe metadata about changes made at the actor or dataset level.
+ *
+ * @author lowery
  */
 public class GlobalContext {
     private final String actorClass;
@@ -40,6 +43,11 @@ public class GlobalContext {
         return actorName;
     }
 
+    /**
+     * Get the context as a map of key value pair properties.
+     *
+     * @return properties map
+     */
     public Map<String, String> getProperties() {
         Map<String, String> props = new HashMap<>();
 

@@ -19,6 +19,11 @@ package org.datakurator.data.provenance;
 
 import java.util.*;
 
+/**
+ * Context defined by name contains information about which fields were affected.
+ *
+ * @author lowery
+ */
 public class NamedContext {
     private String name;
     private FieldContext fields;

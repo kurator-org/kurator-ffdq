@@ -1,3 +1,20 @@
+/**  DQReportBuilder.java
+ *
+ * Copyright 2016 President and Fellows of Harvard College
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.datakurator.data.ffdq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,23 +30,34 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by lowery on 11/2/16.
+ * Builder utility class provides a bridge between the data model used during analysis and assertions defined using
+ * FFDQ. Generates a report that contains the FFDQ assertions.
+ *
+ * @author lowery
  */
 public class DQReportBuilder {
     private AssertionsConfig assertions;
     private BaseRecord result;
     private List<DQReport> reports = new ArrayList<>();
 
+    /**
+     * Constructor loads definitions from config.
+     *
+     * @param config
+     * @throws IOException
+     */
     public DQReportBuilder(InputStream config) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         assertions = mapper.readValue(config, AssertionsConfig.class);
     }
 
-    public AssertionsConfig getAssertions() {
-        return assertions;
-    }
-
+    /**
+     * Produce a summary of data quality reports that correspond to curation stages.
+     *
+     * @param result
+     * @return list of reports
+     */
     public List<DQReport> createReport(BaseRecord result) {
         this.result = result;
 
@@ -41,6 +69,12 @@ public class DQReportBuilder {
         return reports;
     }
 
+    /**
+     * Private helper method processes a curation stage and creates a report.
+     *
+     * @param stage
+     * @return data quality report
+     */
     private DQReport processStage(CurationStage stage) {
         DQReport report = new DQReport(stage.getStageClassifier());
 
@@ -122,6 +156,9 @@ public class DQReportBuilder {
         }
 
         return report;
+    }
 
+    public AssertionsConfig getAssertions() {
+        return assertions;
     }
 }
