@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.kurator.data.provenance;
+package org.datakurator.data.provenance;
 
 /**
  * Constants for marking the outcome of the application of a mechanism that

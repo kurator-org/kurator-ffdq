@@ -1,4 +1,4 @@
-package org.kurator.data.ffdq.assertions;
+package org.datakurator.data.ffdq.assertions;
 
 import java.util.Collections;
 import java.util.List;

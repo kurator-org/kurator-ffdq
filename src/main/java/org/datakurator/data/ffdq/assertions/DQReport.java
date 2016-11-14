@@ -1,4 +1,4 @@
-package org.kurator.data.ffdq.assertions;
+package org.datakurator.data.ffdq.assertions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

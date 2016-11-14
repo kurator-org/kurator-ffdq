@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.kurator.data.provenance;
+package org.datakurator.data.provenance;
 
 import java.util.*;
 

@@ -1,9 +1,6 @@
-package org.kurator.data.ffdq.assertions;
-
-import org.kurator.data.provenance.NamedContext;
+package org.datakurator.data.ffdq.assertions;
 
 import java.util.List;
-import java.util.Map;
 
 public abstract class Assertion {
   private Context context;

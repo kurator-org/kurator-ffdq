@@ -1,9 +1,4 @@
-package org.kurator.data.ffdq.assertions;
-
-import org.kurator.data.provenance.CurationStatus;
-import org.kurator.data.provenance.NamedContext;
-
-import java.util.Map;
+package org.datakurator.data.ffdq.assertions;
 
 public class Measure extends Assertion {
   private String dimension;

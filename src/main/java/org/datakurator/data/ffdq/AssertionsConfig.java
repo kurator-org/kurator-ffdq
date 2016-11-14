@@ -1,9 +1,9 @@
-package org.kurator.data.ffdq;
+package org.datakurator.data.ffdq;
 
-import org.kurator.data.ffdq.assertions.Assertion;
-import org.kurator.data.ffdq.assertions.Improvement;
-import org.kurator.data.ffdq.assertions.Measure;
-import org.kurator.data.ffdq.assertions.Validation;
+import org.datakurator.data.ffdq.assertions.Assertion;
+import org.datakurator.data.ffdq.assertions.Improvement;
+import org.datakurator.data.ffdq.assertions.Measure;
+import org.datakurator.data.ffdq.assertions.Validation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

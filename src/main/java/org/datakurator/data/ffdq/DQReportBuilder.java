@@ -1,9 +1,9 @@
-package org.kurator.data.ffdq;
+package org.datakurator.data.ffdq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.kurator.data.ffdq.assertions.*;
-import org.kurator.data.provenance.*;
+import org.datakurator.data.ffdq.assertions.*;
+import org.datakurator.data.provenance.*;
 
 import java.io.IOException;
 import java.io.InputStream;
