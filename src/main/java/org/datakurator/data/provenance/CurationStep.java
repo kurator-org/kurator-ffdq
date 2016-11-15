@@ -73,14 +73,17 @@ public class CurationStep {
      */
     public CurationStep(Map<String, String> initialValues, Map<String, String> updatedValues,
                         NamedContext context, CurationStatus status, List<String> comments) {
-        // Create copies
+
+        initialElementValues.putAll(initialValues);
+
+        // Include unchanged values from initial as well, not just the fields pertaining to updates
+        finalElementValues.putAll(initialValues);
+
         if (updatedValues != null) {
-            finalElementValues.putAll(initialValues);
+            // Merge any updates with the final values constructed from initial
             finalElementValues.putAll(updatedValues);
         }
-
-        this.initialElementValues = initialElementValues;
-        this.finalElementValues = finalElementValues;
+        
         this.curationContext = context;
         this.curationComments = comments;
         this.recordStatus = status;

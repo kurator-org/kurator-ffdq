@@ -1,4 +1,4 @@
-/**  DQReport.java
+/**  DQReportStage.java
  *
  * Copyright 2016 President and Fellows of Harvard College
  *
@@ -25,19 +25,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Data Quality Report that contains FFDQ assertions.
+ * A Data quality stage that contains FFDQ assertions.
  *
  * @author allankv
  * @author lowery
  */
-public class DQReport {
+public class DQReportStage {
   private String stage;
 
   private List<Measure> measures;
   private List<Validation> validations;
   private List<Improvement> improvements;
 
-  public DQReport(String stage) {
+  public DQReportStage(String stage) {
     this.stage = stage;
 
     this.measures = new ArrayList<Measure>();
@@ -66,17 +66,5 @@ public class DQReport {
 
   public String getStage() {
     return stage;
-  }
-
-  /**
-   * Serialize the report as json
-   *
-   * @param writer
-   * @throws IOException
-   */
-  public void write(Writer writer) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-
-    mapper.writerWithDefaultPrettyPrinter().writeValue(writer, this);
   }
 }

@@ -26,6 +26,8 @@ import java.util.List;
  * @author lowery
  */
 public abstract class Assertion {
+  private String recordId;
+
   private Context context;
   private String specification;
   private String mechanism;
@@ -70,5 +72,13 @@ public abstract class Assertion {
 
   public void setSources(List<String> sources) {
     this.sources = sources;
+  }
+
+  public String getRecordId() {
+    return recordId;
+  }
+
+  public void setRecordId(String recordId) {
+    this.recordId = recordId;
   }
 }

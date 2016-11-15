@@ -38,7 +38,7 @@ import java.util.Map;
 public class DQReportBuilder {
     private AssertionsConfig assertions;
     private BaseRecord result;
-    private List<DQReport> reports = new ArrayList<>();
+    private List<DQReportStage> reports = new ArrayList<>();
 
     /**
      * Constructor loads definitions from config.
@@ -58,25 +58,26 @@ public class DQReportBuilder {
      * @param result
      * @return list of reports
      */
-    public List<DQReport> createReport(BaseRecord result) {
+    public DQReport createReport(BaseRecord result) {
         this.result = result;
 
+        DQReport report = new DQReport(result.getRecordId());
         for (CurationStage stage : result.getCurationStages().values()) {
-            DQReport report = processStage(stage);
-            reports.add(report);
+            DQReportStage reportStage = processStage(stage, result.getRecordId());
+            report.addStage(reportStage);
         }
 
-        return reports;
+        return report;
     }
 
     /**
-     * Private helper method processes a curation stage and creates a report.
+     * Private helper method processes a curation stage and creates a report stage.
      *
      * @param stage
      * @return data quality report
      */
-    private DQReport processStage(CurationStage stage) {
-        DQReport report = new DQReport(stage.getStageClassifier());
+    private DQReportStage processStage(CurationStage stage, String recordId) {
+        DQReportStage report = new DQReportStage(stage.getStageClassifier());
 
         Map<NamedContext, List<CurationStep>> curationStepMap =
                 stage.getCurationHistory();
@@ -90,6 +91,9 @@ public class DQReportBuilder {
 
             Assertion assertion = assertions.forContext(context.getName());
             contextProps.putAll(context.getProperties());
+
+            // Set record id
+            assertion.setRecordId(recordId);
 
             // String substitution
             StrSubstitutor sub = new StrSubstitutor(contextProps);

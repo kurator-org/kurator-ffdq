@@ -28,6 +28,8 @@ import java.util.*;
 public class BaseRecord {
     private GlobalContext globalContext;
 
+    private String recordId;
+
     private Map<String, String> initialValues = new HashMap<>();
     private Map<String, String> currentValues = new HashMap<>();
 
@@ -56,6 +58,14 @@ public class BaseRecord {
      */
     public BaseRecord(Map<String, String> initialValues) {
         this(initialValues, null);
+    }
+
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     /**
@@ -205,4 +215,5 @@ public class BaseRecord {
     public void setGlobalContext(GlobalContext context) {
         this.globalContext = context;
     }
+
 }
