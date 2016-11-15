@@ -75,6 +75,17 @@ public class AssertionsConfig {
     }
 
     public Assertion forContext(String name) {
-        return assertionMap.get(name);
+        // TODO: This functionality needs to be refactored to be less fragile. Use the factory pattern instead.
+        Assertion assertion = assertionMap.get(name);
+
+        if (assertion instanceof Measure) {
+            return new Measure((Measure) assertion);
+        } else if (assertion instanceof Validation) {
+            return new Validation((Validation) assertion);
+        } else if (assertion instanceof Improvement) {
+            return new Improvement((Improvement) assertion);
+        }
+
+        return null; // Unsupported assertion type
     }
 }

@@ -30,24 +30,23 @@ public class CurationStage {
     public static final String POST_ENHANCEMENT = "POST_ENHANCEMENT";
 
     private String stageClassifier;
-    private Map<String, String> initialValues;
-    private Map<String, String> curatedValues;
+    private Map<String, String> initialValues = new HashMap<>();
+    private Map<String, String> curatedValues = new HashMap<>();
 
     private Stack<CurationStep> updateHistory = new Stack<>();
     private Map<NamedContext, List<CurationStep>> curationHistory = new HashMap<>();
 
     public CurationStage(Map<String, String> initialValues, String stage) {
         this.stageClassifier = stage;
-        this.initialValues = initialValues;
-        this.curatedValues = initialValues;
+        this.initialValues.putAll(initialValues);
+        this.curatedValues.putAll(initialValues);
     }
 
     public CurationStage(Map<String, String> initialValues) {
         this.stageClassifier = DEFAULT;
-        this.initialValues = initialValues;
-        this.curatedValues = initialValues;
+        this.initialValues.putAll(initialValues);
+        this.curatedValues.putAll(initialValues);
     }
-
 
     void addCurationStep(CurationStep update, NamedContext context) {
         updateHistory.push(update);

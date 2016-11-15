@@ -30,13 +30,13 @@ public class CurationStep {
     /**
      * Key value pairs representing data elements provided to the method as input.
      */
-    private Map<String,String> initialElementValues;
+    private Map<String,String> initialElementValues = new HashMap<>();
 
     /**
      * Key value pairs representing data elements after any modifications by
      * application of the method.
      */
-    private Map<String,String> finalElementValues;
+    private Map<String,String> finalElementValues = new HashMap<>();
 
     /**
      * An ordered list of comments made by the curation step in evaluating the initial element
@@ -74,9 +74,6 @@ public class CurationStep {
     public CurationStep(Map<String, String> initialValues, Map<String, String> updatedValues,
                         NamedContext context, CurationStatus status, List<String> comments) {
         // Create copies
-        Map<String, String> initialElementValues = new HashMap<>(initialValues);
-        Map<String, String> finalElementValues = new HashMap<>();
-
         if (updatedValues != null) {
             finalElementValues.putAll(initialValues);
             finalElementValues.putAll(updatedValues);

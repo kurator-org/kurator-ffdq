@@ -35,6 +35,15 @@ public class Measure extends Assertion {
     super.setContext(context);
     super.setResult(result);
   }
+
+  public Measure(Measure m) {
+    setDimension(m.getDimension());
+    setSpecification(m.getSpecification());
+    setMechanism(m.getMechanism());
+    setContext(m.getContext());
+    setResult(m.getResult());
+  }
+
   public String getDimension(){
     return this.dimension;
   }

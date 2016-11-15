@@ -42,15 +42,27 @@ public class NamedContext {
     }
 
     public List<String> getFieldsConsulted() {
-        return fields.getConsulted();
+        if (fields != null) {
+            return fields.getConsulted();
+        } else {
+            return Collections.EMPTY_LIST;
+        }
     }
 
     public List<String> getFieldsActedUpon() {
-        return fields.getActedUpon();
+        if (fields != null) {
+            return fields.getActedUpon();
+        } else {
+            return Collections.EMPTY_LIST;
+        }
     }
 
     public Map<String, String> getProperties() {
-        return fields.getProperties();
+        if (fields != null) {
+            return fields.getProperties();
+        } else {
+            return Collections.EMPTY_MAP;
+        }
     }
 
     @Override

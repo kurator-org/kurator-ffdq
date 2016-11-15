@@ -29,12 +29,23 @@ public class Improvement extends Assertion{
 
   public Improvement() {} // default constructor for Jackson
 
-  public Improvement (String enhancement, String specification, String mechanism, Context context, Result result){
+  public Improvement(String enhancement, String specification, String mechanism, Context context, Result result){
     this.enhancement = enhancement;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
     super.setContext(context);
     super.setResult(result);
+  }
+
+  /**
+   * Copy constructor
+   */
+  public Improvement(Improvement i) {
+    setEnhancement(i.getEnhancement());
+    setSpecification(i.getSpecification());
+    setMechanism(i.getMechanism());
+    setContext(i.getContext());
+    setResult(i.getResult());
   }
 
   public String getEnhancement(){

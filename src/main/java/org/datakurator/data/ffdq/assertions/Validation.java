@@ -36,6 +36,14 @@ public class Validation extends Assertion{
     super.setResult(result);
   }
 
+  public Validation(Validation v) {
+    setCriterion(v.getCriterion());
+    setSpecification(v.getSpecification());
+    setMechanism(v.getMechanism());
+    setContext(v.getContext());
+    setResult(v.getResult());
+  }
+
   public String getCriterion(){
     return this.criterion;
   }
