@@ -38,6 +38,8 @@ public class CurationStep {
      */
     private Map<String,String> finalElementValues = new HashMap<>();
 
+    private Map<String, CurationStatus> fieldStatus = new HashMap<>();
+
     /**
      * An ordered list of comments made by the curation step in evaluating the initial element
      * values.  Provides provenance for the curation states and any changes proposed in the
@@ -82,6 +84,13 @@ public class CurationStep {
         if (updatedValues != null) {
             // Merge any updates with the final values constructed from initial
             finalElementValues.putAll(updatedValues);
+
+            // Set field status for updated fields
+
+            for (String field : updatedValues.keySet()) {
+                if (status != null)
+                    fieldStatus.put(field, status);
+            }
         }
         
         this.curationContext = context;
@@ -126,6 +135,10 @@ public class CurationStep {
      */
     public CurationStatus getCurationStatus() {
         return recordStatus;
+    }
+
+    public Map<String, CurationStatus> getFieldStatus() {
+        return fieldStatus;
     }
 
     /**

@@ -173,6 +173,25 @@ public class BaseRecord {
         currentStage.addCurationStep(update, context);
     }
 
+    /**
+     * Obtain a list of just the updates associated with a particular field context.
+     *
+     * @return context to curation steps map
+     */
+    public List<CurationStep> getCurationHistory(String field) {
+        List<CurationStep> history = new ArrayList<>();
+
+        for (CurationStage stage : curationStages.values()) {
+            history.addAll(stage.getCurationHistory(field));
+        }
+
+        return history;
+    }
+
+    public Set<String> getFieldNames() {
+        return currentValues.keySet();
+    }
+
     public CurationStage getCurationStage(String stageName) {
         return currentStage;
     }

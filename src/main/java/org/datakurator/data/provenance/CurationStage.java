@@ -84,6 +84,17 @@ public class CurationStage {
         return curationHistory.get(context);
     }
 
+    public List<CurationStep> getCurationHistory(String field) {
+        List<CurationStep> curationSteps = new ArrayList<>();
+
+        for (CurationStep step : updateHistory) {
+            if (step.getFieldsActedUpon().contains(field)) {
+                curationSteps.add(step);
+            }
+        }
+
+        return curationSteps;
+    }
     /**
      * The name of this stage (pre enhancement, enhancement, post enhancemen)
      *

@@ -20,6 +20,7 @@ package org.datakurator.data.ffdq;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.datakurator.data.ffdq.assertions.DQReportStage;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 public class DQReport {
     private String recordId;
+    private DataResource dataResource;
     private List<DQReportStage> stages = new ArrayList<>();
 
     public DQReport() { }
@@ -60,6 +62,13 @@ public class DQReport {
         stages.add(reportStage);
     }
 
+    public DataResource getDataResource() {
+        return dataResource;
+    }
+
+    public void setDataResource(DataResource dataResource) {
+        this.dataResource = dataResource;
+    }
 
     /**
      * Serialize the report as json
