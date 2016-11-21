@@ -17,10 +17,6 @@
 
 package org.datakurator.data.ffdq.assertions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,34 +29,34 @@ import java.util.List;
 public class DQReportStage {
   private String stage;
 
-  private List<Measure> measures;
-  private List<Validation> validations;
-  private List<Improvement> improvements;
+  private List<DQMeasure> measures;
+  private List<DQValidation> validations;
+  private List<DQImprovement> improvements;
 
   public DQReportStage(String stage) {
     this.stage = stage;
 
-    this.measures = new ArrayList<Measure>();
-    this.validations = new ArrayList<Validation>();
-    this.improvements = new ArrayList<Improvement>();
+    this.measures = new ArrayList<DQMeasure>();
+    this.validations = new ArrayList<DQValidation>();
+    this.improvements = new ArrayList<DQImprovement>();
   }
 
-  public void pushMeasure(Measure measure){
+  public void pushMeasure(DQMeasure measure){
     this.measures.add(measure);
   }
-  public void pushValidation(Validation validation){
+  public void pushValidation(DQValidation validation){
     this.validations.add(validation);
   }
-  public void pushImprovement(Improvement improvement){
+  public void pushImprovement(DQImprovement improvement){
     this.improvements.add(improvement);
   }
-  public List<Measure> getMeasures(){
+  public List<DQMeasure> getMeasures(){
     return this.measures;
   }
-  public List<Validation> getValidations(){
+  public List<DQValidation> getValidations(){
     return this.validations;
   }
-  public List<Improvement> getImprovements(){
+  public List<DQImprovement> getImprovements(){
     return this.improvements;
   }
 

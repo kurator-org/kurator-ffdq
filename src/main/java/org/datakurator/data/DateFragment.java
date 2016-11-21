@@ -1,9 +1,6 @@
 package org.datakurator.data;
 
-import org.datakurator.data.BaseRecord;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.datakurator.data.provenance.FFDQRecord;
 
 /**
  * Created by lowery on 11/8/16.

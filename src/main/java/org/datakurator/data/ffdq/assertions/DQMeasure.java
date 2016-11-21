@@ -1,4 +1,4 @@
-/**  Improvement.java
+/**  DQMeasure.java
  *
  * Copyright 2016 President and Fellows of Harvard College
  *
@@ -15,44 +15,40 @@
  * limitations under the License.
  */
 
-
 package org.datakurator.data.ffdq.assertions;
 
 /**
- * Represents an improvement assertion in FFDQ.
+ * Represents a measure assertion in FFDQ.
  *
  * @author allankv
  * @author lowery
  */
-public class Improvement extends Assertion{
-  private String enhancement;
+public class DQMeasure extends DQAssertion {
+  private String dimension;
 
-  public Improvement() {} // default constructor for Jackson
+  public DQMeasure() {} // default constructor for Jackson
 
-  public Improvement(String enhancement, String specification, String mechanism, Context context, Result result){
-    this.enhancement = enhancement;
+  public DQMeasure(String dimension, String specification, String mechanism, Context context, Result result){
+    this.dimension = dimension;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
     super.setContext(context);
     super.setResult(result);
   }
 
-  /**
-   * Copy constructor
-   */
-  public Improvement(Improvement i) {
-    setEnhancement(i.getEnhancement());
-    setSpecification(i.getSpecification());
-    setMechanism(i.getMechanism());
-    setContext(i.getContext());
-    setResult(i.getResult());
+  public DQMeasure(DQMeasure m) {
+    setDimension(m.getDimension());
+    setSpecification(m.getSpecification());
+    setMechanism(m.getMechanism());
+    setContext(m.getContext());
+    setResult(m.getResult());
   }
 
-  public String getEnhancement(){
-    return this.enhancement;
+  public String getDimension(){
+    return this.dimension;
   }
 
-  public void setEnhancement(String enhancement) {
-    this.enhancement = enhancement;
+  public void setDimension(String dimension) {
+    this.dimension = dimension;
   }
 }

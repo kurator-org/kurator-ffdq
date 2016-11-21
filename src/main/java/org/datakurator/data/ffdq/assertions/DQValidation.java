@@ -1,4 +1,4 @@
-/**  Measure.java
+/**  DQValidation.java
  *
  * Copyright 2016 President and Fellows of Harvard College
  *
@@ -18,37 +18,37 @@
 package org.datakurator.data.ffdq.assertions;
 
 /**
- * Represents a measure assertion in FFDQ.
+ * Represents a validation assertion in FFDQ.
  *
  * @author allankv
  * @author lowery
  */
-public class Measure extends Assertion {
-  private String dimension;
+public class DQValidation extends DQAssertion {
+  private String criterion;
 
-  public Measure() {} // default constructor for Jackson
+  public DQValidation() {} // default constructor for Jackson
 
-  public Measure (String dimension, String specification, String mechanism, Context context, Result result){
-    this.dimension = dimension;
+  public DQValidation(String criterion, String specification, String mechanism, Context context, Result result){
+    this.criterion = criterion;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
     super.setContext(context);
     super.setResult(result);
   }
 
-  public Measure(Measure m) {
-    setDimension(m.getDimension());
-    setSpecification(m.getSpecification());
-    setMechanism(m.getMechanism());
-    setContext(m.getContext());
-    setResult(m.getResult());
+  public DQValidation(DQValidation v) {
+    setCriterion(v.getCriterion());
+    setSpecification(v.getSpecification());
+    setMechanism(v.getMechanism());
+    setContext(v.getContext());
+    setResult(v.getResult());
   }
 
-  public String getDimension(){
-    return this.dimension;
+  public String getCriterion(){
+    return this.criterion;
   }
 
-  public void setDimension(String dimension) {
-    this.dimension = dimension;
+  public void setCriterion(String criterion) {
+    this.criterion = criterion;
   }
 }

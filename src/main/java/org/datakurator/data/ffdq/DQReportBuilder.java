@@ -89,7 +89,7 @@ public class DQReportBuilder {
             GlobalContext globalContext = result.getGlobalContext();
             contextProps.putAll(globalContext.getProperties());
 
-            Assertion assertion = assertions.forContext(context.getName());
+            DQAssertion assertion = assertions.forContext(context.getName());
             contextProps.putAll(context.getProperties());
 
             // Set record id
@@ -120,8 +120,8 @@ public class DQReportBuilder {
                 comments.addAll(step.getCurationComments());
             }
 
-            if (assertion instanceof Measure) {
-                Measure measure = (Measure) assertion;
+            if (assertion instanceof DQMeasure) {
+                DQMeasure measure = (DQMeasure) assertion;
 
                 String dimension = sub.replace(measure.getDimension());
                 measure.setDimension(dimension);
@@ -135,8 +135,8 @@ public class DQReportBuilder {
                 }
 
                 report.pushMeasure(measure);
-            } else if (assertion instanceof Validation) {
-                Validation validation = (Validation) assertion;
+            } else if (assertion instanceof DQValidation) {
+                DQValidation validation = (DQValidation) assertion;
 
                 String criterion = sub.replace(validation.getCriterion());
                 validation.setCriterion(criterion);
@@ -146,8 +146,8 @@ public class DQReportBuilder {
                 assertion.setResult(dataResource);
 
                 report.pushValidation(validation);
-            } else if (assertion instanceof Improvement) {
-                Improvement improvement = (Improvement) assertion;
+            } else if (assertion instanceof DQImprovement) {
+                DQImprovement improvement = (DQImprovement) assertion;
 
                 String enhancement = sub.replace(improvement.getEnhancement());
                 improvement.setEnhancement(enhancement);

@@ -1,4 +1,4 @@
-/**  Assertion.java
+/**  DQAssertion.java
  *
  * Copyright 2016 President and Fellows of Harvard College
  *
@@ -25,7 +25,7 @@ import java.util.List;
  * @author allankv
  * @author lowery
  */
-public abstract class Assertion {
+public abstract class DQAssertion {
   private String recordId;
 
   private Context context;

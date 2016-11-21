@@ -17,10 +17,10 @@
 
 package org.datakurator.data.ffdq;
 
-import org.datakurator.data.ffdq.assertions.Assertion;
-import org.datakurator.data.ffdq.assertions.Improvement;
-import org.datakurator.data.ffdq.assertions.Measure;
-import org.datakurator.data.ffdq.assertions.Validation;
+import org.datakurator.data.ffdq.assertions.DQAssertion;
+import org.datakurator.data.ffdq.assertions.DQImprovement;
+import org.datakurator.data.ffdq.assertions.DQMeasure;
+import org.datakurator.data.ffdq.assertions.DQValidation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,57 +33,57 @@ import java.util.Map;
  * @author lowery
  */
 public class AssertionsConfig {
-    private Map<String, Assertion> assertionMap = new HashMap<>();
+    private Map<String, DQAssertion> assertionMap = new HashMap<>();
 
-    private List<Measure> measures = new ArrayList<>();
-    private List<Validation> validations = new ArrayList<>();
-    private List<Improvement> improvements = new ArrayList<>();
+    private List<DQMeasure> measures = new ArrayList<>();
+    private List<DQValidation> validations = new ArrayList<>();
+    private List<DQImprovement> improvements = new ArrayList<>();
 
     public AssertionsConfig() { }
 
-    public List<Measure> getMeasures() {
+    public List<DQMeasure> getMeasures() {
         return measures;
     }
 
-    public void setMeasures(List<Measure> measures) {
+    public void setMeasures(List<DQMeasure> measures) {
         this.measures = measures;
         mapAssertions(measures);
     }
 
-    private void mapAssertions(List<? extends Assertion> assertions) {
-        for (Assertion assertion : assertions) {
+    private void mapAssertions(List<? extends DQAssertion> assertions) {
+        for (DQAssertion assertion : assertions) {
             assertionMap.put(assertion.getContext().getName(), assertion);
         }
     }
 
-    public List<Validation> getValidations() {
+    public List<DQValidation> getValidations() {
         return validations;
     }
 
-    public void setValidations(List<Validation> validations) {
+    public void setValidations(List<DQValidation> validations) {
         this.validations = validations;
         mapAssertions(validations);
     }
 
-    public List<Improvement> getImprovements() {
+    public List<DQImprovement> getImprovements() {
         return improvements;
     }
 
-    public void setImprovements(List<Improvement> improvements) {
+    public void setImprovements(List<DQImprovement> improvements) {
         this.improvements = improvements;
         mapAssertions(improvements);
     }
 
-    public Assertion forContext(String name) {
+    public DQAssertion forContext(String name) {
         // TODO: This functionality needs to be refactored to be less fragile. Use the factory pattern instead.
-        Assertion assertion = assertionMap.get(name);
+        DQAssertion assertion = assertionMap.get(name);
 
-        if (assertion instanceof Measure) {
-            return new Measure((Measure) assertion);
-        } else if (assertion instanceof Validation) {
-            return new Validation((Validation) assertion);
-        } else if (assertion instanceof Improvement) {
-            return new Improvement((Improvement) assertion);
+        if (assertion instanceof DQMeasure) {
+            return new DQMeasure((DQMeasure) assertion);
+        } else if (assertion instanceof DQValidation) {
+            return new DQValidation((DQValidation) assertion);
+        } else if (assertion instanceof DQImprovement) {
+            return new DQImprovement((DQImprovement) assertion);
         }
 
         return null; // Unsupported assertion type

@@ -17,6 +17,8 @@
 
 package org.datakurator.data.provenance;
 
+import org.datakurator.data.ffdq.assertions.DQAssertion;
+
 import java.util.*;
 
 /**
@@ -68,14 +70,18 @@ public class BaseRecord {
         this.recordId = recordId;
     }
 
+    public BaseAssertion assertUpdate() {
+        return new BaseAssertion(this);
+    }
+
     /**
      * Contextual update of record state that appends a comment without changes to field values and status.
      *
      * @param context
      * @param comment
      */
-    public void update(NamedContext context, String comment) {
-        CurationStep update = new CurationStep(currentValues, null, context, currentStatus, Collections.singletonList(comment));
+    public void update(NamedContext context, String... comment) {
+        CurationStep update = new CurationStep(currentValues, null, context, currentStatus, Arrays.asList(comment));
         addCurationStep(update, context);
     }
 
@@ -98,16 +104,15 @@ public class BaseRecord {
      * one or more comments.
      *
      * @param context
-     * @param field
-     * @param value
+     * @param updates
      * @param status
      * @param comment
      */
-    public void update(NamedContext context, String field, String value, CurationStatus status, String... comment) {
-        CurationStep update = new CurationStep(currentValues, Collections.singletonMap(field, value), context, status, Arrays.asList(comment));
+    public void update(NamedContext context, Map<String, String> updates, CurationStatus status, String... comment) {
+        CurationStep update = new CurationStep(currentValues, updates, context, status, Arrays.asList(comment));
         addCurationStep(update, context);
 
-        currentValues.put(field, value);
+        currentValues.putAll(updates);
         currentStatus = status;
     }
 
@@ -138,16 +143,15 @@ public class BaseRecord {
      * Update of record state that involves updates to a field, change of curation status and
      * one or more comments.
      *
-     * @param field
-     * @param value
+     * @param updates
      * @param status
      * @param comment
      */
-    public void update(String field, String value, CurationStatus status, String... comment) {
-        CurationStep update = new CurationStep(currentValues, Collections.singletonMap(field, value), null, status, Arrays.asList(comment));
+    public void update(Map<String, String> updates, CurationStatus status, String... comment) {
+        CurationStep update = new CurationStep(currentValues, updates, null, status, Arrays.asList(comment));
         addCurationStep(update);
 
-        currentValues.put(field, value);
+        currentValues.putAll(updates);
         currentStatus = status;
     }
 

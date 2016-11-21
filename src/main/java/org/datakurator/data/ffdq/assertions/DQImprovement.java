@@ -1,4 +1,4 @@
-/**  Validation.java
+/**  DQImprovement.java
  *
  * Copyright 2016 President and Fellows of Harvard College
  *
@@ -15,40 +15,44 @@
  * limitations under the License.
  */
 
+
 package org.datakurator.data.ffdq.assertions;
 
 /**
- * Represents a validation assertion in FFDQ.
+ * Represents an improvement assertion in FFDQ.
  *
  * @author allankv
  * @author lowery
  */
-public class Validation extends Assertion{
-  private String criterion;
+public class DQImprovement extends DQAssertion {
+  private String enhancement;
 
-  public Validation() {} // default constructor for Jackson
+  public DQImprovement() {} // default constructor for Jackson
 
-  public Validation (String criterion, String specification, String mechanism, Context context, Result result){
-    this.criterion = criterion;
+  public DQImprovement(String enhancement, String specification, String mechanism, Context context, Result result){
+    this.enhancement = enhancement;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
     super.setContext(context);
     super.setResult(result);
   }
 
-  public Validation(Validation v) {
-    setCriterion(v.getCriterion());
-    setSpecification(v.getSpecification());
-    setMechanism(v.getMechanism());
-    setContext(v.getContext());
-    setResult(v.getResult());
+  /**
+   * Copy constructor
+   */
+  public DQImprovement(DQImprovement i) {
+    setEnhancement(i.getEnhancement());
+    setSpecification(i.getSpecification());
+    setMechanism(i.getMechanism());
+    setContext(i.getContext());
+    setResult(i.getResult());
   }
 
-  public String getCriterion(){
-    return this.criterion;
+  public String getEnhancement(){
+    return this.enhancement;
   }
 
-  public void setCriterion(String criterion) {
-    this.criterion = criterion;
+  public void setEnhancement(String enhancement) {
+    this.enhancement = enhancement;
   }
 }
