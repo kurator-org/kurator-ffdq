@@ -17,7 +17,6 @@
 
 package org.datakurator.data.provenance;
 
-import org.datakurator.data.annotations.Curation;
 import org.datakurator.data.ffdq.assertions.DQAssertion;
 
 import java.util.*;
