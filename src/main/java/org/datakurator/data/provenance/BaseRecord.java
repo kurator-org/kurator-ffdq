@@ -17,6 +17,7 @@
 
 package org.datakurator.data.provenance;
 
+import org.datakurator.data.annotations.Curation;
 import org.datakurator.data.ffdq.assertions.DQAssertion;
 
 import java.util.*;
@@ -211,6 +212,13 @@ public class BaseRecord {
 
     public CurationStatus getCurationStatus() {
         return currentStatus;
+    }
+
+    public CurationStatus getCurationStatus(String field) {
+        List<CurationStep> curationSteps = getCurationHistory(field);
+        CurationStep last = curationSteps.get(curationSteps.size()-1);
+
+        return last.getFieldStatus().get(field);
     }
 
     public GlobalContext getGlobalContext() {
