@@ -146,10 +146,6 @@ public class DQReportBuilder {
                 Result dataResource = new Result(initialValues, curatedValues, comments, status.toString());
                 assertion.setResult(dataResource);
 
-                for (CurationStep step : curationSteps) {
-                    System.out.println(step);
-                }
-
                 report.pushMeasure(measure);
             } else if (assertion instanceof DQValidation) {
                 DQValidation validation = (DQValidation) assertion;
