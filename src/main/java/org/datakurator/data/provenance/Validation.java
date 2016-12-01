@@ -15,4 +15,9 @@ public class Validation extends FFDQAssertion {
     public void nonCompliant(String... comment) {
         update(getContext(), CurationStatus.NOT_COMPLIANT, comment);
     }
+    
+    public void ambiguous(String... comment) {
+        update(getContext(), CurationStatus.AMBIGUOUS, comment);
+    }    
+    
 }

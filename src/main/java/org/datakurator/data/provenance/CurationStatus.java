@@ -25,41 +25,56 @@ package org.datakurator.data.provenance;
 public enum CurationStatus {
 
     /**
-     * Indicates whether or not issues were found in the data per the specification.
+     * For Validations, indicates whether or not issues were found in the data per the specification.
      */
     COMPLIANT,
     NOT_COMPLIANT,
 
 
     /**
-     * Indicates whether or not a measurement is considered complete.
+     * For Measures, indicates whether or not a measurement is considered complete.
      */
     COMPLETE,
     NOT_COMPLETE,
 
     /**
-     * Indicates that a change to the data has been proposed.
+     * For Enhancements, indicates that a change to the data has been proposed.
      */
     CURATED,
 
     /**
-     * Indicates that one or more terms which were blank in the input have been
+     * For Enhancements, indicates that one or more terms which were blank in the input have been
      * filled in with some non-blank value in the output.
      */
     FILLED_IN,
 
+    
+    /**
+     * For Validations or Measures, indicates that the data are internally inconsistent in
+     * some way that makes the test result ambiguous, equivalent to the concept of 
+     * SOLVE_WITH_MORE_DATA, in that some data in addition to that considered by the Context
+     * is needed to resolve the ambiguity.  For a validation that explicitly tests for ambiguity,
+     * use COMPLIANT or NOT_COMPLIANT as responses, AMBIGUOUS should be reserved for tests that
+     * are asking other questions.  For example, given a value for a year of '82', and an 
+     * assumption that the data probably represent dates in the range 1600-2000, a validation test
+     * that checks if a year is specified should report NOT_COMPLIANT, while a validation test
+     * that compares that year to a person's life span should report AMBIGUOUS, if one of the possible
+     * years of 1682, or 1782, or 1882, or 1982 fall within the person's life span. 
+     */
+    AMBIGUOUS,
 
     /**
-     * Indicates that it was possible to perform the tests of the specification on the
-     * data, but that it was not possible to validate the provided data to the specification.
+     * Some prerequisite inherent in the data for performing the tests or enhancements in the 
+     * specification was not met, such as some required field was missing, or a value under 
+     * test being out of range.  Thus it was not possible to validate, measure, or enhance
+     * the provided data to the specification.
      */
     DATA_PREREQUISITES_NOT_MET,
-    DATA_PREREQUISITES_AMBIGUOUS,
 
     /**
-     * Some prerequisite for performing the tests in the specification was not met.  This could
-     * be internal to the data (some required field was missing), or external (a webservice
-     * was down and unable to be consulted).
+     * Some prerequisite external to the provided data for performing the tests or enhancements
+     * in the specification was not met.  For example, a webservice was down and unable to be 
+     * consulted per the specification.
      */
     EXTERNAL_PREREQUISITES_NOT_MET,
 }
