@@ -6,6 +6,8 @@ A library that provides support for using the FFDQ framework for making data qua
 
 # Include using maven
 
+Available from maven central.
+
     <dependency>
         <groupId>org.datakurator</groupId>
         <artifactId>kurator-ffdq</artifactId>
