@@ -2,6 +2,7 @@
 
 A library that provides support for using the FFDQ framework for making data quality assertions.
 
+[![DOI](https://zenodo.org/badge/72672241.svg)](https://zenodo.org/badge/latestdoi/72672241)
 
 # Include using maven
 
