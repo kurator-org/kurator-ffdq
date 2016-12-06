@@ -3,10 +3,7 @@ package org.datakurator.postprocess;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.datakurator.data.ffdq.AssertionsConfig;
 import org.datakurator.data.ffdq.DQReport;
 import org.datakurator.data.ffdq.DataResource;
@@ -67,7 +64,7 @@ public class MeasureSummary {
     }
 
     private double calculatePercentageComplete(int countComplete) {
-        return (countComplete/countTotalReports)*100.0;
+        return (countComplete/(double) countTotalReports)*100.0;
     }
 
     public String getTitle() {
@@ -87,28 +84,97 @@ public class MeasureSummary {
     }
 
     public void writeXls(OutputStream out) throws IOException {
+
         Workbook workbook = new HSSFWorkbook();
+
+        // initialize styles
+
+
+        Font whiteFont = workbook.createFont();
+        whiteFont.setColor(IndexedColors.WHITE.getIndex());
+
+        CellStyle quarter = workbook.createCellStyle();  // 0 - 25%
+        quarter.setFillForegroundColor(IndexedColors.RED.getIndex());
+        quarter.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        quarter.setFont(whiteFont);
+
+        CellStyle half = workbook.createCellStyle();  // 25 - 50%
+        half.setFillForegroundColor(IndexedColors.ORANGE.getIndex());
+        half.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        half.setFont(whiteFont);
+
+        CellStyle threeQuarters = workbook.createCellStyle();  // 50 - 75%
+        threeQuarters.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        threeQuarters.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+        CellStyle full = workbook.createCellStyle();  // 75 - 100%
+        full.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+        full.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        full.setFont(whiteFont);
+
+        CellStyle[] bgColors = { quarter, half, threeQuarters, full };
+
+        Font headerFont = workbook.createFont();
+        headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+
         Sheet sheet = workbook.createSheet("Summary");
 
         // create header
         Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("measure");
-        header.createCell(1).setCellValue("before");
-        header.createCell(2).setCellValue("after");
-        header.createCell(3).setCellValue("count");
+        Cell headerCell = header.createCell(0);
+        headerCell.setCellValue("Measure");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = header.createCell(1);
+        headerCell.setCellValue("Before");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = header.createCell(2);
+        headerCell.setCellValue("After");
+        headerCell.setCellStyle(headerStyle);
+
+        headerCell = header.createCell(3);
+        headerCell.setCellValue("Count");
+        headerCell.setCellStyle(headerStyle);
 
         // measure summary
         Row summary = sheet.createRow(1);
         summary.createCell(0).setCellValue(getTitle());
-        summary.createCell(1).setCellValue(getBefore());
-        summary.createCell(2).setCellValue(getAfter());
+
+        Cell beforeCell = summary.createCell(1);
+        beforeCell.setCellValue(getBefore());
+
+        applyStyleForValue(beforeCell, getBefore(), bgColors, whiteFont);
+
+        Cell afterCell = summary.createCell(2);
+        afterCell.setCellValue(getAfter());
+
+        applyStyleForValue(afterCell, getAfter(), bgColors, whiteFont);
+
         summary.createCell(3).setCellValue(getTotal());
+
+        // auto resize first column with measure name
+        sheet.autoSizeColumn(0);
 
         workbook.write(out);
         out.close();
         workbook.close();
     }
 
+    private void applyStyleForValue(Cell cell, double value, CellStyle[] styles, Font font) {
+        if (value < 25) {
+            cell.setCellStyle(styles[0]);
+        } else if (value >= 25 && value < 50) {
+            cell.setCellStyle(styles[1]);
+        } else if (value >= 50 && value < 75) {
+            cell.setCellStyle(styles[2]);
+        } else if (value >= 75) {
+            cell.setCellStyle(styles[3]);
+        }
+    }
 
     public void writeJson(OutputStream out) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
