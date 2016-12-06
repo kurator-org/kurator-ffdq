@@ -17,6 +17,8 @@
 
 package org.datakurator.data.ffdq.assertions;
 
+import org.datakurator.data.ffdq.DQReport;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,8 @@ public class DQReportStage {
   private List<DQMeasure> measures;
   private List<DQValidation> validations;
   private List<DQImprovement> improvements;
+
+  public DQReportStage() { }
 
   public DQReportStage(String stage) {
     this.stage = stage;
