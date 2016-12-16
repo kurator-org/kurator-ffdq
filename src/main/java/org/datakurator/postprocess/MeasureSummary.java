@@ -6,34 +6,29 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.datakurator.data.ffdq.AssertionsConfig;
 import org.datakurator.data.ffdq.DQReport;
-import org.datakurator.data.ffdq.DataResource;
+import org.datakurator.data.ffdq.DQReportBuilder;
 import org.datakurator.data.ffdq.assertions.DQMeasure;
 import org.datakurator.data.ffdq.assertions.DQReportStage;
 import org.datakurator.data.provenance.CurationStage;
 import org.datakurator.data.provenance.CurationStatus;
-import org.datakurator.data.provenance.Measure;
+import org.json.simple.JSONObject;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.List;
 
 /**
  * Created by lowery on 11/21/16.
  */
 public class MeasureSummary {
-    private String title;
-    private String namedContext;
+    private DQMeasure measure;
 
     private int countTotalReports;
 
     private int countCompleteBefore = 0;
     private int countCompleteAfter = 0;
 
-    public MeasureSummary(String title, String namedContext) {
-        this.title = title;
-        this.namedContext = namedContext;
+    public MeasureSummary(DQMeasure measure) {
+        this.measure = measure;
     }
 
     public void postprocess(List<DQReport> reports) {
@@ -53,6 +48,8 @@ public class MeasureSummary {
     }
 
     private boolean measureIsComplete(List<DQMeasure> measures) {
+        String namedContext = measure.getContext().getName();
+
         for (DQMeasure measure : measures) {
             if (measure.getContext().getName().equals(namedContext)) {
                 return measure.getResult().getStatus().equals(CurationStatus.COMPLETE.name());
@@ -64,24 +61,79 @@ public class MeasureSummary {
     }
 
     private double calculatePercentageComplete(int countComplete) {
-        return (countComplete/(double) countTotalReports)*100.0;
+        return countTotalReports;
     }
 
     public String getTitle() {
-        return title;
+        return measure.getLabel();
     }
 
-    public double getBefore() {
-        return calculatePercentageComplete(countCompleteBefore);
+    public int getCompleteBefore() {
+        return countCompleteBefore;
     }
 
-    public double getAfter() {
-        return calculatePercentageComplete(countCompleteAfter);
+    public int getCompleteAfter() {
+        return countCompleteAfter;
     }
 
-    public double getTotal() {
+    public int getIncompleteBefore() {
+        return getTotal() - countCompleteBefore;
+    }
+
+    public int getIncompleteAfter() {
+        return getTotal() - countCompleteAfter;
+    }
+
+    public String getLabel() {
+        return measure.getLabel();
+    }
+
+    public String getDimension() {
+        return measure.getDimension();
+    }
+
+    public String getMechanism() {
+        return measure.getMechanism();
+    }
+
+    public String getSpecification() {
+        return  measure.getSpecification();
+    }
+
+
+    public int getTotal() {
         return countTotalReports;
     }
+
+    public String toJson() {
+        JSONObject before = new JSONObject();
+
+        before.put("complete", getCompleteBefore());
+        before.put("incomplete", getIncompleteBefore());
+
+        JSONObject after = new JSONObject();
+
+        after.put("complete", getCompleteAfter());
+        after.put("incomplete", getIncompleteAfter());
+
+        JSONObject summary = new JSONObject();
+
+        summary.put("title", getTitle());
+        summary.put("specification", getSpecification());
+        summary.put("mechanism", getMechanism());
+        summary.put("before", before);
+        summary.put("after", after);
+
+        return summary.toJSONString();
+    }
+
+    public void writeJson(OutputStream out) throws IOException {
+        Writer writer = new OutputStreamWriter(out);
+        writer.write(toJson());
+        writer.flush();
+        writer.close();
+    }
+
 
     public void writeXls(OutputStream out) throws IOException {
 
@@ -145,14 +197,14 @@ public class MeasureSummary {
         summary.createCell(0).setCellValue(getTitle());
 
         Cell beforeCell = summary.createCell(1);
-        beforeCell.setCellValue(getBefore());
+        beforeCell.setCellValue(getCompleteBefore());
 
-        applyStyleForValue(beforeCell, getBefore(), bgColors, whiteFont);
+        applyStyleForValue(beforeCell, getCompleteBefore(), bgColors, whiteFont);
 
         Cell afterCell = summary.createCell(2);
-        afterCell.setCellValue(getAfter());
+        afterCell.setCellValue(getCompleteAfter());
 
-        applyStyleForValue(afterCell, getAfter(), bgColors, whiteFont);
+        applyStyleForValue(afterCell, getCompleteAfter(), bgColors, whiteFont);
 
         summary.createCell(3).setCellValue(getTotal());
 
@@ -176,25 +228,31 @@ public class MeasureSummary {
         }
     }
 
-    public void writeJson(OutputStream out) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.writerWithDefaultPrettyPrinter().writeValue(out, this);
-    }
-
     public static void main(String[] args) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         List<DQReport> reports = mapper.readValue(MeasureSummary.class.getResourceAsStream("/dq_report.json"),
                 new TypeReference<List<DQReport>>(){});
 
-        MeasureSummary summary = new MeasureSummary("Event Date Completeness", "eventDateIsNotEmpty");
-        summary.postprocess(reports);
+        InputStream config = MeasureSummary.class.getResourceAsStream("/ev-assertions.json");
+        DQReportBuilder builder = new DQReportBuilder(config);
 
-        FileOutputStream out = new FileOutputStream("test.xls");
-        summary.writeXls(out);
+        AssertionsConfig assertions = builder.getAssertions();
+        for (DQMeasure measure : assertions.getMeasures()) {
+            MeasureSummary summary = new MeasureSummary(measure);
+            summary.postprocess(reports);
 
-        FileOutputStream outJson = new FileOutputStream("test.json");
-        summary.writeJson(outJson);
+            FileOutputStream outJson = new FileOutputStream(measure.getContext().getName() + ".json");
+            summary.writeJson(outJson);
+        }
+
+
+        //MeasureSummary summary = new MeasureSummary("Event Date Completeness", "eventDateIsNotEmpty");
+
+
+        //FileOutputStream out = new FileOutputStream("test.xls");
+        //summary.writeXls(out);
+
+
     }
 }

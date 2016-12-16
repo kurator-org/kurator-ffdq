@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class DQReport {
     private String recordId;
-    private DataResource dataResource;
+
     private List<DQReportStage> stages = new ArrayList<>();
 
     public DQReport() { }
@@ -60,14 +60,6 @@ public class DQReport {
 
     public void addStage(DQReportStage reportStage) {
         stages.add(reportStage);
-    }
-
-    public DataResource getDataResource() {
-        return dataResource;
-    }
-
-    public void setDataResource(DataResource dataResource) {
-        this.dataResource = dataResource;
     }
 
     /**

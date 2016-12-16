@@ -29,6 +29,8 @@ public abstract class DQAssertion {
   private String recordId;
 
   private Context context;
+  private String label;
+
   private String specification;
   private String mechanism;
   private Result result;
@@ -44,6 +46,14 @@ public abstract class DQAssertion {
 
   public Context getContext() {
     return context;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public void setContext(Context context) {
@@ -81,4 +91,6 @@ public abstract class DQAssertion {
   public void setRecordId(String recordId) {
     this.recordId = recordId;
   }
+
+
 }
