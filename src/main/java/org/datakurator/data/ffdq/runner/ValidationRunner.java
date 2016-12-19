@@ -1,15 +1,14 @@
 package org.datakurator.data.ffdq.runner;
 
-import org.datakurator.ffdq.annotations.ActedUpon;
-import org.datakurator.ffdq.annotations.Consulted;
-import org.datakurator.ffdq.annotations.Provides;
-import org.datakurator.ffdq.api.DQValidation;
+import org.datakurator.data.provenance.BaseRecord;
+import org.datakurator.ffdq.annotations.*;
+import org.datakurator.ffdq.api.DQAmendmentResponse;
+import org.datakurator.ffdq.api.DQMeasurementResponse;
+import org.datakurator.ffdq.api.DQValidationResponse;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,10 @@ public class ValidationRunner {
     private static final int CONSULTED = 1;
 
     private Class cls;
-    private List<ValidationTest> tests = new ArrayList<>();
+
+    private RunnerStage preEnhancementStage = new RunnerStage();
+    private RunnerStage enhancementStage = new RunnerStage();
+    private RunnerStage postEnhancementStage = new RunnerStage();
 
     public ValidationRunner(Class cls) {
         this.cls = cls;
@@ -64,7 +66,14 @@ public class ValidationRunner {
                 Provides provides = method.getAnnotation(Provides.class);
 
                 ValidationTest test = new ValidationTest(provides.value(), method);
-                tests.add(test);
+
+                if (method.isAnnotationPresent(PreEnhancement.class)) {
+                    addToStage(test, method, preEnhancementStage);
+                } else if (method.isAnnotationPresent(PostEnhancement.class)) {
+                    addToStage(test, method, postEnhancementStage);
+                } else if (method.isAnnotationPresent(Enhancement.class)) {
+                    addToStage(test, method, enhancementStage);
+                }
 
                 // Parse parameter annotations
                 processParameters(test);
@@ -74,10 +83,51 @@ public class ValidationRunner {
         //System.out.println(tests);
     }
 
-    public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        Object instance = cls.newInstance();
+    private void addToStage(ValidationTest test, Method method, RunnerStage stage) {
+        if(method.isAnnotationPresent(Measure.class)) {
+            stage.getMeasures().add(test);
+        } else if (method.isAnnotationPresent(Validation.class)) {
+            stage.getValidations().add(test);
+        } else if (method.isAnnotationPresent(Amendment.class)) {
+            stage.getAmendments().add(test);
+        }
+    }
 
-        for (ValidationTest test : tests) {
+    public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        BaseRecord baseRecord = new BaseRecord(record);
+
+        Object instance = cls.newInstance();
+        runStage(preEnhancementStage, baseRecord, instance);
+        runStage(enhancementStage, baseRecord, instance);
+        runStage(postEnhancementStage, baseRecord, instance);
+
+    }
+
+    private void runStage(RunnerStage stage, BaseRecord baseRecord, Object instance) throws InvocationTargetException, IllegalAccessException {
+        for (ValidationTest validation : stage.getValidations()) {
+            DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, baseRecord.getFinalValues()));
+
+            System.out.println("Validation { name=" + validation.getName() + ", method=" + validation.getMethod().getName() +
+                    ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
+        }
+
+        for (ValidationTest measure : stage.getMeasures()) {
+            DQMeasurementResponse retVal = (DQMeasurementResponse) measure.getMethod().invoke(instance, assembleArgs(measure,  baseRecord.getFinalValues()));
+
+            System.out.println("Validation { name=" + measure.getName() + ", method=" + measure.getMethod().getName() +
+                    ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
+        }
+
+        for (ValidationTest amendment : stage.getAmendments()) {
+            DQAmendmentResponse retVal = (DQAmendmentResponse) amendment.getMethod().invoke(instance, assembleArgs(amendment,  baseRecord.getFinalValues()));
+
+            System.out.println("Validation { name=" + amendment.getName() + ", method=" + amendment.getMethod().getName() +
+                    ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
+        }
+    }
+
+
+    private String[] assembleArgs(ValidationTest test, Map<String, String> record) {
             List<ValidationParam> inputs = test.getInputs();
             String[] args = new String[inputs.size()];
 
@@ -89,10 +139,7 @@ public class ValidationRunner {
                 args[i] = value;
             }
 
-            DQValidation retVal = (DQValidation) test.getMethod().invoke(instance, args);
-
-            System.out.println("Ran test " + test.getName() + " using method " + test.getMethod().getName() + ": " + retVal.getResultState() + " | " + retVal.getComment());
-        }
+            return args;
     }
 
 }
