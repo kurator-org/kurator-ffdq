@@ -25,4 +25,8 @@ public class Measure extends FFDQAssertion {
     public void incomplete(Map<String, String> updates, String... comment) {
         update(getContext(), updates, CurationStatus.NOT_COMPLETE, comment);
     }
+    
+    public void ambiguous(String... comment) {
+        update(getContext(), CurationStatus.AMBIGUOUS, comment);
+    }        
 }

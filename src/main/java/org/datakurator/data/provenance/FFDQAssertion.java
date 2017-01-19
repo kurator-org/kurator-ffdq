@@ -21,4 +21,9 @@ public class FFDQAssertion extends BaseAssertion {
     public void prereqUnmet(String... comment) {
         update(context, CurationStatus.DATA_PREREQUISITES_NOT_MET, comment);
     }
+    
+    public void externalPrereqUnmet(String... comment) {
+        update(context, CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET, comment);
+    }    
+    
 }

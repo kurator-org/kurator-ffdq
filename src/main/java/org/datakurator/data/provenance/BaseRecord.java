@@ -213,6 +213,13 @@ public class BaseRecord {
         return currentStatus;
     }
 
+    public CurationStatus getCurationStatus(String field) {
+        List<CurationStep> curationSteps = getCurationHistory(field);
+        CurationStep last = curationSteps.get(curationSteps.size()-1);
+
+        return last.getFieldStatus().get(field);
+    }
+
     public GlobalContext getGlobalContext() {
         return globalContext;
     }
