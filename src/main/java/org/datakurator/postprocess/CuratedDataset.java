@@ -1,5 +1,8 @@
 package org.datakurator.postprocess;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +18,9 @@ public class CuratedDataset {
     public CuratedDataset(Map<String, String> fields) {
         this.fields = fields;
     }
+    public CuratedDataset() {
+
+    }
 
     public void addRecord(CuratedRecord record) {
         records.add(record);
@@ -26,5 +32,18 @@ public class CuratedDataset {
 
     public Map<String, String> getFields() {
         return fields;
+    }
+
+    public void setFields(Map<String, String> fields) {
+        this.fields = fields;
+    }
+
+    public String toJson() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

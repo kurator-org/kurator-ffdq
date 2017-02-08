@@ -6,7 +6,7 @@
 
     <groupId>org.datakurator</groupId>
     <artifactId>kurator-ffdq</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>kurator-ffdq</name>
     <description>Data quality assertion framework. Provides utilities for capturing provenance data and generation of data quality reports using FFDQ.</description>
     <url>http://wiki.datakurator.org/</url>
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.datakurator</groupId>
             <artifactId>ffdq-api</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

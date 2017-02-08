@@ -63,20 +63,19 @@ public class DQReportBuilder {
 
         DQReport report = new DQReport(result.getRecordId());
 
-//        // Add the data resource
-//
-//        DataResource dataResource = new DataResource();
-//
-//        for (String field : result.getFieldNames()) {
-//            List<CurationStep> curationSteps = result.getCurationHistory(field);
-//            CurationStep first = curationSteps.get(0);
-//            CurationStep last = curationSteps.get(curationSteps.size()-1);
-//
-//            dataResource.add(field, first.getInitialElementValues().get(field),
-//                    last.getFinalElementValues().get(field), last.getFieldStatus().get(field));
-//        }
-//
-//        report.setDataResource(dataResource);
+        // Add the data resource
+        DataResource dataResource = new DataResource();
+        for (String field : result.getFieldNames()) {
+            List<CurationStep> curationSteps = result.getCurationHistory(field);
+            CurationStep first = curationSteps.get(0);
+            CurationStep last = curationSteps.get(curationSteps.size()-1);
+
+            dataResource.setRecordId(result.getRecordId());
+            dataResource.setInitialValues(first.getInitialElementValues());
+            dataResource.setFinalValues(last.getFinalElementValues());
+        }
+
+        report.setDataResource(dataResource);
 
         for (CurationStage stage : result.getCurationStages().values()) {
             DQReportStage reportStage = processStage(stage, result.getRecordId());

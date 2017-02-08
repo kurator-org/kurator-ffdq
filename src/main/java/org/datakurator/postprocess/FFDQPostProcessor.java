@@ -2,14 +2,20 @@ package org.datakurator.postprocess;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.jena.base.Sys;
 import org.datakurator.data.ffdq.AssertionsConfig;
 import org.datakurator.data.ffdq.DQReport;
 import org.datakurator.data.ffdq.DQReportBuilder;
+import org.datakurator.data.ffdq.DataResource;
 import org.datakurator.data.ffdq.assertions.DQMeasure;
+import org.datakurator.data.ffdq.assertions.DQReportStage;
+import org.datakurator.data.provenance.CurationStage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lowery on 11/21/16.
@@ -26,7 +32,6 @@ public class FFDQPostProcessor {
         DQReportBuilder builder = new DQReportBuilder(config);
         assertions = builder.getAssertions();
     }
-
 
     public String measureSummary() throws IOException {
         List<MeasureSummary> measureSummaryList = new ArrayList<>();
@@ -55,5 +60,27 @@ public class FFDQPostProcessor {
         return sb.toString();
     }
 
+    public String curatedDataset() throws IOException {
+        CuratedDataset dataset = new CuratedDataset();
+        Map<String, String> fields = new HashMap<>();
 
+        for (DQReport report : reports) {
+            DataResource data = report.getDataResource();
+            CuratedRecord record = new CuratedRecord(data);
+
+            // include the record id
+            fields.put("recordId", "recordId");
+
+            for (String field : data.getInitialValues().keySet()) {
+                // TODO: mapping of field to label via config
+                fields.put(field, field);
+            }
+
+            dataset.addRecord(record);
+        }
+
+        dataset.setFields(fields);
+
+        return dataset.toJson();
+    }
 }
