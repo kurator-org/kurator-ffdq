@@ -27,6 +27,8 @@ public class MeasureSummary {
     private int countCompleteBefore = 0;
     private int countCompleteAfter = 0;
 
+    private int assurance = 0; // TODO: postprocessor should determine value for this
+
     public MeasureSummary(DQMeasure measure) {
         this.measure = measure;
     }
@@ -84,6 +86,10 @@ public class MeasureSummary {
         return getTotal() - countCompleteAfter;
     }
 
+    public int getAssurance() {
+        return assurance;
+    }
+
     public String getLabel() {
         return measure.getLabel();
     }
@@ -110,11 +116,13 @@ public class MeasureSummary {
 
         before.put("complete", getCompleteBefore());
         before.put("incomplete", getIncompleteBefore());
+        before.put("assurance", getAssurance());
 
         JSONObject after = new JSONObject();
 
         after.put("complete", getCompleteAfter());
         after.put("incomplete", getIncompleteAfter());
+        after.put("assurance", getAssurance());
 
         JSONObject summary = new JSONObject();
 
