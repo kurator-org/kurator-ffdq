@@ -41,6 +41,7 @@ public class DQImprovement extends DQAssertion {
    * Copy constructor
    */
   public DQImprovement(DQImprovement i) {
+    setLabel(i.getLabel());
     setEnhancement(i.getEnhancement());
     setSpecification(i.getSpecification());
     setMechanism(i.getMechanism());

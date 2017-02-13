@@ -10,6 +10,7 @@ import org.datakurator.data.ffdq.DataResource;
 import org.datakurator.data.ffdq.assertions.DQMeasure;
 import org.datakurator.data.ffdq.assertions.DQReportStage;
 import org.datakurator.data.provenance.CurationStage;
+import org.datakurator.postprocess.xlsx.ReportSummary;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -31,6 +32,10 @@ public class FFDQPostProcessor {
 
         DQReportBuilder builder = new DQReportBuilder(config);
         assertions = builder.getAssertions();
+    }
+
+    public FFDQPostProcessor(List<DQReport> reports, InputStream config) {
+        this.reports = reports;
     }
 
     public String measureSummary() throws IOException {
@@ -82,5 +87,10 @@ public class FFDQPostProcessor {
         dataset.setFields(fields);
 
         return dataset.toJson();
+    }
+
+    public void reportSummary(File outputFile) throws IOException {
+        ReportSummary summary = new ReportSummary(reports);
+        summary.toXls(outputFile);
     }
 }

@@ -37,6 +37,7 @@ public class DQMeasure extends DQAssertion {
   }
 
   public DQMeasure(DQMeasure m) {
+    setLabel(m.getLabel());
     setDimension(m.getDimension());
     setSpecification(m.getSpecification());
     setMechanism(m.getMechanism());

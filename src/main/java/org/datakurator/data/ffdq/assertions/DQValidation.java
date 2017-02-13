@@ -37,6 +37,7 @@ public class DQValidation extends DQAssertion {
   }
 
   public DQValidation(DQValidation v) {
+    setLabel(v.getLabel());
     setCriterion(v.getCriterion());
     setSpecification(v.getSpecification());
     setMechanism(v.getMechanism());
