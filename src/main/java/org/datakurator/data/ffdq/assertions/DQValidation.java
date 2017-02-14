@@ -28,7 +28,8 @@ public class DQValidation extends DQAssertion {
 
   public DQValidation() {} // default constructor for Jackson
 
-  public DQValidation(String criterion, String specification, String mechanism, Context context, Result result){
+  public DQValidation(String label, String criterion, String specification, String mechanism, Context context, Result result){
+    super.setLabel(label);
     this.criterion = criterion;
     super.setSpecification(specification);
     super.setMechanism(mechanism);

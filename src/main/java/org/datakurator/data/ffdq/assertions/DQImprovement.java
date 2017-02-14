@@ -29,7 +29,8 @@ public class DQImprovement extends DQAssertion {
 
   public DQImprovement() {} // default constructor for Jackson
 
-  public DQImprovement(String enhancement, String specification, String mechanism, Context context, Result result){
+  public DQImprovement(String label, String enhancement, String specification, String mechanism, Context context, Result result){
+    super.setLabel(label);
     this.enhancement = enhancement;
     super.setSpecification(specification);
     super.setMechanism(mechanism);

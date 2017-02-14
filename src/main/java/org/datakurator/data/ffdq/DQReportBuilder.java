@@ -135,6 +135,7 @@ public class DQReportBuilder {
                 comments.addAll(step.getCurationComments());
             }
 
+            System.out.println("label: " + assertion.getLabel());
             if (assertion instanceof DQMeasure) {
                 DQMeasure measure = (DQMeasure) assertion;
 

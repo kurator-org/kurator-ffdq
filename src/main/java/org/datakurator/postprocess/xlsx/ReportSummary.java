@@ -121,8 +121,8 @@ public class ReportSummary {
             row.createCell(i+2).setCellValue(fields.get(i));
         }
 
-        row.createCell(fields.size()+1).setCellValue("comments");
-        row.createCell(fields.size()+2).setCellValue("status");
+        row.createCell(fields.size()+2).setCellValue("comments");
+        row.createCell(fields.size()+3).setCellValue("status");
 
         // Create validation rows
         int rowNum = row.getRowNum();
@@ -131,8 +131,10 @@ public class ReportSummary {
             Row validationRow = sheet.createRow(rowNum+1+i);
 
             // Validation label
-            System.out.println(validation.getLabel());
             validationRow.createCell(0).setCellValue(validation.getLabel());
+
+            // Record id
+            validationRow.createCell(1).setCellValue(validation.getRecordId());
 
             // Validation initial and final values
             Result result = validation.getResult();
@@ -144,7 +146,7 @@ public class ReportSummary {
             int j = 0;
             while (j < fields.size()) {
                 String field = fields.get(j);
-                Cell cell = validationRow.createCell(j+1);
+                Cell cell = validationRow.createCell(j+2);
                 String curatedValue = curatedValues.get(field);
                 String initialValue = initialValues.get(field);
 
@@ -168,7 +170,7 @@ public class ReportSummary {
             }
 
             // Validation comments
-            Cell commentsCell = validationRow.createCell(j+1);
+            Cell commentsCell = validationRow.createCell(j+2);
 
             StringBuilder comments = new StringBuilder();
             int count = 0;
@@ -183,11 +185,11 @@ public class ReportSummary {
             commentsCell.setCellValue(comments.toString());
 
             // Validation status
-            Cell statusCell = validationRow.createCell(j+2);
+            Cell statusCell = validationRow.createCell(j+3);
             statusCell.setCellValue(result.getStatus());
             statusCell.setCellStyle(styles.get(result.getStatus()));
         }
 
-        return assertions.size()+1; // numRows
+        return assertions.size()+1; // numRows (includes header)
     }
 }

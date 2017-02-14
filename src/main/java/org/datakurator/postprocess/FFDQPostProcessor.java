@@ -2,13 +2,11 @@ package org.datakurator.postprocess;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.jena.base.Sys;
 import org.datakurator.data.ffdq.AssertionsConfig;
 import org.datakurator.data.ffdq.DQReport;
 import org.datakurator.data.ffdq.DQReportBuilder;
 import org.datakurator.data.ffdq.DataResource;
-import org.datakurator.data.ffdq.assertions.DQMeasure;
-import org.datakurator.data.ffdq.assertions.DQReportStage;
+import org.datakurator.data.ffdq.assertions.*;
 import org.datakurator.data.provenance.CurationStage;
 import org.datakurator.postprocess.xlsx.ReportSummary;
 
@@ -66,6 +64,7 @@ public class FFDQPostProcessor {
     }
 
     public String curatedDataset() throws IOException {
+        // Data resource
         CuratedDataset dataset = new CuratedDataset();
         Map<String, String> fields = new HashMap<>();
 
@@ -83,14 +82,153 @@ public class FFDQPostProcessor {
 
             dataset.addRecord(record);
         }
-
         dataset.setFields(fields);
 
-        return dataset.toJson();
+        // Measure summary
+        List<MeasureSummary> measureSummaryList = new ArrayList<>();
+
+        int length = assertions.getMeasures().size();
+
+        for (DQMeasure measure : assertions.getMeasures()) {
+            MeasureSummary summary = new MeasureSummary(measure);
+
+            summary.postprocess(reports);
+            measureSummaryList.add(summary);
+        }
+
+        DatasetSummary summary = new DatasetSummary();
+        summary.setDataset(dataset);
+        summary.setMeasures(measureSummaryList);
+        summary.setImprovements(improvementSummary());
+        summary.setValidations(validationSummary());
+
+        // To json
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(summary);
     }
 
     public void reportSummary(File outputFile) throws IOException {
         ReportSummary summary = new ReportSummary(reports);
         summary.toXls(outputFile);
+    }
+
+    public List<AssertionSummary> validationSummary() {
+        List<AssertionSummary> summaryList = new ArrayList<>();
+
+        for (DQReport report : reports) {
+            AssertionSummary summary = new AssertionSummary();
+            summary.setRecordId(report.getRecordId());
+
+            List<DQValidation> validations = new ArrayList<>();
+
+            for (DQReportStage stage : report.getStages()) {
+                if (stage.getStage().equals(CurationStage.POST_ENHANCEMENT)) {
+                    validations = stage.getValidations();
+                }
+            }
+
+            for (DQValidation validation : validations) {
+                String rowStatus = validation.getResult().getStatus();
+
+                AssertionRow assertionRow = new AssertionRow();
+                assertionRow.setLabel(validation.getLabel());
+                assertionRow.setComment(commentString(validation));
+                assertionRow.setStatus(rowStatus);
+
+                Map<String, String> curatedValues = validation.getResult().getCuratedValues();
+                for (String field : curatedValues.keySet()) {
+                    CuratedField curatedField = new CuratedField();
+                    curatedField.setField(field);
+                    curatedField.setValue(curatedValues.get(field));
+
+                    if (validation.getContext().getFieldsActedUpon().contains(field)) {
+                        curatedField.setStatus(rowStatus);
+                    }
+
+                    assertionRow.addValue(curatedField);
+                }
+
+                summary.addAssertionRow(assertionRow);
+            }
+
+            summaryList.add(summary);
+        }
+
+        return summaryList;
+    }
+
+    public List<AssertionSummary> improvementSummary() {
+        List<AssertionSummary> summaryList = new ArrayList<>();
+
+        for (DQReport report : reports) {
+            AssertionSummary summary = new AssertionSummary();
+            summary.setRecordId(report.getRecordId());
+
+            List<DQImprovement> improvements = new ArrayList<>();
+
+            for (DQReportStage stage : report.getStages()) {
+                if (stage.getStage().equals(CurationStage.ENHANCEMENT)) {
+                    improvements = stage.getImprovements();
+                }
+            }
+
+            for (DQImprovement improvement : improvements) {
+                String rowStatus = improvement.getResult().getStatus();
+
+                AssertionRow assertionRow = new AssertionRow();
+                assertionRow.setLabel(improvement.getLabel());
+                assertionRow.setComment(commentString(improvement));
+                assertionRow.setStatus(rowStatus);
+
+                Map<String, String> initialValues = improvement.getResult().getInitialValues();
+                Map<String, String> curatedValues = improvement.getResult().getCuratedValues();
+
+                for (String field : curatedValues.keySet()) {
+                    CuratedField curatedField = new CuratedField();
+                    curatedField.setField(field);
+
+                    String curatedValue = curatedValues.get(field);
+                    String initialValue = initialValues.get(field);
+
+                    if (initialValue == null || initialValue.isEmpty()) {
+                        initialValue = "empty"; // Placeholder for empty values
+                    }
+
+                    if (curatedValue == null || curatedValue.isEmpty()) {
+                        curatedValue = "empty"; // Placeholder for empty values
+                    }
+
+                    // if the initial value is different than the currated value, add "CHANGED TO: ..."
+                    curatedField.setValue(curatedValue.equals(initialValue) ? curatedValue : initialValue + " CHANGED TO: " + curatedValue);
+
+                    if (improvement.getContext().getFieldsActedUpon().contains(field)) {
+                        curatedField.setStatus(rowStatus);
+                    }
+
+                    assertionRow.addValue(curatedField);
+                }
+
+                summary.addAssertionRow(assertionRow);
+            }
+
+            summaryList.add(summary);
+        }
+
+        return summaryList;
+    }
+
+    private static String commentString(DQAssertion assertion) {
+        StringBuilder comments = new StringBuilder();
+        int count = 0;
+        for (String comment : assertion.getResult().getComments()) {
+            if (count > 0) {
+                comments.append(" | ");
+            }
+
+            comments.append(comment);
+        }
+
+        return comments.toString();
     }
 }

@@ -28,7 +28,8 @@ public class DQMeasure extends DQAssertion {
 
   public DQMeasure() {} // default constructor for Jackson
 
-  public DQMeasure(String dimension, String specification, String mechanism, Context context, Result result){
+  public DQMeasure(String label, String dimension, String specification, String mechanism, Context context, Result result){
+    super.setLabel(label);
     this.dimension = dimension;
     super.setSpecification(specification);
     super.setMechanism(mechanism);
