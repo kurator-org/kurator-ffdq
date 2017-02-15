@@ -74,12 +74,11 @@ public class DQReport {
     /**
      * Serialize the report as json
      *
-     * @param writer
      * @throws IOException
      */
-    public void write(Writer writer) throws IOException {
+    public String toJson() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        mapper.writerWithDefaultPrettyPrinter().writeValue(writer, this);
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 }

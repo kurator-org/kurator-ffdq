@@ -94,34 +94,34 @@ public class ValidationRunner {
     }
 
     public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        BaseRecord baseRecord = new BaseRecord(record);
-
         Object instance = cls.newInstance();
-        runStage(preEnhancementStage, baseRecord, instance);
-        runStage(enhancementStage, baseRecord, instance);
-        runStage(postEnhancementStage, baseRecord, instance);
+
+        runStage(preEnhancementStage, record, instance);
+        runStage(enhancementStage, record, instance);
+        runStage(postEnhancementStage, record, instance);
 
     }
 
-    private void runStage(RunnerStage stage, BaseRecord baseRecord, Object instance) throws InvocationTargetException, IllegalAccessException {
+    private void runStage(RunnerStage stage, Map<String, String> record, Object instance) throws InvocationTargetException, IllegalAccessException {
         for (ValidationTest validation : stage.getValidations()) {
-            DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, baseRecord.getFinalValues()));
+            DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, record));
+
 
             System.out.println("Validation { name=" + validation.getName() + ", method=" + validation.getMethod().getName() +
                     ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
         }
 
         for (ValidationTest measure : stage.getMeasures()) {
-            DQMeasurementResponse retVal = (DQMeasurementResponse) measure.getMethod().invoke(instance, assembleArgs(measure,  baseRecord.getFinalValues()));
+            DQMeasurementResponse retVal = (DQMeasurementResponse) measure.getMethod().invoke(instance, assembleArgs(measure, record));
 
-            System.out.println("Validation { name=" + measure.getName() + ", method=" + measure.getMethod().getName() +
+            System.out.println("Measure { name=" + measure.getName() + ", method=" + measure.getMethod().getName() +
                     ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
         }
 
         for (ValidationTest amendment : stage.getAmendments()) {
-            DQAmendmentResponse retVal = (DQAmendmentResponse) amendment.getMethod().invoke(instance, assembleArgs(amendment,  baseRecord.getFinalValues()));
+            DQAmendmentResponse retVal = (DQAmendmentResponse) amendment.getMethod().invoke(instance, assembleArgs(amendment, record));
 
-            System.out.println("Validation { name=" + amendment.getName() + ", method=" + amendment.getMethod().getName() +
+            System.out.println("Amendment { name=" + amendment.getName() + ", method=" + amendment.getMethod().getName() +
                     ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
         }
     }
