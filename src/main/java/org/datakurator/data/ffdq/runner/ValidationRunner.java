@@ -1,11 +1,14 @@
 package org.datakurator.data.ffdq.runner;
 
+import org.datakurator.data.ffdq.assertions.Result;
 import org.datakurator.data.provenance.BaseRecord;
+import org.datakurator.data.provenance.CurationStatus;
 import org.datakurator.ffdq.annotations.*;
-import org.datakurator.ffdq.api.DQAmendmentResponse;
-import org.datakurator.ffdq.api.DQMeasurementResponse;
-import org.datakurator.ffdq.api.DQValidationResponse;
+import org.datakurator.ffdq.api.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,7 +22,7 @@ import java.util.Map;
  */
 
 public class ValidationRunner {
-    private static final String RECORD_ID_FIELD = "occurrenceId";
+    private static final String RECORD_ID_FIELD = "dwc:occurrenceID";
 
     private Map<String, String> fields;
 
@@ -29,14 +32,13 @@ public class ValidationRunner {
     private RunnerStage enhancementStage = new RunnerStage("ENHANCEMENT");
     private RunnerStage postEnhancementStage = new RunnerStage("POST_ENHANCEMENT");
 
-    public ValidationRunner(Class cls) {
+    private Writer writer;
+
+    public ValidationRunner(Class cls, Writer writer) {
         this.cls = cls;
         //this.fields = fields;
+        this.writer = writer;
         processMethods();
-    }
-
-    public void setFields(Map<String, String> fields) {
-        this.fields = fields;
     }
 
     private void processParameters(ValidationTest test) {
@@ -77,9 +79,13 @@ public class ValidationRunner {
 
                 if (method.isAnnotationPresent(PreEnhancement.class)) {
                     addToStage(test, method, preEnhancementStage);
-                } else if (method.isAnnotationPresent(PostEnhancement.class)) {
+                }
+
+                if (method.isAnnotationPresent(PostEnhancement.class)) {
                     addToStage(test, method, postEnhancementStage);
-                } else if (method.isAnnotationPresent(Amendment.class)) {
+                }
+
+                if (method.isAnnotationPresent(Amendment.class)) {
                     addToStage(test, method, enhancementStage);
                 }
 
@@ -88,7 +94,6 @@ public class ValidationRunner {
             }
 
         }
-        //System.out.println(tests);
     }
 
     private void addToStage(ValidationTest test, Method method, RunnerStage stage) {
@@ -103,71 +108,151 @@ public class ValidationRunner {
 
     public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object instance = cls.newInstance();
+        JSONObject json = new JSONObject();
 
         String recordId = record.get(RECORD_ID_FIELD);
-        System.out.println("recordId: " + recordId);
+        json.put("recordId", recordId);
 
         Map<String, String> initialValues = new HashMap<>(record);
-        System.out.println("initialValues: " + initialValues);
+        json.put("initialValues", new JSONObject(initialValues));
 
-        record = runStage(preEnhancementStage, record, instance);
-        record = runStage(enhancementStage, record, instance);
-        record = runStage(postEnhancementStage, record, instance);
+        JSONArray assertionsArr = new JSONArray();
+        record = runStage(preEnhancementStage, record, instance, assertionsArr);
+        record = runStage(enhancementStage, record, instance, assertionsArr);
+        record = runStage(postEnhancementStage, record, instance, assertionsArr);
+        json.put("assertions", assertionsArr);
 
         Map<String, String> finalValues = record;
-        System.out.println("finalValues: " + finalValues);
-        System.out.println();
+        json.put("finalValues", new JSONObject(finalValues));
+
+        try {
+            writer.write(json.toJSONString());
+            writer.flush();
+        } catch (Exception e) {
+            throw new RuntimeException("Error writing report json to file", e);
+        }
     }
 
-    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance) throws InvocationTargetException, IllegalAccessException {
-        String stageName = stage.getName();
-
-        System.out.println("stage: " + stageName);
-
+    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray assertionsArr) throws InvocationTargetException, IllegalAccessException {
         for (ValidationTest validation : stage.getValidations()) {
+            JSONObject json = new JSONObject();
+
             DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, record));
 
-            String name = validation.getName();
-            String state = retVal.getResultState().getName();
-            String result = retVal.getResult().name();
-            String comment = retVal.getComment();
-            List<String> actedUpon = validation.fieldsActedUpon();
+            json.put("name", validation.getName());
+            json.put("type", "VALIDATION");
+            json.put("stage", stage.getName());
+            json.put("context", createContext(validation.fieldsActedUpon(), validation.fieldsConsulted()));
 
-            System.out.println("\tValidation { name=" + name + ", actedUpon=" + actedUpon + ", state=" + state + ", result=" + result +
-                    ", comment=" + comment + " }");
+            CurationStatus status = null;
+            ResultState state = retVal.getResultState();
+
+            if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
+                EnumDQValidationResult result = retVal.getResult();
+
+                if (result.equals(EnumDQValidationResult.COMPLIANT)) {
+                    status = CurationStatus.COMPLIANT;
+                } else if (result.equals(EnumDQValidationResult.NOT_COMPLIANT)) {
+                    status = CurationStatus.NOT_COMPLIANT;
+                }
+            } else if (state.equals(EnumDQResultState.AMBIGUOUS)) {
+                status = CurationStatus.AMBIGUOUS;
+            } else if (state.equals(EnumDQResultState.EXTERNAL_PREREQUISITES_NOT_MET)) {
+                status = CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET;
+            } else if (state.equals(EnumDQResultState.INTERNAL_PREREQUISITES_NOT_MET)) {
+                status = CurationStatus.DATA_PREREQUISITES_NOT_MET;
+            }
+
+            json.put("status", status.name());
+            json.put("comment", retVal.getComment());
+
+            assertionsArr.add(json);
         }
 
         for (ValidationTest measure : stage.getMeasures()) {
+            JSONObject json = new JSONObject();
+
             DQMeasurementResponse retVal = (DQMeasurementResponse) measure.getMethod().invoke(instance, assembleArgs(measure, record));
 
-            String name = measure.getName();
-            String state = retVal.getResultState().getName();
-            String result = retVal.getValue().toString();
-            String comment = retVal.getComment();
-            List<String> actedUpon = measure.fieldsActedUpon();
+            json.put("name", measure.getName());
+            json.put("type", "MEASURE");
+            json.put("stage", stage.getName());
+            json.put("context", createContext(measure.fieldsActedUpon(), measure.fieldsConsulted()));
 
-            System.out.println("\tMeasure { name=" + name + ", actedUpon=" + actedUpon + ", state=" + state + ", result=" + result +
-                    ", comment=" + comment + " }");
+            CurationStatus status = CurationStatus.NOT_COMPLETE;
+            ResultState state = retVal.getResultState();
+            Object value = null;
+
+            if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
+                status = CurationStatus.COMPLETE;
+                value = retVal.getValue();
+            } else if (state.equals(EnumDQResultState.AMBIGUOUS)) {
+                status = CurationStatus.AMBIGUOUS;
+            } else if (state.equals(EnumDQResultState.EXTERNAL_PREREQUISITES_NOT_MET)) {
+                status = CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET;
+            } else if (state.equals(EnumDQResultState.INTERNAL_PREREQUISITES_NOT_MET)) {
+                status = CurationStatus.DATA_PREREQUISITES_NOT_MET;
+            }
+
+            json.put("value", value);
+            json.put("status", status.name());
+            json.put("comment", retVal.getComment());
+
+            assertionsArr.add(json);
         }
 
         Map<String, String> finalValues = new HashMap<>(record);
 
         for (ValidationTest amendment : stage.getAmendments()) {
+            JSONObject json = new JSONObject();
+
             DQAmendmentResponse retVal = (DQAmendmentResponse) amendment.getMethod().invoke(instance, assembleArgs(amendment, record));
 
-            String name = amendment.getName();
-            String state = retVal.getResultState().getName();
-            Map<String, String> result = retVal.getResult();
-            String comment = retVal.getComment();
-            List<String> actedUpon = amendment.fieldsActedUpon();
+            json.put("name", amendment.getName());
+            json.put("type", "AMENDMENT");
+            json.put("stage", stage.getName());
+            json.put("context", createContext(amendment.fieldsActedUpon(), amendment.fieldsConsulted()));
 
+            CurationStatus status = CurationStatus.NO_CHANGE;;
+            ResultState state = retVal.getResultState();
+
+            if (state.equals(EnumDQAmendmentResultState.CHANGED)) {
+                status = CurationStatus.CURATED;
+            } else if (state.equals(EnumDQAmendmentResultState.FILLED_IN)) {
+                status = CurationStatus.FILLED_IN;
+            } else if (state.equals(EnumDQAmendmentResultState.TRANSPOSED)) {
+                status = CurationStatus.TRANSPOSED;
+            }
+
+            Map<String, String> result = retVal.getResult();
             finalValues.putAll(result);
 
-            System.out.println("\tAmendment { name=" + name + ", actedUpon=" + actedUpon + ", state=" + state + ", result=" + result +
-                    ", comment=" + comment + " }");
+            json.put("result", result);
+            json.put("status", status.name());
+            json.put("comment", retVal.getComment());
+
+            assertionsArr.add(json);
         }
 
         return finalValues;
+    }
+
+    private JSONObject createContext(List<String> fieldsActedUpon, List<String> fieldsConsulted) {
+        JSONObject json = new JSONObject();
+
+        JSONArray actedUpon = new JSONArray();
+        for (String field : fieldsActedUpon) {
+            actedUpon.add(field);
+        }
+        json.put("fieldsActedUpon", actedUpon);
+
+        JSONArray consulted = new JSONArray();
+        for (String field : fieldsConsulted) {
+            consulted.add(field);
+        }
+        json.put("fieldsConsulted", consulted);
+
+        return json;
     }
 
 

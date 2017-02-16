@@ -38,15 +38,25 @@ public enum CurationStatus {
     NOT_COMPLETE,
 
     /**
-     * For Enhancements, indicates that a change to the data has been proposed.
+     * For Amendments, indicates that a change to the data has been proposed.
      */
     CURATED,
 
     /**
-     * For Enhancements, indicates that one or more terms which were blank in the input have been
+     * For Amendments, indicates that one or more terms which were blank in the input have been
      * filled in with some non-blank value in the output.
      */
     FILLED_IN,
+
+    /**
+     * For Amendments, indicates a transposition
+     */
+    TRANSPOSED,
+
+    /**
+     * For Enhancements, indicates that no change to the data is proposed.
+     */
+    NO_CHANGE,
 
     
     /**
