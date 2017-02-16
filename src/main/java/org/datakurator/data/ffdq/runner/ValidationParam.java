@@ -4,6 +4,9 @@ package org.datakurator.data.ffdq.runner;
  * Created by lowery on 12/15/16.
  */
 public class ValidationParam {
+    public static final int ACTED_UPON = 0;
+    public static final int CONSULTED = 1;
+
     private String term;
     private String value;
     private int usage;

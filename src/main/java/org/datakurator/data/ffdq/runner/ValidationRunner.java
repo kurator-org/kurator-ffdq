@@ -9,6 +9,8 @@ import org.datakurator.ffdq.api.DQValidationResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,18 +19,24 @@ import java.util.Map;
  */
 
 public class ValidationRunner {
-    private static final int ACTED_UPON = 0;
-    private static final int CONSULTED = 1;
+    private static final String RECORD_ID_FIELD = "occurrenceId";
+
+    private Map<String, String> fields;
 
     private Class cls;
 
-    private RunnerStage preEnhancementStage = new RunnerStage();
-    private RunnerStage enhancementStage = new RunnerStage();
-    private RunnerStage postEnhancementStage = new RunnerStage();
+    private RunnerStage preEnhancementStage = new RunnerStage("PRE_ENHANCEMENT");
+    private RunnerStage enhancementStage = new RunnerStage("ENHANCEMENT");
+    private RunnerStage postEnhancementStage = new RunnerStage("POST_ENHANCEMENT");
 
     public ValidationRunner(Class cls) {
         this.cls = cls;
+        //this.fields = fields;
         processMethods();
+    }
+
+    public void setFields(Map<String, String> fields) {
+        this.fields = fields;
     }
 
     private void processParameters(ValidationTest test) {
@@ -44,11 +52,11 @@ public class ValidationRunner {
                     if (annotation.annotationType().equals(ActedUpon.class)) {
                         ActedUpon actedUpon = (ActedUpon) annotation;
                         param.setTerm(actedUpon.value());
-                        param.setUsage(ACTED_UPON);
+                        param.setUsage(ValidationParam.ACTED_UPON);
                     } else if (annotation.annotationType().equals(Consulted.class)) {
                         Consulted consulted = (Consulted) annotation;
                         param.setTerm(consulted.value());
-                        param.setUsage(CONSULTED);
+                        param.setUsage(ValidationParam.CONSULTED);
                     }
 
                     test.addParam(param);
@@ -71,7 +79,7 @@ public class ValidationRunner {
                     addToStage(test, method, preEnhancementStage);
                 } else if (method.isAnnotationPresent(PostEnhancement.class)) {
                     addToStage(test, method, postEnhancementStage);
-                } else if (method.isAnnotationPresent(Enhancement.class)) {
+                } else if (method.isAnnotationPresent(Amendment.class)) {
                     addToStage(test, method, enhancementStage);
                 }
 
@@ -96,34 +104,70 @@ public class ValidationRunner {
     public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object instance = cls.newInstance();
 
-        runStage(preEnhancementStage, record, instance);
-        runStage(enhancementStage, record, instance);
-        runStage(postEnhancementStage, record, instance);
+        String recordId = record.get(RECORD_ID_FIELD);
+        System.out.println("recordId: " + recordId);
 
+        Map<String, String> initialValues = new HashMap<>(record);
+        System.out.println("initialValues: " + initialValues);
+
+        record = runStage(preEnhancementStage, record, instance);
+        record = runStage(enhancementStage, record, instance);
+        record = runStage(postEnhancementStage, record, instance);
+
+        Map<String, String> finalValues = record;
+        System.out.println("finalValues: " + finalValues);
+        System.out.println();
     }
 
-    private void runStage(RunnerStage stage, Map<String, String> record, Object instance) throws InvocationTargetException, IllegalAccessException {
+    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance) throws InvocationTargetException, IllegalAccessException {
+        String stageName = stage.getName();
+
+        System.out.println("stage: " + stageName);
+
         for (ValidationTest validation : stage.getValidations()) {
             DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, record));
 
+            String name = validation.getName();
+            String state = retVal.getResultState().getName();
+            String result = retVal.getResult().name();
+            String comment = retVal.getComment();
+            List<String> actedUpon = validation.fieldsActedUpon();
 
-            System.out.println("Validation { name=" + validation.getName() + ", method=" + validation.getMethod().getName() +
-                    ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
+            System.out.println("\tValidation { name=" + name + ", actedUpon=" + actedUpon + ", state=" + state + ", result=" + result +
+                    ", comment=" + comment + " }");
         }
 
         for (ValidationTest measure : stage.getMeasures()) {
             DQMeasurementResponse retVal = (DQMeasurementResponse) measure.getMethod().invoke(instance, assembleArgs(measure, record));
 
-            System.out.println("Measure { name=" + measure.getName() + ", method=" + measure.getMethod().getName() +
-                    ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
+            String name = measure.getName();
+            String state = retVal.getResultState().getName();
+            String result = retVal.getValue().toString();
+            String comment = retVal.getComment();
+            List<String> actedUpon = measure.fieldsActedUpon();
+
+            System.out.println("\tMeasure { name=" + name + ", actedUpon=" + actedUpon + ", state=" + state + ", result=" + result +
+                    ", comment=" + comment + " }");
         }
+
+        Map<String, String> finalValues = new HashMap<>(record);
 
         for (ValidationTest amendment : stage.getAmendments()) {
             DQAmendmentResponse retVal = (DQAmendmentResponse) amendment.getMethod().invoke(instance, assembleArgs(amendment, record));
 
-            System.out.println("Amendment { name=" + amendment.getName() + ", method=" + amendment.getMethod().getName() +
-                    ", state=" + retVal.getResultState().getName() + ", comment=" + retVal.getComment());
+            String name = amendment.getName();
+            String state = retVal.getResultState().getName();
+            Map<String, String> result = retVal.getResult();
+            String comment = retVal.getComment();
+            List<String> actedUpon = amendment.fieldsActedUpon();
+
+            finalValues.putAll(result);
+
+            System.out.println("\tAmendment { name=" + name + ", actedUpon=" + actedUpon + ", state=" + state + ", result=" + result +
+                    ", comment=" + comment + " }");
         }
+
+        return finalValues;
     }
 
 

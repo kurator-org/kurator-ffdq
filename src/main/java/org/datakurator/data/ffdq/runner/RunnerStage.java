@@ -7,9 +7,22 @@ import java.util.List;
  * Created by lowery on 12/19/16.
  */
 public class RunnerStage {
+    private String name;
     private List<ValidationTest> validations = new ArrayList<>();
     private List<ValidationTest> measures = new ArrayList<>();
     private List<ValidationTest> amendments = new ArrayList<>();
+
+    public RunnerStage(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public List<ValidationTest> getValidations() {
         return validations;

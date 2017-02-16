@@ -45,6 +45,29 @@ public class ValidationTest {
         inputs.add(param);
     }
 
+    public List<String> fieldsActedUpon() {
+        List<String> actedUpon = new ArrayList<>();
+
+        for (ValidationParam param : inputs) {
+            if (param.getUsage() == ValidationParam.ACTED_UPON)
+                actedUpon.add(param.getTerm());
+        }
+
+        return actedUpon;
+    }
+
+    public List<String> fieldsConsulted() {
+        List<String> consulted = new ArrayList<>();
+
+        for (ValidationParam param : inputs) {
+            if (param.getUsage() == ValidationParam.CONSULTED)
+                consulted.add(param.getTerm());
+        }
+
+        return consulted;
+    }
+
+
     @Override
     public String toString() {
         return "ValidationTest{" +
