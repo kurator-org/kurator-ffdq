@@ -1,5 +1,6 @@
 package org.datakurator.data.ffdq.runner;
 
+import org.apache.jena.base.Sys;
 import org.datakurator.data.ffdq.assertions.Result;
 import org.datakurator.data.provenance.BaseRecord;
 import org.datakurator.data.provenance.CurationStatus;
@@ -8,6 +9,7 @@ import org.datakurator.ffdq.api.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -23,6 +25,8 @@ import java.util.Map;
 
 public class ValidationRunner {
     private static final String RECORD_ID_FIELD = "dwc:occurrenceID";
+    private String mechanism;
+    private long count = 0;
 
     private Map<String, String> fields;
 
@@ -38,7 +42,20 @@ public class ValidationRunner {
         this.cls = cls;
         //this.fields = fields;
         this.writer = writer;
-        processMethods();
+
+        for (Annotation annotation : cls.getDeclaredAnnotations()) {
+            if (annotation.annotationType().equals(Mechanism.class)) {
+                this.mechanism = ((Mechanism) annotation).value();
+            }
+        }
+
+        try {
+            writer.write("{");
+            processMethods();
+            writer.write("\"report\": [");
+        } catch (Exception e) {
+            throw new RuntimeException("Error writing dq report json", e);
+        }
     }
 
     private void processParameters(ValidationTest test) {
@@ -67,14 +84,52 @@ public class ValidationRunner {
         }
     }
 
-    private void processMethods() {
+    private void processMethods() throws IOException {
+        writer.write("\"profile\": ");
+
+        JSONArray profileArr = new JSONArray();
         Method[] methods = cls.getDeclaredMethods();
+
 
         for (final Method method : methods) {
             if (method.isAnnotationPresent(Provides.class)) {
-                // Parse method annotations
+                // Parse method annotations and add dq assertions to report
+                JSONObject json = new JSONObject();
                 Provides provides = method.getAnnotation(Provides.class);
+                json.put("name", provides.value());
 
+                if(method.isAnnotationPresent(Measure.class)) {
+                    Measure measure = method.getAnnotation(Measure.class);
+                    json.put("type", "MEASURE");
+                    json.put("label", measure.label());
+                    json.put("description", measure.description());
+
+                    Specification specification = method.getAnnotation(Specification.class);
+                    json.put("specification", specification.value());
+                    json.put("mechanism", mechanism);
+                } else if (method.isAnnotationPresent(Validation.class)) {
+                    Validation validation = method.getAnnotation(Validation.class);
+                    json.put("type", "VALIDATION");
+                    json.put("label", validation.label());
+                    json.put("description", validation.description());
+
+                    Specification specification = method.getAnnotation(Specification.class);
+                    json.put("specification", specification.value());
+                    json.put("mechanism", mechanism);
+                } else if (method.isAnnotationPresent(Amendment.class)) {
+                    Amendment amendment = method.getAnnotation(Amendment.class);
+                    json.put("type", "AMENDMENT");
+                    json.put("label", amendment.label());
+                    json.put("description", amendment.description());
+
+                    Specification specification = method.getAnnotation(Specification.class);
+                    json.put("specification", specification.value());
+                    json.put("mechanism", mechanism);
+                }
+
+                profileArr.add(json);
+
+                // Create a validation test object for invoking the method
                 ValidationTest test = new ValidationTest(provides.value(), method);
 
                 if (method.isAnnotationPresent(PreEnhancement.class)) {
@@ -92,8 +147,10 @@ public class ValidationRunner {
                 // Parse parameter annotations
                 processParameters(test);
             }
-
         }
+
+        writer.write(profileArr.toJSONString() + ",");
+        writer.flush();
     }
 
     private void addToStage(ValidationTest test, Method method, RunnerStage stage) {
@@ -106,34 +163,37 @@ public class ValidationRunner {
         }
     }
 
-    public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    public void validate(Map<String, String> record) throws IllegalAccessException, InstantiationException, InvocationTargetException, IOException {
         Object instance = cls.newInstance();
         JSONObject json = new JSONObject();
+
+        if (count > 0) {
+            writer.write(", ");
+        }
 
         String recordId = record.get(RECORD_ID_FIELD);
         json.put("recordId", recordId);
 
         Map<String, String> initialValues = new HashMap<>(record);
-        json.put("initialValues", new JSONObject(initialValues));
 
-        JSONArray assertionsArr = new JSONArray();
-        record = runStage(preEnhancementStage, record, instance, assertionsArr);
-        record = runStage(enhancementStage, record, instance, assertionsArr);
-        record = runStage(postEnhancementStage, record, instance, assertionsArr);
-        json.put("assertions", assertionsArr);
+        JSONArray reportArr = new JSONArray();
+        record = runStage(preEnhancementStage, record, instance, reportArr);
+        record = runStage(enhancementStage, record, instance, reportArr);
+        record = runStage(postEnhancementStage, record, instance, reportArr);
+        json.put("assertions", reportArr);
+
+        json.put("initialValues", new JSONObject(initialValues));
 
         Map<String, String> finalValues = record;
         json.put("finalValues", new JSONObject(finalValues));
 
-        try {
-            writer.write(json.toJSONString());
-            writer.flush();
-        } catch (Exception e) {
-            throw new RuntimeException("Error writing report json to file", e);
-        }
+        writer.write(json.toJSONString());
+        writer.flush();
+
+        count++;
     }
 
-    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray assertionsArr) throws InvocationTargetException, IllegalAccessException {
+    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray reportArr) throws InvocationTargetException, IllegalAccessException {
         for (ValidationTest validation : stage.getValidations()) {
             JSONObject json = new JSONObject();
 
@@ -166,7 +226,7 @@ public class ValidationRunner {
             json.put("status", status.name());
             json.put("comment", retVal.getComment());
 
-            assertionsArr.add(json);
+            reportArr.add(json);
         }
 
         for (ValidationTest measure : stage.getMeasures()) {
@@ -198,7 +258,7 @@ public class ValidationRunner {
             json.put("status", status.name());
             json.put("comment", retVal.getComment());
 
-            assertionsArr.add(json);
+            reportArr.add(json);
         }
 
         Map<String, String> finalValues = new HashMap<>(record);
@@ -231,7 +291,7 @@ public class ValidationRunner {
             json.put("status", status.name());
             json.put("comment", retVal.getComment());
 
-            assertionsArr.add(json);
+            reportArr.add(json);
         }
 
         return finalValues;
@@ -255,6 +315,11 @@ public class ValidationRunner {
         return json;
     }
 
+    public void close() throws IOException {
+        writer.write("]}");
+        writer.close();
+        System.out.println("Wrote dq report containing " + count + " assertions.");
+    }
 
     private String[] assembleArgs(ValidationTest test, Map<String, String> record) {
             List<ValidationParam> inputs = test.getInputs();
