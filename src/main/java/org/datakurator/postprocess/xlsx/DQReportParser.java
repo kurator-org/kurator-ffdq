@@ -25,6 +25,7 @@ public class DQReportParser {
     private static final int IN_RESULT = 6;
     private static final int IN_ACTED_UPON = 7;
 
+    private JsonParser parser;
     private int state = DEFAULT;
     private Map<String, String> currObj;
 
@@ -34,14 +35,37 @@ public class DQReportParser {
     private Map<String, String> finalValues;
 
     private Map<String, Object> assertion;
+    private List<Map<String, Object>> assertions;
     private List<String> fieldsActedUpon;
 
     private Map<String, Map<String, String>> profile = new HashMap<>();
 
-    public void postprocess(InputStream reportStream) throws IOException {
+    public DQReportParser(InputStream reportStream) throws IOException {
         JsonFactory jsonFactory = new JsonFactory();
-        JsonParser parser = jsonFactory.createParser(reportStream);
+        parser = jsonFactory.createParser(reportStream);
+    }
 
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public Map<String, String> getInitialValues() {
+        return initialValues;
+    }
+
+    public Map<String, String> getFinalValues() {
+        return finalValues;
+    }
+
+    public List<Map<String, Object>> getAssertions() {
+        return assertions;
+    }
+
+    public List<String> getActedUpon() {
+        return fieldsActedUpon;
+    }
+
+    public boolean next() throws IOException {
         while (!parser.isClosed()) {
             JsonToken jsonToken = parser.nextToken();
 
@@ -66,11 +90,13 @@ public class DQReportParser {
                     profile.put(currObj.remove("name"), currObj);
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     state = DEFAULT;
-                    System.out.println(profile);
+                    //System.out.println(profile);
                 }
             } else if (state == IN_REPORTS) {
                 if (jsonToken.equals(JsonToken.START_ARRAY)) {
                     // TODO: Initialize the post processor here
+                } else if (jsonToken.equals(JsonToken.START_OBJECT)) {
+                    assertions = new ArrayList<>();
                 } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
                     String field = parser.getCurrentName();
 
@@ -86,6 +112,7 @@ public class DQReportParser {
                     }
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     // TODO: Post process the result here
+                    return true;
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     // TODO: End of report, close post processor here
                     parser.close();
@@ -104,7 +131,7 @@ public class DQReportParser {
                         assertion.put(field, parser.getValueAsString());
                     }
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    System.out.println(assertion);
+                    assertions.add(assertion);
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     state = IN_REPORTS;
                 }
@@ -117,7 +144,7 @@ public class DQReportParser {
 
                     initialValues.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    System.out.println(initialValues);
+                    //System.out.println(initialValues);
                     state = IN_REPORTS;
                 }
             } else if (state == IN_FINALVALS) {
@@ -129,7 +156,7 @@ public class DQReportParser {
 
                     finalValues.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    System.out.println(finalValues);
+                    //System.out.println(finalValues);
                     state = IN_REPORTS;
                 }
             } else if (state == IN_CONTEXT) {
@@ -147,7 +174,7 @@ public class DQReportParser {
                 } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
                     fieldsActedUpon.add(parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
-                    System.out.println(fieldsActedUpon);
+                    //System.out.println(fieldsActedUpon);
                     state = IN_CONTEXT;
                 }
             } else if (state == IN_RESULT) {
@@ -164,10 +191,15 @@ public class DQReportParser {
                 }
             }
         }
+
+        return false;
     }
 
     public static void main(String[] args) throws IOException {
-        DQReportParser postprocessor = new DQReportParser();
-        postprocessor.postprocess(DQReportParser.class.getResourceAsStream("/dq_report.json"));
+        DQReportParser parser = new DQReportParser(DQReportParser.class.getResourceAsStream("/dq_report.json"));
+            while (parser.next()) {
+            String recordId = parser.getRecordId();
+            System.out.println(recordId);
+        }
     }
 }
