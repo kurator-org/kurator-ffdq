@@ -41,6 +41,10 @@ public class DQReportParser {
     private Map<String, Map<String, String>> profile = new HashMap<>();
 
     public DQReportParser(InputStream reportStream) throws IOException {
+        if (reportStream == null) {
+            throw new NullPointerException("Report stream argument is null, does the file exist?");
+        }
+
         JsonFactory jsonFactory = new JsonFactory();
         parser = jsonFactory.createParser(reportStream);
     }
