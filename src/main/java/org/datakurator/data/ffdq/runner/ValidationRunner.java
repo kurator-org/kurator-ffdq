@@ -4,6 +4,7 @@ import org.apache.jena.base.Sys;
 import org.datakurator.data.ffdq.assertions.Result;
 import org.datakurator.data.provenance.BaseRecord;
 import org.datakurator.data.provenance.CurationStatus;
+import org.datakurator.exceptions.ValidationRunnerException;
 import org.datakurator.ffdq.annotations.*;
 import org.datakurator.ffdq.api.*;
 import org.json.simple.JSONArray;
@@ -195,38 +196,40 @@ public class ValidationRunner {
 
     private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray reportArr) throws InvocationTargetException, IllegalAccessException {
         for (ValidationTest validation : stage.getValidations()) {
-            JSONObject json = new JSONObject();
-
             DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, record));
 
-            json.put("name", validation.getName());
-            json.put("type", "VALIDATION");
-            json.put("stage", stage.getName());
-            json.put("context", createContext(validation.fieldsActedUpon(), validation.fieldsConsulted()));
-
-            CurationStatus status = null;
             ResultState state = retVal.getResultState();
 
-            if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
-                EnumDQValidationResult result = retVal.getResult();
+            if (!state.equals(EnumDQResultState.NOT_RUN)) {
+                JSONObject json = new JSONObject();
+                CurationStatus status = null;
 
-                if (result.equals(EnumDQValidationResult.COMPLIANT)) {
-                    status = CurationStatus.COMPLIANT;
-                } else if (result.equals(EnumDQValidationResult.NOT_COMPLIANT)) {
-                    status = CurationStatus.NOT_COMPLIANT;
+                json.put("name", validation.getName());
+                json.put("type", "VALIDATION");
+                json.put("stage", stage.getName());
+                json.put("context", createContext(validation.fieldsActedUpon(), validation.fieldsConsulted()));
+
+                if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
+                    EnumDQValidationResult result = retVal.getResult();
+
+                    if (result.equals(EnumDQValidationResult.COMPLIANT)) {
+                        status = CurationStatus.COMPLIANT;
+                    } else if (result.equals(EnumDQValidationResult.NOT_COMPLIANT)) {
+                        status = CurationStatus.NOT_COMPLIANT;
+                    }
+                } else if (state.equals(EnumDQResultState.AMBIGUOUS)) {
+                    status = CurationStatus.AMBIGUOUS;
+                } else if (state.equals(EnumDQResultState.EXTERNAL_PREREQUISITES_NOT_MET)) {
+                    status = CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET;
+                } else if (state.equals(EnumDQResultState.INTERNAL_PREREQUISITES_NOT_MET)) {
+                    status = CurationStatus.DATA_PREREQUISITES_NOT_MET;
                 }
-            } else if (state.equals(EnumDQResultState.AMBIGUOUS)) {
-                status = CurationStatus.AMBIGUOUS;
-            } else if (state.equals(EnumDQResultState.EXTERNAL_PREREQUISITES_NOT_MET)) {
-                status = CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET;
-            } else if (state.equals(EnumDQResultState.INTERNAL_PREREQUISITES_NOT_MET)) {
-                status = CurationStatus.DATA_PREREQUISITES_NOT_MET;
+
+                json.put("status", status.name());
+                json.put("comment", retVal.getComment());
+
+                reportArr.add(json);
             }
-
-            json.put("status", status.name());
-            json.put("comment", retVal.getComment());
-
-            reportArr.add(json);
         }
 
         for (ValidationTest measure : stage.getMeasures()) {
