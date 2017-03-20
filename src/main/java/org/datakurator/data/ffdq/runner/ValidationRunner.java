@@ -4,7 +4,6 @@ import org.apache.jena.base.Sys;
 import org.datakurator.data.ffdq.assertions.Result;
 import org.datakurator.data.provenance.BaseRecord;
 import org.datakurator.data.provenance.CurationStatus;
-import org.datakurator.exceptions.ValidationRunnerException;
 import org.datakurator.ffdq.annotations.*;
 import org.datakurator.ffdq.api.*;
 import org.json.simple.JSONArray;
