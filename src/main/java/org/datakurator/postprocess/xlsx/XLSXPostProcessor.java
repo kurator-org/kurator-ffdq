@@ -2,16 +2,20 @@ package org.datakurator.postprocess.xlsx;
 
 import com.github.jsonldjava.utils.Obj;
 import org.apache.jena.base.Sys;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.datakurator.data.provenance.CurationStatus;
 import org.datakurator.ffdq.annotations.Validation;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +25,51 @@ import java.util.Map;
 public class XLSXPostProcessor {
     private DQReportParser reportParser;
     private List<String> header;
+
+    private static Map<String, CellStyle> styles = new HashMap<>();
+
+    private static void initStyles(Workbook wb) {
+        // White font
+        Font font = wb.createFont();
+        font.setColor(HSSFColor.WHITE.index);
+
+        // Compliant or complete styled with green background
+        CellStyle style = wb.createCellStyle();
+        style.setFillForegroundColor(HSSFColor.GREEN.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFont(font);
+
+        styles.put(CurationStatus.COMPLIANT.toString(), style);
+        styles.put(CurationStatus.COMPLETE.toString(), style);
+
+        // Not compliant or not complete styled with red background
+        style = wb.createCellStyle();
+        style.setFillForegroundColor(HSSFColor.RED.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFont(font);
+
+        styles.put(CurationStatus.NOT_COMPLIANT.toString(), style);
+        styles.put(CurationStatus.NOT_COMPLETE.toString(), style);
+
+        // Filled in, curated or transposed styled with yellow background
+        style = wb.createCellStyle();
+        style.setFillForegroundColor(HSSFColor.DARK_YELLOW.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFont(font);
+
+        styles.put(CurationStatus.FILLED_IN.toString(), style);
+        styles.put(CurationStatus.CURATED.toString(), style);
+        styles.put(CurationStatus.TRANSPOSED.toString(), style);
+
+        // Unable determine validity styled with grey background
+        style = wb.createCellStyle();
+        style.setFillForegroundColor(HSSFColor.GREY_40_PERCENT.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFont(font);
+
+        styles.put(CurationStatus.DATA_PREREQUISITES_NOT_MET.toString(), style);
+        styles.put(CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET.toString(), style);
+    }
 
     public XLSXPostProcessor(InputStream reportStream) {
         try {
@@ -32,6 +81,7 @@ public class XLSXPostProcessor {
 
     public void postprocess() {
         SXSSFWorkbook workbook = new SXSSFWorkbook();
+        initStyles(workbook);
 
         int windowSize = 100; // keep 100 rows in memory, exceeding rows will be flushed to disk
 
@@ -119,12 +169,26 @@ public class XLSXPostProcessor {
                         Row validationsRow = validationsSheet.createRow(validationRowNum);
                         validationsRow.createCell(0).setCellValue(reportParser.getRecordId());
                         validationsRow.createCell(1).setCellValue((String) assertion.get("name"));
-                        validationsRow.createCell(2).setCellValue((String) assertion.get("status"));
+
+                        String status = (String) assertion.get("status");
+
+                        Cell statusCell = validationsRow.createCell(2);
+                        statusCell.setCellValue(status);
+
+                        if (styles.containsKey(status)) {
+                            statusCell.setCellStyle(styles.get(status));
+                        }
+
                         validationsRow.createCell(3).setCellValue((String) assertion.get("comment"));
 
                         for (int i = 0; i < fieldsActedUpon.size(); i++) {
                             String field = fieldsActedUpon.get(i);
-                            validationsRow.createCell(i+4).setCellValue(initialValues.get(field));
+                            Cell cell = validationsRow.createCell(i+4);
+                            cell.setCellValue(initialValues.get(field));
+
+                            if (styles.containsKey(status)) {
+                                cell.setCellStyle(styles.get(status));
+                            }
                         }
 
                         validationRowNum++;
@@ -134,7 +198,16 @@ public class XLSXPostProcessor {
 
                         amendmentsRow.createCell(0).setCellValue(reportParser.getRecordId());
                         amendmentsRow.createCell(1).setCellValue((String) assertion.get("name"));
-                        amendmentsRow.createCell(2).setCellValue((String) assertion.get("status"));
+
+                        String status = (String) assertion.get("status");
+
+                        Cell statusCell = amendmentsRow.createCell(2);
+                        statusCell.setCellValue(status);
+
+                        if (styles.containsKey(status)) {
+                            statusCell.setCellStyle(styles.get(status));
+                        }
+
                         amendmentsRow.createCell(3).setCellValue((String) assertion.get("comment"));
 
                         if (assertion.containsKey("result") && assertion.get("result") != null && !((Map) assertion.get("result")).isEmpty()) {
@@ -142,7 +215,12 @@ public class XLSXPostProcessor {
 
                             for (int i = 0; i < fieldsActedUpon.size(); i++) {
                                 String field = fieldsActedUpon.get(i);
-                                amendmentsRow.createCell(i + 4).setCellValue(result.get(field));
+                                Cell cell = amendmentsRow.createCell(i + 4);
+                                cell.setCellValue(result.get(field));
+
+                                if (styles.containsKey(status)) {
+                                    cell.setCellStyle(styles.get(status));
+                                }
                             }
                         }
 
