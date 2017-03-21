@@ -27,6 +27,7 @@ public class XLSXPostProcessor {
     private List<String> header;
 
     private static Map<String, CellStyle> styles = new HashMap<>();
+    private static Map<String, Integer> actedUponCols = new HashMap<>();
 
     private static void initStyles(Workbook wb) {
         // White font
@@ -100,6 +101,8 @@ public class XLSXPostProcessor {
         amendmentsSheet.setRandomAccessWindowSize(100);
         measuresSheet.setRandomAccessWindowSize(100);
 
+        Row validationsHeader = validationsSheet.createRow(0);
+
         try {
             int rowNum = 0;
             int validationRowNum = 0;
@@ -110,7 +113,6 @@ public class XLSXPostProcessor {
                 Map<String, String> finalValues = reportParser.getFinalValues();
 
                 List<Map<String, Object>> assertions = reportParser.getAssertions();
-                List<String> fieldsActedUpon = reportParser.getActedUpon();
 
                 if (header == null) {
                     header = new ArrayList<>();
@@ -122,7 +124,6 @@ public class XLSXPostProcessor {
                     Row initialValuesHeader = initialValuesSheet.createRow(rowNum);
                     Row finalValuesHeader = finalValuesSheet.createRow(rowNum);
 
-                    Row validationsHeader = validationsSheet.createRow(rowNum);
                     Row amendmentsHeader = amendmentsSheet.createRow(rowNum);
 
                     for (int i = 0; i < header.size(); i++) {
@@ -140,10 +141,10 @@ public class XLSXPostProcessor {
                     amendmentsHeader.createCell(2).setCellValue("Status");
                     amendmentsHeader.createCell(3).setCellValue("Comment");
 
-                    for (int i = 0; i < fieldsActedUpon.size(); i++) {
-                        validationsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
-                        amendmentsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
-                    }
+                    //for (int i = 0; i < fieldsActedUpon.size(); i++) {
+                    //    validationsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
+                    //    amendmentsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
+                    //}
 
                     rowNum++;
                     validationRowNum++;
@@ -164,6 +165,9 @@ public class XLSXPostProcessor {
                 // process assertions
 
                 for (Map<String, Object> assertion : assertions) {
+                    List<String> fieldsActedUpon = (List<String>) assertion.get("actedUpon");
+                    List<String> fieldsConsulted = (List<String>) assertion.get("consulted");
+
                     if ("VALIDATION".equalsIgnoreCase((String) assertion.get("type")) &&
                             "PRE_ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
                         Row validationsRow = validationsSheet.createRow(validationRowNum);
@@ -181,8 +185,27 @@ public class XLSXPostProcessor {
 
                         validationsRow.createCell(3).setCellValue((String) assertion.get("comment"));
 
-                        for (int i = 0; i < fieldsActedUpon.size(); i++) {
-                            String field = fieldsActedUpon.get(i);
+//                        for (int i = 0; i < fieldsActedUpon.size(); i++) {
+//                            String field = fieldsActedUpon.get(i);
+//                            Cell cell = validationsRow.createCell(i+4);
+//                            cell.setCellValue(initialValues.get(field));
+//
+//                            if (styles.containsKey(status)) {
+//                                cell.setCellStyle(styles.get(status));
+//                            }
+//                        }
+
+                        for (String field : fieldsActedUpon) {
+                            if (!actedUponCols.containsKey(field)) {
+                                int colNum = actedUponCols.size();
+                                actedUponCols.put(field, colNum);
+
+                                int columnOffset = 4;
+                                validationsHeader.createCell(columnOffset+colNum).setCellValue(field);
+                            }
+
+                            int i = actedUponCols.get(field);
+
                             Cell cell = validationsRow.createCell(i+4);
                             cell.setCellValue(initialValues.get(field));
 

@@ -24,6 +24,7 @@ public class DQReportParser {
     private static final int IN_CONTEXT = 5;
     private static final int IN_RESULT = 6;
     private static final int IN_ACTED_UPON = 7;
+    private static final int IN_CONSULTED = 8;
 
     private JsonParser parser;
     private int state = DEFAULT;
@@ -37,6 +38,7 @@ public class DQReportParser {
     private Map<String, Object> assertion;
     private List<Map<String, Object>> assertions;
     private List<String> fieldsActedUpon;
+    private List<String> fieldsConsulted;
 
     private Map<String, Map<String, String>> profile = new HashMap<>();
 
@@ -168,6 +170,8 @@ public class DQReportParser {
                     String field = parser.getCurrentName();
                     if (field.equals("fieldsActedUpon")) {
                         state = IN_ACTED_UPON;
+                    } else if (field.equals("fieldsConsulted")) {
+                        state = IN_CONSULTED;
                     }
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     state = IN_ASSERTIONS;
@@ -178,7 +182,18 @@ public class DQReportParser {
                 } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
                     fieldsActedUpon.add(parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
+                    assertion.put("actedUpon", fieldsActedUpon);
                     //System.out.println(fieldsActedUpon);
+                    state = IN_CONTEXT;
+                }
+            } else if (state == IN_CONSULTED) {
+                if (jsonToken.equals(JsonToken.START_ARRAY)) {
+                    fieldsConsulted = new ArrayList<>();
+                } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
+                    fieldsConsulted.add(parser.getValueAsString());
+                } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
+                    assertion.put("consulted", fieldsConsulted);
+                    //System.out.println(fieldsConsulted);
                     state = IN_CONTEXT;
                 }
             } else if (state == IN_RESULT) {
