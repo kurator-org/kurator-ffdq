@@ -107,6 +107,7 @@ public class XLSXPostProcessor {
             int rowNum = 0;
             int validationRowNum = 0;
             int amendmentRowNum = 0;
+            int measuresRowNum = 0;
 
             while(reportParser.next()) {
                 Map<String, String> initialValues = reportParser.getInitialValues();
@@ -125,6 +126,7 @@ public class XLSXPostProcessor {
                     Row finalValuesHeader = finalValuesSheet.createRow(rowNum);
 
                     Row amendmentsHeader = amendmentsSheet.createRow(rowNum);
+                    Row measuresHeader = measuresSheet.createRow(rowNum);
 
                     for (int i = 0; i < header.size(); i++) {
                         initialValuesHeader.createCell(i).setCellValue(header.get(i));
@@ -141,6 +143,12 @@ public class XLSXPostProcessor {
                     amendmentsHeader.createCell(2).setCellValue("Status");
                     amendmentsHeader.createCell(3).setCellValue("Comment");
 
+                    measuresHeader.createCell(0).setCellValue("Record Id");
+                    measuresHeader.createCell(1).setCellValue("Measure");
+                    measuresHeader.createCell(2).setCellValue("Status");
+                    measuresHeader.createCell(3).setCellValue("Comment");
+                    measuresHeader.createCell(4).setCellValue("Value");
+
                     //for (int i = 0; i < fieldsActedUpon.size(); i++) {
                     //    validationsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
                     //    amendmentsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
@@ -149,6 +157,7 @@ public class XLSXPostProcessor {
                     rowNum++;
                     validationRowNum++;
                     amendmentRowNum++;
+                    measuresRowNum++;
                 }
 
                 Row initialValuesRow = finalValuesSheet.createRow(rowNum);
@@ -201,12 +210,12 @@ public class XLSXPostProcessor {
                                 actedUponCols.put(field, colNum);
 
                                 int columnOffset = 4;
-                                validationsHeader.createCell(columnOffset+colNum).setCellValue(field);
+                                validationsHeader.createCell(columnOffset + colNum).setCellValue(field);
                             }
 
                             int i = actedUponCols.get(field);
 
-                            Cell cell = validationsRow.createCell(i+4);
+                            Cell cell = validationsRow.createCell(i + 4);
                             cell.setCellValue(initialValues.get(field));
 
                             if (styles.containsKey(status)) {
@@ -248,12 +257,35 @@ public class XLSXPostProcessor {
                         }
 
                         amendmentRowNum++;
-                    }
-                }
+                    } else if ("MEASURE".equalsIgnoreCase((String) assertion.get("type")) &&
+                            "PRE_ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
+                        Row measuresRow = measuresSheet.createRow(measuresRowNum);
 
-                rowNum++;
-                validationRowNum++; // space between blocks of validations
-                amendmentRowNum++;
+                        measuresRow.createCell(1).setCellValue((String) assertion.get("name"));
+
+                        String status = (String) assertion.get("status");
+
+                        Cell statusCell = measuresRow.createCell(2);
+                        statusCell.setCellValue(status);
+
+                        if (styles.containsKey(status)) {
+                            statusCell.setCellStyle(styles.get(status));
+                        }
+
+                        measuresRow.createCell(3).setCellValue((String) assertion.get("comment"));
+
+                        if (assertion.containsKey("value") && assertion.get("value") != null) {
+                            measuresRow.createCell(4).setCellValue((String) assertion.get("value"));
+                        }
+
+                        measuresRowNum++;
+                    }
+
+                    rowNum++;
+                    validationRowNum++; // space between blocks of validations
+                    amendmentRowNum++;
+                    measuresRowNum++;
+                }
             }
 
             FileOutputStream out = new FileOutputStream("tempsxssf.xlsx");
