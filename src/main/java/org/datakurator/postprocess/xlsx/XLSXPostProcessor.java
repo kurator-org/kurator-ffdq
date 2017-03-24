@@ -11,9 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.datakurator.data.provenance.CurationStatus;
 import org.datakurator.ffdq.annotations.Validation;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +78,7 @@ public class XLSXPostProcessor {
         }
     }
 
-    public void postprocess() {
+    public void postprocess(OutputStream out) {
         SXSSFWorkbook workbook = new SXSSFWorkbook();
         initStyles(workbook);
 
@@ -160,6 +158,7 @@ public class XLSXPostProcessor {
                     measuresRowNum++;
                 }
 
+                // initial and final values sheets
                 Row initialValuesRow = finalValuesSheet.createRow(rowNum);
                 Row finalValuesRow = initialValuesSheet.createRow(rowNum);
 
@@ -171,16 +170,23 @@ public class XLSXPostProcessor {
                     finalValuesRow.createCell(i).setCellValue(finalValue);
                 }
 
+                rowNum++;
+
                 // process assertions
 
                 for (Map<String, Object> assertion : assertions) {
                     List<String> fieldsActedUpon = (List<String>) assertion.get("actedUpon");
                     List<String> fieldsConsulted = (List<String>) assertion.get("consulted");
 
+                    String recordId = reportParser.getRecordId();
+
                     if ("VALIDATION".equalsIgnoreCase((String) assertion.get("type")) &&
                             "PRE_ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
                         Row validationsRow = validationsSheet.createRow(validationRowNum);
-                        validationsRow.createCell(0).setCellValue(reportParser.getRecordId());
+
+                        if (recordId != null) {
+                            validationsRow.createCell(0).setCellValue(recordId);
+                        }
                         validationsRow.createCell(1).setCellValue((String) assertion.get("name"));
 
                         String status = (String) assertion.get("status");
@@ -228,7 +234,9 @@ public class XLSXPostProcessor {
                             "ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
                         Row amendmentsRow = amendmentsSheet.createRow(amendmentRowNum);
 
-                        amendmentsRow.createCell(0).setCellValue(reportParser.getRecordId());
+                        if (recordId != null) {
+                            amendmentsRow.createCell(0).setCellValue(recordId);
+                        }
                         amendmentsRow.createCell(1).setCellValue((String) assertion.get("name"));
 
                         String status = (String) assertion.get("status");
@@ -261,6 +269,9 @@ public class XLSXPostProcessor {
                             "PRE_ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
                         Row measuresRow = measuresSheet.createRow(measuresRowNum);
 
+                        if (recordId != null) {
+                            measuresRow.createCell(0).setCellValue(recordId);
+                        }
                         measuresRow.createCell(1).setCellValue((String) assertion.get("name"));
 
                         String status = (String) assertion.get("status");
@@ -280,15 +291,14 @@ public class XLSXPostProcessor {
 
                         measuresRowNum++;
                     }
-
-                    rowNum++;
-                    validationRowNum++; // space between blocks of validations
-                    amendmentRowNum++;
-                    measuresRowNum++;
                 }
+
+                // add empty row between blocks of assertions
+                validationRowNum++;
+                amendmentRowNum++;
+                measuresRowNum++;
             }
 
-            FileOutputStream out = new FileOutputStream("tempsxssf.xlsx");
             workbook.write(out);
             out.close();
 
@@ -300,8 +310,8 @@ public class XLSXPostProcessor {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream(args[0]));
-        postProcessor.postprocess();
+        postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
     }
 }
