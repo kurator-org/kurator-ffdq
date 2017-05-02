@@ -5,6 +5,7 @@ import org.apache.jena.base.Sys;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -84,6 +85,7 @@ public class XLSXPostProcessor {
 
         int windowSize = 100; // keep 100 rows in memory, exceeding rows will be flushed to disk
 
+        SXSSFSheet summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
         SXSSFSheet finalValuesSheet = (SXSSFSheet) workbook.createSheet("Final Values");
         SXSSFSheet initialValuesSheet = (SXSSFSheet) workbook.createSheet("Initial Values");
 
@@ -91,6 +93,21 @@ public class XLSXPostProcessor {
         SXSSFSheet amendmentsSheet = (SXSSFSheet) workbook.createSheet("Amendments");
         SXSSFSheet measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
 
+        CellStyle summaryStyle = workbook.createCellStyle();
+        summaryStyle.setWrapText(true);
+
+        Row summaryRow = summarySheet.createRow(1);
+        Cell summaryCell = summaryRow.createCell(1);
+
+        summaryCell.setCellValue("The sheet labeled \"Final Values\" contains data including any changes made as part of running the workflow. The sheet labeled \"Initial Values\" contains the original data supplied as input to the workflow.\n" +
+                "\n" +
+                "The \"Validations\" sheet gives a summary for each of the validation tests performed. The \"Amendments sheet summarizes any changes made to the records. In both sheets rows indicating the test results are grouped by record and separated by spaces.\n" +
+                "\n" +
+                "The 'Measures' sheet contains the value of any measurements performed (i.e. precision, completeness).");
+
+        summaryCell.setCellStyle(summaryStyle);
+
+        summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
 
         finalValuesSheet.setRandomAccessWindowSize(100);
         initialValuesSheet.setRandomAccessWindowSize(100);
@@ -100,6 +117,7 @@ public class XLSXPostProcessor {
         measuresSheet.setRandomAccessWindowSize(100);
 
         Row validationsHeader = validationsSheet.createRow(0);
+        Row amendmentsHeader = amendmentsSheet.createRow(0);
 
         try {
             int rowNum = 0;
@@ -112,6 +130,7 @@ public class XLSXPostProcessor {
                 Map<String, String> finalValues = reportParser.getFinalValues();
 
                 List<Map<String, Object>> assertions = reportParser.getAssertions();
+                Map<String, Map<String, String>> profile = reportParser.getProfile();
 
                 if (header == null) {
                     header = new ArrayList<>();
@@ -123,7 +142,6 @@ public class XLSXPostProcessor {
                     Row initialValuesHeader = initialValuesSheet.createRow(rowNum);
                     Row finalValuesHeader = finalValuesSheet.createRow(rowNum);
 
-                    Row amendmentsHeader = amendmentsSheet.createRow(rowNum);
                     Row measuresHeader = measuresSheet.createRow(rowNum);
 
                     for (int i = 0; i < header.size(); i++) {
@@ -175,8 +193,12 @@ public class XLSXPostProcessor {
                 // process assertions
 
                 for (Map<String, Object> assertion : assertions) {
-                    List<String> fieldsActedUpon = (List<String>) assertion.get("actedUpon");
-                    List<String> fieldsConsulted = (List<String>) assertion.get("consulted");
+                    //List<String> fieldsActedUpon = (List<String>) assertion.get("actedUpon");
+                    //List<String> fieldsConsulted = (List<String>) assertion.get("consulted");
+
+                    List<String> fields = new ArrayList<>();
+                    fields.addAll((List<String>) assertion.get("actedUpon"));
+                    fields.addAll((List<String>) assertion.get("consulted"));
 
                     String recordId = reportParser.getRecordId();
 
@@ -187,7 +209,11 @@ public class XLSXPostProcessor {
                         if (recordId != null) {
                             validationsRow.createCell(0).setCellValue(recordId);
                         }
-                        validationsRow.createCell(1).setCellValue((String) assertion.get("name"));
+
+                        String test = (String) assertion.get("name");
+                        String validation = profile.get(test).get("label");
+
+                        validationsRow.createCell(1).setCellValue(validation);
 
                         String status = (String) assertion.get("status");
 
@@ -200,29 +226,14 @@ public class XLSXPostProcessor {
 
                         validationsRow.createCell(3).setCellValue((String) assertion.get("comment"));
 
-//                        for (int i = 0; i < fieldsActedUpon.size(); i++) {
-//                            String field = fieldsActedUpon.get(i);
-//                            Cell cell = validationsRow.createCell(i+4);
-//                            cell.setCellValue(initialValues.get(field));
-//
-//                            if (styles.containsKey(status)) {
-//                                cell.setCellStyle(styles.get(status));
-//                            }
-//                        }
+                        int columnOffset = 4;
+                        for (int colNum = 0; colNum < fields.size(); colNum++) {
+                            String field = fields.get(colNum);
+                            validationsHeader.createCell(columnOffset + colNum).setCellValue(field);
 
-                        for (String field : fieldsActedUpon) {
-                            if (!actedUponCols.containsKey(field)) {
-                                int colNum = actedUponCols.size();
-                                actedUponCols.put(field, colNum);
-
-                                int columnOffset = 4;
-                                validationsHeader.createCell(columnOffset + colNum).setCellValue(field);
-                            }
-
-                            int i = actedUponCols.get(field);
-
-                            Cell cell = validationsRow.createCell(i + 4);
-                            cell.setCellValue(initialValues.get(field));
+                            String value = initialValues.get(field);
+                            Cell cell = validationsRow.createCell(columnOffset + colNum);
+                            cell.setCellValue(value != null ? value : "");
 
                             if (styles.containsKey(status)) {
                                 cell.setCellStyle(styles.get(status));
@@ -237,7 +248,11 @@ public class XLSXPostProcessor {
                         if (recordId != null) {
                             amendmentsRow.createCell(0).setCellValue(recordId);
                         }
-                        amendmentsRow.createCell(1).setCellValue((String) assertion.get("name"));
+
+                        String test = (String) assertion.get("name");
+                        String amendment = profile.get(test).get("label");
+
+                        amendmentsRow.createCell(1).setCellValue(amendment);
 
                         String status = (String) assertion.get("status");
 
@@ -253,10 +268,14 @@ public class XLSXPostProcessor {
                         if (assertion.containsKey("result") && assertion.get("result") != null && !((Map) assertion.get("result")).isEmpty()) {
                             Map<String, String> result = (Map<String, String>) assertion.get("result");
 
-                            for (int i = 0; i < fieldsActedUpon.size(); i++) {
-                                String field = fieldsActedUpon.get(i);
-                                Cell cell = amendmentsRow.createCell(i + 4);
-                                cell.setCellValue(result.get(field));
+                            int columnOffset = 4;
+                            for (int colNum = 0; colNum < fields.size(); colNum++) {
+                                String field = fields.get(colNum);
+                                amendmentsHeader.createCell(columnOffset + colNum).setCellValue(field);
+
+                                String value = initialValues.get(field);
+                                Cell cell = amendmentsRow.createCell(columnOffset);
+                                cell.setCellValue(value != null ? value : "");
 
                                 if (styles.containsKey(status)) {
                                     cell.setCellStyle(styles.get(status));
@@ -272,7 +291,11 @@ public class XLSXPostProcessor {
                         if (recordId != null) {
                             measuresRow.createCell(0).setCellValue(recordId);
                         }
-                        measuresRow.createCell(1).setCellValue((String) assertion.get("name"));
+
+                        String test = (String) assertion.get("name");
+                        String measure = profile.get(test).get("label");
+
+                        measuresRow.createCell(1).setCellValue(measure);
 
                         String status = (String) assertion.get("status");
 

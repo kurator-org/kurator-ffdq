@@ -221,4 +221,8 @@ public class DQReportParser {
             System.out.println(recordId);
         }
     }
+
+    public Map<String,Map<String,String>> getProfile() {
+        return profile;
+    }
 }
