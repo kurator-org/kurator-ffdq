@@ -177,9 +177,11 @@ public class ValidationRunner {
         Map<String, String> initialValues = new HashMap<>(record);
 
         JSONArray reportArr = new JSONArray();
-        record = runStage(preEnhancementStage, record, instance, reportArr);
-        record = runStage(enhancementStage, record, instance, reportArr);
-        record = runStage(postEnhancementStage, record, instance, reportArr);
+        JSONObject reportStatus = new JSONObject();
+
+        record = runStage(preEnhancementStage, record, instance, reportArr, reportStatus);
+        record = runStage(enhancementStage, record, instance, reportArr, reportStatus);
+        record = runStage(postEnhancementStage, record, instance, reportArr, reportStatus);
         json.put("assertions", reportArr);
 
         json.put("initialValues", new JSONObject(initialValues));
@@ -193,8 +195,10 @@ public class ValidationRunner {
         count++;
     }
 
-    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray reportArr) throws InvocationTargetException, IllegalAccessException {
+    private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray reportArr, JSONObject reportStatus) throws InvocationTargetException, IllegalAccessException {
         for (ValidationTest validation : stage.getValidations()) {
+            Map<String, CurationStatus> validationState = new HashMap<>();
+
             DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, record));
 
             ResultState state = retVal.getResultState();
@@ -224,10 +228,20 @@ public class ValidationRunner {
                     status = CurationStatus.DATA_PREREQUISITES_NOT_MET;
                 }
 
+                for (String field : validation.fieldsActedUpon()) {
+                    if (!validationState.containsKey(field) || validationState.get(field) != CurationStatus.NOT_COMPLIANT) {
+                        validationState.put(field, status);
+                    }
+                }
+
                 json.put("status", status.name());
                 json.put("comment", retVal.getComment());
 
                 reportArr.add(json);
+
+                if (stage.getName().equals("PRE_ENHANCEMENT")) {
+                    reportStatus.put("validationState", new JSONObject(validationState));
+                }
             }
         }
 
@@ -266,6 +280,8 @@ public class ValidationRunner {
         Map<String, String> finalValues = new HashMap<>(record);
 
         for (ValidationTest amendment : stage.getAmendments()) {
+            Map<String, CurationStatus> amendmentState = new HashMap<>();
+
             JSONObject json = new JSONObject();
 
             DQAmendmentResponse retVal = (DQAmendmentResponse) amendment.getMethod().invoke(instance, assembleArgs(amendment, record));
@@ -286,6 +302,17 @@ public class ValidationRunner {
                 status = CurationStatus.TRANSPOSED;
             }
 
+            for (String field : amendment.fieldsActedUpon()) {
+                if (!amendmentState.containsKey(field) || amendmentState.get(field) != CurationStatus.CURATED &&
+                        amendmentState.get(field) != CurationStatus.FILLED_IN &&
+                        amendmentState.get(field) != CurationStatus.TRANSPOSED) {
+
+                    if (status != CurationStatus.NO_CHANGE) {
+                        amendmentState.put(field, status);
+                    }
+                }
+            }
+
             Map<String, String> result = retVal.getResult();
             finalValues.putAll(result);
 
@@ -294,6 +321,10 @@ public class ValidationRunner {
             json.put("comment", retVal.getComment());
 
             reportArr.add(json);
+
+            if (stage.getName().equals("ENHANCEMENT")) {
+                reportStatus.put("amendmentState", new JSONObject(amendmentState));
+            }
         }
 
         return finalValues;
