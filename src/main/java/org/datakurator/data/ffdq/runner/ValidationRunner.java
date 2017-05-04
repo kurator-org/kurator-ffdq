@@ -182,6 +182,7 @@ public class ValidationRunner {
         record = runStage(preEnhancementStage, record, instance, reportArr, reportStatus);
         record = runStage(enhancementStage, record, instance, reportArr, reportStatus);
         record = runStage(postEnhancementStage, record, instance, reportArr, reportStatus);
+        json.put("reportStatus", reportStatus);
         json.put("assertions", reportArr);
 
         json.put("initialValues", new JSONObject(initialValues));
@@ -197,7 +198,7 @@ public class ValidationRunner {
 
     private Map<String, String> runStage(RunnerStage stage, Map<String, String> record, Object instance, JSONArray reportArr, JSONObject reportStatus) throws InvocationTargetException, IllegalAccessException {
         for (ValidationTest validation : stage.getValidations()) {
-            Map<String, CurationStatus> validationState = new HashMap<>();
+            Map<String, String> validationState = new HashMap<>();
 
             DQValidationResponse retVal = (DQValidationResponse) validation.getMethod().invoke(instance, assembleArgs(validation, record));
 
@@ -229,8 +230,8 @@ public class ValidationRunner {
                 }
 
                 for (String field : validation.fieldsActedUpon()) {
-                    if (!validationState.containsKey(field) || validationState.get(field) != CurationStatus.NOT_COMPLIANT) {
-                        validationState.put(field, status);
+                    if (!validationState.containsKey(field) || !validationState.get(field).equals(CurationStatus.NOT_COMPLIANT.name())) {
+                        validationState.put(field, status.name());
                     }
                 }
 
@@ -280,7 +281,7 @@ public class ValidationRunner {
         Map<String, String> finalValues = new HashMap<>(record);
 
         for (ValidationTest amendment : stage.getAmendments()) {
-            Map<String, CurationStatus> amendmentState = new HashMap<>();
+            Map<String, String> amendmentState = new HashMap<>();
 
             JSONObject json = new JSONObject();
 
@@ -303,12 +304,12 @@ public class ValidationRunner {
             }
 
             for (String field : amendment.fieldsActedUpon()) {
-                if (!amendmentState.containsKey(field) || amendmentState.get(field) != CurationStatus.CURATED &&
-                        amendmentState.get(field) != CurationStatus.FILLED_IN &&
-                        amendmentState.get(field) != CurationStatus.TRANSPOSED) {
+                if (!amendmentState.containsKey(field) || !amendmentState.get(field).equals(CurationStatus.CURATED.name()) &&
+                        !amendmentState.get(field).equals(CurationStatus.FILLED_IN.name()) &&
+                        !amendmentState.get(field).equals(CurationStatus.TRANSPOSED.name())) {
 
                     if (status != CurationStatus.NO_CHANGE) {
-                        amendmentState.put(field, status);
+                        amendmentState.put(field, status.name());
                     }
                 }
             }

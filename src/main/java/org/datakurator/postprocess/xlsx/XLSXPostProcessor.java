@@ -129,6 +129,9 @@ public class XLSXPostProcessor {
                 Map<String, String> initialValues = reportParser.getInitialValues();
                 Map<String, String> finalValues = reportParser.getFinalValues();
 
+                Map<String, String> validationState = reportParser.getValidationState();
+                Map<String, String> amendmentState = reportParser.getAmendmentState();
+
                 List<Map<String, Object>> assertions = reportParser.getAssertions();
                 Map<String, Map<String, String>> profile = reportParser.getProfile();
 
@@ -148,6 +151,9 @@ public class XLSXPostProcessor {
                         initialValuesHeader.createCell(i).setCellValue(header.get(i));
                         finalValuesHeader.createCell(i).setCellValue(header.get(i));
                     }
+
+                    initialValuesHeader.createCell(header.size()).setCellValue("Data Quality Flags (Validations)");
+                    finalValuesHeader.createCell(header.size()).setCellValue("Data Quality Flags (Amendments)");
 
                     validationsHeader.createCell(0).setCellValue("Record Id");
                     validationsHeader.createCell(1).setCellValue("Validation");
@@ -176,21 +182,10 @@ public class XLSXPostProcessor {
                     measuresRowNum++;
                 }
 
-                // initial and final values sheets
-                Row initialValuesRow = finalValuesSheet.createRow(rowNum);
-                Row finalValuesRow = initialValuesSheet.createRow(rowNum);
-
-                for (int i = 0; i < header.size(); i++) {
-                    String initialValue = finalValues.get(header.get(i));
-                    String finalValue = finalValues.get(header.get(i));
-
-                    initialValuesRow.createCell(i).setCellValue(initialValue);
-                    finalValuesRow.createCell(i).setCellValue(finalValue);
-                }
-
-                rowNum++;
-
                 // process assertions
+
+                StringBuilder rowValidationTests = new StringBuilder();
+                StringBuilder rowAmendmentTests = new StringBuilder();
 
                 for (Map<String, Object> assertion : assertions) {
                     //List<String> fieldsActedUpon = (List<String>) assertion.get("actedUpon");
@@ -216,6 +211,12 @@ public class XLSXPostProcessor {
                         validationsRow.createCell(1).setCellValue(validation);
 
                         String status = (String) assertion.get("status");
+
+                        if (rowValidationTests.length() > 0) {
+                            rowValidationTests.append(", ");
+                        }
+
+                        rowValidationTests.append("[" + validation + "=" + status + "]");
 
                         Cell statusCell = validationsRow.createCell(2);
                         statusCell.setCellValue(status);
@@ -255,6 +256,14 @@ public class XLSXPostProcessor {
                         amendmentsRow.createCell(1).setCellValue(amendment);
 
                         String status = (String) assertion.get("status");
+
+                        if (!status.equals("NO_CHANGE")) {
+                            if (rowAmendmentTests.length() > 0) {
+                                rowAmendmentTests.append(", ");
+                            }
+
+                            rowAmendmentTests.append("[" + amendment + "=" + status + "]");
+                        }
 
                         Cell statusCell = amendmentsRow.createCell(2);
                         statusCell.setCellValue(status);
@@ -315,6 +324,43 @@ public class XLSXPostProcessor {
                         measuresRowNum++;
                     }
                 }
+
+
+                // initial and final values sheets
+                Row initialValuesRow = finalValuesSheet.createRow(rowNum);
+                Row finalValuesRow = initialValuesSheet.createRow(rowNum);
+
+                for (int i = 0; i < header.size(); i++) {
+                    String field = header.get(i);
+                    String initialValue = initialValues.get(field);
+                    String finalValue = finalValues.get(field);
+
+                    String initialStatus = validationState.get(field);
+                    String finalStatus = amendmentState.get(field);
+
+                    Cell initialValueCell = initialValuesRow.createCell(i);
+                    initialValueCell.setCellValue(initialValue);
+
+                    if (initialStatus != null) {
+                        if (styles.containsKey(initialStatus)) {
+                            initialValueCell.setCellStyle(styles.get(initialStatus));
+                        }
+                    }
+
+                    Cell finalValueCell = finalValuesRow.createCell(i);
+                    finalValueCell.setCellValue(finalValue);
+
+                    if (finalStatus != null) {
+                        if (styles.containsKey(finalStatus)) {
+                            finalValueCell.setCellStyle(styles.get(finalStatus));
+                        }
+                    }
+                }
+
+                initialValuesRow.createCell(header.size()).setCellValue(rowValidationTests.toString());
+                finalValuesRow.createCell(header.size()).setCellValue(rowAmendmentTests.toString());
+
+                rowNum++;
 
                 // add empty row between blocks of assertions
                 validationRowNum++;

@@ -25,6 +25,9 @@ public class DQReportParser {
     private static final int IN_RESULT = 6;
     private static final int IN_ACTED_UPON = 7;
     private static final int IN_CONSULTED = 8;
+    private static final int IN_REPORT_STATUS = 9;
+    private static final int IN_VALIDATION_STATE = 10;
+    private static final int IN_AMENDMENT_STATE = 11;
 
     private JsonParser parser;
     private int state = DEFAULT;
@@ -41,6 +44,9 @@ public class DQReportParser {
     private List<String> fieldsConsulted;
 
     private Map<String, Map<String, String>> profile = new HashMap<>();
+
+    private Map<String, String> validationState;
+    private Map<String, String> amendmentState;
 
     public DQReportParser(InputStream reportStream) throws IOException {
         if (reportStream == null) {
@@ -61,6 +67,14 @@ public class DQReportParser {
 
     public Map<String, String> getFinalValues() {
         return finalValues;
+    }
+
+    public Map<String, String> getValidationState() {
+        return validationState;
+    }
+
+    public Map<String, String> getAmendmentState() {
+        return amendmentState;
     }
 
     public List<Map<String, Object>> getAssertions() {
@@ -115,8 +129,10 @@ public class DQReportParser {
                         state = IN_INITIALVALS;
                     } else if (field.equals("finalValues")) {
                         state = IN_FINALVALS;
+                    } else if (field.equals("reportStatus")) {
+                        state = IN_REPORT_STATUS;
                     }
-                } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
+            } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     // TODO: Post process the result here
                     return true;
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
@@ -164,6 +180,39 @@ public class DQReportParser {
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     //System.out.println(finalValues);
                     state = IN_REPORTS;
+                }
+            } else if (state == IN_REPORT_STATUS) {
+                if (jsonToken.equals(JsonToken.FIELD_NAME)) {
+                    String field = parser.getCurrentName();
+                    if (field.equals("validationState")) {
+                        state = IN_VALIDATION_STATE;
+                    } else if (field.equals("amendmentState")) {
+                        state = IN_AMENDMENT_STATE;
+                    }
+                } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
+                    state = IN_REPORTS;
+                }
+            } else if (state == IN_VALIDATION_STATE) {
+                if (jsonToken.equals(JsonToken.START_OBJECT)) {
+                    validationState = new HashMap<>();
+                } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
+                    String field = parser.getCurrentName();
+                    parser.nextValue();
+
+                    validationState.put(field, parser.getValueAsString());
+                } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
+                    state = IN_REPORT_STATUS;
+                }
+            } else if (state == IN_AMENDMENT_STATE) {
+                if (jsonToken.equals(JsonToken.START_OBJECT)) {
+                    amendmentState = new HashMap<>();
+                } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
+                    String field = parser.getCurrentName();
+                    parser.nextValue();
+
+                    amendmentState.put(field, parser.getValueAsString());
+                } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
+                    state = IN_REPORT_STATUS;
                 }
             } else if (state == IN_CONTEXT) {
                 if (jsonToken.equals(JsonToken.FIELD_NAME)) {
