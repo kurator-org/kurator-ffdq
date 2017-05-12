@@ -1,16 +1,12 @@
 package org.datakurator.postprocess.xlsx;
 
-import com.github.jsonldjava.utils.Obj;
-import org.apache.jena.base.Sys;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.datakurator.data.provenance.CurationStatus;
-import org.datakurator.ffdq.annotations.Validation;
 
 import java.io.*;
 import java.util.ArrayList;

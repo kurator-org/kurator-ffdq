@@ -1,6 +1,5 @@
 package org.datakurator.data.ffdq.runner;
 
-import org.apache.jena.base.Sys;
 import org.datakurator.data.ffdq.assertions.Result;
 import org.datakurator.data.provenance.BaseRecord;
 import org.datakurator.data.provenance.CurationStatus;
