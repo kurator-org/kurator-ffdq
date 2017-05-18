@@ -16,7 +16,11 @@ public class ValidationParam {
     }
 
     public void setTerm(String term) {
-        this.term = term;
+        if (term.contains(":")) {
+            this.term = term.substring(term.indexOf(":")+1);
+        } else {
+            this.term = term;
+        }
     }
 
     public String getValue() {
