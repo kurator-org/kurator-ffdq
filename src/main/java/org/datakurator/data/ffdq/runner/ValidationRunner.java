@@ -358,10 +358,16 @@ public class ValidationRunner {
             List<ValidationParam> inputs = test.getInputs();
             String[] args = new String[inputs.size()];
 
+            Map<String, String> dwcRecord = new HashMap<String, String>();
+            for (String term : record.keySet()) {
+                String dwcTerm = term.substring(term.indexOf(":")+1);
+                dwcRecord.put(dwcTerm, record.get(term));
+            }
+
             for (int i = 0; i < args.length; i++) {
                 ValidationParam input = inputs.get(i);
                 String term = input.getTerm();
-                String value = record.get(term);
+                String value = dwcRecord.get(term);
 
                 args[i] = value;
             }
