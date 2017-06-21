@@ -128,17 +128,32 @@ public class XLSXPostProcessor {
                 Map<String, String> finalValues = reportParser.getFinalValues();
 
                 // TODO: Fix color coding on final values sheet
-                Map<String, String> validationState = reportParser.getValidationState();
+                Map<String, String> validationState = new HashMap<>();
                 Map<String, String> amendmentState = reportParser.getAmendmentState();
 
                 // process assertions and create flags
                 StringBuilder rowValidationTests = new StringBuilder();
+
                 for (Validation validation : reportParser.getValidations()) {
                     String test = validation.getTest().getName();
                     String status = validation.getStatus();
 
                     String flag = "[" + test + "_" + status + "] ";
                     rowValidationTests.append(flag);
+
+                    for (String field : validation.getContext().getFieldsActedUpon()) {
+                        String fieldStatus = validationState.get(field);
+
+                        if (status.equals("COMPLIANT") && fieldStatus == null) {
+                            fieldStatus = "COMPLIANT";
+                        } else if (status.equals("DATA_PREREQUISITES_NOT_MET") && fieldStatus != "NON_COMPLIANT") {
+                            fieldStatus = "DATA_PREREQUISITES_NOT_MET";
+                        } else if (status.equals("NON_COMPLIANT")) {
+                            fieldStatus = "NON_COMPLIANT";
+                        }
+
+                        validationState.put(field, fieldStatus);
+                    }
                 }
 
                 StringBuilder rowAmendmentTests = new StringBuilder();
@@ -148,6 +163,21 @@ public class XLSXPostProcessor {
 
                     String flag = "[" + test + "_" + status + "] ";
                     rowAmendmentTests.append(flag);
+
+                    for (String field : improvement.getContext().getFieldsActedUpon()) {
+                        String fieldStatus = amendmentState.get(field);
+
+                        if (status.equals("NO_CHANGE") && fieldStatus == null) {
+                            fieldStatus = "NO_CHANGE";
+                        } else if (status.equals("DATA_PREREQUISITES_NOT_MET") && !fieldStatus.equals("FILLED_IN")) {
+                            fieldStatus = "DATA_PREREQUISITES_NOT_MET";
+                        } else if (status.equals("FILLED_IN")) {
+                            fieldStatus = "FILLED_IN";
+                        }
+
+                        amendmentState.put(field, fieldStatus);
+                    }
+
                 }
 
                 String recordId = reportParser.getRecordId(); // TODO: Fix this
