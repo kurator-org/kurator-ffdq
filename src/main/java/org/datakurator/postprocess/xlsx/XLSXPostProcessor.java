@@ -24,6 +24,14 @@ public class XLSXPostProcessor {
     private static Map<String, CellStyle> styles = new HashMap<>();
     private static Map<String, Integer> actedUponCols = new HashMap<>();
 
+    private SXSSFSheet summarySheet;
+    private SXSSFSheet finalValuesSheet;
+    private SXSSFSheet initialValuesSheet;
+
+    private SXSSFSheet validationsSheet;
+    private SXSSFSheet amendmentsSheet;
+    private SXSSFSheet measuresSheet;
+
     private static void initStyles(Workbook wb) {
         // White font
         Font font = wb.createFont();
@@ -76,41 +84,26 @@ public class XLSXPostProcessor {
     }
 
     public void postprocess(OutputStream out) {
+        int windowSize = 100; // keep 100 rows in memory, exceeding rows will be flushed to disk
+
+        // Create the workbook and initialize the cell styles
         SXSSFWorkbook workbook = new SXSSFWorkbook();
         initStyles(workbook);
 
-        int windowSize = 100; // keep 100 rows in memory, exceeding rows will be flushed to disk
-
-        SXSSFSheet summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
-        SXSSFSheet finalValuesSheet = (SXSSFSheet) workbook.createSheet("Final Values");
-        SXSSFSheet initialValuesSheet = (SXSSFSheet) workbook.createSheet("Initial Values");
-
-        SXSSFSheet validationsSheet = (SXSSFSheet) workbook.createSheet("Validations");
-        SXSSFSheet amendmentsSheet = (SXSSFSheet) workbook.createSheet("Amendments");
-        SXSSFSheet measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
-
-        CellStyle summaryStyle = workbook.createCellStyle();
-        summaryStyle.setWrapText(true);
-
-        Row summaryRow = summarySheet.createRow(1);
-        Cell summaryCell = summaryRow.createCell(1);
-
-        summaryCell.setCellValue("The sheet labeled \"Final Values\" contains data including any changes made as part of running the workflow. The sheet labeled \"Initial Values\" contains the original data supplied as input to the workflow.\n" +
+        // Summary sheet containing descriptive text
+        String summaryText = "The sheet labeled \"Final Values\" contains data including any changes " +
+                "made as part of running the workflow. The sheet labeled \"Initial Values\" contains the original data " +
+                "supplied as input to the workflow.\n" +
                 "\n" +
-                "The \"Validations\" sheet gives a summary for each of the validation tests performed. The \"Amendments sheet summarizes any changes made to the records. In both sheets rows indicating the test results are grouped by record and separated by spaces.\n" +
+                "The \"Validations\" sheet gives a summary for each of the validation tests performed. The \"Amendments " +
+                "sheet summarizes any changes made to the records. In both sheets rows indicating the test results are " +
+                "grouped by record and separated by spaces.\n" +
                 "\n" +
-                "The 'Measures' sheet contains the value of any measurements performed (i.e. precision, completeness).");
+                "The 'Measures' sheet contains the value of any measurements performed (i.e. precision, completeness).";
 
-        summaryCell.setCellStyle(summaryStyle);
+        createSummarySheet(workbook, summaryText);
 
-        summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
-
-        finalValuesSheet.setRandomAccessWindowSize(100);
-        initialValuesSheet.setRandomAccessWindowSize(100);
-
-        validationsSheet.setRandomAccessWindowSize(100);
-        amendmentsSheet.setRandomAccessWindowSize(100);
-        measuresSheet.setRandomAccessWindowSize(100);
+        initSheets(workbook, windowSize);
 
         Row validationsHeader = validationsSheet.createRow(0);
         Row amendmentsHeader = amendmentsSheet.createRow(0);
@@ -128,7 +121,8 @@ public class XLSXPostProcessor {
                 Map<String, String> validationState = reportParser.getValidationState();
                 Map<String, String> amendmentState = reportParser.getAmendmentState();
 
-                List<Map<String, Object>> assertions = reportParser.getAssertions();
+                //List<Map<String, Object>> assertions = reportParser.getAssertions();
+                List<Map<String, Object>> assertions = null;
                 Map<String, Map<String, String>> profile = reportParser.getProfile();
 
                 if (header == null) {
@@ -373,6 +367,45 @@ public class XLSXPostProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createSummarySheet(SXSSFWorkbook workbook, String summaryText) {
+        // Wrap text on the summary page
+        CellStyle summaryStyle = workbook.createCellStyle();
+        summaryStyle.setWrapText(true);
+
+        // Add the summary text to the cell
+        Row summaryRow = summarySheet.createRow(1);
+        Cell summaryCell = summaryRow.createCell(1);
+
+        summaryCell.setCellValue(summaryText);
+
+        summaryCell.setCellStyle(summaryStyle);
+
+        // Create a merged region from (1,1) to (7,9) for the summary text
+        summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
+    }
+
+    private void initSheets(SXSSFWorkbook workbook, int windowSize) {
+        summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
+
+        // Final values sheet
+        finalValuesSheet = (SXSSFSheet) workbook.createSheet("Final Values");
+        finalValuesSheet.setRandomAccessWindowSize(windowSize);
+
+        // Initial values sheet
+        initialValuesSheet = (SXSSFSheet) workbook.createSheet("Initial Values");
+        initialValuesSheet.setRandomAccessWindowSize(windowSize);
+
+        // Sheets for the ffdq assertions: validations, amendements and measures
+        validationsSheet = (SXSSFSheet) workbook.createSheet("Validations");
+        validationsSheet.setRandomAccessWindowSize(windowSize);
+
+        amendmentsSheet = (SXSSFSheet) workbook.createSheet("Amendments");
+        amendmentsSheet.setRandomAccessWindowSize(windowSize);
+
+        measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
+        measuresSheet.setRandomAccessWindowSize(windowSize);
     }
 
     public static void main(String[] args) throws FileNotFoundException {

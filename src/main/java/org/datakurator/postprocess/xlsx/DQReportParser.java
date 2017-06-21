@@ -3,6 +3,7 @@ package org.datakurator.postprocess.xlsx;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import org.datakurator.postprocess.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,19 +32,21 @@ public class DQReportParser {
 
     private JsonParser parser;
     private int state = DEFAULT;
-    private Map<String, String> currObj;
+    private Object currObj;
 
     private String recordId;
 
     private Map<String, String> initialValues;
     private Map<String, String> finalValues;
 
-    private Map<String, Object> assertion;
-    private List<Map<String, Object>> assertions;
+    private Map<String, Object> currAssertion;
+    private Context currContext;
+
+    private Map<String, List<Assertion>> assertions = new HashMap<>();
     private List<String> fieldsActedUpon;
     private List<String> fieldsConsulted;
 
-    private Map<String, Map<String, String>> profile = new HashMap<>();
+    private Map<String, Test> profile = new HashMap<>();
 
     private Map<String, String> validationState;
     private Map<String, String> amendmentState;
@@ -77,8 +80,8 @@ public class DQReportParser {
         return amendmentState;
     }
 
-    public List<Map<String, Object>> getAssertions() {
-        return assertions;
+    public List<Assertion> getAssertions(String stage) {
+        return assertions.get(stage);
     }
 
     public List<String> getActedUpon() {
@@ -101,36 +104,62 @@ public class DQReportParser {
                 }
             } else if (state == IN_PROFILE) {
                 if (jsonToken.equals(JsonToken.START_OBJECT)) {
-                    currObj = new HashMap<>();
+                    // Create the test profile
+                    currObj = new Test();
                 } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
                     String field = parser.getCurrentName();
+
                     parser.nextValue();
-                    currObj.put(field, parser.getValueAsString());
+                    String value = parser.getValueAsString();
+
+                    Test test = (Test) currObj;
+
+                    switch (field) {
+                        case "name":
+                            test.setName(value);
+                            break;
+                        case "description":
+                            test.setDescription(value);
+                        case "specification":
+                            test.setSpecification(value);
+                        case "label":
+                            test.setLabel(value);
+                        case "type":
+                            test.setType(value);
+                        case "mechanism":
+                            test.setMechanism(value);
+                    }
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    profile.put(currObj.remove("name"), currObj);
+                    Test test = (Test) currObj;
+                    profile.put(test.getName(), test);
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     state = DEFAULT;
-                    //System.out.println(profile);
                 }
             } else if (state == IN_REPORTS) {
                 if (jsonToken.equals(JsonToken.START_ARRAY)) {
                     // TODO: Initialize the post processor here
                 } else if (jsonToken.equals(JsonToken.START_OBJECT)) {
-                    assertions = new ArrayList<>();
+                    assertions = new HashMap<>();
                 } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
                     String field = parser.getCurrentName();
 
-                    if (field.equals("recordId")) {
-                        parser.nextValue();
-                        recordId = parser.getValueAsString();
-                    } else if (field.equals("assertions")) {
-                        state = IN_ASSERTIONS;
-                    } else if (field.equals("initialValues")) {
-                        state = IN_INITIALVALS;
-                    } else if (field.equals("finalValues")) {
-                        state = IN_FINALVALS;
-                    } else if (field.equals("reportStatus")) {
-                        state = IN_REPORT_STATUS;
+                    switch (field) {
+                        case "recordId":
+                            parser.nextValue();
+                            recordId = parser.getValueAsString();
+                            break;
+                        case "assertions":
+                            state = IN_ASSERTIONS;
+                            break;
+                        case "initialValues":
+                            state = IN_INITIALVALS;
+                            break;
+                        case "finalValues":
+                            state = IN_FINALVALS;
+                            break;
+                        case "reportStatus":
+                            state = IN_REPORT_STATUS;
+                            break;
                     }
             } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     // TODO: Post process the result here
@@ -141,19 +170,58 @@ public class DQReportParser {
                 }
             } else if (state == IN_ASSERTIONS) {
                 if (jsonToken.equals(JsonToken.START_OBJECT)) {
-                    assertion = new HashMap<>();
+                    currAssertion = new HashMap<>();
                 } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
                     String field = parser.getCurrentName();
-                    if (field.equals("context")) {
-                        state = IN_CONTEXT;
-                    } else if (field.equals("result")) {
-                        state = IN_RESULT;
-                    } else {
-                        parser.nextValue();
-                        assertion.put(field, parser.getValueAsString());
+
+                    switch (field) {
+                        case "context":
+                            state = IN_CONTEXT;
+                            break;
+                        case "result":
+                            state = IN_RESULT;
+                            break;
+                        default:
+                            parser.nextValue();
+                            currAssertion.put(field, parser.getValueAsString());
+                            break;
                     }
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    assertions.add(assertion);
+                    String type = (String) currAssertion.get("type");
+                    String comment = (String) currAssertion.get("comment");
+                    String status = (String) currAssertion.get("status");
+                    Context context = (Context) currAssertion.get("context");
+
+                    Test test = profile.get(currAssertion.get("name"));
+                    Assertion assertion = null;
+
+                    if ("VALIDATION".equalsIgnoreCase(type)) {
+                        assertion = new Validation();
+                    } else if ("MEASURE".equalsIgnoreCase(type)) {
+                        Measure measure = new Measure();
+                        measure.setValue((String) currAssertion.get("value"));
+
+                        assertion = measure;
+                    } else if ("AMENDMENT".equalsIgnoreCase(type)) {
+                        Improvement improvement = new Improvement();
+                        improvement.setEnhancement((String) currAssertion.get("enhancement"));
+                        improvement.setResult((Map<String, String>) currAssertion.get("result"));
+
+                        assertion = improvement;
+                    }
+
+                    assertion.setTest(test);
+                    assertion.setContext(context);
+                    assertion.setComment(comment);
+                    assertion.setStatus(status);
+
+                    List<Assertion> list = assertions.get(currAssertion.get("stage"));
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        assertions.put((String) currAssertion.get("stage"), list);
+                    }
+
+                    list.add(assertion);
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     state = IN_REPORTS;
                 }
@@ -166,7 +234,6 @@ public class DQReportParser {
 
                     initialValues.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    //System.out.println(initialValues);
                     state = IN_REPORTS;
                 }
             } else if (state == IN_FINALVALS) {
@@ -178,7 +245,6 @@ public class DQReportParser {
 
                     finalValues.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    //System.out.println(finalValues);
                     state = IN_REPORTS;
                 }
             } else if (state == IN_REPORT_STATUS) {
@@ -215,7 +281,9 @@ public class DQReportParser {
                     state = IN_REPORT_STATUS;
                 }
             } else if (state == IN_CONTEXT) {
-                if (jsonToken.equals(JsonToken.FIELD_NAME)) {
+                if (jsonToken.equals(JsonToken.START_OBJECT)) {
+                    currContext = new Context();
+                } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
                     String field = parser.getCurrentName();
                     if (field.equals("fieldsActedUpon")) {
                         state = IN_ACTED_UPON;
@@ -223,6 +291,7 @@ public class DQReportParser {
                         state = IN_CONSULTED;
                     }
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
+                    currAssertion.put("context", currContext);
                     state = IN_ASSERTIONS;
                 }
             } else if (state == IN_ACTED_UPON) {
@@ -231,8 +300,7 @@ public class DQReportParser {
                 } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
                     fieldsActedUpon.add(parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
-                    assertion.put("actedUpon", fieldsActedUpon);
-                    //System.out.println(fieldsActedUpon);
+                    currContext.setFieldsActedUpon(fieldsActedUpon);
                     state = IN_CONTEXT;
                 }
             } else if (state == IN_CONSULTED) {
@@ -241,20 +309,20 @@ public class DQReportParser {
                 } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
                     fieldsConsulted.add(parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
-                    assertion.put("consulted", fieldsConsulted);
-                    //System.out.println(fieldsConsulted);
+                    currContext.setFieldsConsulted(fieldsConsulted);
                     state = IN_CONTEXT;
                 }
             } else if (state == IN_RESULT) {
                 if (jsonToken.equals(JsonToken.START_OBJECT)) {
-                    currObj = new HashMap<>();
+                    currObj = new HashMap<String, String>();
                 } else if (jsonToken.equals(JsonToken.FIELD_NAME)) {
                     String field = parser.getCurrentName();
                     parser.nextValue();
 
-                    currObj.put(field, parser.getValueAsString());
+                    Map<String, String> result = (Map<String, String>) currObj;
+                    result.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
-                    assertion.put("result", currObj);
+                    currAssertion.put("result", currObj);
                     state = IN_ASSERTIONS;
                 }
             }
@@ -264,7 +332,7 @@ public class DQReportParser {
     }
 
     public static void main(String[] args) throws IOException {
-        DQReportParser parser = new DQReportParser(DQReportParser.class.getResourceAsStream("/dq_report.json"));
+        DQReportParser parser = new DQReportParser(DQReportParser.class.getResourceAsStream("/mcz_test.json"));
             while (parser.next()) {
             String recordId = parser.getRecordId();
             System.out.println(recordId);
@@ -272,6 +340,6 @@ public class DQReportParser {
     }
 
     public Map<String,Map<String,String>> getProfile() {
-        return profile;
+        return null;
     }
 }

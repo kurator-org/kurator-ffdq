@@ -23,7 +23,7 @@ import java.util.Map;
  */
 
 public class ValidationRunner {
-    private static final String RECORD_ID_FIELD = "dwc:occurrenceID";
+    private static final String RECORD_ID_FIELD = "occurrenceID";
     private String mechanism;
     private long count = 0;
 
