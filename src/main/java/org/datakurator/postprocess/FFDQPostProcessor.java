@@ -108,11 +108,6 @@ public class FFDQPostProcessor {
         return mapper.writeValueAsString(summary);
     }
 
-    public void reportSummary(File outputFile) throws IOException {
-        ReportSummary summary = new ReportSummary(reports);
-        summary.toXls(outputFile);
-    }
-
     public List<AssertionSummary> validationSummary() {
         List<AssertionSummary> summaryList = new ArrayList<>();
 

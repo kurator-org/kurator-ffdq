@@ -7,10 +7,7 @@ import org.datakurator.postprocess.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lowery on 2/17/2017.
@@ -38,11 +35,14 @@ public class DQReportParser {
 
     private Map<String, String> initialValues;
     private Map<String, String> finalValues;
+    private Set<String> dataResourceFields = new HashSet<>();
 
     private Map<String, Object> currAssertion;
     private Context currContext;
 
     private Map<String, List<Assertion>> assertions = new HashMap<>();
+    private Set<String> assertionFields = new HashSet<>();
+
     private List<String> fieldsActedUpon;
     private List<String> fieldsConsulted;
 
@@ -84,8 +84,60 @@ public class DQReportParser {
         return assertions.get(stage);
     }
 
-    public List<String> getActedUpon() {
-        return fieldsActedUpon;
+    public List<Validation> getValidations() {
+        List<Validation> validations = new ArrayList<>();
+
+        for (Assertion assertion : assertions.get("PRE_ENHANCEMENT")) {
+            if (assertion.getTest().getType().equalsIgnoreCase("VALIDATION")) {
+                validations.add((Validation) assertion);
+            }
+        }
+
+        return validations;
+    }
+
+    public List<Measure> getMeasures() {
+        List<Measure> measures = new ArrayList<>();
+
+        for (Assertion assertion : assertions.get("PRE_ENHANCEMENT")) {
+            if (assertion.getTest().getType().equalsIgnoreCase("MEASURE")) {
+                measures.add((Measure) assertion);
+            }
+        }
+
+        return measures;
+    }
+
+    public List<Improvement> getAmendments() {
+        List<Improvement> amendments = new ArrayList<>();
+
+        for (Assertion assertion : assertions.get("ENHANCEMENT")) {
+            if (assertion.getTest().getType().equalsIgnoreCase("AMENDMENT")) {
+                amendments.add((Improvement) assertion);
+            }
+        }
+
+        return amendments;
+    }
+
+    public List<String> getDataResourceFields() {
+        List<String> fields = new ArrayList<>();
+
+        for (String field : dataResourceFields) {
+            fields.add(field);
+        }
+
+        return fields;
+    }
+
+    public List<String> getAssertionFields() {
+        List<String> fields = new ArrayList<>();
+
+        for (String field : assertionFields) {
+            fields.add(field);
+        }
+
+        return fields;
     }
 
     public boolean next() throws IOException {
@@ -232,6 +284,7 @@ public class DQReportParser {
                     String field = parser.getCurrentName();
                     parser.nextValue();
 
+                    dataResourceFields.add(field);
                     initialValues.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     state = IN_REPORTS;
@@ -243,6 +296,7 @@ public class DQReportParser {
                     String field = parser.getCurrentName();
                     parser.nextValue();
 
+                    dataResourceFields.add(field);
                     finalValues.put(field, parser.getValueAsString());
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     state = IN_REPORTS;
@@ -298,7 +352,9 @@ public class DQReportParser {
                 if (jsonToken.equals(JsonToken.START_ARRAY)) {
                     fieldsActedUpon = new ArrayList<>();
                 } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
-                    fieldsActedUpon.add(parser.getValueAsString());
+                    String value = parser.getValueAsString();
+                    fieldsActedUpon.add(value);
+                    assertionFields.add(value);
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     currContext.setFieldsActedUpon(fieldsActedUpon);
                     state = IN_CONTEXT;
@@ -307,7 +363,9 @@ public class DQReportParser {
                 if (jsonToken.equals(JsonToken.START_ARRAY)) {
                     fieldsConsulted = new ArrayList<>();
                 } else if (jsonToken.equals(JsonToken.VALUE_STRING)) {
-                    fieldsConsulted.add(parser.getValueAsString());
+                    String value = parser.getValueAsString();
+                    fieldsConsulted.add(value);
+                    assertionFields.add(value);
                 } else if (jsonToken.equals(JsonToken.END_ARRAY)) {
                     currContext.setFieldsConsulted(fieldsConsulted);
                     state = IN_CONTEXT;
@@ -339,7 +397,7 @@ public class DQReportParser {
         }
     }
 
-    public Map<String,Map<String,String>> getProfile() {
+    public Map<String,Test> getProfile() {
         return null;
     }
 }

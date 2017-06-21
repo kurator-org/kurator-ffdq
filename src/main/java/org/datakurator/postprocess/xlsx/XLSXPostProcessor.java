@@ -7,12 +7,10 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.datakurator.data.provenance.CurationStatus;
+import org.datakurator.postprocess.model.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lowery on 2/17/2017.
@@ -24,13 +22,21 @@ public class XLSXPostProcessor {
     private static Map<String, CellStyle> styles = new HashMap<>();
     private static Map<String, Integer> actedUponCols = new HashMap<>();
 
-    private SXSSFSheet summarySheet;
-    private SXSSFSheet finalValuesSheet;
-    private SXSSFSheet initialValuesSheet;
+    private ReportSummary initialValuesSummary;
+    private ReportSummary finalValuesSummary;
 
-    private SXSSFSheet validationsSheet;
-    private SXSSFSheet amendmentsSheet;
-    private SXSSFSheet measuresSheet;
+    private AssertionSummary validationSummary;
+    private AssertionSummary measureSummary;
+    private AssertionSummary amendmentSummary;
+
+    public XLSXPostProcessor(InputStream reportStream) {
+        try {
+            reportParser = new DQReportParser(reportStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private static void initStyles(Workbook wb) {
         // White font
@@ -75,18 +81,10 @@ public class XLSXPostProcessor {
         styles.put(CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET.toString(), style);
     }
 
-    public XLSXPostProcessor(InputStream reportStream) {
-        try {
-            reportParser = new DQReportParser(reportStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void postprocess(OutputStream out) {
         int windowSize = 100; // keep 100 rows in memory, exceeding rows will be flushed to disk
 
-        // Create the workbook and initialize the cell styles
+        // Create the workbook and initialize cell styles
         SXSSFWorkbook workbook = new SXSSFWorkbook();
         initStyles(workbook);
 
@@ -103,259 +101,51 @@ public class XLSXPostProcessor {
 
         createSummarySheet(workbook, summaryText);
 
-        initSheets(workbook, windowSize);
-
-        Row validationsHeader = validationsSheet.createRow(0);
-        Row amendmentsHeader = amendmentsSheet.createRow(0);
 
         try {
-            int rowNum = 0;
-            int validationRowNum = 0;
-            int amendmentRowNum = 0;
-            int measuresRowNum = 0;
-
             while(reportParser.next()) {
+
+                if (validationSummary == null) {
+                    validationSummary = new AssertionSummary(reportParser.getAssertionFields(), "Validations", workbook, styles, Validation.class);
+                }
+
+                if (measureSummary == null) {
+                    measureSummary = new AssertionSummary(reportParser.getAssertionFields(), "Measures", workbook, styles, Measure.class);
+                }
+
+                if (amendmentSummary == null) {
+                    amendmentSummary = new AssertionSummary(reportParser.getAssertionFields(), "Amendments", workbook, styles, Improvement.class);
+                }
+
+                if (initialValuesSummary == null) {
+                    initialValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Initial Values", workbook);
+                }
+
+                if (finalValuesSummary == null) {
+                    finalValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Final Values", workbook);
+                }
+
+                System.out.println(reportParser.getAssertionFields());
                 Map<String, String> initialValues = reportParser.getInitialValues();
                 Map<String, String> finalValues = reportParser.getFinalValues();
 
-                Map<String, String> validationState = reportParser.getValidationState();
-                Map<String, String> amendmentState = reportParser.getAmendmentState();
-
-                //List<Map<String, Object>> assertions = reportParser.getAssertions();
-                List<Map<String, Object>> assertions = null;
-                Map<String, Map<String, String>> profile = reportParser.getProfile();
-
-                if (header == null) {
-                    header = new ArrayList<>();
-                    for (String key : finalValues.keySet()) {
-                        header.add(key);
-                    }
-
-                    // Create header row
-                    Row initialValuesHeader = initialValuesSheet.createRow(rowNum);
-                    Row finalValuesHeader = finalValuesSheet.createRow(rowNum);
-
-                    Row measuresHeader = measuresSheet.createRow(rowNum);
-
-                    for (int i = 0; i < header.size(); i++) {
-                        initialValuesHeader.createCell(i).setCellValue(header.get(i));
-                        finalValuesHeader.createCell(i).setCellValue(header.get(i));
-                    }
-
-                    initialValuesHeader.createCell(header.size()).setCellValue("Data Quality Flags (Validations)");
-                    finalValuesHeader.createCell(header.size()).setCellValue("Data Quality Flags (Amendments)");
-
-                    validationsHeader.createCell(0).setCellValue("Record Id");
-                    validationsHeader.createCell(1).setCellValue("Validation");
-                    validationsHeader.createCell(2).setCellValue("Status");
-                    validationsHeader.createCell(3).setCellValue("Comment");
-
-                    amendmentsHeader.createCell(0).setCellValue("Record Id");
-                    amendmentsHeader.createCell(1).setCellValue("Amendment");
-                    amendmentsHeader.createCell(2).setCellValue("Status");
-                    amendmentsHeader.createCell(3).setCellValue("Comment");
-
-                    measuresHeader.createCell(0).setCellValue("Record Id");
-                    measuresHeader.createCell(1).setCellValue("Measure");
-                    measuresHeader.createCell(2).setCellValue("Status");
-                    measuresHeader.createCell(3).setCellValue("Comment");
-                    measuresHeader.createCell(4).setCellValue("Value");
-
-                    //for (int i = 0; i < fieldsActedUpon.size(); i++) {
-                    //    validationsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
-                    //    amendmentsHeader.createCell(i+4).setCellValue(fieldsActedUpon.get(i));
-                    //}
-
-                    rowNum++;
-                    validationRowNum++;
-                    amendmentRowNum++;
-                    measuresRowNum++;
-                }
+                // TODO: Fix color coding on final values sheet
+                //Map<String, String> validationState = reportParser.getValidationState();
+                //Map<String, String> amendmentState = reportParser.getAmendmentState();
 
                 // process assertions
+                //StringBuilder rowValidationTests = new StringBuilder();
+                //StringBuilder rowAmendmentTests = new StringBuilder();
 
-                StringBuilder rowValidationTests = new StringBuilder();
-                StringBuilder rowAmendmentTests = new StringBuilder();
+                String recordId = reportParser.getRecordId(); // TODO: Fix this
 
-                for (Map<String, Object> assertion : assertions) {
-                    //List<String> fieldsActedUpon = (List<String>) assertion.get("actedUpon");
-                    //List<String> fieldsConsulted = (List<String>) assertion.get("consulted");
+                initialValuesSummary.postprocess(initialValues);
+                finalValuesSummary.postprocess(finalValues);
 
-                    List<String> fields = new ArrayList<>();
-                    fields.addAll((List<String>) assertion.get("actedUpon"));
-                    fields.addAll((List<String>) assertion.get("consulted"));
+                validationSummary.postprocess(reportParser.getValidations(), initialValues, recordId);
+                measureSummary.postprocess(reportParser.getMeasures(), initialValues, recordId);
+                amendmentSummary.postprocess(reportParser.getAmendments(), initialValues, recordId);
 
-                    String recordId = reportParser.getRecordId();
-
-                    if ("VALIDATION".equalsIgnoreCase((String) assertion.get("type")) &&
-                            "PRE_ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
-                        Row validationsRow = validationsSheet.createRow(validationRowNum);
-
-                        if (recordId != null) {
-                            validationsRow.createCell(0).setCellValue(recordId);
-                        }
-
-                        String test = (String) assertion.get("name");
-                        String validation = profile.get(test).get("label");
-
-                        validationsRow.createCell(1).setCellValue(validation);
-
-                        String status = (String) assertion.get("status");
-
-                        if (rowValidationTests.length() > 0) {
-                            rowValidationTests.append(", ");
-                        }
-
-                        rowValidationTests.append("[" + validation + "=" + status + "]");
-
-                        Cell statusCell = validationsRow.createCell(2);
-                        statusCell.setCellValue(status);
-
-                        if (styles.containsKey(status)) {
-                            statusCell.setCellStyle(styles.get(status));
-                        }
-
-                        validationsRow.createCell(3).setCellValue((String) assertion.get("comment"));
-
-                        int columnOffset = 4;
-                        for (int colNum = 0; colNum < fields.size(); colNum++) {
-                            String field = fields.get(colNum);
-                            validationsHeader.createCell(columnOffset + colNum).setCellValue(field);
-
-                            String value = initialValues.get(field);
-                            Cell cell = validationsRow.createCell(columnOffset + colNum);
-                            cell.setCellValue(value != null ? value : "");
-
-                            if (styles.containsKey(status)) {
-                                cell.setCellStyle(styles.get(status));
-                            }
-                        }
-
-                        validationRowNum++;
-                    } else if ("AMENDMENT".equalsIgnoreCase((String) assertion.get("type")) &&
-                            "ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
-                        Row amendmentsRow = amendmentsSheet.createRow(amendmentRowNum);
-
-                        if (recordId != null) {
-                            amendmentsRow.createCell(0).setCellValue(recordId);
-                        }
-
-                        String test = (String) assertion.get("name");
-                        String amendment = profile.get(test).get("label");
-
-                        amendmentsRow.createCell(1).setCellValue(amendment);
-
-                        String status = (String) assertion.get("status");
-
-                        if (!status.equals("NO_CHANGE")) {
-                            if (rowAmendmentTests.length() > 0) {
-                                rowAmendmentTests.append(", ");
-                            }
-
-                            rowAmendmentTests.append("[" + amendment + "=" + status + "]");
-                        }
-
-                        Cell statusCell = amendmentsRow.createCell(2);
-                        statusCell.setCellValue(status);
-
-                        if (styles.containsKey(status)) {
-                            statusCell.setCellStyle(styles.get(status));
-                        }
-
-                        amendmentsRow.createCell(3).setCellValue((String) assertion.get("comment"));
-
-                        if (assertion.containsKey("result") && assertion.get("result") != null && !((Map) assertion.get("result")).isEmpty()) {
-                            Map<String, String> result = (Map<String, String>) assertion.get("result");
-
-                            int columnOffset = 4;
-                            for (int colNum = 0; colNum < fields.size(); colNum++) {
-                                String field = fields.get(colNum);
-                                amendmentsHeader.createCell(columnOffset + colNum).setCellValue(field);
-
-                                String value = initialValues.get(field);
-                                Cell cell = amendmentsRow.createCell(columnOffset);
-                                cell.setCellValue(value != null ? value : "");
-
-                                if (styles.containsKey(status)) {
-                                    cell.setCellStyle(styles.get(status));
-                                }
-                            }
-                        }
-
-                        amendmentRowNum++;
-                    } else if ("MEASURE".equalsIgnoreCase((String) assertion.get("type")) &&
-                            "PRE_ENHANCEMENT".equalsIgnoreCase((String) assertion.get("stage"))) {
-                        Row measuresRow = measuresSheet.createRow(measuresRowNum);
-
-                        if (recordId != null) {
-                            measuresRow.createCell(0).setCellValue(recordId);
-                        }
-
-                        String test = (String) assertion.get("name");
-                        String measure = profile.get(test).get("label");
-
-                        measuresRow.createCell(1).setCellValue(measure);
-
-                        String status = (String) assertion.get("status");
-
-                        Cell statusCell = measuresRow.createCell(2);
-                        statusCell.setCellValue(status);
-
-                        if (styles.containsKey(status)) {
-                            statusCell.setCellStyle(styles.get(status));
-                        }
-
-                        measuresRow.createCell(3).setCellValue((String) assertion.get("comment"));
-
-                        if (assertion.containsKey("value") && assertion.get("value") != null) {
-                            measuresRow.createCell(4).setCellValue((String) assertion.get("value"));
-                        }
-
-                        measuresRowNum++;
-                    }
-                }
-
-
-                // initial and final values sheets
-                Row initialValuesRow = finalValuesSheet.createRow(rowNum);
-                Row finalValuesRow = initialValuesSheet.createRow(rowNum);
-
-                for (int i = 0; i < header.size(); i++) {
-                    String field = header.get(i);
-                    String initialValue = initialValues.get(field);
-                    String finalValue = finalValues.get(field);
-
-                    String initialStatus = validationState.get(field);
-                    String finalStatus = amendmentState.get(field);
-
-                    Cell initialValueCell = initialValuesRow.createCell(i);
-                    initialValueCell.setCellValue(initialValue);
-
-                    if (initialStatus != null) {
-                        if (styles.containsKey(initialStatus)) {
-                            initialValueCell.setCellStyle(styles.get(initialStatus));
-                        }
-                    }
-
-                    Cell finalValueCell = finalValuesRow.createCell(i);
-                    finalValueCell.setCellValue(finalValue);
-
-                    if (finalStatus != null) {
-                        if (styles.containsKey(finalStatus)) {
-                            finalValueCell.setCellStyle(styles.get(finalStatus));
-                        }
-                    }
-                }
-
-                initialValuesRow.createCell(header.size()).setCellValue(rowValidationTests.toString());
-                finalValuesRow.createCell(header.size()).setCellValue(rowAmendmentTests.toString());
-
-                rowNum++;
-
-                // add empty row between blocks of assertions
-                validationRowNum++;
-                amendmentRowNum++;
-                measuresRowNum++;
             }
 
             workbook.write(out);
@@ -370,6 +160,8 @@ public class XLSXPostProcessor {
     }
 
     private void createSummarySheet(SXSSFWorkbook workbook, String summaryText) {
+        SXSSFSheet summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
+
         // Wrap text on the summary page
         CellStyle summaryStyle = workbook.createCellStyle();
         summaryStyle.setWrapText(true);
@@ -379,37 +171,14 @@ public class XLSXPostProcessor {
         Cell summaryCell = summaryRow.createCell(1);
 
         summaryCell.setCellValue(summaryText);
-
         summaryCell.setCellStyle(summaryStyle);
 
         // Create a merged region from (1,1) to (7,9) for the summary text
         summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
     }
 
-    private void initSheets(SXSSFWorkbook workbook, int windowSize) {
-        summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
-
-        // Final values sheet
-        finalValuesSheet = (SXSSFSheet) workbook.createSheet("Final Values");
-        finalValuesSheet.setRandomAccessWindowSize(windowSize);
-
-        // Initial values sheet
-        initialValuesSheet = (SXSSFSheet) workbook.createSheet("Initial Values");
-        initialValuesSheet.setRandomAccessWindowSize(windowSize);
-
-        // Sheets for the ffdq assertions: validations, amendements and measures
-        validationsSheet = (SXSSFSheet) workbook.createSheet("Validations");
-        validationsSheet.setRandomAccessWindowSize(windowSize);
-
-        amendmentsSheet = (SXSSFSheet) workbook.createSheet("Amendments");
-        amendmentsSheet.setRandomAccessWindowSize(windowSize);
-
-        measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
-        measuresSheet.setRandomAccessWindowSize(windowSize);
-    }
-
     public static void main(String[] args) throws FileNotFoundException {
-        XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream(args[0]));
+        XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream("/mcz_test.json"));
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
     }
 }
