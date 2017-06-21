@@ -19,12 +19,14 @@ import java.util.*;
  */
 public class ReportSummary {
     private final SXSSFSheet sheet;
+    private Map<String, CellStyle> styles;
 
     private List<String> header;
     private int rowNum = 0;
 
-    public ReportSummary(List<String> header, String title, Workbook workbook) {
+    public ReportSummary(List<String> header, String title, Workbook workbook, Map<String, CellStyle> styles) {
         this.header = header;
+        this.styles = styles;
 
         // Create the sheet
         this.sheet = (SXSSFSheet) workbook.createSheet(title);
@@ -42,7 +44,7 @@ public class ReportSummary {
         rowNum++;
     }
 
-    public void postprocess(Map<String, String> values) {
+    public void postprocess(Map<String, String> values, Map<String, String> state, String flags) {
         // initial and final values sheets
         Row row = sheet.createRow(rowNum);
 
@@ -51,27 +53,19 @@ public class ReportSummary {
 
             String value = values.get(field);
 
-            //String initialStatus = validationState.get(field);
-            //String finalStatus = amendmentState.get(field);
+            String status = state.get(field);
 
             Cell cell = row.createCell(i);
             cell.setCellValue(value);
 
-            /*if (initialStatus != null) {
-                if (styles.containsKey(initialStatus)) {
-                    initialValueCell.setCellStyle(styles.get(initialStatus));
+            if (status != null) {
+                if (styles.containsKey(status)) {
+                    cell.setCellStyle(styles.get(status));
                 }
             }
-
-            Cell finalValueCell = finalValuesRow.createCell(i);
-            finalValueCell.setCellValue(finalValue);
-
-            if (finalStatus != null) {
-                if (styles.containsKey(finalStatus)) {
-                    finalValueCell.setCellStyle(styles.get(finalStatus));
-                }
-            }*/
         }
+
+        row.createCell(header.size()).setCellValue(flags);
 
         rowNum++;
     }

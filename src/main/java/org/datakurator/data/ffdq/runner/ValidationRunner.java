@@ -291,7 +291,7 @@ public class ValidationRunner {
             json.put("stage", stage.getName());
             json.put("context", createContext(amendment.fieldsActedUpon(), amendment.fieldsConsulted()));
 
-            CurationStatus status = CurationStatus.NO_CHANGE;;
+            CurationStatus status = CurationStatus.NO_CHANGE;
             ResultState state = retVal.getResultState();
 
             if (state.equals(EnumDQAmendmentResultState.CHANGED)) {

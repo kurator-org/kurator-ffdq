@@ -37,7 +37,6 @@ public class XLSXPostProcessor {
         }
     }
 
-
     private static void initStyles(Workbook wb) {
         // White font
         Font font = wb.createFont();
@@ -105,6 +104,14 @@ public class XLSXPostProcessor {
         try {
             while(reportParser.next()) {
 
+                if (initialValuesSummary == null) {
+                    initialValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Initial Values", workbook, styles);
+                }
+
+                if (finalValuesSummary == null) {
+                    finalValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Final Values", workbook, styles);
+                }
+
                 if (validationSummary == null) {
                     validationSummary = new AssertionSummary(reportParser.getAssertionFields(), "Validations", workbook, styles, Validation.class);
                 }
@@ -117,30 +124,36 @@ public class XLSXPostProcessor {
                     amendmentSummary = new AssertionSummary(reportParser.getAssertionFields(), "Amendments", workbook, styles, Improvement.class);
                 }
 
-                if (initialValuesSummary == null) {
-                    initialValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Initial Values", workbook);
-                }
-
-                if (finalValuesSummary == null) {
-                    finalValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Final Values", workbook);
-                }
-
-                System.out.println(reportParser.getAssertionFields());
                 Map<String, String> initialValues = reportParser.getInitialValues();
                 Map<String, String> finalValues = reportParser.getFinalValues();
 
                 // TODO: Fix color coding on final values sheet
-                //Map<String, String> validationState = reportParser.getValidationState();
-                //Map<String, String> amendmentState = reportParser.getAmendmentState();
+                Map<String, String> validationState = reportParser.getValidationState();
+                Map<String, String> amendmentState = reportParser.getAmendmentState();
 
-                // process assertions
-                //StringBuilder rowValidationTests = new StringBuilder();
-                //StringBuilder rowAmendmentTests = new StringBuilder();
+                // process assertions and create flags
+                StringBuilder rowValidationTests = new StringBuilder();
+                for (Validation validation : reportParser.getValidations()) {
+                    String test = validation.getTest().getName();
+                    String status = validation.getStatus();
+
+                    String flag = "[" + test + "_" + status + "] ";
+                    rowValidationTests.append(flag);
+                }
+
+                StringBuilder rowAmendmentTests = new StringBuilder();
+                for (Improvement improvement : reportParser.getAmendments()) {
+                    String test = improvement.getTest().getName();
+                    String status = improvement.getStatus();
+
+                    String flag = "[" + test + "_" + status + "] ";
+                    rowAmendmentTests.append(flag);
+                }
 
                 String recordId = reportParser.getRecordId(); // TODO: Fix this
 
-                initialValuesSummary.postprocess(initialValues);
-                finalValuesSummary.postprocess(finalValues);
+                initialValuesSummary.postprocess(initialValues, validationState, rowValidationTests.toString());
+                finalValuesSummary.postprocess(finalValues, amendmentState, rowAmendmentTests.toString());
 
                 validationSummary.postprocess(reportParser.getValidations(), initialValues, recordId);
                 measureSummary.postprocess(reportParser.getMeasures(), initialValues, recordId);
