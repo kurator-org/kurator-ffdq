@@ -180,7 +180,11 @@ public class XLSXPostProcessor {
 
                 }
 
-                String recordId = reportParser.getRecordId(); // TODO: Fix this
+                String recordId = "";
+
+                if (initialValues.containsKey("occurrenceID")) {
+                    recordId = initialValues.get("occurrenceID");
+                }
 
                 initialValuesSummary.postprocess(initialValues, validationState, rowValidationTests.toString());
                 finalValuesSummary.postprocess(finalValues, amendmentState, rowAmendmentTests.toString());
