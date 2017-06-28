@@ -180,11 +180,7 @@ public class XLSXPostProcessor {
 
                 }
 
-                String recordId = "";
-
-                if (initialValues.containsKey("occurrenceID")) {
-                    recordId = initialValues.get("occurrenceID");
-                }
+                String recordId = reportParser.getRecordId();
 
                 initialValuesSummary.postprocess(initialValues, validationState, rowValidationTests.toString());
                 finalValuesSummary.postprocess(finalValues, amendmentState, rowAmendmentTests.toString());
@@ -225,7 +221,7 @@ public class XLSXPostProcessor {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream("/mcz_test.json"));
+        XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream("/ffdq.json"));
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
     }
 }
