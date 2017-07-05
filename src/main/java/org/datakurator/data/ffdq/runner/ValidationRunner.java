@@ -314,9 +314,20 @@ public class ValidationRunner {
             }
 
             Map<String, String> result = retVal.getResult();
-            finalValues.putAll(result);
 
-            json.put("result", result);
+            // Normalize if namespace prefix is present
+            Map<String, String> dwcRecord = new HashMap<String, String>();
+            for (String term : result.keySet()) {
+                String dwcTerm = term;
+                if (term.contains(":")) {
+                    dwcTerm = term.substring(term.indexOf(":") + 1);
+                }
+                dwcRecord.put(dwcTerm, record.get(dwcTerm));
+            }
+
+            finalValues.putAll(dwcRecord);
+
+            json.put("result", dwcRecord);
             json.put("status", status.name());
             json.put("comment", retVal.getComment());
 
