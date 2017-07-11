@@ -131,11 +131,8 @@ public class ValidationRunner {
                 // Create a validation test object for invoking the method
                 ValidationTest test = new ValidationTest(provides.value(), method);
 
-                if (method.isAnnotationPresent(PreEnhancement.class)) {
+                if (method.isAnnotationPresent(Validation.class) || method.isAnnotationPresent(Measure.class)) {
                     addToStage(test, method, preEnhancementStage);
-                }
-
-                if (method.isAnnotationPresent(PostEnhancement.class)) {
                     addToStage(test, method, postEnhancementStage);
                 }
 
