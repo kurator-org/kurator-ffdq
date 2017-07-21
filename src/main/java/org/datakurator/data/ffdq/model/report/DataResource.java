@@ -18,6 +18,20 @@ package org.datakurator.data.ffdq.model.report;
 
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 
+/**
+ * Data Resource is an instance of data and the target to the DQ assessment and management.
+ *
+ * Data Resources have a property called “resource type.” Resource type, in the context of the conceptual framework,
+ * can be "single record" or "multi-record (dataset)". This property is important because it affects the method for
+ * measuring, validating and improving a Data Resource. For example, coordinate completeness of a single record could
+ * be measured qualitatively by checking whether the latitude and longitude of the record are filled or not; whereas
+ * the coordinate completeness of a dataset could be measured quantitatively, measuring the percentage of records in
+ * the dataset which have the latitude and longitude fields filled. Both measurements are for coordinate completeness,
+ * but they are measured in different ways due to the different resource type.
+ *
+ * TODO: Draft of sample java comment acknowledgements to published works of Allan
+ */
 @RDFBean("ffdq:DataResource")
 public class DataResource {
+
 }

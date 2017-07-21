@@ -144,3 +144,5 @@ After this, you will need to login to the sonatype oss repository hosting nexus 
 
     mvn nexus-staging:release -P release
 
+# Acknowledgements
+Draft of sample java comment acknowledgements to published works of Allan where appropriate
