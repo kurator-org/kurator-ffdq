@@ -29,7 +29,11 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
  * the dataset which have the latitude and longitude fields filled. Both measurements are for coordinate completeness,
  * but they are measured in different ways due to the different resource type.
  *
- * TODO: Draft of sample java comment acknowledgements to published works of Allan
+ * Veiga AK, Saraiva AM, Chapman AD, Morris PJ, Gendreau C, Schigel D, et al. (2017) A conceptual framework for quality
+ * assessment and management of biodiversity data. PLoS ONE 12(6): e0178731.
+ *
+ * @see <a href="https://doi.org/10.1371/journal.pone.0178731">https://doi.org/10.1371/journal.pone.0178731</a>
+ *
  */
 @RDFBean("ffdq:DataResource")
 public class DataResource {
