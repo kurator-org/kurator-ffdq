@@ -16,8 +16,62 @@
  */
 package org.datakurator.data.ffdq.model.needs;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+})
 @RDFBean("ffdq:UseCase")
 public class UseCase {
+    private UUID uuid;
+    private String label;
+
+    private List<InformationElement> vie;
+    private ResourceType rt;
+
+    public UseCase() {
+        this.uuid = UUID.randomUUID();
+        this.vie = new ArrayList<>();
+    }
+
+    @RDFSubject()
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    @RDF("ffdq:hasInformationElement")
+    public List<InformationElement> getInformationElements() {
+        return vie;
+    }
+
+    public void setInformationElements(List<InformationElement> vie) {
+        this.vie = vie;
+    }
+
+    @RDF("ffdq:hasResourceType")
+    public ResourceType getResourceType() {
+        return rt;
+    }
+
+    public void setResourceType(ResourceType rt) {
+        this.rt = rt;
+    }
+
 }

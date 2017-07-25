@@ -57,10 +57,31 @@
             <groupId>org.datakurator</groupId>
             <artifactId>ffdq-api</artifactId>
             <version>1.0.3-SNAPSHOT</version>
+
         </dependency>
         <dependency>
             <groupId>org.cyberborean</groupId>
             <artifactId>rdfbeans</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-repository-sail</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-sail-memory</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-rio-rdfxml</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-queryresultio-text</artifactId>
             <version>2.2</version>
         </dependency>
         <dependency>

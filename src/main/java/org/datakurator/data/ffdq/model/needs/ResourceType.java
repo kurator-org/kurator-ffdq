@@ -1,4 +1,4 @@
-/**  InformationElement.java
+/**  ResourceType.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -16,36 +16,37 @@
  */
 package org.datakurator.data.ffdq.model.needs;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
-})
-@RDFBean("ffdq:InformationElement")
-public class InformationElement {
-    private UUID uuid;
-    private URI composedOf;
+public class ResourceType {
+    public static final ResourceType SINGLE_RECORD = new ResourceType.SingleRecord();
+    public static final ResourceType DATASET = new ResourceType.Dataset();
 
-    public InformationElement(String uri) throws URISyntaxException {
-        this.uuid = UUID.randomUUID();
-        this.composedOf = new URI(uri);
-    }
+    private UUID uuid = UUID.randomUUID();
 
     @RDFSubject
     public String getId() {
         return "urn:uuid:" + uuid.toString();
     }
 
-    @RDF("ffdq:composedOf")
-    public URI getComposedOf() {
-        return composedOf;
+    @RDFNamespaces({
+            "rt = http://example.com/rt/"
+    })
+    @RDFBean("rt:SingleRecord")
+    public static class SingleRecord extends ResourceType {
+
+    }
+
+    @RDFNamespaces({
+            "rt = http://example.com/rt"
+    })
+    @RDFBean("rt:Dataset")
+    public static class Dataset extends ResourceType {
+
     }
 
 }
