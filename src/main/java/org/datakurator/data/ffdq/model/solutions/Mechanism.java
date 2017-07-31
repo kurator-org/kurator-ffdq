@@ -29,8 +29,13 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Mechanism")
 public class Mechanism {
-    private UUID uuid = UUID.randomUUID();
+    private UUID uuid;
     private String label;
+
+    public Mechanism(String label) {
+        this.uuid = UUID.randomUUID();
+        this.label = label;
+    }
 
     @RDFSubject
     public String getId() {

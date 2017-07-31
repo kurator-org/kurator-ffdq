@@ -17,7 +17,11 @@
 package org.datakurator.data.ffdq.model;
 
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/"
+})
 @RDFBean("ffdq:Profile")
 public class Profile {
 }

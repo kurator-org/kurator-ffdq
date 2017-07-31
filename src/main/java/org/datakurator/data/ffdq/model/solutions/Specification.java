@@ -29,8 +29,13 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Specification")
 public class Specification {
-    private UUID uuid = UUID.randomUUID();
+    private UUID uuid;
     private String label;
+
+    public Specification(String label) {
+        this.uuid = UUID.randomUUID();
+        this.label = label;
+    }
 
     @RDFSubject
     public String getId() {

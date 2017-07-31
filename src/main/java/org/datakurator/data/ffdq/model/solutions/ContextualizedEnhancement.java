@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+        "ffdq = http://example.com/ffdq/"
 })
 @RDFBean("ffdq:ContextualizedEnhancement")
 public class ContextualizedEnhancement {

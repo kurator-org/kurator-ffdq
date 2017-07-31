@@ -57,6 +57,4 @@ public class AmendmentPolicy {
     public void setEnhancementInContext(ContextualizedEnhancement ce) {
         this.ce = ce;
     }
-
-
 }

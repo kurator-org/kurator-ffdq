@@ -18,10 +18,14 @@ package org.datakurator.data.ffdq.model.needs;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
 import java.util.UUID;
 
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/"
+})
 @RDFBean("ffdq:Dimension")
 public class Dimension {
     private UUID uuid;
