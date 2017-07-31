@@ -1,4 +1,4 @@
-/**  MeasurementPolicy.java
+/**  AmendmentPolicy.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -21,19 +21,19 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.data.ffdq.model.needs.UseCase;
-import org.datakurator.data.ffdq.model.solutions.ContextualizedDimension;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedEnhancement;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:MeasurementPolicy")
-public class MeasurementPolicy {
+@RDFBean("ffdq:AmendmentPolicy")
+public class AmendmentPolicy {
     private UUID uuid = UUID.randomUUID();
 
     private UseCase useCase;
-    private ContextualizedDimension cd;
+    private ContextualizedEnhancement ce;
 
     @RDFSubject
     public String getId() {
@@ -49,12 +49,14 @@ public class MeasurementPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("ffdq:dimensionInContext")
-    public ContextualizedDimension getDimensionInContext() {
-        return cd;
+    @RDF("ffdq:enhancementInContext")
+    public ContextualizedEnhancement getEnhancementInContext() {
+        return ce;
     }
 
-    public void setDimensionInContext(ContextualizedDimension cd) {
-        this.cd = cd;
+    public void setEnhancementInContext(ContextualizedEnhancement ce) {
+        this.ce = ce;
     }
+
+
 }

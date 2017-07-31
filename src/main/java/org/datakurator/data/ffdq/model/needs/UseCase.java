@@ -16,11 +16,26 @@
  */
 package org.datakurator.data.ffdq.model.needs;
 
+import org.cyberborean.rdfbeans.RDFBeanManager;
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
+import org.datakurator.data.ffdq.model.ValidationPolicy;
+import org.datakurator.data.ffdq.model.solutions.*;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFWriter;
+import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +60,10 @@ public class UseCase {
     @RDFSubject()
     public String getId() {
         return "urn:uuid:" + uuid.toString();
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     @RDF("rdfs:label")
@@ -73,5 +92,4 @@ public class UseCase {
     public void setResourceType(ResourceType rt) {
         this.rt = rt;
     }
-
 }

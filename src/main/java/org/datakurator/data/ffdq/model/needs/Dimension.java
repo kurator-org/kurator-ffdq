@@ -16,8 +16,34 @@
  */
 package org.datakurator.data.ffdq.model.needs;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
+
+import java.util.UUID;
 
 @RDFBean("ffdq:Dimension")
 public class Dimension {
+    private UUID uuid;
+    private String label;
+
+    public Dimension(String label) {
+        this.uuid = UUID.randomUUID();
+        this.label = label;
+    }
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
 }

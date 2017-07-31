@@ -16,8 +16,45 @@
  */
 package org.datakurator.data.ffdq.model;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.data.ffdq.model.needs.UseCase;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedCriterion;
 
+import java.util.UUID;
+
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/"
+})
 @RDFBean("ffdq:ValidationPolicy")
 public class ValidationPolicy {
+    private UUID uuid = UUID.randomUUID();
+
+    private UseCase useCase;
+    private ContextualizedCriterion cc;
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("ffdq:coversUseCase")
+    public UseCase getUseCase() {
+        return useCase;
+    }
+
+    public void setUseCase(UseCase useCase) {
+        this.useCase = useCase;
+    }
+
+    @RDF("ffdq:criterionInContext")
+    public ContextualizedCriterion getCriterionInContext() {
+        return cc;
+    }
+
+    public void setCriterionInContext(ContextualizedCriterion cc) {
+        this.cc = cc;
+    }
 }

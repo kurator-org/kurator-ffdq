@@ -16,9 +16,35 @@
  */
 package org.datakurator.data.ffdq.model.needs;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.data.ffdq.model.report.Assertion;
+
+import java.util.UUID;
 
 @RDFBean("ffdq:Enhancement")
 public class Enhancement {
+    private UUID uuid;
+    private String label;
+
+    public Enhancement(String label) {
+        this.uuid = UUID.randomUUID();
+        this.label = label;
+    }
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
 }

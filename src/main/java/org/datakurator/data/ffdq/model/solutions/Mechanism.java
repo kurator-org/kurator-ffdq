@@ -16,8 +16,33 @@
  */
 package org.datakurator.data.ffdq.model.solutions;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
+import java.util.UUID;
+
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+})
 @RDFBean("ffdq:Mechanism")
 public class Mechanism {
+    private UUID uuid = UUID.randomUUID();
+    private String label;
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }

@@ -17,6 +17,7 @@
 package org.datakurator.data.ffdq.model.report;
 
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 
 /**
  * Data Resource is an instance of data and the target to the DQ assessment and management.
@@ -35,6 +36,9 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
  * @see <a href="https://doi.org/10.1371/journal.pone.0178731">https://doi.org/10.1371/journal.pone.0178731</a>
  *
  */
+@RDFNamespaces({
+        "dwc = http://rs.tdwg.org/dwc/terms/"
+})
 @RDFBean("ffdq:DataResource")
 public class DataResource {
 

@@ -24,7 +24,7 @@ import java.util.UUID;
 
 public class ResourceType {
     public static final ResourceType SINGLE_RECORD = new ResourceType.SingleRecord();
-    public static final ResourceType DATASET = new ResourceType.Dataset();
+    public static final ResourceType MULTI_RECORD = new ResourceType.MultiRecord();
 
     private UUID uuid = UUID.randomUUID();
 
@@ -44,8 +44,8 @@ public class ResourceType {
     @RDFNamespaces({
             "rt = http://example.com/rt"
     })
-    @RDFBean("rt:Dataset")
-    public static class Dataset extends ResourceType {
+    @RDFBean("rt:MultiRecord")
+    public static class MultiRecord extends ResourceType {
 
     }
 
