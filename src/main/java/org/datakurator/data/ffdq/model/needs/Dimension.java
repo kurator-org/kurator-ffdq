@@ -50,4 +50,10 @@ public class Dimension {
         this.label = label;
     }
 
+    public static Dimension VALUE = new Dimension("Value");
+    public static Dimension VOCAB_MATCH = new Dimension("Vocab Match");
+    public static Dimension COMPLETENESS = new Dimension("Completeness");
+    public static Dimension ACCURACY = new Dimension("Accuracy");
+    public static Dimension PRECISION = new Dimension("Precision");
+    public static Dimension UNIQUENESS = new Dimension("Uniqueness");
 }
