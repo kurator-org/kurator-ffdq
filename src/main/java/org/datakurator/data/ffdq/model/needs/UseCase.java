@@ -49,12 +49,8 @@ public class UseCase {
     private UUID uuid;
     private String label;
 
-    private List<InformationElement> vie;
-    private ResourceType rt;
-
     public UseCase() {
         this.uuid = UUID.randomUUID();
-        this.vie = new ArrayList<>();
     }
 
     @RDFSubject()
@@ -73,23 +69,5 @@ public class UseCase {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    @RDF("ffdq:hasInformationElement")
-    public List<InformationElement> getInformationElements() {
-        return vie;
-    }
-
-    public void setInformationElements(List<InformationElement> vie) {
-        this.vie = vie;
-    }
-
-    @RDF("ffdq:hasResourceType")
-    public ResourceType getResourceType() {
-        return rt;
-    }
-
-    public void setResourceType(ResourceType rt) {
-        this.rt = rt;
     }
 }

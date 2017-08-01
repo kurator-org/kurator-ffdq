@@ -29,21 +29,11 @@ import java.util.UUID;
 public class QueryUtil {
 
     public static void main(String [] args) throws URISyntaxException {
-
         // Construct RdfBeans
-        List<InformationElement> vie = new ArrayList<>();
-        vie.add(new InformationElement("http://rs.tdwg.org/dwc/terms/eventDate"));
-        vie.add(new InformationElement("http://rs.tdwg.org/dwc/terms/verbatimEventDate"));
-        vie.add(new InformationElement("http://rs.tdwg.org/dwc/terms/year"));
-        vie.add(new InformationElement("http://rs.tdwg.org/dwc/terms/month"));
-        vie.add(new InformationElement("http://rs.tdwg.org/dwc/terms/day"));
 
         UseCase useCase = new UseCase();
         useCase.setUuid(UUID.fromString("dd78b90c-640f-4b9c-bece-564e525a43e0"));
-
         useCase.setLabel("Check for internal consistency of dates");
-        useCase.setResourceType(ResourceType.SINGLE_RECORD);
-        useCase.setInformationElements(vie);
 
         Criterion criterion = new Criterion("Value for day must be consistent with the provided month and year.");
 
@@ -59,11 +49,9 @@ public class QueryUtil {
         policy.setCriterionInContext(cc);
         policy.setUseCase(useCase);
 
-        Mechanism mechanism = new Mechanism();
-        mechanism.setLabel("Kurator: Date Validator - DwCEventDQ");
+        Mechanism mechanism = new Mechanism("Kurator: Date Validator - DwCEventDQ");
 
-        Specification specification = new Specification();
-        specification.setLabel("Compliant if dwc:day is an integer in the range 1 to 31 inclusive, not compliant otherwise. " +
+        Specification specification = new Specification("Compliant if dwc:day is an integer in the range 1 to 31 inclusive, not compliant otherwise. " +
                 "Internal prerequisites not met if day is empty or an integer cannot be parsed from day.");
 
         List<Mechanism> mechanisms = new ArrayList<>();
