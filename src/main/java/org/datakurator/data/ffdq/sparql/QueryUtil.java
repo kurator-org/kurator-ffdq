@@ -2,11 +2,15 @@ package org.datakurator.data.ffdq.sparql;
 
 import org.cyberborean.rdfbeans.RDFBeanManager;
 import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
+import org.datakurator.data.ffdq.ResultStatus;
 import org.datakurator.data.ffdq.model.ValidationPolicy;
 import org.datakurator.data.ffdq.model.needs.Criterion;
 import org.datakurator.data.ffdq.model.needs.InformationElement;
 import org.datakurator.data.ffdq.model.needs.ResourceType;
 import org.datakurator.data.ffdq.model.needs.UseCase;
+import org.datakurator.data.ffdq.model.report.DataResource;
+import org.datakurator.data.ffdq.model.report.Result;
+import org.datakurator.data.ffdq.model.report.Validation;
 import org.datakurator.data.ffdq.model.solutions.*;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
@@ -68,6 +72,22 @@ public class QueryUtil {
         method.setSpecifications(specifications);
         method.setContextualizedCriterion(cc);
 
+        DataResource dataResource = new DataResource();
+        dataResource.setMonth("6");
+        dataResource.setDay("29");
+        dataResource.setYear("2007");
+
+        Result result = new Result();
+        result.setStatus(ResultStatus.COMPLIANT);
+        result.setComment("Provided value for day '29' is an integer in the range 1 to 31.");
+
+        Validation validation = new Validation();
+        validation.setCriterion(cc);
+        validation.setDataResource(dataResource);
+        validation.setMechanism(mechanism);
+        validation.setSpecification(specification);
+        validation.setResult(result);
+
         // Initialize an in-memory store and run SPARQL query
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
@@ -80,6 +100,8 @@ public class QueryUtil {
             manager.add(policy);
             manager.add(implementation);
             manager.add(method);
+            manager.add(dataResource);
+            manager.add(validation);
 
             RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, System.out);
 
@@ -88,6 +110,7 @@ public class QueryUtil {
 
             System.out.println();
 
+            // Given a use case find the mechanisms used
             conn.prepareTupleQuery(QueryLanguage.SPARQL,
                     "PREFIX ffdq: <http://example.com/ffdq/> " +
                             "PREFIX dwc: <http://rs.tdwg.org/dwc/terms/> " +
@@ -120,6 +143,52 @@ public class QueryUtil {
 
                             // Filter by a specific use case
                             "FILTER( ?uc = <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> )" +
+
+                            "} "
+            ).evaluate(new SPARQLResultsTSVWriter(System.out));
+
+            // Query validations for data resource id, status and comment
+            conn.prepareTupleQuery(QueryLanguage.SPARQL,
+                    "PREFIX ffdq: <http://example.com/ffdq/> " +
+                            "PREFIX dwc: <http://rs.tdwg.org/dwc/terms/> " +
+                            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+                            "PREFIX prov: <http://www.w3.org/ns/prov#>" +
+
+                            "SELECT ?dqv ?dr ?status ?comment " +
+
+                            "WHERE { " +
+
+                            // Find the validation results
+                            "?dqv a ffdq:Validation ." +
+                            "?dqv prov:generated ?r ." +
+
+                            // Get the result status
+                            "?r ffdq:hasStatus ?rs ." +
+                            "?rs rdfs:label ?status ." +
+
+                            // Get the result comment
+                            "?r rdfs:comment ?comment ." +
+
+                            // Get the dataResource used
+                            "?dqv prov:used ?dr" +
+
+                            "} "
+            ).evaluate(new SPARQLResultsTSVWriter(System.out));
+
+            // Query data resource for values
+            conn.prepareTupleQuery(QueryLanguage.SPARQL,
+                    "PREFIX ffdq: <http://example.com/ffdq/> " +
+                            "PREFIX dwc: <http://rs.tdwg.org/dwc/terms/> " +
+                            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+                            "PREFIX prov: <http://www.w3.org/ns/prov#>" +
+
+                            "SELECT ?dr ?p ?v " +
+
+                            "WHERE { " +
+
+                            // All occurrence record triples
+                            "?dr a dwc:Occurrence ." +
+                            "?dr ?p ?v ." +
 
                             "} "
             ).evaluate(new SPARQLResultsTSVWriter(System.out));
