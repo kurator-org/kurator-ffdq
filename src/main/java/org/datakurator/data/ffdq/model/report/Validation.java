@@ -16,8 +16,89 @@
  */
 package org.datakurator.data.ffdq.model.report;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedCriterion;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedDimension;
+import org.datakurator.data.ffdq.model.solutions.Mechanism;
+import org.datakurator.data.ffdq.model.solutions.Specification;
 
+import java.util.UUID;
+
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/",
+        "prov = http://www.w3.org/ns/prov#"
+})
 @RDFBean("ffdq:Validation")
 public class Validation extends Assertion {
+    private UUID uuid = UUID.randomUUID();
+
+    private ContextualizedCriterion criterion;
+    private Specification specification;
+    private Mechanism mechanism;
+
+    private Amendment informedBy;
+    private Result result;
+    private DataResource dataResource;
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("ffdq:criterionInContext")
+    public ContextualizedCriterion getCriterion() {
+        return criterion;
+    }
+
+    public void setCriterion(ContextualizedCriterion criterion) {
+        this.criterion = criterion;
+    }
+
+    @RDF("prov:wasInformedBy")
+    public Amendment getInformedBy() {
+        return informedBy;
+    }
+
+    public void setInformedBy(Amendment informedBy) {
+        this.informedBy = informedBy;
+    }
+
+    @RDF("prov:used")
+    public DataResource getDataResource() {
+        return dataResource;
+    }
+
+    public void setDataResource(DataResource dataResource) {
+        this.dataResource = dataResource;
+    }
+
+    @RDF("prov:hadPlan")
+    public Specification getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(Specification specification) {
+        this.specification = specification;
+    }
+
+    @RDF("prov:wasAttributedTo")
+    public Mechanism getMechanism() {
+        return mechanism;
+    }
+
+    public void setMechanism(Mechanism mechanism) {
+        this.mechanism = mechanism;
+    }
+
+    @RDF("prov:generated")
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
 }

@@ -25,7 +25,8 @@ import org.datakurator.data.ffdq.model.report.Assertion;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://example.com/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Enhancement")
 public class Enhancement {

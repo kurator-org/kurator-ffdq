@@ -16,8 +16,58 @@
  */
 package org.datakurator.data.ffdq.model.report;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.data.ffdq.*;
 
+import java.util.List;
+import java.util.UUID;
+
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/",
+        "prov = http://www.w3.org/ns/prov#",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+})
 @RDFBean("ffdq:Result")
 public class Result {
+    private UUID uuid = UUID.randomUUID();
+
+    private String comment;
+    private ResultStatus status;
+
+    private List<Entity> members;
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("ffdq:hasStatus")
+    public ResultStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ResultStatus status) {
+        this.status = status;
+    }
+
+    @RDF("prov:hadMember")
+    public List<Entity> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<Entity> members) {
+        this.members = members;
+    }
+
+    @RDF("rdfs:comment")
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }

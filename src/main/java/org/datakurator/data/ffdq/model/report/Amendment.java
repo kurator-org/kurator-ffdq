@@ -16,8 +16,76 @@
  */
 package org.datakurator.data.ffdq.model.report;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.data.ffdq.model.solutions.*;
 
+import java.util.UUID;
+
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/",
+        "prov = http://www.w3.org/ns/prov#"
+})
 @RDFBean("ffdq:Amendment")
 public class Amendment extends Assertion {
+    private UUID uuid = UUID.randomUUID();
+
+    private ContextualizedEnhancement enhancement;
+    private Specification specification;
+    private Mechanism mechanism;
+
+    private Result result;
+    private DataResource dataResource;
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("ffdq:enhancementInContext")
+    public ContextualizedEnhancement getEnhancement() {
+        return enhancement;
+    }
+
+    public void setEnhancement(ContextualizedEnhancement enhancement) {
+        this.enhancement = enhancement;
+    }
+
+    @RDF("prov:used")
+    public DataResource getDataResource() {
+        return dataResource;
+    }
+
+    public void setDataResource(DataResource dataResource) {
+        this.dataResource = dataResource;
+    }
+
+    @RDF("prov:hadPlan")
+    public Specification getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(Specification specification) {
+        this.specification = specification;
+    }
+
+    @RDF("prov:wasAttributedTo")
+    public Mechanism getMechanism() {
+        return mechanism;
+    }
+
+    public void setMechanism(Mechanism mechanism) {
+        this.mechanism = mechanism;
+    }
+
+    @RDF("prov:generated")
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
 }

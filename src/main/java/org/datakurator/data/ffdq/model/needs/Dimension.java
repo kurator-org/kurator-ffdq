@@ -24,7 +24,8 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://example.com/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Dimension")
 public class Dimension {

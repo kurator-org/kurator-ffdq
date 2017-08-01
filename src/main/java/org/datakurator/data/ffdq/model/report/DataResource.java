@@ -16,8 +16,12 @@
  */
 package org.datakurator.data.ffdq.model.report;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
+
+import java.util.UUID;
 
 /**
  * Data Resource is an instance of data and the target to the DQ assessment and management.
@@ -36,10 +40,97 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
  * @see <a href="https://doi.org/10.1371/journal.pone.0178731">https://doi.org/10.1371/journal.pone.0178731</a>
  *
  */
+
 @RDFNamespaces({
         "dwc = http://rs.tdwg.org/dwc/terms/"
 })
-@RDFBean("ffdq:DataResource")
+@RDFBean("dwc:Occurrence")
 public class DataResource {
+    private UUID uuid = UUID.randomUUID();
 
+    private String eventDate;
+    private String eventTime;
+    private String verbatimEventDate;
+    private String day;
+    private String month;
+    private String year;
+    private String startDayOfYear;
+    private String endDayOfYear;
+
+    @RDFSubject
+    public String getId() {
+        return "urn:uuid:" + uuid.toString();
+    }
+
+    @RDF("dwc:eventDate")
+    public String getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(String eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    @RDF("dwc:eventTime")
+    public String getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(String eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    @RDF("dwc:verbatimEventDate")
+    public String getVerbatimEventDate() {
+        return verbatimEventDate;
+    }
+
+    public void setVerbatimEventDate(String verbatimEventDate) {
+        this.verbatimEventDate = verbatimEventDate;
+    }
+
+    @RDF("dwc:day")
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    @RDF("dwc:month")
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    @RDF("dwc:year")
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    @RDF("dwc:startDayOfYear")
+    public String getStartDayOfYear() {
+        return startDayOfYear;
+    }
+
+    public void setStartDayOfYear(String startDayOfYear) {
+        this.startDayOfYear = startDayOfYear;
+    }
+
+    @RDF("dwc:endDayOfYear")
+    public String getEndDayOfYear() {
+        return endDayOfYear;
+    }
+
+    public void setEndDayOfYear(String endDayOfYear) {
+        this.endDayOfYear = endDayOfYear;
+    }
 }
