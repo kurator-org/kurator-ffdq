@@ -4,7 +4,6 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.data.ffdq.model.needs.Criterion;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,16 +11,16 @@ import java.util.UUID;
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:ValidationMethod")
-public class ValidationMethod {
+@RDFBean("ffdq:MeasurementMethod")
+public class MeasurementMethod {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Specification specification;
-    private ContextualizedCriterion cc;
+    private ContextualizedDimension cd;
 
-    public ValidationMethod() { }
+    public MeasurementMethod() { }
 
-    public ValidationMethod(String id) {
+    public MeasurementMethod(String id) {
         this.id = id;
     }
 
@@ -43,12 +42,12 @@ public class ValidationMethod {
         this.specification = specification;
     }
 
-    @RDF("ffdq:hasContextualizedCriterion")
-    public ContextualizedCriterion getContextualizedCriterion() {
-        return cc;
+    @RDF("ffdq:hasContextualizedDimension")
+    public ContextualizedDimension getContextualizedDimension() {
+        return cd;
     }
 
-    public void setContextualizedCriterion(ContextualizedCriterion cc) {
-        this.cc = cc;
+    public void setContextualizedDimension(ContextualizedDimension cd) {
+        this.cd = cd;
     }
 }

@@ -26,11 +26,15 @@ public class ResourceType {
     public static final ResourceType SINGLE_RECORD = new ResourceType.SingleRecord();
     public static final ResourceType MULTI_RECORD = new ResourceType.MultiRecord();
 
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDFNamespaces({

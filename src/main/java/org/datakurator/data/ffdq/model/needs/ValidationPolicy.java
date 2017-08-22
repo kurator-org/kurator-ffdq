@@ -1,4 +1,4 @@
-/**  AmendmentPolicy.java
+/**  ValidationPolicy.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,33 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.data.ffdq.model;
+package org.datakurator.data.ffdq.model.needs;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.data.ffdq.model.needs.UseCase;
-import org.datakurator.data.ffdq.model.solutions.ContextualizedEnhancement;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedCriterion;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:AmendmentPolicy")
-public class AmendmentPolicy {
+@RDFBean("ffdq:ValidationPolicy")
+public class ValidationPolicy {
     private UUID uuid = UUID.randomUUID();
 
     private UseCase useCase;
-    private ContextualizedEnhancement ce;
+    private ContextualizedCriterion cc;
 
     @RDFSubject
     public String getId() {
         return "urn:uuid:" + uuid.toString();
     }
 
-    @RDF("ffdq:hasUseCase")
+    @RDF("ffdq:coversUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -49,12 +49,12 @@ public class AmendmentPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("ffdq:enhancementInContext")
-    public ContextualizedEnhancement getEnhancementInContext() {
-        return ce;
+    @RDF("ffdq:criterionInContext")
+    public ContextualizedCriterion getCriterionInContext() {
+        return cc;
     }
 
-    public void setEnhancementInContext(ContextualizedEnhancement ce) {
-        this.ce = ce;
+    public void setCriterionInContext(ContextualizedCriterion cc) {
+        this.cc = cc;
     }
 }

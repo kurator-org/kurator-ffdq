@@ -16,7 +16,7 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:ContextualizedEnhancement")
 public class ContextualizedEnhancement {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Enhancement enhancement;
     private List<InformationElement> informationElements;
@@ -24,7 +24,11 @@ public class ContextualizedEnhancement {
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:hasInformationElement")

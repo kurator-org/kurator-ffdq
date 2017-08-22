@@ -30,17 +30,22 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:InformationElement")
 public class InformationElement {
-    private UUID uuid;
+    private String id = "urn:uuid:" + UUID.randomUUID();
     private URI composedOf;
 
+    public InformationElement() { }
+
     public InformationElement(String uri) throws URISyntaxException {
-        this.uuid = UUID.randomUUID();
         this.composedOf = new URI(uri);
     }
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:composedOf")
@@ -48,4 +53,7 @@ public class InformationElement {
         return composedOf;
     }
 
+    public void setComposedOf(URI composedOf) {
+        this.composedOf = composedOf;
+    }
 }

@@ -30,17 +30,22 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Enhancement")
 public class Enhancement {
-    private UUID uuid;
+    private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
+    public Enhancement() { }
+
     public Enhancement(String label) {
-        this.uuid = UUID.randomUUID();
         this.label = label;
     }
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("rdfs:label")

@@ -29,17 +29,23 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Mechanism")
 public class Mechanism {
-    private UUID uuid;
+    private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    public Mechanism(String label) {
-        this.uuid = UUID.randomUUID();
+    public Mechanism() { }
+
+    public Mechanism(String id, String label) {
+        this.id = id;
         this.label = label;
     }
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("rdfs:label")

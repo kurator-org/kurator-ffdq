@@ -3,7 +3,7 @@ package org.datakurator.data.ffdq.sparql;
 import org.cyberborean.rdfbeans.RDFBeanManager;
 import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.data.ffdq.ResultStatus;
-import org.datakurator.data.ffdq.model.ValidationPolicy;
+import org.datakurator.data.ffdq.model.needs.ValidationPolicy;
 import org.datakurator.data.ffdq.model.needs.Criterion;
 import org.datakurator.data.ffdq.model.needs.InformationElement;
 import org.datakurator.data.ffdq.model.needs.ResourceType;
@@ -53,7 +53,7 @@ public class QueryUtil {
         policy.setCriterionInContext(cc);
         policy.setUseCase(useCase);
 
-        Mechanism mechanism = new Mechanism("Kurator: Date Validator - DwCEventDQ");
+        Mechanism mechanism = new Mechanism("urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84", "Kurator: Date Validator - DwCEventDQ");
 
         Specification specification = new Specification("Compliant if dwc:day is an integer in the range 1 to 31 inclusive, not compliant otherwise. " +
                 "Internal prerequisites not met if day is empty or an integer cannot be parsed from day.");
@@ -65,11 +65,8 @@ public class QueryUtil {
         implementation.setSpecification(specification);
         implementation.setImplementedBy(mechanisms);
 
-        List<Specification> specifications = new ArrayList<>();
-        specifications.add(specification);
-
         ValidationMethod method = new ValidationMethod();
-        method.setSpecifications(specifications);
+        method.setSpecification(specification);
         method.setContextualizedCriterion(cc);
 
         DataResource dataResource = new DataResource();

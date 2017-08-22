@@ -18,7 +18,7 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:ContextualizedCriterion")
 public class ContextualizedCriterion {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Criterion criterion;
     private List<InformationElement> informationElements;
@@ -26,7 +26,11 @@ public class ContextualizedCriterion {
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:hasInformationElement")
