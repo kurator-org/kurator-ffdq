@@ -141,6 +141,7 @@ public class RDFBeanFactory {
 
         Result result = new Result();
         result.setStatus(status);
+        result.setComment(response.getComment());
 
         Measure measure = new Measure();
         measure.setMechanism(mechanism);
@@ -184,7 +185,6 @@ public class RDFBeanFactory {
         ResultState state = response.getResultState();
 
         if (!state.equals(EnumDQResultState.NOT_RUN)) {
-            JSONObject json = new JSONObject();
             ResultStatus status = null;
 
             if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
@@ -205,6 +205,7 @@ public class RDFBeanFactory {
 
             Result result = new Result();
             result.setStatus(status);
+            result.setComment(response.getComment());
 
             Validation validation = new Validation();
             validation.setMechanism(mechanism);
@@ -257,8 +258,25 @@ public class RDFBeanFactory {
             status = ResultStatus.TRANSPOSED;
         }
 
+        List<Entity> members = new ArrayList<>();
+        Map<String, String> values = response.getResult();
+
+        for (String field : values.keySet()) {
+            Entity entity = new Entity();
+
+            Parameter param = new Parameter(field);
+            InformationElement ie = new InformationElement(param.getURI());
+
+            entity.setInformationElement(ie);
+            entity.setValue(values.get(field));
+
+            members.add(entity);
+        }
+
         Result result = new Result();
         result.setStatus(status);
+        result.setComment(response.getComment());
+        result.setMembers(members);
 
         Amendment amendment = new Amendment();
         amendment.setMechanism(mechanism);

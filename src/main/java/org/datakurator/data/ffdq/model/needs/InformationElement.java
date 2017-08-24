@@ -39,6 +39,11 @@ public class InformationElement {
         this.composedOf = new URI(uri);
     }
 
+    public InformationElement(URI uri) {
+        this.composedOf = uri;
+    }
+
+
     @RDFSubject
     public String getId() {
         return id;
