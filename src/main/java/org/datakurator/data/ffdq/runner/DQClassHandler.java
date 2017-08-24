@@ -36,13 +36,14 @@ public class DQClassHandler {
     private final Class cls;
     private String mechanism;
 
-    private RDFBeanFactory rdfFactory = new RDFBeanFactory();
+    private RDFBeanFactory rdfFactory;
 
     private List<AssertionTest> measures = new ArrayList<>();
     private List<AssertionTest> validations = new ArrayList<>();
     private List<AssertionTest> amendments = new ArrayList<>();
 
-    public DQClassHandler(Class cls) {
+    public DQClassHandler(RDFBeanFactory factory, Class cls) {
+        this.rdfFactory = factory;
         this.cls = cls;
 
         // Class level annotations
@@ -155,7 +156,9 @@ public class DQClassHandler {
     }
 
     public static void main(String[] args) throws IOException, RDFBeanException {
-        DQClassHandler handler = new DQClassHandler(DwCEventDQ.class);
+        RDFBeanFactory factory = new RDFBeanFactory();
+
+        DQClassHandler handler = new DQClassHandler(factory, DwCEventDQ.class);
         List<Map<String, String>> records = new LinkedList<Map<String, String>>();
 
         // Read csv file as a list of Map objects
@@ -164,7 +167,7 @@ public class DQClassHandler {
 
         MappingIterator<Map<String, String>> iterator = mapper.reader(Map.class)
                 .with(schema)
-                .readValues(DQClassHandler.class.getResourceAsStream("/occurrence.txt"));
+                .readValues(DQClassHandler.class.getResourceAsStream("/nine_molluscs.csv"));
         while (iterator.hasNext()) {
             records.add(iterator.next());
         }
@@ -172,5 +175,7 @@ public class DQClassHandler {
         for (Map<String, String> record : records) {
             handler.run(record);
         }
+
+        factory.write(RDFFormat.TURTLE, System.out);
     }
 }

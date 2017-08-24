@@ -36,4 +36,17 @@ public class ResultStatus {
     }
 
     public static ResultStatus COMPLIANT = new ResultStatus("COMPLIANT");
+    public static ResultStatus NOT_COMPLIANT = new ResultStatus("NOT_COMPLIANT");
+
+    public static ResultStatus COMPLETE = new ResultStatus("COMPLETE");
+    public static ResultStatus NOT_COMPLETE = new ResultStatus("NOT_COMPLETE");
+
+    public static ResultStatus CURATED = new ResultStatus("CURATED");
+    public static ResultStatus FILLED_IN = new ResultStatus("FILLED_IN");
+    public static ResultStatus TRANSPOSED = new ResultStatus("TRANSPOSED");
+    public static ResultStatus NO_CHANGE = new ResultStatus("NO_CHANGE");
+
+    public static ResultStatus AMBIGUOUS = new ResultStatus("AMBIGUOUS");
+    public static ResultStatus DATA_PREREQUISITES_NOT_MET = new ResultStatus("DATA_PREREQUISITES_NOT_MET");
+    public static ResultStatus EXTERNAL_PREREQUISITES_NOT_MET = new ResultStatus("EXTERNAL_PREREQUISITES_NOT_MET");
 }

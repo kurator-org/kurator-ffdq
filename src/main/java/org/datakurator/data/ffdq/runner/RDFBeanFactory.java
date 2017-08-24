@@ -3,13 +3,13 @@ package org.datakurator.data.ffdq.runner;
 import org.cyberborean.rdfbeans.RDFBeanManager;
 import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.data.ffdq.Namespace;
+import org.datakurator.data.ffdq.ResultStatus;
 import org.datakurator.data.ffdq.assertions.DQValidation;
 import org.datakurator.data.ffdq.model.needs.*;
 import org.datakurator.data.ffdq.model.report.*;
 import org.datakurator.data.ffdq.model.solutions.*;
-import org.datakurator.ffdq.api.DQAmendmentResponse;
-import org.datakurator.ffdq.api.DQMeasurementResponse;
-import org.datakurator.ffdq.api.DQValidationResponse;
+import org.datakurator.data.provenance.CurationStatus;
+import org.datakurator.ffdq.api.*;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.repository.Repository;
@@ -19,6 +19,7 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
+import org.json.simple.JSONObject;
 
 import java.io.OutputStream;
 import java.lang.reflect.Method;
@@ -123,11 +124,30 @@ public class RDFBeanFactory {
 
         // TODO: process response and add result
 
+        ResultStatus status = ResultStatus.NOT_COMPLETE;
+        ResultState state = response.getResultState();
+        Object value = null;
+
+        if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
+            status = ResultStatus.COMPLETE;
+            value = response.getValue();
+        } else if (state.equals(EnumDQResultState.AMBIGUOUS)) {
+            status = ResultStatus.AMBIGUOUS;
+        } else if (state.equals(EnumDQResultState.EXTERNAL_PREREQUISITES_NOT_MET)) {
+            status = ResultStatus.EXTERNAL_PREREQUISITES_NOT_MET;
+        } else if (state.equals(EnumDQResultState.INTERNAL_PREREQUISITES_NOT_MET)) {
+            status = ResultStatus.DATA_PREREQUISITES_NOT_MET;
+        }
+
+        Result result = new Result();
+        result.setStatus(status);
+
         Measure measure = new Measure();
         measure.setMechanism(mechanism);
         measure.setSpecification(specification);
         measure.setDimension(context);
         measure.setDataResource(dataResource);
+        measure.setResult(result);
         saveBean(measure);
     }
 
@@ -161,12 +181,39 @@ public class RDFBeanFactory {
 
         // TODO: process response and add result
 
-        Validation validation = new Validation();
-        validation.setMechanism(mechanism);
-        validation.setSpecification(specification);
-        validation.setCriterion(context);
-        validation.setDataResource(dataResource);
-        saveBean(validation);
+        ResultState state = response.getResultState();
+
+        if (!state.equals(EnumDQResultState.NOT_RUN)) {
+            JSONObject json = new JSONObject();
+            ResultStatus status = null;
+
+            if (state.equals(EnumDQResultState.RUN_HAS_RESULT)) {
+                EnumDQValidationResult result = response.getResult();
+
+                if (result.equals(EnumDQValidationResult.COMPLIANT)) {
+                    status = ResultStatus.COMPLIANT;
+                } else if (result.equals(EnumDQValidationResult.NOT_COMPLIANT)) {
+                    status = ResultStatus.NOT_COMPLIANT;
+                }
+            } else if (state.equals(EnumDQResultState.AMBIGUOUS)) {
+                status = ResultStatus.AMBIGUOUS;
+            } else if (state.equals(EnumDQResultState.EXTERNAL_PREREQUISITES_NOT_MET)) {
+                status = ResultStatus.EXTERNAL_PREREQUISITES_NOT_MET;
+            } else if (state.equals(EnumDQResultState.INTERNAL_PREREQUISITES_NOT_MET)) {
+                status = ResultStatus.DATA_PREREQUISITES_NOT_MET;
+            }
+
+            Result result = new Result();
+            result.setStatus(status);
+
+            Validation validation = new Validation();
+            validation.setMechanism(mechanism);
+            validation.setSpecification(specification);
+            validation.setCriterion(context);
+            validation.setDataResource(dataResource);
+            validation.setResult(result);
+            saveBean(validation);
+        }
     }
 
     public void createAmendmentMethod(AssertionTest test, String e) {
@@ -199,11 +246,26 @@ public class RDFBeanFactory {
 
         // TODO: process response and add result
 
+        ResultStatus status = ResultStatus.NO_CHANGE;
+        ResultState state = response.getResultState();
+
+        if (state.equals(EnumDQAmendmentResultState.CHANGED)) {
+            status = ResultStatus.CURATED;
+        } else if (state.equals(EnumDQAmendmentResultState.FILLED_IN)) {
+            status = ResultStatus.FILLED_IN;
+        } else if (state.equals(EnumDQAmendmentResultState.TRANSPOSED)) {
+            status = ResultStatus.TRANSPOSED;
+        }
+
+        Result result = new Result();
+        result.setStatus(status);
+
         Amendment amendment = new Amendment();
         amendment.setMechanism(mechanism);
         amendment.setSpecification(specification);
         amendment.setEnhancement(context);
         amendment.setDataResource(dataResource);
+        amendment.setResult(result);
         saveBean(amendment);
     }
 
