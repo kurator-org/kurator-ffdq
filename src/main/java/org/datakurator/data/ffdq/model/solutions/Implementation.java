@@ -13,14 +13,18 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Implementation")
 public class Implementation {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private List<Mechanism> implementedBy;
     private Specification specification;
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:hasSpecification")

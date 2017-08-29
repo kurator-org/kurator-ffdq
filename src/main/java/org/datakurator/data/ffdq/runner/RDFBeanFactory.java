@@ -11,7 +11,10 @@ import org.datakurator.data.ffdq.model.solutions.*;
 import org.datakurator.data.provenance.CurationStatus;
 import org.datakurator.ffdq.api.*;
 import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.TupleQuery;
+import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
@@ -32,6 +35,7 @@ import java.util.*;
  */
 public class RDFBeanFactory {
     private Repository repo;
+    private RepositoryConnection conn;
     private RDFBeanManager manager;
 
     public RDFBeanFactory() {
@@ -39,7 +43,7 @@ public class RDFBeanFactory {
         repo = new SailRepository(new MemoryStore());
         repo.initialize();
 
-        RepositoryConnection conn = repo.getConnection();
+        conn = repo.getConnection();
         manager = new RDFBeanManager(conn);
     }
 
@@ -67,8 +71,8 @@ public class RDFBeanFactory {
         return mechanism;
     }
 
-    public Specification createSpecification(String label, Mechanism mechanism) {
-        Specification specification = new Specification(label);
+    public Specification createSpecification(String guid, String label, Mechanism mechanism) {
+        Specification specification = new Specification(guid, label);
 
         Implementation implementation = new Implementation();
         implementation.setSpecification(specification);
@@ -96,7 +100,7 @@ public class RDFBeanFactory {
 
     public void createMeasurementMethod(AssertionTest test, String d) {
         Mechanism mechanism = createMechanism(test.getMechanism(), test.getClassName());
-        Specification specification = createSpecification(test.getSpecification(), mechanism);
+        Specification specification = createSpecification(test.getGuid(), test.getSpecification(), mechanism);
         List<InformationElement> vie = createInformationElements(test.getParameters());
 
         Dimension dimension = new Dimension(d);
@@ -107,16 +111,24 @@ public class RDFBeanFactory {
         context.setInformationElements(vie);
         saveBean(context);
 
-        MeasurementMethod method = new MeasurementMethod(test.getGuid());
+        MeasurementMethod method = new MeasurementMethod();
         method.setSpecification(specification);
         method.setContextualizedDimension(context);
         saveBean(method);
     }
 
     public void createMeasure(AssertionTest test, Map<String, String> record, DQMeasurementResponse response) {
-        MeasurementMethod method = (MeasurementMethod) fetchBean(test.getGuid(), MeasurementMethod.class);
+        Specification specification = (Specification) fetchBean(test.getGuid(), Specification.class);
         Mechanism mechanism = (Mechanism) fetchBean(test.getMechanism(), Mechanism.class);
-        Specification specification = method.getSpecification();
+
+        TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL,
+                "PREFIX ffdq: <http://example.com/ffdq/> " +
+                        "SELECT ?id " +
+                        "WHERE { ?id a ffdq:MeasurementMethod ." +
+                        "?id ffdq:hasSpecification ?specification . " +
+                        "FILTER( ?specification = <" + test.getGuid() + "> ) }");
+
+        MeasurementMethod method = (MeasurementMethod) fetchBean(query, MeasurementMethod.class);
 
         ContextualizedDimension context = method.getContextualizedDimension();
 
@@ -152,9 +164,16 @@ public class RDFBeanFactory {
         saveBean(measure);
     }
 
+    private Object fetchBean(TupleQuery query, Class cls) {
+        try (TupleQueryResult result = query.evaluate()) {
+            BindingSet solution = result.next();
+            return fetchBean(solution.getValue("id").stringValue(), cls);
+        }
+    }
+
     public void createValidationMethod(AssertionTest test, String c) {
         Mechanism mechanism = createMechanism(test.getMechanism(), test.getClassName());
-        Specification specification = createSpecification(test.getSpecification(), mechanism);
+        Specification specification = createSpecification(test.getGuid(), test.getSpecification(), mechanism);
         List<InformationElement> vie = createInformationElements(test.getParameters());
 
         Criterion criterion = new Criterion(c);
@@ -165,16 +184,24 @@ public class RDFBeanFactory {
         context.setInformationElements(vie);
         saveBean(context);
 
-        ValidationMethod method = new ValidationMethod(test.getGuid());
+        ValidationMethod method = new ValidationMethod();
         method.setSpecification(specification);
         method.setContextualizedCriterion(context);
         saveBean(method);
     }
 
     public void createValidation(AssertionTest test, Map<String, String> record, DQValidationResponse response) {
-        ValidationMethod method = (ValidationMethod) fetchBean(test.getGuid(), ValidationMethod.class);
+        Specification specification = (Specification) fetchBean(test.getGuid(), Specification.class);
         Mechanism mechanism = (Mechanism) fetchBean(test.getMechanism(), Mechanism.class);
-        Specification specification = method.getSpecification();
+
+        TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL,
+                "PREFIX ffdq: <http://example.com/ffdq/> " +
+                        "SELECT ?id " +
+                        "WHERE { ?id a ffdq:ValidationMethod . " +
+                        "?id ffdq:hasSpecification ?specification . " +
+                        "FILTER( ?specification = <" + test.getGuid() + "> ) }");
+
+        ValidationMethod method = (ValidationMethod) fetchBean(query, ValidationMethod.class);
 
         ContextualizedCriterion context = method.getContextualizedCriterion();
 
@@ -219,7 +246,7 @@ public class RDFBeanFactory {
 
     public void createAmendmentMethod(AssertionTest test, String e) {
         Mechanism mechanism = createMechanism(test.getMechanism(), test.getClassName());
-        Specification specification = createSpecification(test.getSpecification(), mechanism);
+        Specification specification = createSpecification(test.getGuid(), test.getSpecification(), mechanism);
         List<InformationElement> vie = createInformationElements(test.getParameters());
 
         Enhancement enhancement = new Enhancement(e);
@@ -230,16 +257,24 @@ public class RDFBeanFactory {
         context.setInformationElements(vie);
         saveBean(context);
 
-        AmendmentMethod method = new AmendmentMethod(test.getGuid());
+        AmendmentMethod method = new AmendmentMethod();
         method.setSpecification(specification);
         method.setContextualizedEnhancement(context);
         saveBean(method);
     }
 
     public void createAmendment(AssertionTest test, Map<String, String> record, DQAmendmentResponse response) {
-        AmendmentMethod method = (AmendmentMethod) fetchBean(test.getGuid(), AmendmentMethod.class);
+        Specification specification = (Specification) fetchBean(test.getGuid(), Specification.class);
         Mechanism mechanism = (Mechanism) fetchBean(test.getMechanism(), Mechanism.class);
-        Specification specification = method.getSpecification();
+
+        TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL,
+                "PREFIX ffdq: <http://example.com/ffdq/> " +
+                        "SELECT ?id " +
+                        "WHERE { ?id a ffdq:AmendmentMethod . " +
+                        "?id ffdq:hasSpecification ?specification . " +
+                        "FILTER( ?specification = <" + test.getGuid() + "> ) }");
+
+        AmendmentMethod method = (AmendmentMethod) fetchBean(query, ValidationMethod.class);
 
         ContextualizedEnhancement context = method.getContextualizedEnhancement();
 

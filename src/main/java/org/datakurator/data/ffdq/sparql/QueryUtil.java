@@ -55,7 +55,7 @@ public class QueryUtil {
 
         Mechanism mechanism = new Mechanism("urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84", "Kurator: Date Validator - DwCEventDQ");
 
-        Specification specification = new Specification("Compliant if dwc:day is an integer in the range 1 to 31 inclusive, not compliant otherwise. " +
+        Specification specification = new Specification("urn:uuid:48aa7d66-36d1-4662-a503-df170f11b03f", "Compliant if dwc:day is an integer in the range 1 to 31 inclusive, not compliant otherwise. " +
                 "Internal prerequisites not met if day is empty or an integer cannot be parsed from day.");
 
         List<Mechanism> mechanisms = new ArrayList<>();

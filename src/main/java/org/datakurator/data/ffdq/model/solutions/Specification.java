@@ -34,7 +34,8 @@ public class Specification {
 
     public Specification() { }
 
-    public Specification(String label) {
+    public Specification(String id, String label) {
+        this.id = id;
         this.label = label;
     }
 
