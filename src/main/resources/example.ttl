@@ -2,146 +2,152 @@
 # "DAY_POSSIBLE_FOR_MONTH_YEAR". Also contains an example result for a single occurrence record row that was found to be
 # valid
 
-@prefix rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> .
+@base <http://example.com/> .
+
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sesame: <http://www.openrdf.org/schema/sesame#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+@prefix dwc: <http://rs.tdwg.org/dwc/terms/> .
+@prefix ffdq: <http://example.com/ffdq/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 
 # Example UseCase for validating internal consistency of dates
-<urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> a <http://example.com/ffdq/UseCase> ;
-	rdfs:label "Check for internal consistency of dates" .
+<urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> a ffdq:UseCase ;
+    rdfs:label "Check for internal consistency of dates" .
 
 # The ValidationPolicy ties a UseCase to some Criterion by referencing an instance of ContextualizedCriterion
-<urn:uuid:5694279a-3103-4413-986d-127f2141795f> <http://example.com/ffdq/coversUseCase> <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> ;
-	<http://example.com/ffdq/criterionInContext> <urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a> ;
-	a <http://example.com/ffdq/ValidationPolicy> .
+<#validation-policy> a ffdq:ValidationPolicy ;
+    ffdq:coversUseCase <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> ;
+    ffdq:criterionInContext <#contextualized-criterion> .
+
 
 # The Criterion for a validation test
-<urn:uuid:75d64099-b62d-4b4f-8d6b-b3cae74b7400> a <http://example.com/ffdq/Criterion> ;
-	rdfs:label "Check if a value for day is consistent with a provided month and year." .
+<#criterion> a <ffdq:Criterion> ;
+    rdfs:label "Check if a value for day is consistent with a provided month and year." .
 
 # ContextualizedCriterion describes Criterion in the context of a resource type (SingleRecord) and information elements (year, month, day)
-<urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a> <http://example.com/ffdq/hasCriterion> <urn:uuid:75d64099-b62d-4b4f-8d6b-b3cae74b7400> ;
-	<http://example.com/ffdq/hasInformationElement> <urn:uuid:4def6d47-1626-4fd0-b70c-c0ef9932c519> , <urn:uuid:b396dd5c-60e5-4ec8-b8eb-57fdcc28a00c> , <urn:uuid:b79dc547-786b-48c5-bba8-d2a436a3239b> ;
-	<http://example.com/ffdq/hasResourceType> <urn:uuid:c2fea4e6-4c40-495d-8f3e-4938c9414712> ;
-	a <http://example.com/ffdq/ContextualizedCriterion> .
+<#contextualized-criterion> a ffdq:ContextualizedCriterion ;
+    ffdq:hasCriterion <#criterion> ;
+    ffdq:hasInformationElement <#year> , <#month> , <#day> ;
+    ffdq:hasResourceType <#single-record> .
 
 # ResourceType can be single or multi record
-<urn:uuid:c2fea4e6-4c40-495d-8f3e-4938c9414712> a <http://example.com/rt/SingleRecord> .
+<#single-record> a <http://example.com/rt/SingleRecord> .
 
 # The InformationElements describe how terms from a controlled vocabulary (darwin core) relate to fields acted upon by the test
-<urn:uuid:b79dc547-786b-48c5-bba8-d2a436a3239b> <http://example.com/ffdq/composedOf> <http://rs.tdwg.org/dwc/terms/year> ;
-	a <http://example.com/ffdq/InformationElement> .
+<#year> a ffdq:InformationElement ;
+    ffdq:composedOf <dwc:year> .
 
-<urn:uuid:4def6d47-1626-4fd0-b70c-c0ef9932c519> <http://example.com/ffdq/composedOf> <http://rs.tdwg.org/dwc/terms/month> ;
-	a <http://example.com/ffdq/InformationElement> .
+<#month> a ffdq:InformationElement ;
+    ffdq:composedOf <dwc:month> .
 
-<urn:uuid:b396dd5c-60e5-4ec8-b8eb-57fdcc28a00c> <http://example.com/ffdq/composedOf> <http://rs.tdwg.org/dwc/terms/day> ;
-	a <http://example.com/ffdq/InformationElement> .
+<#day> a ffdq:InformationElement;
+    ffdq:composedOf <dwc:day> .
 
 # ValidationMethod ties ContextualizedCriterion to a Specification for a test
-<urn:uuid:7e00b597-658f-41cd-913d-f9f06d348f30> <http://example.com/ffdq/hasContextualizedCriterion> <urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a> ;
-	<http://example.com/ffdq/hasSpecification> <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
-	a <http://example.com/ffdq/ValidationMethod> .
+<#validation-method> a ffdq:ValidationMethod ;
+    ffdq:hasContextualizedCriterion <#contextualized-criterion> ;
+    ffdq:hasSpecification <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> .
 
 # Implementation describes the relationship between specification and mechanism (can be used to identify Java method and class)
-<urn:uuid:02a041e3-2d8d-41ba-86ed-1036b8da599f> <http://example.com/ffdq/hasSpecification> <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
-	<http://example.com/ffdq/implementedBy> <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> ;
-	a <http://example.com/ffdq/Implementation> .
+<#implementation> a ffdq:Implementation ;
+    ffdq:hasSpecification <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
+    ffdq:implementedBy <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> .
 
 # The specification for the DAY_POSSIBLE_FOR_MONTH_YEAR test (guid can be mapped to Java method DwCEventDQ.isDayPossibleForMonthYear)
-<urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> a <http://example.com/ffdq/Specification> ;
-	rdfs:label "Check that the value of dwc:eventDate is consistent with the values for dwc:month and dwc:year. Requires valid values for month and year." .
+<urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> a ffdq:Specification ;
+    rdfs:label "Check that the value of dwc:eventDate is consistent with the values for dwc:month and dwc:year. Requires valid values for month and year." .
 
 # Date validator mechanism (guid can be mapped to DwCEventDQ Java class from the event_date_qc project)
-<urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> a <http://example.com/ffdq/Mechanism> ;
-	rdfs:label "org.filteredpush.qc.date.DwCEventDQ" .
+<urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> a ffdq:Mechanism ;
+    rdfs:label "org.filteredpush.qc.date.DwCEventDQ" .
 
 # DQ validation report instance: "generated" references the Result, "hadPlan" references the specification, "used" references the
 # original DataResource, "wasAttributedTo" references the Mechanism that ran the test
-<urn:uuid:dc698a99-eced-4330-94f9-e59ba303101e> <http://example.com/ffdq/criterionInContext> <urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a> ;
-	a <http://example.com/ffdq/Validation> ;
-	<http://www.w3.org/ns/prov#generated> <urn:uuid:677e067a-66dc-4f4e-bb76-890d2f8f91ef> ;
-	<http://www.w3.org/ns/prov#hadPlan> <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
-	<http://www.w3.org/ns/prov#used> <urn:uuid:2ac4f690-4fd8-401f-adcb-869dd72bf656> ;
-	<http://www.w3.org/ns/prov#wasAttributedTo> <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> .
+<#validation> a ffdq:Validation ;
+    ffdq:criterionInContext <#contextualized-criterion> ;
+    prov:used <#data-resource> ;
+    prov:generated <#validation-result> ;
+    prov:hadPlan <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
+    prov:wasAttributedTo <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> .
 
 # ResultStatus for the Validation
-<urn:uuid:c2b301b3-39c9-4a1a-8cd8-448469a9ca18> a <http://example.com/ffdq/ResultStatus> ;
-	rdfs:label "COMPLIANT" .
+<#status-compliant> a ffdq:ResultStatus ;
+    rdfs:label "COMPLIANT" .
 
 # The Result of running the validation contains a comment and ResultStatus (COMPLIANT)
-<urn:uuid:677e067a-66dc-4f4e-bb76-890d2f8f91ef> <http://example.com/ffdq/hasStatus> <urn:uuid:c2b301b3-39c9-4a1a-8cd8-448469a9ca18> ;
-	a <http://example.com/ffdq/Result> ;
-	rdfs:comment "Provided value for year-month-day 1974-2-12 parses to a valid day." .
+<#validation-result> a ffdq:Result ;
+    ffdq:hasStatus <#status-compliant> ;
+    rdfs:comment "Provided value for year-month-day 1974-2-12 parses to a valid day." .
 
 # DataResource for a single occurrence record contains original values from the input file
-<urn:uuid:2ac4f690-4fd8-401f-adcb-869dd72bf656> <http://purl.org/dc/terms/identifier> "MCZ:Herp:R-142427" ;
-	<http://purl.org/dc/terms/license> "CC-BY-NC" ;
-	<http://purl.org/dc/terms/modified> "2015-05-14 16:04:26.0" ;
-	<http://purl.org/dc/terms/type> "PhysicalObject" ;
-	<http://rs.tdwg.org/dwc/terms/associatedMedia> "" ;
-	<http://rs.tdwg.org/dwc/terms/associatedSequences> "" ;
-	<http://rs.tdwg.org/dwc/terms/basisOfRecord> "PreservedSpecimen" ;
-	<http://rs.tdwg.org/dwc/terms/catalogNumber> "142427" ;
-	<http://rs.tdwg.org/dwc/terms/class> "Reptilia" ;
-	<http://rs.tdwg.org/dwc/terms/collectionCode> "Herp" ;
-	<http://rs.tdwg.org/dwc/terms/continent> "North America" ;
-	<http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters> "" ;
-	<http://rs.tdwg.org/dwc/terms/country> "Bonaire, Sint Eustatius and Saba" ;
-	<http://rs.tdwg.org/dwc/terms/county> "" ;
-	<http://rs.tdwg.org/dwc/terms/dateIdentified> "" ;
-	<http://rs.tdwg.org/dwc/terms/day> "12" ;
-	<http://rs.tdwg.org/dwc/terms/decimalLatitude> "" ;
-	<http://rs.tdwg.org/dwc/terms/decimalLongitude> "" ;
-	<http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage> "" ;
-	<http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries> "" ;
-	<http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem> "" ;
-	<http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem> "" ;
-	<http://rs.tdwg.org/dwc/terms/eventDate> "" ;
-	<http://rs.tdwg.org/dwc/terms/family> "Iguanidae" ;
-	<http://rs.tdwg.org/dwc/terms/formation> "" ;
-	<http://rs.tdwg.org/dwc/terms/genus> "Anolis" ;
-	<http://rs.tdwg.org/dwc/terms/geodeticDatum> "" ;
-	<http://rs.tdwg.org/dwc/terms/georeferenceProtocol> "" ;
-	<http://rs.tdwg.org/dwc/terms/georeferenceSources> "" ;
-	<http://rs.tdwg.org/dwc/terms/georeferencedBy> "" ;
-	<http://rs.tdwg.org/dwc/terms/habitat> "" ;
-	<http://rs.tdwg.org/dwc/terms/higherGeography> "North America: Bonaire, Sint Eustatius and Saba: Bonaire: West Indies: Bonaire" ;
-	<http://rs.tdwg.org/dwc/terms/identifiedBy> "Catalog" ;
-	<http://rs.tdwg.org/dwc/terms/individualCount> "1" ;
-	<http://rs.tdwg.org/dwc/terms/infraspecificEpithet> "" ;
-	<http://rs.tdwg.org/dwc/terms/institutionCode> "MCZ" ;
-	<http://rs.tdwg.org/dwc/terms/island> "Bonaire" ;
-	<http://rs.tdwg.org/dwc/terms/islandGroup> "West Indies" ;
-	<http://rs.tdwg.org/dwc/terms/kingdom> "Animalia" ;
-	<http://rs.tdwg.org/dwc/terms/lifeStage> "" ;
-	<http://rs.tdwg.org/dwc/terms/locality> "Ceru Jargo,5km N. Kralendijk" ;
-	<http://rs.tdwg.org/dwc/terms/maximumDepthInMeters> "" ;
-	<http://rs.tdwg.org/dwc/terms/maximumElevationInMeters> "" ;
-	<http://rs.tdwg.org/dwc/terms/minimumDepthInMeters> "" ;
-	<http://rs.tdwg.org/dwc/terms/minimumElevationInMeters> "" ;
-	<http://rs.tdwg.org/dwc/terms/month> "2" ;
-	<http://rs.tdwg.org/dwc/terms/nomenclaturalCode> "ICZN" ;
-	<http://rs.tdwg.org/dwc/terms/occurrenceID> "MCZ:Herp:R-142427" ;
-	<http://rs.tdwg.org/dwc/terms/occurrenceRemarks> "" ;
-	<http://rs.tdwg.org/dwc/terms/order> "Squamata" ;
-	<http://rs.tdwg.org/dwc/terms/otherCatalogNumbers> "collector number=MCZ FS-F15918; muse location number=ZR142427" ;
-	<http://rs.tdwg.org/dwc/terms/phylum> "Chordata" ;
-	<http://rs.tdwg.org/dwc/terms/recordNumber> "" ;
-	<http://rs.tdwg.org/dwc/terms/recordedBy> "A Dennison" ;
-	<http://rs.tdwg.org/dwc/terms/scientificName> "Anolis bonairensis" ;
-	<http://rs.tdwg.org/dwc/terms/sex> "" ;
-	<http://rs.tdwg.org/dwc/terms/specificEpithet> "bonairensis" ;
-	<http://rs.tdwg.org/dwc/terms/stateProvince> "Bonaire" ;
-	<http://rs.tdwg.org/dwc/terms/taxonRank> "" ;
-	<http://rs.tdwg.org/dwc/terms/typeStatus> "" ;
-	<http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem> "" ;
-	<http://rs.tdwg.org/dwc/terms/verbatimEventDate> "12/2/1974-12/2/1974" ;
-	<http://rs.tdwg.org/dwc/terms/verbatimLocality> "Ceru Jargo,5km N. Kralendijk,Bonaire" ;
-	<http://rs.tdwg.org/dwc/terms/waterBody> "" ;
-	<http://rs.tdwg.org/dwc/terms/year> "1974" ;
-	a <http://rs.tdwg.org/dwc/terms/Occurrence> .
+<#data-resource> a dwc:Occurrence ;
+    dcterms:identifier "MCZ:Herp:R-142427" ;
+    dcterms:license "CC-BY-NC" ;
+    dcterms:modified "2015-05-14 16:04:26.0" ;
+    dcterms:type "PhysicalObject" ;
+    dwc:associatedMedia "" ;
+    dwc:associatedSequences "" ;
+    dwc:basisOfRecord "PreservedSpecimen" ;
+    dwc:catalogNumber "142427" ;
+    dwc:class "Reptilia" ;
+    dwc:collectionCode "Herp" ;
+    dwc:continent "North America" ;
+    dwc:coordinateUncertaintyInMeters "" ;
+    dwc:country "Bonaire, Sint Eustatius and Saba" ;
+    dwc:county "" ;
+    dwc:dateIdentified "" ;
+    dwc:day "12" ;
+    dwc:decimalLatitude "" ;
+    dwc:decimalLongitude "" ;
+    dwc:earliestAgeOrLowestStage "" ;
+    dwc:earliestEpochOrLowestSeries "" ;
+    dwc:earliestEraOrLowestErathem "" ;
+    dwc:earliestPeriodOrLowestSystem "" ;
+    dwc:eventDate "" ;
+    dwc:family "Iguanidae" ;
+    dwc:formation "" ;
+    dwc:genus "Anolis" ;
+    dwc:geodeticDatum "" ;
+    dwc:georeferenceProtocol "" ;
+    dwc:georeferenceSources "" ;
+    dwc:georeferencedBy "" ;
+    dwc:habitat "" ;
+    dwc:higherGeography "North America: Bonaire, Sint Eustatius and Saba: Bonaire: West Indies: Bonaire" ;
+    dwc:identifiedBy "Catalog" ;
+    dwc:individualCount "1" ;
+    dwc:infraspecificEpithet "" ;
+    dwc:institutionCode "MCZ" ;
+    dwc:island "Bonaire" ;
+    dwc:islandGroup "West Indies" ;
+    dwc:kingdom "Animalia" ;
+    dwc:lifeStage "" ;
+    dwc:locality "Ceru Jargo,5km N. Kralendijk" ;
+    dwc:maximumDepthInMeters "" ;
+    dwc:maximumElevationInMeters "" ;
+    dwc:minimumDepthInMeters "" ;
+    dwc:minimumElevationInMeters "" ;
+    dwc:month "2" ;
+    dwc:nomenclaturalCode "ICZN" ;
+    dwc:occurrenceID "MCZ:Herp:R-142427" ;
+    dwc:occurrenceRemarks "" ;
+    dwc:order "Squamata" ;
+    dwc:otherCatalogNumbers "collector number=MCZ FS-F15918; muse location number=ZR142427" ;
+    dwc:phylum "Chordata" ;
+    dwc:recordNumber "" ;
+    dwc:recordedBy "A Dennison" ;
+    dwc:scientificName "Anolis bonairensis" ;
+    dwc:sex "" ;
+    dwc:specificEpithet "bonairensis" ;
+    dwc:stateProvince "Bonaire" ;
+    dwc:taxonRank "" ;
+    dwc:typeStatus "" ;
+    dwc:verbatimCoordinateSystem "" ;
+    dwc:verbatimEventDate "12/2/1974-12/2/1974" ;
+    dwc:verbatimLocality "Ceru Jargo,5km N. Kralendijk,Bonaire" ;
+    dwc:waterBody "" ;
+    dwc:year "1974" .

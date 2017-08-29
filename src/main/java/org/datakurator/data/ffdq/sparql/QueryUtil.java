@@ -13,6 +13,7 @@ import org.datakurator.data.ffdq.model.report.DataResource;
 import org.datakurator.data.ffdq.model.report.Result;
 import org.datakurator.data.ffdq.model.report.Validation;
 import org.datakurator.data.ffdq.model.solutions.*;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
@@ -44,9 +45,10 @@ public class QueryUtil {
 
         try (RepositoryConnection conn = repo.getConnection()) {
             // Load RDF data from file
-            conn.add(QueryUtil.class.getResourceAsStream("/example.ttl"), "", RDFFormat.TURTLE );
+            Model model = Rio.parse(QueryUtil.class.getResourceAsStream("/example.ttl"), "", RDFFormat.TURTLE);
+            conn.add(model);
 
-            RDFWriter writer = Rio.createWriter(RDFFormat.JSONLD, System.out);
+            RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, System.out);
 
             conn.prepareGraphQuery(QueryLanguage.SPARQL,
                     "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o } ").evaluate(writer);
