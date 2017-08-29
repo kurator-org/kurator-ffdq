@@ -1,0 +1,39 @@
+# Given a use case find the mechanisms used
+
+PREFIX ffdq: <http://example.com/ffdq/>
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?useCase ?specification ?mechanism ?policy
+
+WHERE {
+
+    # Find criterion in context from the validation
+    # policy for a given use case
+
+    ?policy a ffdq:ValidationPolicy .
+    ?policy ffdq:coversUseCase ?uc .
+    ?policy ffdq:criterionInContext ?cc .
+    ?uc rdfs:label ?useCase .
+
+    # Find the specification from the validation method
+    # referencing the criterion in context
+
+    ?vm a ffdq:ValidationMethod .
+    ?vm ffdq:hasContextualizedCriterion ?cc .
+    ?vm ffdq:hasSpecification ?s .
+    ?s rdfs:label ?specification .
+
+    # Find the mechanism from the implementation
+    # for the specification
+
+    ?i a ffdq:Implementation .
+    ?i ffdq:hasSpecification ?s .
+    ?i ffdq:implementedBy ?m .
+    ?m rdfs:label ?mechanism .
+
+    # Filter by a specific use case
+
+    FILTER( ?uc = <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> )
+
+}

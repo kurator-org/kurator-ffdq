@@ -34,6 +34,7 @@ import java.util.*;
  */
 public class DQClassHandler {
     private final Class cls;
+    private final String[] guids;
     private String mechanism;
 
     private RDFBeanFactory rdfFactory;
@@ -43,6 +44,11 @@ public class DQClassHandler {
     private List<AssertionTest> amendments = new ArrayList<>();
 
     public DQClassHandler(RDFBeanFactory factory, Class cls) {
+        this(factory, new String[] { }, cls);
+    }
+
+    public DQClassHandler(RDFBeanFactory factory, String[] guids, Class<DwCEventDQ> cls) {
+        this.guids = guids;
         this.rdfFactory = factory;
         this.cls = cls;
 
@@ -70,33 +76,39 @@ public class DQClassHandler {
         List<Parameter> parameters = processParameters(method);
         AssertionTest test = new AssertionTest(guid, specification, mechanism, cls, method, parameters);
 
-        // Process methods annotated as measures, validations, amendments
-        if (method.isAnnotationPresent(Measure.class)) {
-            Measure measure = method.getAnnotation(Measure.class);
-            Dimension dimension = measure.dimension();
+        // Include all tests or a subset of all if a list of test guids was supplied
+        if (guids.length == 0 || Arrays.asList(guids).contains(guid)) {
 
-            String label = measure.label();
-            String description = measure.description();
+            // Process methods annotated as measures, validations, amendments
+            if (method.isAnnotationPresent(Measure.class)) {
+                Measure measure = method.getAnnotation(Measure.class);
+                Dimension dimension = measure.dimension();
 
-            rdfFactory.createMeasurementMethod(test, dimension.name());
-            measures.add(test);
-        } else if (method.isAnnotationPresent(Validation.class)) {
-            Validation validation = method.getAnnotation(Validation.class);
+                String label = measure.label();
+                String description = measure.description();
 
-            String label = validation.label();
-            String description = validation.description();
+                rdfFactory.createMeasurementMethod(test, dimension.name());
+                measures.add(test);
+            } else if (method.isAnnotationPresent(Validation.class)) {
+                Validation validation = method.getAnnotation(Validation.class);
 
-            rdfFactory.createValidationMethod(test, description);
-            validations.add(test);
-        } else if (method.isAnnotationPresent(Amendment.class)) {
-            Amendment amendment = method.getAnnotation(Amendment.class);
+                String label = validation.label();
+                String description = validation.description();
 
-            String label = amendment.label();
-            String description = amendment.description();
+                rdfFactory.createValidationMethod(test, description);
+                validations.add(test);
+            } else if (method.isAnnotationPresent(Amendment.class)) {
+                Amendment amendment = method.getAnnotation(Amendment.class);
 
-            rdfFactory.createAmendmentMethod(test, description);
-            amendments.add(test);
+                String label = amendment.label();
+                String description = amendment.description();
+
+                rdfFactory.createAmendmentMethod(test, description);
+                amendments.add(test);
+            }
+
         }
+
     }
 
     private List<Parameter> processParameters(Method method) {
@@ -156,9 +168,11 @@ public class DQClassHandler {
     }
 
     public static void main(String[] args) throws IOException, RDFBeanException {
+        String[] testGuids = new String[]{"urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"};
+
         RDFBeanFactory factory = new RDFBeanFactory();
 
-        DQClassHandler handler = new DQClassHandler(factory, DwCEventDQ.class);
+        DQClassHandler handler = new DQClassHandler(factory, testGuids, DwCEventDQ.class);
         List<Map<String, String>> records = new LinkedList<Map<String, String>>();
 
         // Read csv file as a list of Map objects
@@ -167,7 +181,7 @@ public class DQClassHandler {
 
         MappingIterator<Map<String, String>> iterator = mapper.reader(Map.class)
                 .with(schema)
-                .readValues(DQClassHandler.class.getResourceAsStream("/nine_molluscs.csv"));
+                .readValues(DQClassHandler.class.getResourceAsStream("/mcz_eventdate.tsv"));
         while (iterator.hasNext()) {
             records.add(iterator.next());
         }

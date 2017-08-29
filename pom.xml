@@ -63,8 +63,14 @@
             <groupId>org.datakurator</groupId>
             <artifactId>ffdq-api</artifactId>
             <version>1.0.3-SNAPSHOT</version>
-
         </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+
         <dependency>
             <groupId>org.cyberborean</groupId>
             <artifactId>rdfbeans</artifactId>

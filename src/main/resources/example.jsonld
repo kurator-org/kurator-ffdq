@@ -1,0 +1,201 @@
+{
+  "@graph": [
+    {
+      "@id": "urn:uuid:02a041e3-2d8d-41ba-86ed-1036b8da599f",
+      "@type": "http://example.com/ffdq/Implementation",
+      "http://example.com/ffdq/hasSpecification": {
+        "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"
+      },
+      "http://example.com/ffdq/implementedBy": {
+        "@id": "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84"
+      }
+    },
+    {
+      "@id": "urn:uuid:2ac4f690-4fd8-401f-adcb-869dd72bf656",
+      "@type": "http://rs.tdwg.org/dwc/terms/Occurrence",
+      "http://purl.org/dc/terms/identifier": "MCZ:Herp:R-142427",
+      "http://purl.org/dc/terms/license": "CC-BY-NC",
+      "http://purl.org/dc/terms/modified": "2015-05-14 16:04:26.0",
+      "http://purl.org/dc/terms/type": "PhysicalObject",
+      "http://rs.tdwg.org/dwc/terms/associatedMedia": "",
+      "http://rs.tdwg.org/dwc/terms/associatedSequences": "",
+      "http://rs.tdwg.org/dwc/terms/basisOfRecord": "PreservedSpecimen",
+      "http://rs.tdwg.org/dwc/terms/catalogNumber": "142427",
+      "http://rs.tdwg.org/dwc/terms/class": "Reptilia",
+      "http://rs.tdwg.org/dwc/terms/collectionCode": "Herp",
+      "http://rs.tdwg.org/dwc/terms/continent": "North America",
+      "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters": "",
+      "http://rs.tdwg.org/dwc/terms/country": "Bonaire, Sint Eustatius and Saba",
+      "http://rs.tdwg.org/dwc/terms/county": "",
+      "http://rs.tdwg.org/dwc/terms/dateIdentified": "",
+      "http://rs.tdwg.org/dwc/terms/day": "12",
+      "http://rs.tdwg.org/dwc/terms/decimalLatitude": "",
+      "http://rs.tdwg.org/dwc/terms/decimalLongitude": "",
+      "http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage": "",
+      "http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries": "",
+      "http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem": "",
+      "http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem": "",
+      "http://rs.tdwg.org/dwc/terms/eventDate": "",
+      "http://rs.tdwg.org/dwc/terms/family": "Iguanidae",
+      "http://rs.tdwg.org/dwc/terms/formation": "",
+      "http://rs.tdwg.org/dwc/terms/genus": "Anolis",
+      "http://rs.tdwg.org/dwc/terms/geodeticDatum": "",
+      "http://rs.tdwg.org/dwc/terms/georeferenceProtocol": "",
+      "http://rs.tdwg.org/dwc/terms/georeferenceSources": "",
+      "http://rs.tdwg.org/dwc/terms/georeferencedBy": "",
+      "http://rs.tdwg.org/dwc/terms/habitat": "",
+      "http://rs.tdwg.org/dwc/terms/higherGeography": "North America: Bonaire, Sint Eustatius and Saba: Bonaire: West Indies: Bonaire",
+      "http://rs.tdwg.org/dwc/terms/identifiedBy": "Catalog",
+      "http://rs.tdwg.org/dwc/terms/individualCount": "1",
+      "http://rs.tdwg.org/dwc/terms/infraspecificEpithet": "",
+      "http://rs.tdwg.org/dwc/terms/institutionCode": "MCZ",
+      "http://rs.tdwg.org/dwc/terms/island": "Bonaire",
+      "http://rs.tdwg.org/dwc/terms/islandGroup": "West Indies",
+      "http://rs.tdwg.org/dwc/terms/kingdom": "Animalia",
+      "http://rs.tdwg.org/dwc/terms/lifeStage": "",
+      "http://rs.tdwg.org/dwc/terms/locality": "Ceru Jargo,5km N. Kralendijk",
+      "http://rs.tdwg.org/dwc/terms/maximumDepthInMeters": "",
+      "http://rs.tdwg.org/dwc/terms/maximumElevationInMeters": "",
+      "http://rs.tdwg.org/dwc/terms/minimumDepthInMeters": "",
+      "http://rs.tdwg.org/dwc/terms/minimumElevationInMeters": "",
+      "http://rs.tdwg.org/dwc/terms/month": "2",
+      "http://rs.tdwg.org/dwc/terms/nomenclaturalCode": "ICZN",
+      "http://rs.tdwg.org/dwc/terms/occurrenceID": "MCZ:Herp:R-142427",
+      "http://rs.tdwg.org/dwc/terms/occurrenceRemarks": "",
+      "http://rs.tdwg.org/dwc/terms/order": "Squamata",
+      "http://rs.tdwg.org/dwc/terms/otherCatalogNumbers": "collector number=MCZ FS-F15918; muse location number=ZR142427",
+      "http://rs.tdwg.org/dwc/terms/phylum": "Chordata",
+      "http://rs.tdwg.org/dwc/terms/recordNumber": "",
+      "http://rs.tdwg.org/dwc/terms/recordedBy": "A Dennison",
+      "http://rs.tdwg.org/dwc/terms/scientificName": "Anolis bonairensis",
+      "http://rs.tdwg.org/dwc/terms/sex": "",
+      "http://rs.tdwg.org/dwc/terms/specificEpithet": "bonairensis",
+      "http://rs.tdwg.org/dwc/terms/stateProvince": "Bonaire",
+      "http://rs.tdwg.org/dwc/terms/taxonRank": "",
+      "http://rs.tdwg.org/dwc/terms/typeStatus": "",
+      "http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem": "",
+      "http://rs.tdwg.org/dwc/terms/verbatimEventDate": "12/2/1974-12/2/1974",
+      "http://rs.tdwg.org/dwc/terms/verbatimLocality": "Ceru Jargo,5km N. Kralendijk,Bonaire",
+      "http://rs.tdwg.org/dwc/terms/waterBody": "",
+      "http://rs.tdwg.org/dwc/terms/year": "1974"
+    },
+    {
+      "@id": "urn:uuid:4def6d47-1626-4fd0-b70c-c0ef9932c519",
+      "@type": "http://example.com/ffdq/InformationElement",
+      "http://example.com/ffdq/composedOf": {
+        "@id": "http://rs.tdwg.org/dwc/terms/month"
+      }
+    },
+    {
+      "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f",
+      "@type": "http://example.com/ffdq/Specification",
+      "http://www.w3.org/2000/01/rdf-schema#label": "Check that the value of dwc:eventDate is consistent with the values for dwc:month and dwc:year. Requires valid values for month and year."
+    },
+    {
+      "@id": "urn:uuid:5694279a-3103-4413-986d-127f2141795f",
+      "@type": "http://example.com/ffdq/ValidationPolicy",
+      "http://example.com/ffdq/coversUseCase": {
+        "@id": "urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0"
+      },
+      "http://example.com/ffdq/criterionInContext": {
+        "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a"
+      }
+    },
+    {
+      "@id": "urn:uuid:677e067a-66dc-4f4e-bb76-890d2f8f91ef",
+      "@type": "http://example.com/ffdq/Result",
+      "http://example.com/ffdq/hasStatus": {
+        "@id": "urn:uuid:c2b301b3-39c9-4a1a-8cd8-448469a9ca18"
+      },
+      "http://www.w3.org/2000/01/rdf-schema#comment": "Provided value for year-month-day 1974-2-12 parses to a valid day."
+    },
+    {
+      "@id": "urn:uuid:75d64099-b62d-4b4f-8d6b-b3cae74b7400",
+      "@type": "http://example.com/ffdq/Criterion",
+      "http://www.w3.org/2000/01/rdf-schema#label": "Check if a value for day is consistent with a provided month and year."
+    },
+    {
+      "@id": "urn:uuid:7e00b597-658f-41cd-913d-f9f06d348f30",
+      "@type": "http://example.com/ffdq/ValidationMethod",
+      "http://example.com/ffdq/hasContextualizedCriterion": {
+        "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a"
+      },
+      "http://example.com/ffdq/hasSpecification": {
+        "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"
+      }
+    },
+    {
+      "@id": "urn:uuid:b396dd5c-60e5-4ec8-b8eb-57fdcc28a00c",
+      "@type": "http://example.com/ffdq/InformationElement",
+      "http://example.com/ffdq/composedOf": {
+        "@id": "http://rs.tdwg.org/dwc/terms/day"
+      }
+    },
+    {
+      "@id": "urn:uuid:b79dc547-786b-48c5-bba8-d2a436a3239b",
+      "@type": "http://example.com/ffdq/InformationElement",
+      "http://example.com/ffdq/composedOf": {
+        "@id": "http://rs.tdwg.org/dwc/terms/year"
+      }
+    },
+    {
+      "@id": "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84",
+      "@type": "http://example.com/ffdq/Mechanism",
+      "http://www.w3.org/2000/01/rdf-schema#label": "org.filteredpush.qc.date.DwCEventDQ"
+    },
+    {
+      "@id": "urn:uuid:c2b301b3-39c9-4a1a-8cd8-448469a9ca18",
+      "@type": "http://example.com/ffdq/ResultStatus",
+      "http://www.w3.org/2000/01/rdf-schema#label": "COMPLIANT"
+    },
+    {
+      "@id": "urn:uuid:c2fea4e6-4c40-495d-8f3e-4938c9414712",
+      "@type": "http://example.com/rt/SingleRecord"
+    },
+    {
+      "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a",
+      "@type": "http://example.com/ffdq/ContextualizedCriterion",
+      "http://example.com/ffdq/hasCriterion": {
+        "@id": "urn:uuid:75d64099-b62d-4b4f-8d6b-b3cae74b7400"
+      },
+      "http://example.com/ffdq/hasInformationElement": [
+        {
+          "@id": "urn:uuid:4def6d47-1626-4fd0-b70c-c0ef9932c519"
+        },
+        {
+          "@id": "urn:uuid:b396dd5c-60e5-4ec8-b8eb-57fdcc28a00c"
+        },
+        {
+          "@id": "urn:uuid:b79dc547-786b-48c5-bba8-d2a436a3239b"
+        }
+      ],
+      "http://example.com/ffdq/hasResourceType": {
+        "@id": "urn:uuid:c2fea4e6-4c40-495d-8f3e-4938c9414712"
+      }
+    },
+    {
+      "@id": "urn:uuid:dc698a99-eced-4330-94f9-e59ba303101e",
+      "@type": "http://example.com/ffdq/Validation",
+      "http://example.com/ffdq/criterionInContext": {
+        "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a"
+      },
+      "http://www.w3.org/ns/prov#generated": {
+        "@id": "urn:uuid:677e067a-66dc-4f4e-bb76-890d2f8f91ef"
+      },
+      "http://www.w3.org/ns/prov#hadPlan": {
+        "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"
+      },
+      "http://www.w3.org/ns/prov#used": {
+        "@id": "urn:uuid:2ac4f690-4fd8-401f-adcb-869dd72bf656"
+      },
+      "http://www.w3.org/ns/prov#wasAttributedTo": {
+        "@id": "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84"
+      }
+    },
+    {
+      "@id": "urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0",
+      "@type": "http://example.com/ffdq/UseCase",
+      "http://www.w3.org/2000/01/rdf-schema#label": "Check for internal consistency of dates"
+    }
+  ]
+}
