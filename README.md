@@ -21,16 +21,14 @@ Available from maven central.
 # QueryUtil
 
 A command-line utility is provided at `target/kurator-ffdq-1.0.3-jar-with-dependencies.jar` for running sparql queries 
-on sample rdf data. Example sparql query files can be found in the `src/main/resources/sparql` directory relative to the
-project root and example turtle and jsonld files can be found in `src/main/resources/rdf`.
+on sample rdf data. Example sparql query files can be found in the `competencyquestions/sparql` directory relative to the
+project root and example turtle and jsonld files can be found in `competencyquestions/rdf`.
 
-To view the example turtle on GitHub with comments describing the relationships between ffdq concepts see the following:
-
-https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/resources/rdf/example.ttl
+To view competency questions and example rdf see the readme at: https://github.com/kurator-org/kurator-ffdq/blob/master/competencyquestions/README.md
 
 Run the jar via the following and provide the utility with the options specified below or run with no options to see usage.
 
-`java -jar kurator-ffdq-1.0.3-jar-with-dependencies.jar --triples src/main/resources/rdf/example.ttl --query src/main/resources/sparql/results.sparql --out result.tsv`
+`java -jar kurator-ffdq-1.0.3.jar -t ../competencyquestions/rdf/example.jsonld -q ../competencyquestions/sparql/results.sparql -o results.tsv`
 
 # Using 
 

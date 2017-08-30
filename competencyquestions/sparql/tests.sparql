@@ -5,8 +5,9 @@ PREFIX ffdq: <http://example.com/ffdq/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
 
-SELECT ?useCase ?validation ?term ?status ?comment
+SELECT DISTINCT ?useCase ?test ?specification ?id ?status ?comment
 
 WHERE {
 
@@ -23,8 +24,8 @@ WHERE {
 
     ?vm a ffdq:ValidationMethod .
     ?vm ffdq:hasContextualizedCriterion ?cc .
-    ?vm ffdq:hasSpecification ?s .
-    ?s rdfs:label ?specification .
+    ?vm ffdq:hasSpecification ?test .
+    ?test rdfs:label ?specification .
 
     # Find the validations from the criterion
     # in context and the specification
@@ -33,13 +34,11 @@ WHERE {
     ?v ffdq:criterionInContext ?cc .
     ?v prov:hadPlan ?s .
 
-    # Find the valuable information element
-    # terms from the criterion in context
+    # Get the record id from the data resource
+    ?v prov:used ?dr .
+    ?dr dcterms:identifier ?id .
 
-    ?cc ffdq:hasInformationElement ?vie .
-    ?vie ffdq:composedOf ?term .
-
-    # Find the result status and comment
+    # Find the result status.sparql and comment
     # from the validations
 
     ?validation prov:generated ?r .

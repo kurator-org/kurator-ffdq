@@ -6,7 +6,7 @@
 
     <groupId>org.datakurator</groupId>
     <artifactId>kurator-ffdq</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <name>kurator-ffdq</name>
     <description>Data quality assertion framework. Provides utilities for capturing provenance data and generation of data quality reports using FFDQ.</description>
     <url>http://wiki.datakurator.org/</url>
@@ -144,6 +144,12 @@
             <version>3.12</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -187,30 +193,24 @@
                 </executions>
             </plugin>
 
-            <!-- Maven Assembly Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.datakurator.data.ffdq.sparql.QueryUtil</mainClass>
-                        </manifest>
-                    </archive>
-
-                </configuration>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <!-- bind to the packaging phase -->
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.datakurator.data.ffdq.sparql.QueryUtil</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

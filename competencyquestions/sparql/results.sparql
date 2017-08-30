@@ -1,0 +1,54 @@
+# Given a use case find the validation result status and valuable
+# information elements
+
+PREFIX ffdq: <http://example.com/ffdq/>
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?useCase ?validation ?term ?status ?comment
+
+WHERE {
+
+    # Find criterion in context from the validation
+    # policy for a given use case
+
+    ?policy a ffdq:ValidationPolicy .
+    ?policy ffdq:coversUseCase ?uc .
+    ?policy ffdq:criterionInContext ?cc .
+    ?uc rdfs:label ?useCase .
+
+    # Find the specification from the validation method
+    # referencing the criterion in context
+
+    ?vm a ffdq:ValidationMethod .
+    ?vm ffdq:hasContextualizedCriterion ?cc .
+    ?vm ffdq:hasSpecification ?s .
+    ?s rdfs:label ?specification .
+
+    # Find the validations from the criterion
+    # in context and the specification
+
+    ?v a ffdq:Validation .
+    ?v ffdq:criterionInContext ?cc .
+    ?v prov:hadPlan ?s .
+
+    # Find the valuable information element
+    # terms from the criterion in context
+
+    ?cc ffdq:hasInformationElement ?vie .
+    ?vie ffdq:composedOf ?term .
+
+    # Find the result status.sparql and comment
+    # from the validations
+
+    ?validation prov:generated ?r .
+    ?r ffdq:hasStatus ?rs .
+    ?rs rdfs:label ?status .
+    ?r rdfs:comment ?comment .
+
+    # Filter by a specific use case
+
+    FILTER( ?uc = <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> )
+
+}

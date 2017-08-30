@@ -24,7 +24,6 @@
     ffdq:coversUseCase <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> ;
     ffdq:criterionInContext <#contextualized-criterion> .
 
-
 # The Criterion for a validation test
 <#criterion> a <ffdq:Criterion> ;
     rdfs:label "Check if a value for day is consistent with a provided month and year." .
