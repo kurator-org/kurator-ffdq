@@ -18,6 +18,20 @@ Available from maven central.
 
     mvn package
 
+# QueryUtil
+
+A command-line utility is provided at `target/kurator-ffdq-1.0.3-jar-with-dependencies.jar` for running sparql queries 
+on sample rdf data. Example sparql query files can be found in the `src/main/resources/sparql` directory relative to the
+project root and example turtle and jsonld files can be found in `src/main/resources/rdf`.
+
+To view the example turtle on GitHub with comments describing the relationships between ffdq concepts see the following:
+
+https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/resources/rdf/example.ttl
+
+Run the jar via the following and provide the utility with the options specified below or run with no options to see usage.
+
+`java -jar kurator-ffdq-1.0.3-jar-with-dependencies.jar --triples src/main/resources/rdf/example.ttl --query src/main/resources/sparql/results.sparql --out result.tsv`
+
 # Using 
 
 Classes are provided to represent Measures, Validations, and Improvements, to relate them to criteria in Context,

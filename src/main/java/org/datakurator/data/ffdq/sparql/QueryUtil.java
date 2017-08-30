@@ -34,7 +34,7 @@ public class QueryUtil {
 
         if (cmd.hasOption("t") && cmd.hasOption("q") && cmd.hasOption("o")) {
             // Get option values
-            InputStream input = new FileInputStream(cmd.getOptionValue("t"));
+            String input = cmd.getOptionValue("t");
             String output = cmd.getOptionValue("o");
 
             String sparql = loadSparql(new FileInputStream(cmd.getOptionValue("q")));
@@ -44,19 +44,29 @@ public class QueryUtil {
         } else {
             // Print usage
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("java -jar ffdq.jar", options);
+            formatter.printHelp("ffdq", options);
         }
     }
 
-    private static void executeQuery(InputStream input, String output, String sparql) {
+    private static void executeQuery(String input, String output, String sparql) {
         // Initialize an in-memory store and run SPARQL query
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
 
         try (RepositoryConnection conn = repo.getConnection()) {
 
+            RDFFormat format = RDFFormat.TURTLE;
+
+            if (input.endsWith("jsonld")) {
+                format = RDFFormat.JSONLD;
+            } else if (input.endsWith("rdf")) {
+                format = RDFFormat.RDFXML;
+            } else {
+                format = RDFFormat.TURTLE;
+            }
+
             // Load RDF data from file
-            Model model = Rio.parse(input, "", RDFFormat.TURTLE);
+            Model model = Rio.parse(new FileInputStream(input), "", format);
             conn.add(model);
 
             if (sparql.contains("CONSTRUCT")) {
