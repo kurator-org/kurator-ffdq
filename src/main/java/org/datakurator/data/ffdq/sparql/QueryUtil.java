@@ -1,20 +1,10 @@
 package org.datakurator.data.ffdq.sparql;
 
+import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
-import org.cyberborean.rdfbeans.RDFBeanManager;
-import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
-import org.datakurator.data.ffdq.ResultStatus;
-import org.datakurator.data.ffdq.model.needs.ValidationPolicy;
-import org.datakurator.data.ffdq.model.needs.Criterion;
-import org.datakurator.data.ffdq.model.needs.InformationElement;
-import org.datakurator.data.ffdq.model.needs.ResourceType;
-import org.datakurator.data.ffdq.model.needs.UseCase;
-import org.datakurator.data.ffdq.model.report.DataResource;
-import org.datakurator.data.ffdq.model.report.Result;
-import org.datakurator.data.ffdq.model.report.Validation;
-import org.datakurator.data.ffdq.model.solutions.*;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.TupleQueryResultHandler;
 import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -24,60 +14,67 @@ import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
- * Example sparql queries on the ffdq rdf model
+ * Execute sparql queries on the ffdq rdf model
  */
 public class QueryUtil {
 
-    public static void main(String [] args) throws URISyntaxException {
+    public static void main(String[] args) throws URISyntaxException, ParseException, IOException {
+        Options options = new Options();
+
+        options.addOption("t", "triples", true, "File containing triples (jsonld or turtle).");
+        options.addOption("q", "query", true, "File containing sparql query.");
+        options.addOption("o", "out", true, "Output file for query result.");
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        if (cmd.hasOption("t") && cmd.hasOption("q") && cmd.hasOption("o")) {
+            // Get option values
+            InputStream input = new FileInputStream(cmd.getOptionValue("t"));
+            String output = cmd.getOptionValue("o");
+
+            String sparql = loadSparql(new FileInputStream(cmd.getOptionValue("q")));
+
+            // Execute query and save result to file
+            executeQuery(input, output, sparql);
+        } else {
+            // Print usage
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("java -jar ffdq.jar", options);
+        }
+    }
+
+    private static void executeQuery(InputStream input, String output, String sparql) {
         // Initialize an in-memory store and run SPARQL query
         Repository repo = new SailRepository(new MemoryStore());
         repo.initialize();
 
         try (RepositoryConnection conn = repo.getConnection()) {
+
             // Load RDF data from file
-            Model model = Rio.parse(QueryUtil.class.getResourceAsStream("/example.ttl"), "", RDFFormat.TURTLE);
+            Model model = Rio.parse(input, "", RDFFormat.TURTLE);
             conn.add(model);
 
-            RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, System.out);
+            if (sparql.contains("CONSTRUCT")) {
 
-            conn.prepareGraphQuery(QueryLanguage.SPARQL,
-                    "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o } ").evaluate(writer);
+                // Sparql CONSTRUCT
+                RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, new FileOutputStream(output));
+                conn.prepareGraphQuery(QueryLanguage.SPARQL, sparql).evaluate(writer);
 
-            System.out.println();
+            } else if (sparql.contains("SELECT")) {
 
-            // Given a use case find the mechanisms used
-            String sparql = loadSparql(QueryUtil.class.getResourceAsStream("/sparql/mechanism.sparql"));
-            conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(new SPARQLResultsTSVWriter(System.out));
+                // Sparql SELECT
+                TupleQueryResultHandler handler = new SPARQLResultsTSVWriter(new FileOutputStream(output));
+                conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(handler);
 
-            // Given a use case find the validation result status and valuable
-            // information elements
-            sparql = loadSparql(QueryUtil.class.getResourceAsStream("/sparql/results.sparql"));
-            conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(new SPARQLResultsTSVWriter(System.out));
+            }
 
-            // Given a use case find the validation mechanisms,
-            // implementation and valuable information elements
-            //
-            // The mechanism and specification guids link a
-            // validation to the Java class and method that
-            // implementing a specific standardized test.
-            //
-            // The valuable information elements are linked to
-            // "fieldsActedUpon" and "fieldsConsulted" via
-            // annotated method parameters
-            sparql = loadSparql(QueryUtil.class.getResourceAsStream("/sparql/guids.sparql"));
-            conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(new SPARQLResultsTSVWriter(System.out));
-        //} catch (RDFBeanException e) {
-        //    e.printStackTrace();
+            System.out.println("Wrote sparql query to output file: " + output);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
