@@ -25,6 +25,7 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/",
+        "d = http://example.com/ffdq/dimension",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Dimension")
@@ -32,15 +33,13 @@ public class Dimension {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    public Dimension() { }
-
     public Dimension(String label) {
         this.label = label;
     }
 
-    @RDFSubject
+    @RDFSubject(prefix = "d:")
     public String getId() {
-        return id;
+        return label.toLowerCase();
     }
 
     public void setId(String id) {
@@ -62,4 +61,5 @@ public class Dimension {
     public static Dimension ACCURACY = new Dimension("Accuracy");
     public static Dimension PRECISION = new Dimension("Precision");
     public static Dimension UNIQUENESS = new Dimension("Uniqueness");
+
 }

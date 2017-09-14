@@ -26,7 +26,8 @@ import java.net.URISyntaxException;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://example.com/ffdq/",
+        "ie = http://example.com/ffdq/ie"
 })
 @RDFBean("ffdq:InformationElement")
 public class InformationElement {
@@ -44,9 +45,10 @@ public class InformationElement {
     }
 
 
-    @RDFSubject
+    @RDFSubject(prefix = "ie:")
     public String getId() {
-        return id;
+        String path = composedOf.getPath();
+        return path;
     }
 
     public void setId(String id) {

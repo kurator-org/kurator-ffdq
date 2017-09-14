@@ -6,17 +6,85 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.cyberborean.rdfbeans.RDFBeanManager;
+import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
+import org.datakurator.data.ffdq.Namespace;
+import org.datakurator.data.ffdq.model.needs.*;
+import org.datakurator.data.ffdq.model.solutions.*;
+import org.datakurator.data.ffdq.runner.AssertionTest;
+import org.datakurator.data.ffdq.runner.Parameter;
+import org.datakurator.data.ffdq.runner.RDFBeanFactory;
+import org.datakurator.postprocess.model.Measure;
+import org.datakurator.postprocess.model.Validation;
+import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFWriter;
+import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * Created by lowery on 9/12/17.
  */
 public class ParseTestsXLSX {
+    private static String DWC_NS;
+
+    private static String[] DWC_TERMS = { "institutionID", "collectionID", "datasetID", "institutionCode",
+            "collectionCode", "datasetName", "ownerInstitutionCode", "basisOfRecord", "informationWithheld",
+            "dataGeneralizations", "dynamicProperties", "occurrenceID", "catalogNumber", "recordNumber", "recordedBy",
+            "individualCount", "organismQuantity", "organismQuantityType", "sex", "lifeStage", "reproductiveCondition",
+            "behavior", "establishmentMeans", "occurrenceStatus", "preparations", "disposition", "associatedMedia",
+            "associatedReferences", "associatedSequences", "associatedTaxa", "otherCatalogNumbers", "occurrenceRemarks",
+            "organismID", "organismName", "organismScope", "associatedOccurrences", "associatedOrganisms",
+            "previousIdentifications", "organismRemarks", "materialSampleID", "eventID", "parentEventID", "fieldNumber",
+            "eventDate", "eventTime", "startDayOfYear", "endDayOfYear", "year", "month", "day", "verbatimEventDate",
+            "habitat", "samplingProtocol", "sampleSizeValue", "sampleSizeUnit", "samplingEffort", "fieldNotes",
+            "eventRemarks", "locationID", "higherGeographyID", "higherGeography", "continent", "waterBody",
+            "islandGroup", "island", "country", "countryCode", "stateProvince", "county", "municipality",
+            "locality", "verbatimLocality", "minimumElevationInMeters", "maximumElevationInMeters", "verbatimElevation",
+            "minimumDepthInMeters", "maximumDepthInMeters", "verbatimDepth", "minimumDistanceAboveSurfaceInMeters",
+            "maximumDistanceAboveSurfaceInMeters", "locationAccordingTo", "locationRemarks", "decimalLatitude",
+            "decimalLongitude", "geodeticDatum", "coordinateUncertaintyInMeters", "coordinatePrecision",
+            "pointRadiusSpatialFit", "verbatimCoordinates", "verbatimLatitude", "verbatimLongitude",
+            "verbatimCoordinateSystem", "verbatimSRS", "footprintWKT", "footprintSRS", "footprintSpatialFit",
+            "georeferencedBy", "georeferencedDate", "georeferenceProtocol", "georeferenceSources",
+            "georeferenceVerificationStatus", "georeferenceRemarks", "geologicalContextID",
+            "earliestEonOrLowestEonothem", "latestEonOrHighestEonothem", "earliestEraOrLowestErathem",
+            "latestEraOrHighestErathem", "earliestPeriodOrLowestSystem", "latestPeriodOrHighestSystem",
+            "earliestEpochOrLowestSeries", "latestEpochOrHighestSeries", "earliestAgeOrLowestStage",
+            "latestAgeOrHighestStage", "lowestBiostratigraphicZone", "highestBiostratigraphicZone",
+            "lithostratigraphicTerms", "group", "formation", "member", "bed", "identificationID",
+            "identificationQualifier", "typeStatus", "identifiedBy", "dateIdentified", "identificationReferences",
+            "identificationVerificationStatus", "identificationRemarks", "taxonID", "scientificNameID",
+            "acceptedNameUsageID", "parentNameUsageID", "originalNameUsageID", "nameAccordingToID", "namePublishedInID",
+            "taxonConceptID", "scientificName", "acceptedNameUsage", "parentNameUsage", "originalNameUsage",
+            "nameAccordingTo", "namePublishedIn", "namePublishedInYear", "higherClassification", "kingdom", "phylum",
+            "class", "order", "family", "genus", "subgenus", "specificEpithet", "infraspecificEpithet", "taxonRank",
+            "verbatimTaxonRank", "scientificNameAuthorship", "vernacularName", "nomenclaturalCode", "taxonomicStatus",
+            "nomenclaturalStatus", "taxonRemarks", "measurementID", "measurementType", "measurementValue",
+            "measurementAccuracy", "measurementUnit", "measurementDeterminedBy", "measurementDeterminedDate",
+            "measurementMethod", "measurementRemarks", "resourceRelationshipID", "resourceID", "relatedResourceID",
+            "relationshipOfResource", "relationshipAccordingTo", "relationshipEstablishedDate", "relationshipRemarks" };
+
+    private Repository repo;
+    private RepositoryConnection conn;
+    private RDFBeanManager manager;
+
+    public ParseTestsXLSX() {
+        // Initialize an in-memory store and the rdf bean manager
+        repo = new SailRepository(new MemoryStore());
+        repo.initialize();
+
+        conn = repo.getConnection();
+        manager = new RDFBeanManager(conn);
+    }
 
     public static void main(String[] args) throws ParseException, IOException {
         Options options = new Options();
@@ -53,7 +121,11 @@ public class ParseTestsXLSX {
                 }
             }
 
-            parseXlsx(new FileInputStream(new File(input)));
+            ParseTestsXLSX testsToRDF = new ParseTestsXLSX();
+
+            testsToRDF.parseXlsx(new FileInputStream(new File(input)));
+            testsToRDF.write(format, new FileOutputStream(new File(output)));
+
         } else {
 
             // Print usage
@@ -62,10 +134,12 @@ public class ParseTestsXLSX {
         }
     }
 
-    private static void parseXlsx(InputStream input) throws IOException {
+    private void parseXlsx(InputStream input) throws IOException {
         int LABEL_IDX = -1, GUID_IDX = -1, DESCRIPTION_IDX = -1, SPECIFICATION_IDX = -1,
                 RESOURCE_TYPE_IDX = -1, ASSERTION_TYPE_IDX = -1, INFORMATION_ELEMENTS_IDX = -1,
                 DIMENSION_IDX = -1;
+
+        RDFBeanFactory beanFactory = new RDFBeanFactory();
 
         Workbook workbook = new XSSFWorkbook(input);
         Sheet sheet = workbook.getSheet("Tests-current");
@@ -102,26 +176,163 @@ public class ParseTestsXLSX {
         while (rows.hasNext()) {
             Row row = rows.next();
 
-            String label = row.getCell(LABEL_IDX).getStringCellValue().trim();
-            String guid = row.getCell(GUID_IDX).getStringCellValue().trim();
-            String description = row.getCell(DESCRIPTION_IDX).getStringCellValue().trim();
-            String specification = row.getCell(SPECIFICATION_IDX).getStringCellValue().trim();
-            String resourceType = row.getCell(RESOURCE_TYPE_IDX).getStringCellValue().trim();
-            String assertionType = row.getCell(ASSERTION_TYPE_IDX).getStringCellValue().trim();
-            String informationElements = row.getCell(INFORMATION_ELEMENTS_IDX).getStringCellValue().trim();
-            String dimension = row.getCell(DIMENSION_IDX).getStringCellValue().trim();
+            Cell labelCell = row.getCell(LABEL_IDX);
+            Cell guidCell = row.getCell(GUID_IDX);
 
-            boolean errors = false;
-            if (!label.isEmpty() && label != null) {
+            if (labelCell != null && guidCell != null) {
+                String label = labelCell.getStringCellValue().trim();
+                String guid = "urn:uuid:" + guidCell.getStringCellValue().trim();
+                String description = row.getCell(DESCRIPTION_IDX).getStringCellValue().trim();
+                String specification = row.getCell(SPECIFICATION_IDX).getStringCellValue().trim();
+                String resourceType = row.getCell(RESOURCE_TYPE_IDX).getStringCellValue().trim();
+                String assertionType = row.getCell(ASSERTION_TYPE_IDX).getStringCellValue().trim();
+                String informationElements = row.getCell(INFORMATION_ELEMENTS_IDX).getStringCellValue().trim();
+                String dimension = row.getCell(DIMENSION_IDX).getStringCellValue().trim();
 
-                if (guid.isEmpty() || guid == null) {
-                    errors = true;
-                    System.err.println("ERROR: Test " + label + " does not have an associated guid");
+                boolean errors = false;
+                if (!label.isEmpty() && label != null) {
+
+                    if (guid.isEmpty() || guid == null) {
+                        errors = true;
+                        System.err.println("ERROR: Test " + label + " does not have an associated guid");
+                    }
+
+                    try {
+                        if (assertionType.equalsIgnoreCase("Measure")) {
+                            createMeasure(guid, specification, label, dimension, resourceType,
+                                    informationElements);
+                        } else if (assertionType.equalsIgnoreCase("Validation")) {
+                            createValidation(guid, specification, label, description, resourceType,
+                                    informationElements);
+                        } else if (assertionType.equalsIgnoreCase("Amendment")) {
+                            createAmendment(guid, specification, label, description, resourceType,
+                                    informationElements);
+                        } else {
+                            errors = true;
+                            System.err.println("ERROR: Test " + label + " has invalid assertion type " + assertionType);
+                        }
+                    } catch (RDFBeanException e) {
+                        errors = true;
+                        e.printStackTrace();
+                    }
+
                 }
-
-                System.out.println(label + " - " + guid + ": " + specification);
             }
         }
+    }
+
+    public void write(RDFFormat format, OutputStream out) {
+        RDFWriter writer = Rio.createWriter(format, out);
+        try (RepositoryConnection conn = repo.getConnection()) {
+            conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
+        }
+    }
+
+    private List<InformationElement> parseInformationElements(String informationElements) throws URISyntaxException {
+
+            URI uri = new URI(Namespace.DWC);
+            List<InformationElement> ie = new ArrayList<InformationElement>();
+
+            if (informationElements.equalsIgnoreCase("All Darwin Core Terms")) {
+                for (String term : DWC_TERMS) {
+                    ie.add(new InformationElement(uri.resolve(term)));
+                }
+            } else {
+                StringTokenizer tokenizer = new StringTokenizer(informationElements, ",");
+
+                while (tokenizer.hasMoreTokens()) {
+                    String term = tokenizer.nextToken().trim();
+                    ie.add(new InformationElement(uri.resolve(term)));
+                }
+            }
+
+            return ie;
+
+    }
+
+    private void createMeasure(String guid, String specification, String label, String dimension, String resourceType,
+                               String informationElements) throws RDFBeanException {
+
+        Dimension d = new Dimension(dimension);
+        ResourceType rt = new ResourceType(resourceType);
+
+        List<InformationElement> ie = new ArrayList<>();
+
+        try {
+            ie = parseInformationElements(informationElements);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not construct dwc namespace uri for information element in test " + label, e);
+        }
+
+        ContextualizedDimension cd = new ContextualizedDimension();
+        cd.setDimension(d);
+        cd.setResourceType(rt);
+        cd.setInformationElements(ie);
+
+        Specification s = new Specification(guid, specification);
+
+        MeasurementMethod measurementMethod = new MeasurementMethod();
+        measurementMethod.setContextualizedDimension(cd);
+        measurementMethod.setSpecification(s);
+
+        manager.add(measurementMethod);
+    }
+
+    private void createValidation(String guid, String specification, String label, String criterion, String resourceType,
+                               String informationElements) throws RDFBeanException {
+
+        Criterion c = new Criterion(criterion);
+        ResourceType rt = new ResourceType(resourceType);
+
+        List<InformationElement> ie = new ArrayList<>();
+
+        try {
+            ie = parseInformationElements(informationElements);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not construct dwc namespace uri for information element in test " + label, e);
+        }
+
+        ContextualizedCriterion cc = new ContextualizedCriterion();
+        cc.setCriterion(c);
+        cc.setResourceType(rt);
+        cc.setInformationElements(ie);
+
+        Specification s = new Specification(guid, specification);
+
+        ValidationMethod validationMethod = new ValidationMethod();
+        validationMethod.setContextualizedCriterion(cc);
+        validationMethod.setSpecification(s);
+
+        manager.add(validationMethod);
+    }
+
+    private void createAmendment(String guid, String specification, String label, String enhancement, String resourceType,
+                                  String informationElements) throws RDFBeanException {
+
+        Enhancement e = new Enhancement(enhancement);
+        ResourceType rt = new ResourceType(resourceType);
+
+        List<InformationElement> ie = new ArrayList<>();
+
+        try {
+            ie = parseInformationElements(informationElements);
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not construct dwc namespace uri for information element in test " + label, ex);
+        }
+
+        ContextualizedEnhancement ce = new ContextualizedEnhancement();
+        ce.setEnhancement(e);
+        ce.setResourceType(rt);
+        ce.setInformationElements(ie);
+
+        Specification s = new Specification(guid, specification);
+
+        AmendmentMethod amendmentMethod = new AmendmentMethod();
+        amendmentMethod.setContextualizedEnhancement(ce);
+        amendmentMethod.setSpecification(s);
+
+        manager.add(amendmentMethod);
     }
 
 }

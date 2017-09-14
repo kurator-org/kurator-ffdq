@@ -22,35 +22,28 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
 import java.util.UUID;
 
+@RDFNamespaces({
+        "rt = http://example.com/rt/"
+})
+@RDFBean("ffdq:ResourceType")
 public class ResourceType {
-    public static final ResourceType SINGLE_RECORD = new ResourceType.SingleRecord();
-    public static final ResourceType MULTI_RECORD = new ResourceType.MultiRecord();
+    public static final ResourceType SINGLE_RECORD = new ResourceType("SingleRecord");
+    public static final ResourceType MULTI_RECORD = new ResourceType("MultiRecord");
 
     private String id = "urn:uuid:" + UUID.randomUUID();
+    private String label;
 
-    @RDFSubject
+    @RDFSubject(prefix = "rt:")
     public String getId() {
-        return id;
+        return label;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    @RDFNamespaces({
-            "rt = http://example.com/rt/"
-    })
-    @RDFBean("rt:SingleRecord")
-    public static class SingleRecord extends ResourceType {
-
-    }
-
-    @RDFNamespaces({
-            "rt = http://example.com/rt"
-    })
-    @RDFBean("rt:MultiRecord")
-    public static class MultiRecord extends ResourceType {
-
+    public ResourceType(String label) {
+        this.label = label;
     }
 
 }
