@@ -16,7 +16,13 @@ import org.datakurator.data.ffdq.runner.Parameter;
 import org.datakurator.data.ffdq.runner.RDFBeanFactory;
 import org.datakurator.postprocess.model.Measure;
 import org.datakurator.postprocess.model.Validation;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.impl.TreeModel;
+import org.eclipse.rdf4j.query.GraphQueryResult;
 import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.QueryResults;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
@@ -73,11 +79,20 @@ public class ParseTestsXLSX {
             "measurementMethod", "measurementRemarks", "resourceRelationshipID", "resourceID", "relatedResourceID",
             "relationshipOfResource", "relationshipAccordingTo", "relationshipEstablishedDate", "relationshipRemarks" };
 
+    private final RDFFormat format;
+    private final OutputStream out;
+
+    private RDFWriter writer;
+
     private Repository repo;
     private RepositoryConnection conn;
     private RDFBeanManager manager;
 
-    public ParseTestsXLSX() {
+    public ParseTestsXLSX(RDFFormat format, OutputStream out) {
+        this.format = format;
+        this.out = out;
+
+        this.writer = Rio.createWriter(format, out);
         // Initialize an in-memory store and the rdf bean manager
         repo = new SailRepository(new MemoryStore());
         repo.initialize();
@@ -121,10 +136,8 @@ public class ParseTestsXLSX {
                 }
             }
 
-            ParseTestsXLSX testsToRDF = new ParseTestsXLSX();
-
+            ParseTestsXLSX testsToRDF = new ParseTestsXLSX(format, new FileOutputStream(output));
             testsToRDF.parseXlsx(new FileInputStream(new File(input)));
-            testsToRDF.write(format, new FileOutputStream(new File(output)));
 
         } else {
 
@@ -221,11 +234,35 @@ public class ParseTestsXLSX {
         }
     }
 
-    public void write(RDFFormat format, OutputStream out) {
-        RDFWriter writer = Rio.createWriter(format, out);
+    public void writeComment(String comment) {
+        StringBuilder sb = new StringBuilder();
+        int length = comment.length()+4;
+
+        for (int i = 0; i < length; i++) {
+            sb.append("#");
+        }
+
+        sb.append("\n# " + comment + " #\n");
+
+        for (int i = 0; i < length; i++) {
+            sb.append("#");
+        }
+
+        try {
+            out.write('\n');
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        writer.handleComment(sb.toString());
+    }
+
+    public void writeResource(Resource resource) {
         try (RepositoryConnection conn = repo.getConnection()) {
-            conn.prepareGraphQuery(QueryLanguage.SPARQL,
-                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
+            GraphQueryResult graphResult = conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate();
+            Model resultModel = QueryResults.asModel(graphResult).filter(resource, null, null);
+            Rio.write(resultModel, writer);
         }
     }
 
@@ -257,6 +294,8 @@ public class ParseTestsXLSX {
     private void createMeasure(String guid, String specification, String label, String dimension, String resourceType,
                                String informationElements) throws RDFBeanException {
 
+        writeComment(label);
+
         Dimension d = new Dimension(dimension);
         ResourceType rt = new ResourceType(resourceType);
 
@@ -273,11 +312,18 @@ public class ParseTestsXLSX {
         measurementMethod.setContextualizedDimension(cd);
         measurementMethod.setSpecification(s);
 
-        manager.add(measurementMethod);
+        writeResource(manager.add(s));
+        writeResource(manager.add(d));
+        writeResource(manager.add(rt));
+        writeResource(manager.add(ie));
+        writeResource(manager.add(cd));
+        writeResource(manager.add(measurementMethod));
     }
 
     private void createValidation(String guid, String specification, String label, String criterion, String resourceType,
                                String informationElements) throws RDFBeanException {
+
+        writeComment(label);
 
         Criterion c = new Criterion(criterion);
         ResourceType rt = new ResourceType(resourceType);
@@ -295,11 +341,18 @@ public class ParseTestsXLSX {
         validationMethod.setContextualizedCriterion(cc);
         validationMethod.setSpecification(s);
 
-        manager.add(validationMethod);
+        writeResource(manager.add(s));
+        writeResource(manager.add(c));
+        writeResource(manager.add(rt));
+        writeResource(manager.add(ie));
+        writeResource(manager.add(cc));
+        writeResource(manager.add(validationMethod));
     }
 
     private void createAmendment(String guid, String specification, String label, String enhancement, String resourceType,
                                   String informationElements) throws RDFBeanException {
+
+        writeComment(label);
 
         Enhancement e = new Enhancement(enhancement);
         ResourceType rt = new ResourceType(resourceType);
@@ -317,7 +370,12 @@ public class ParseTestsXLSX {
         amendmentMethod.setContextualizedEnhancement(ce);
         amendmentMethod.setSpecification(s);
 
-        manager.add(amendmentMethod);
+        writeResource(manager.add(s));
+        writeResource(manager.add(e));
+        writeResource(manager.add(rt));
+        writeResource(manager.add(ie));
+        writeResource(manager.add(ce));
+        writeResource(manager.add(amendmentMethod));
     }
 
 }
