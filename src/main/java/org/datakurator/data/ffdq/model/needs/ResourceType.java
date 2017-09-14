@@ -23,7 +23,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "rt = http://example.com/rt/"
+        "rt = http://example.com/ffdq/rt/"
 })
 @RDFBean("ffdq:ResourceType")
 public class ResourceType {

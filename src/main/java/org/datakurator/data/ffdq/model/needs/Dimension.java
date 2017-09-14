@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/",
-        "d = http://example.com/ffdq/dimension",
+        "d = http://example.com/ffdq/dimension/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Dimension")
