@@ -23,32 +23,31 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
-        "ie = http://example.com/ffdq/ie"
+        "ffdq = http://example.com/ffdq/"
 })
 @RDFBean("ffdq:InformationElement")
 public class InformationElement {
     private String id = "urn:uuid:" + UUID.randomUUID();
-    private URI composedOf;
+    private List<URI> composedOf = new ArrayList<>();
 
     public InformationElement() { }
 
-    public InformationElement(String uri) throws URISyntaxException {
-        this.composedOf = new URI(uri);
+    public InformationElement(List<URI> uris) {
+        this.composedOf = uris;
     }
 
     public InformationElement(URI uri) {
-        this.composedOf = uri;
+        composedOf.add(uri);
     }
 
-
-    @RDFSubject(prefix = "ie:")
+    @RDFSubject()
     public String getId() {
-        String path = composedOf.getPath();
-        return path;
+        return id;
     }
 
     public void setId(String id) {
@@ -56,11 +55,15 @@ public class InformationElement {
     }
 
     @RDF("ffdq:composedOf")
-    public URI getComposedOf() {
+    public List<URI> getComposedOf() {
         return composedOf;
     }
 
-    public void setComposedOf(URI composedOf) {
+    public void setComposedOf(List<URI> composedOf) {
         this.composedOf = composedOf;
+    }
+
+    public void addTerm(URI uri) {
+        composedOf.add(uri);
     }
 }

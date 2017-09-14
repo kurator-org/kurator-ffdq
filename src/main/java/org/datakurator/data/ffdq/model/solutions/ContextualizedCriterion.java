@@ -21,7 +21,7 @@ public class ContextualizedCriterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Criterion criterion;
-    private List<InformationElement> informationElements;
+    private InformationElement ie;
     private ResourceType rt;
 
     @RDFSubject
@@ -34,12 +34,12 @@ public class ContextualizedCriterion {
     }
 
     @RDF("ffdq:hasInformationElement")
-    public List<InformationElement> getInformationElements() {
-        return informationElements;
+    public InformationElement getInformationElements() {
+        return ie;
     }
 
-    public void setInformationElements(List<InformationElement> informationElements) {
-        this.informationElements = informationElements;
+    public void setInformationElements(InformationElement ie) {
+        this.ie = ie;
     }
 
     @RDF("ffdq:hasResourceType")

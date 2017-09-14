@@ -83,25 +83,23 @@ public class RDFBeanFactory {
         return specification;
     }
 
-    public List<InformationElement> createInformationElements(List<Parameter> params) {
-        List<InformationElement> vie = new ArrayList<>();
+    public InformationElement createInformationElements(List<Parameter> params) {
+        InformationElement ie = new InformationElement();
 
         for (Parameter param : params) {
-                // Create an information element from the term
-                InformationElement ie = new InformationElement();
-                ie.setComposedOf(param.getURI());
-
-                saveBean(ie);
-                vie.add(ie);
+                // Create an information element from the terms
+                ie.addTerm(param.getURI());
         }
 
-        return vie;
+        saveBean(ie);
+
+        return ie;
     }
 
     public void createMeasurementMethod(AssertionTest test, String d) {
         Mechanism mechanism = createMechanism(test.getMechanism(), test.getClassName());
         Specification specification = createSpecification(test.getGuid(), test.getSpecification(), mechanism);
-        List<InformationElement> vie = createInformationElements(test.getParameters());
+        InformationElement vie = createInformationElements(test.getParameters());
 
         Dimension dimension = new Dimension(d);
 
@@ -174,7 +172,7 @@ public class RDFBeanFactory {
     public void createValidationMethod(AssertionTest test, String c) {
         Mechanism mechanism = createMechanism(test.getMechanism(), test.getClassName());
         Specification specification = createSpecification(test.getGuid(), test.getSpecification(), mechanism);
-        List<InformationElement> vie = createInformationElements(test.getParameters());
+        InformationElement vie = createInformationElements(test.getParameters());
 
         Criterion criterion = new Criterion(c);
 
@@ -247,7 +245,7 @@ public class RDFBeanFactory {
     public void createAmendmentMethod(AssertionTest test, String e) {
         Mechanism mechanism = createMechanism(test.getMechanism(), test.getClassName());
         Specification specification = createSpecification(test.getGuid(), test.getSpecification(), mechanism);
-        List<InformationElement> vie = createInformationElements(test.getParameters());
+        InformationElement vie = createInformationElements(test.getParameters());
 
         Enhancement enhancement = new Enhancement(e);
 

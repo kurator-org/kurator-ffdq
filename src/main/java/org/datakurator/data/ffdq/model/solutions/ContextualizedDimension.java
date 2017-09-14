@@ -19,7 +19,7 @@ public class ContextualizedDimension {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Dimension dimension;
-    private List<InformationElement> informationElements;
+    private InformationElement ie;
     private ResourceType rt;
 
     @RDFSubject
@@ -32,12 +32,12 @@ public class ContextualizedDimension {
     }
 
     @RDF("ffdq:hasInformationElement")
-    public List<InformationElement> getInformationElements() {
-        return informationElements;
+    public InformationElement getInformationElements() {
+        return ie;
     }
 
-    public void setInformationElements(List<InformationElement> informationElements) {
-        this.informationElements = informationElements;
+    public void setInformationElements(InformationElement ie) {
+        this.ie = ie;
     }
 
     @RDF("ffdq:hasResourceType")

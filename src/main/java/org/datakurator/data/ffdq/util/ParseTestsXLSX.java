@@ -229,25 +229,28 @@ public class ParseTestsXLSX {
         }
     }
 
-    private List<InformationElement> parseInformationElements(String informationElements) throws URISyntaxException {
-
+    private InformationElement parseInformationElements(String informationElements) {
+        try {
             URI uri = new URI(Namespace.DWC);
-            List<InformationElement> ie = new ArrayList<InformationElement>();
+            List<URI> uris = new ArrayList<>();
 
             if (informationElements.equalsIgnoreCase("All Darwin Core Terms")) {
                 for (String term : DWC_TERMS) {
-                    ie.add(new InformationElement(uri.resolve(term)));
+                    uris.add(uri.resolve(term));
                 }
             } else {
                 StringTokenizer tokenizer = new StringTokenizer(informationElements, ",");
 
                 while (tokenizer.hasMoreTokens()) {
                     String term = tokenizer.nextToken().trim();
-                    ie.add(new InformationElement(uri.resolve(term)));
+                    uris.add(uri.resolve(term));
                 }
             }
 
-            return ie;
+            return new InformationElement(uris);
+    } catch (Exception e) {
+        throw new RuntimeException("Could not construct dwc namespace uri for information elements \"" + informationElements + "\"", e);
+    }
 
     }
 
@@ -257,13 +260,7 @@ public class ParseTestsXLSX {
         Dimension d = new Dimension(dimension);
         ResourceType rt = new ResourceType(resourceType);
 
-        List<InformationElement> ie = new ArrayList<>();
-
-        try {
-            ie = parseInformationElements(informationElements);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not construct dwc namespace uri for information element in test " + label, e);
-        }
+        InformationElement ie = parseInformationElements(informationElements);
 
         ContextualizedDimension cd = new ContextualizedDimension();
         cd.setDimension(d);
@@ -285,13 +282,7 @@ public class ParseTestsXLSX {
         Criterion c = new Criterion(criterion);
         ResourceType rt = new ResourceType(resourceType);
 
-        List<InformationElement> ie = new ArrayList<>();
-
-        try {
-            ie = parseInformationElements(informationElements);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not construct dwc namespace uri for information element in test " + label, e);
-        }
+        InformationElement ie = parseInformationElements(informationElements);
 
         ContextualizedCriterion cc = new ContextualizedCriterion();
         cc.setCriterion(c);
@@ -313,13 +304,7 @@ public class ParseTestsXLSX {
         Enhancement e = new Enhancement(enhancement);
         ResourceType rt = new ResourceType(resourceType);
 
-        List<InformationElement> ie = new ArrayList<>();
-
-        try {
-            ie = parseInformationElements(informationElements);
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not construct dwc namespace uri for information element in test " + label, ex);
-        }
+        InformationElement ie = parseInformationElements(informationElements);
 
         ContextualizedEnhancement ce = new ContextualizedEnhancement();
         ce.setEnhancement(e);
