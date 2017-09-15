@@ -1,0 +1,83 @@
+@prefix :     <http://www.example.org/ffdq.rdfs#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+## DQ Needs
+
+:CriterionInContext		a	rdfs:Class
+:hasInformationElement		a	rdfs:Property
+:hasResourceType		a	rdfs:Property
+:hasCriterion			a	rdfs:Property
+
+:Dimension			a	rdfs:Class
+:Criterion			a	rdfs:Class
+:Enhancement			a	rdfs:Class
+
+:ResourceType			a	rdfs:Class
+
+:InformationElement		a	rdfs:Class
+:composedOf			a	rdfs:Property
+
+:ContextualizedDimension	a	rdfs:Class
+:hasInformationElement		a	rdfs:Property
+:hasResourceType		a	rdfs:Property
+:hasDimension			a	rdfs:Property
+
+:ContextualizedCriterion	a	rdfs:Class
+:hasInformationElement		a	rdfs:Property
+:hasResourceType		a	rdfs:Property
+:hasCriterion			a	rdfs:Property
+
+:ContextualizedEnhancement	a	rdfs:Class
+:hasInformationElement		a	rdfs:Property
+:hasResourceType		a	rdfs:Property
+:hasEnhancement			a	rdfs:Property
+
+:UseCase			a	rdfs:Class
+
+:MeasurementPolicy		a	rdfs:Class
+:ValidationPolicy		a	rdfs:Class
+:AmendmentPolicy		a	rdfs:Class
+
+:coversUseCase			a	rdfs:Property
+:dimensionInContext		a	rdfs:Property
+:criterionInContext		a	rdfs:Property
+:enhancementInContext		a	rdfs:Property
+
+# TODO: properties for type Profile
+:Profile			a			rdfs:Class
+
+
+## DQ Report
+
+:Assertion			a			rdfs:Class
+
+# Properties are expressed using prov
+:Measure			rdfs:subClassOf		:Assertion
+:Validation			rdfs:subClassOf		:Assertion
+:Amendment			rdfs:subClassOf		:Assertion
+
+# DataResource could be any DWC class
+:DataResource			a	rdfs:Class
+
+# TODO: Split Result into status and state and add support for
+# single values for measures
+:Result				a	rdfs:Class
+:ResultStatus			a	rdfs:Class
+
+:hasStatus			a	rdfs:Property
+
+:Mechanism			a	rdfs:Class
+:Specification			a	rdfs:Class
+
+:MeasurementMethod		a	rdfs:Class
+:ValidationMethod		a	rdfs:Class
+:AmendmentMethod		a	rdfs:Class
+
+:Implementation			a 	rdfs:Class
+:hasSpecification		a	rdfs:Property
+:implementedBy			a	rdfs:Property
+
+:hasContextualizedDimension	a	rdfs:Property
+:hasContextualizedCriterion	a	rdfs:Property
+:hasContextualizedEnhancement	a	rdfs:Property
