@@ -1,0 +1,288 @@
+@prefix : <http://www.example.com/ffdq#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.example.com/ffdq> .
+
+<http://www.example.com/ffdq> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.example.com/ffdq#amendmentProperties
+:amendmentProperties rdf:type owl:ObjectProperty .
+
+
+###  http://www.example.com/ffdq#composedOf
+:composedOf rdf:type owl:ObjectProperty ;
+            rdfs:range [ rdf:type owl:Restriction ;
+                         owl:onProperty :hasSpecification ;
+                         owl:someValuesFrom :InformationElement
+                       ] .
+
+
+###  http://www.example.com/ffdq#coversUseCase
+:coversUseCase rdf:type owl:ObjectProperty ;
+               rdfs:domain [ rdf:type owl:Restriction ;
+                             owl:onProperty :hasInformationElement ;
+                             owl:someValuesFrom :UseCase
+                           ] .
+
+
+###  http://www.example.com/ffdq#criterionInContext
+:criterionInContext rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf :validationProperties ;
+                    rdfs:domain [ rdf:type owl:Restriction ;
+                                  owl:onProperty :criterionInContext ;
+                                  owl:someValuesFrom :ContextualizedCriterion
+                                ] ;
+                    rdfs:range [ rdf:type owl:Restriction ;
+                                 owl:onProperty :criterionInContext ;
+                                 owl:someValuesFrom :ValidationMethod
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :criterionInContext ;
+                                 owl:someValuesFrom :ValidationPolicy
+                               ] .
+
+
+###  http://www.example.com/ffdq#dimensionInContext
+:dimensionInContext rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf :measurementProperties ;
+                    rdfs:domain [ rdf:type owl:Restriction ;
+                                  owl:onProperty :dimensionInContext ;
+                                  owl:someValuesFrom :ContextualizedDimension
+                                ] ;
+                    rdfs:range [ rdf:type owl:Restriction ;
+                                 owl:onProperty :dimensionInContext ;
+                                 owl:someValuesFrom :MeasurementMethod
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :dimensionInContext ;
+                                 owl:someValuesFrom :MeasurementPolicy
+                               ] .
+
+
+###  http://www.example.com/ffdq#enhancementInContext
+:enhancementInContext rdf:type owl:ObjectProperty ;
+                      rdfs:subPropertyOf :amendmentProperties ;
+                      rdfs:domain [ rdf:type owl:Restriction ;
+                                    owl:onProperty :enhancementInContext ;
+                                    owl:someValuesFrom :ContextualizedEnhancement
+                                  ] ;
+                      rdfs:range [ rdf:type owl:Restriction ;
+                                   owl:onProperty :enhancementInContext ;
+                                   owl:someValuesFrom :AmendmentMethod
+                                 ] ,
+                                 [ rdf:type owl:Restriction ;
+                                   owl:onProperty :enhancementInContext ;
+                                   owl:someValuesFrom :AmendmentPolicy
+                                 ] .
+
+
+###  http://www.example.com/ffdq#hasCriterion
+:hasCriterion rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf :validationProperties ;
+              rdfs:domain [ rdf:type owl:Restriction ;
+                            owl:onProperty :hasCriterion ;
+                            owl:someValuesFrom :Criterion
+                          ] ;
+              rdfs:range [ rdf:type owl:Restriction ;
+                           owl:onProperty :hasCriterion ;
+                           owl:someValuesFrom :ContextualizedCriterion
+                         ] .
+
+
+###  http://www.example.com/ffdq#hasDimension
+:hasDimension rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf :measurementProperties ;
+              rdfs:domain [ rdf:type owl:Restriction ;
+                            owl:onProperty :hasDimension ;
+                            owl:someValuesFrom :Dimension
+                          ] ;
+              rdfs:range [ rdf:type owl:Restriction ;
+                           owl:onProperty :hasDimension ;
+                           owl:someValuesFrom :ContextualizedDimension
+                         ] .
+
+
+###  http://www.example.com/ffdq#hasEnhancement
+:hasEnhancement rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf :amendmentProperties ;
+                rdfs:domain [ rdf:type owl:Restriction ;
+                              owl:onProperty :hasEnhancement ;
+                              owl:someValuesFrom :Enhancement
+                            ] ;
+                rdfs:range [ rdf:type owl:Restriction ;
+                             owl:onProperty :hasEnhancement ;
+                             owl:someValuesFrom :ContextualizedEnhancement
+                           ] .
+
+
+###  http://www.example.com/ffdq#hasInformationElement
+:hasInformationElement rdf:type owl:ObjectProperty ;
+                       rdfs:domain [ rdf:type owl:Restriction ;
+                                     owl:onProperty :hasInformationElement ;
+                                     owl:someValuesFrom :InformationElement
+                                   ] .
+
+
+###  http://www.example.com/ffdq#hasResourceType
+:hasResourceType rdf:type owl:ObjectProperty .
+
+
+###  http://www.example.com/ffdq#hasSpecification
+:hasSpecification rdf:type owl:ObjectProperty ;
+                  rdfs:domain [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasSpecification ;
+                                owl:someValuesFrom :Specification
+                              ] ;
+                  rdfs:range [ rdf:type owl:Restriction ;
+                               owl:onProperty :hasSpecification ;
+                               owl:someValuesFrom :Assertion
+                             ] .
+
+
+###  http://www.example.com/ffdq#hasStatus
+:hasStatus rdf:type owl:ObjectProperty .
+
+
+###  http://www.example.com/ffdq#implementedBy
+:implementedBy rdf:type owl:ObjectProperty ;
+               rdfs:domain [ rdf:type owl:Restriction ;
+                             owl:onProperty :implementedBy ;
+                             owl:someValuesFrom :Mechanism
+                           ] ;
+               rdfs:range [ rdf:type owl:Restriction ;
+                            owl:onProperty :implementedBy ;
+                            owl:someValuesFrom :Implementation
+                          ] .
+
+
+###  http://www.example.com/ffdq#measurementProperties
+:measurementProperties rdf:type owl:ObjectProperty .
+
+
+###  http://www.example.com/ffdq#validationProperties
+:validationProperties rdf:type owl:ObjectProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.example.com/ffdq#Amendment
+:Amendment rdf:type owl:Class ;
+           rdfs:subClassOf :Assertion .
+
+
+###  http://www.example.com/ffdq#AmendmentMethod
+:AmendmentMethod rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#AmendmentPolicy
+:AmendmentPolicy rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Assertion
+:Assertion rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ContextualizedCriterion
+:ContextualizedCriterion rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ContextualizedDimension
+:ContextualizedDimension rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ContextualizedEnhancement
+:ContextualizedEnhancement rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Criterion
+:Criterion rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#DataResource
+:DataResource rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Dimension
+:Dimension rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Enhancement
+:Enhancement rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Implementation
+:Implementation rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#InformationElement
+:InformationElement rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Measure
+:Measure rdf:type owl:Class ;
+         rdfs:subClassOf :Assertion .
+
+
+###  http://www.example.com/ffdq#MeasurementMethod
+:MeasurementMethod rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#MeasurementPolicy
+:MeasurementPolicy rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Mechanism
+:Mechanism rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Profile
+:Profile rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Report
+:Report rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ResourceType
+:ResourceType rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Result
+:Result rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ResultStatus
+:ResultStatus rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Specification
+:Specification rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#UseCase
+:UseCase rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#Validation
+:Validation rdf:type owl:Class ;
+            rdfs:subClassOf :Assertion .
+
+
+###  http://www.example.com/ffdq#ValidationMethod
+:ValidationMethod rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ValidationPolicy
+:ValidationPolicy rdf:type owl:Class .
+
+
+###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi
