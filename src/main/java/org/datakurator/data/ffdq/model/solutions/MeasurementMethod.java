@@ -42,7 +42,7 @@ public class MeasurementMethod {
         this.specification = specification;
     }
 
-    @RDF("ffdq:hasContextualizedDimension")
+    @RDF("ffdq:dimensionInContext")
     public ContextualizedDimension getContextualizedDimension() {
         return cd;
     }

@@ -43,7 +43,7 @@ public class ValidationMethod {
         this.specification = specification;
     }
 
-    @RDF("ffdq:hasContextualizedCriterion")
+    @RDF("ffdq:criterionInContext")
     public ContextualizedCriterion getContextualizedCriterion() {
         return cc;
     }

@@ -42,7 +42,7 @@ public class AmendmentMethod {
         this.specification = specification;
     }
 
-    @RDF("ffdq:hasContextualizedEnhancement")
+    @RDF("ffdq:enhancementInContext")
     public ContextualizedEnhancement getContextualizedEnhancement() {
         return ce;
     }
