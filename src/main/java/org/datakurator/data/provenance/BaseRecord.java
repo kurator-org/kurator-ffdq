@@ -75,7 +75,7 @@ public class BaseRecord {
     }
 
     /**
-     * Contextual update of record state that appends a comment without changes to field values and status.
+     * Contextual update of record state that appends a comment without changes to field values and status.sparql.
      *
      * @param context
      * @param comment
@@ -86,7 +86,7 @@ public class BaseRecord {
     }
 
     /**
-     * Contextual update of record state that involves change of curation status and one or more comments.
+     * Contextual update of record state that involves change of curation status.sparql and one or more comments.
      *
      * @param context
      * @param status
@@ -100,7 +100,7 @@ public class BaseRecord {
     }
 
     /**
-     * Contextual update of record state that involves updates to a field, change of curation status and
+     * Contextual update of record state that involves updates to a field, change of curation status.sparql and
      * one or more comments.
      *
      * @param context
@@ -117,7 +117,7 @@ public class BaseRecord {
     }
 
     /**
-     * Update of record state that appends a comment without changes to field values and status.
+     * Update of record state that appends a comment without changes to field values and status.sparql.
      *
      * @param comment
      */
@@ -127,7 +127,7 @@ public class BaseRecord {
     }
 
     /**
-     * Update of record state that involves updates to curation status and one or more comments.
+     * Update of record state that involves updates to curation status.sparql and one or more comments.
      *
      * @param status
      * @param comment
@@ -140,7 +140,7 @@ public class BaseRecord {
     }
 
     /**
-     * Update of record state that involves updates to a field, change of curation status and
+     * Update of record state that involves updates to a field, change of curation status.sparql and
      * one or more comments.
      *
      * @param updates

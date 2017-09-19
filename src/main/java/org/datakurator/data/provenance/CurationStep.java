@@ -20,7 +20,7 @@ package org.datakurator.data.provenance;
 import java.util.*;
 
 /**
- * Represents a single update applied to the state of a record. Keeps track of comments, status and any changes to
+ * Represents a single update applied to the state of a record. Keeps track of comments, status.sparql and any changes to
  * field values performed as part of the update.
  *
  * @author lowery
@@ -55,7 +55,7 @@ public class CurationStep {
     private List<String> sourcesConsulted;
 
     /**
-     * The curation status that applies at a record level
+     * The curation status.sparql that applies at a record level
      */
     private CurationStatus recordStatus;
 
@@ -85,7 +85,7 @@ public class CurationStep {
             // Merge any updates with the final values constructed from initial
             finalElementValues.putAll(updatedValues);
 
-            // Set field status for updated fields
+            // Set field status.sparql for updated fields
 
             for (String field : updatedValues.keySet()) {
                 if (status != null)
@@ -129,9 +129,9 @@ public class CurationStep {
     }
 
     /**
-     * Get the current status of the record at the time of the update.
+     * Get the current status.sparql of the record at the time of the update.
      *
-     * @return the record curation status
+     * @return the record curation status.sparql
      */
     public CurationStatus getCurationStatus() {
         return recordStatus;

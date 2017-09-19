@@ -231,7 +231,7 @@ public class ValidationRunner {
                     }
                 }
 
-                json.put("status", status.name());
+                json.put("status.sparql", status.name());
                 json.put("comment", retVal.getComment());
 
                 reportArr.add(json);
@@ -268,7 +268,7 @@ public class ValidationRunner {
             }
 
             json.put("value", value);
-            json.put("status", status.name());
+            json.put("status.sparql", status.name());
             json.put("comment", retVal.getComment());
 
             reportArr.add(json);
@@ -325,7 +325,7 @@ public class ValidationRunner {
             finalValues.putAll(dwcRecord);
 
             json.put("result", dwcRecord);
-            json.put("status", status.name());
+            json.put("status.sparql", status.name());
             json.put("comment", retVal.getComment());
 
             reportArr.add(json);
