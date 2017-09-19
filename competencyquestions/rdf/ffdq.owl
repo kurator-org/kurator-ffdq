@@ -162,8 +162,45 @@
                           ] .
 
 
+###  http://www.example.com/ffdq#improvedBy
+:improvedBy rdf:type owl:ObjectProperty ;
+            rdfs:domain [ rdf:type owl:Restriction ;
+                          owl:onProperty :improvedBy ;
+                          owl:someValuesFrom :ContextualizedEnhancement
+                        ] ;
+            rdfs:range [ rdf:type owl:Restriction ;
+                         owl:onProperty :improvedBy ;
+                         owl:someValuesFrom :ImprovementTarget
+                       ] .
+
+
 ###  http://www.example.com/ffdq#measurementProperties
 :measurementProperties rdf:type owl:ObjectProperty .
+
+
+###  http://www.example.com/ffdq#targetedCriterion
+:targetedCriterion rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain [ rdf:type owl:Restriction ;
+                                 owl:onProperty :targetedCriterion ;
+                                 owl:someValuesFrom :ContextualizedCriterion
+                               ] ;
+                   rdfs:range [ rdf:type owl:Restriction ;
+                                owl:onProperty :targetedCriterion ;
+                                owl:someValuesFrom :ImprovementTarget
+                              ] .
+
+
+###  http://www.example.com/ffdq#targetedDimension
+:targetedDimension rdf:type owl:ObjectProperty ;
+                   rdfs:domain [ rdf:type owl:Restriction ;
+                                 owl:onProperty :targetedDimension ;
+                                 owl:someValuesFrom :ContextualizedDimension
+                               ] ;
+                   rdfs:range [ rdf:type owl:Restriction ;
+                                owl:onProperty :targetedDimension ;
+                                owl:someValuesFrom :ImprovementTarget
+                              ] .
 
 
 ###  http://www.example.com/ffdq#validationProperties
@@ -221,6 +258,10 @@
 
 ###  http://www.example.com/ffdq#Implementation
 :Implementation rdf:type owl:Class .
+
+
+###  http://www.example.com/ffdq#ImprovementTarget
+:ImprovementTarget rdf:type owl:Class .
 
 
 ###  http://www.example.com/ffdq#InformationElement
