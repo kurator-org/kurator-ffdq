@@ -213,7 +213,8 @@
 
 ###  http://www.example.com/ffdq#Amendment
 :Amendment rdf:type owl:Class ;
-           rdfs:subClassOf :Assertion .
+           rdfs:subClassOf :Assertion ;
+           rdfs:comment "The Amendment assertion type is a report level concept that describes a run of a test that proposes changes based on some data quality enhancement. The Amendment concept in FFDQ consists of a run result that includes a status (FILLED_IN, TRANSPOSED, etc) as well as the proposed changes to values from the original data." .
 
 
 ###  http://www.example.com/ffdq#AmendmentMethod
@@ -225,39 +226,50 @@
 
 
 ###  http://www.example.com/ffdq#Assertion
-:Assertion rdf:type owl:Class .
+:Assertion rdf:type owl:Class ;
+           rdfs:comment """The Assertion type in FFDQ is the fundemental concept that makes up a data quality report. Assertion can be any one of three types (represented as subClasses), Measure, Validation and Amendement.
+
+The assertion concept consists of a specification (the technical description of a performed test), a data resource (initial values of input data expressed in terms of some controlled vocabulary), the mechanism (external service, actor, or code that performs the test), and some form of result.""" .
 
 
 ###  http://www.example.com/ffdq#ContextualizedCriterion
-:ContextualizedCriterion rdf:type owl:Class .
+:ContextualizedCriterion rdf:type owl:Class ;
+                         rdfs:comment "Describes an instance of the criterion concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
 
 
 ###  http://www.example.com/ffdq#ContextualizedDimension
-:ContextualizedDimension rdf:type owl:Class .
+:ContextualizedDimension rdf:type owl:Class ;
+                         rdfs:comment "Describes an instance of the dimension concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
 
 
 ###  http://www.example.com/ffdq#ContextualizedEnhancement
-:ContextualizedEnhancement rdf:type owl:Class .
+:ContextualizedEnhancement rdf:type owl:Class ;
+                           rdfs:comment "Describes an instance of the enhancement concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
 
 
 ###  http://www.example.com/ffdq#Criterion
-:Criterion rdf:type owl:Class .
+:Criterion rdf:type owl:Class ;
+           rdfs:comment "Describes the criterion a Validation test uses to determine compliance. For example, \"The value of basisOfRecord of single records must be in the controlled vocabulary\"." .
 
 
 ###  http://www.example.com/ffdq#DataResource
-:DataResource rdf:type owl:Class .
+:DataResource rdf:type owl:Class ;
+              rdfs:comment "Describes a data resource described in terms of a controlled vocabulary such as dwc and represents the original values of the data operated on by an assertion test (i.e. an instance of dwc:Occurrence)." .
 
 
 ###  http://www.example.com/ffdq#Dimension
-:Dimension rdf:type owl:Class .
+:Dimension rdf:type owl:Class ;
+           rdfs:comment "Describes the data quality dimension (accuracy, precision, completeness, etc.) of a measurement test. For example \"coordinate percision of single records\"." .
 
 
 ###  http://www.example.com/ffdq#Enhancement
-:Enhancement rdf:type owl:Class .
+:Enhancement rdf:type owl:Class ;
+             rdfs:comment "Describes the enhancement to the original data performed by an Ammendment test. For example, \"Recommends valid value for taxon name in a single record\"." .
 
 
 ###  http://www.example.com/ffdq#Implementation
-:Implementation rdf:type owl:Class .
+:Implementation rdf:type owl:Class ;
+                rdfs:comment "The FFDQ derived concept of an Implementation describes the relationship between a specification (technical description of a test) and the mechanism that implements it." .
 
 
 ###  http://www.example.com/ffdq#ImprovementTarget
@@ -265,12 +277,14 @@
 
 
 ###  http://www.example.com/ffdq#InformationElement
-:InformationElement rdf:type owl:Class .
+:InformationElement rdf:type owl:Class ;
+                    rdfs:comment "The information element in FFDQ can be represented as a single or composite element that consists of one or more terms from a controlled vocabulary (fields actedUpon or consulted by an assertion test)." .
 
 
 ###  http://www.example.com/ffdq#Measure
 :Measure rdf:type owl:Class ;
-         rdfs:subClassOf :Assertion .
+         rdfs:subClassOf :Assertion ;
+         rdfs:comment "The Measure assertion type is a report level concept that describes a run of a test that performs a measurement according to some data quality dimension. In FFDQ, the Measure concept consists of a run result of COMPLETE or NOT_COMPLETE or a value of the measurement (i.e. a measure of dwc:eventDate duration in seconds)." .
 
 
 ###  http://www.example.com/ffdq#MeasurementMethod
@@ -282,7 +296,8 @@
 
 
 ###  http://www.example.com/ffdq#Mechanism
-:Mechanism rdf:type owl:Class .
+:Mechanism rdf:type owl:Class ;
+           rdfs:comment "The FFDQ concept of mechanism describes the entity that performs an assertion test (code, external service, actor, etc.). Tied to a specification via the concept of an Implementation." .
 
 
 ###  http://www.example.com/ffdq#Profile
@@ -294,19 +309,25 @@
 
 
 ###  http://www.example.com/ffdq#ResourceType
-:ResourceType rdf:type owl:Class .
+:ResourceType rdf:type owl:Class ;
+              rdfs:comment "In FFDQ the concept of ResourceType has instances for SingleRecord or MultiRecord" .
 
 
 ###  http://www.example.com/ffdq#Result
-:Result rdf:type owl:Class .
+:Result rdf:type owl:Class ;
+        rdfs:comment "The report result concept in FFDQ is represented as a value or a status for measures, just a result status for validations and a result status as well as values for changes propsed by amendments." .
 
 
 ###  http://www.example.com/ffdq#ResultStatus
-:ResultStatus rdf:type owl:Class .
+:ResultStatus rdf:type owl:Class ;
+              rdfs:comment """Depending on the assertion type would have values of COMPLIANT or NON_COMPLIANT for a Validation, COMPLETE or NOT_COMPLETE for a Measure and CURATED, FILLED_IN,TRANSPOSED, NO_CHANGE.
+
+A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_PREREQUISITES_NOT_MET and EXTERNAL_PREREQUISITES_NOT_MET.""" .
 
 
 ###  http://www.example.com/ffdq#Specification
-:Specification rdf:type owl:Class .
+:Specification rdf:type owl:Class ;
+               rdfs:comment "The specification serves as a technical desription of the assertion test implemented by some instance of the mechanism concept." .
 
 
 ###  http://www.example.com/ffdq#UseCase
@@ -315,7 +336,8 @@
 
 ###  http://www.example.com/ffdq#Validation
 :Validation rdf:type owl:Class ;
-            rdfs:subClassOf :Assertion .
+            rdfs:subClassOf :Assertion ;
+            rdfs:comment "The Validation assertion type is a report level concept that describes a run of a test for validity. The Validation concept in FFDQ consists of a run result of COMPLIANT or NON_COMPLIANT and a criterion that describes the conditions for validity that result in a status of COMPLIANT." .
 
 
 ###  http://www.example.com/ffdq#ValidationMethod
