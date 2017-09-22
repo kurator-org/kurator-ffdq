@@ -6,14 +6,16 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @base <http://www.example.com/ffdq> .
 
-<http://www.example.com/ffdq> rdf:type owl:Ontology .
+<http://www.example.com/ffdq> rdf:type owl:Ontology ;
+                               rdfs:comment "The classes and object properties found in this ontology are dedicated to fundamental and derived concepts from the Fitness For Use Framework described in the paper by Veiga et al available at: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178731" .
 
 #################################################################
 #    Object Properties
 #################################################################
 
 ###  http://www.example.com/ffdq#amendmentProperties
-:amendmentProperties rdf:type owl:ObjectProperty .
+:amendmentProperties rdf:type owl:ObjectProperty ;
+                     rdfs:comment "Sub properties of this type group object properties that apply to amendment concepts such as AmendmentPolicy (DQ Needs), AmendmentMethod (DQ Solutions) and Amendment (DQ Reports)." .
 
 
 ###  http://www.example.com/ffdq#composedOf
@@ -21,7 +23,8 @@
             rdfs:range [ rdf:type owl:Restriction ;
                          owl:onProperty :hasSpecification ;
                          owl:someValuesFrom :InformationElement
-                       ] .
+                       ] ;
+            rdfs:comment "Describes the properties from a controlled vocabulary that compose an InformationElement. For example, an InformationElement may be \"composedOf\" properties such as dwc:day, dwc:month and dwc:year." .
 
 
 ###  http://www.example.com/ffdq#coversUseCase
@@ -29,7 +32,8 @@
                rdfs:domain [ rdf:type owl:Restriction ;
                              owl:onProperty :hasInformationElement ;
                              owl:someValuesFrom :UseCase
-                           ] .
+                           ] ;
+               rdfs:comment "Used by concepts in the DQ Needs category to describe the relationship between DQ Policies (ValidationPolicy, AmendmentPolicy, MeasurementPolicy) and an instance of the use case covered by that policy." .
 
 
 ###  http://www.example.com/ffdq#criterionInContext
@@ -46,7 +50,8 @@
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :criterionInContext ;
                                  owl:someValuesFrom :ValidationPolicy
-                               ] .
+                               ] ;
+                    rdfs:comment "Describes the relationship between a validation concept in FFDQ (needs, solutions, reports) and a contextualizedCriterion." .
 
 
 ###  http://www.example.com/ffdq#dimensionInContext
@@ -63,7 +68,8 @@
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :dimensionInContext ;
                                  owl:someValuesFrom :MeasurementPolicy
-                               ] .
+                               ] ;
+                    rdfs:comment "Describes the relationship between an ammendment concept in FFDQ (needs, solutions, reports) and a ContextualizedDimension." .
 
 
 ###  http://www.example.com/ffdq#enhancementInContext
@@ -80,7 +86,8 @@
                                  [ rdf:type owl:Restriction ;
                                    owl:onProperty :enhancementInContext ;
                                    owl:someValuesFrom :AmendmentPolicy
-                                 ] .
+                                 ] ;
+                      rdfs:comment "Describes the relationship between an ammendment concept in FFDQ (needs, solutions, reports) and a ContextualizedEnhancement." .
 
 
 ###  http://www.example.com/ffdq#hasCriterion
@@ -93,7 +100,8 @@
               rdfs:range [ rdf:type owl:Restriction ;
                            owl:onProperty :hasCriterion ;
                            owl:someValuesFrom :ContextualizedCriterion
-                         ] .
+                         ] ;
+              rdfs:comment "Used to link the derived concept of a ContextualizedCriterion to the fundamental concept of a Criterion." .
 
 
 ###  http://www.example.com/ffdq#hasDimension
@@ -106,7 +114,8 @@
               rdfs:range [ rdf:type owl:Restriction ;
                            owl:onProperty :hasDimension ;
                            owl:someValuesFrom :ContextualizedDimension
-                         ] .
+                         ] ;
+              rdfs:comment "Used to link the derived concept of a ContextualizedDimension to the fundamental concept of a Dimension." .
 
 
 ###  http://www.example.com/ffdq#hasEnhancement
@@ -119,7 +128,8 @@
                 rdfs:range [ rdf:type owl:Restriction ;
                              owl:onProperty :hasEnhancement ;
                              owl:someValuesFrom :ContextualizedEnhancement
-                           ] .
+                           ] ;
+                rdfs:comment "Used to link the derived concept of a ContextualizedEnhancement to the fundamental concept of an Enhancement." .
 
 
 ###  http://www.example.com/ffdq#hasInformationElement
@@ -127,11 +137,13 @@
                        rdfs:domain [ rdf:type owl:Restriction ;
                                      owl:onProperty :hasInformationElement ;
                                      owl:someValuesFrom :InformationElement
-                                   ] .
+                                   ] ;
+                       rdfs:comment "Provides a relationship between FFDQ concepts and the information elements. For example, ContextualizedCriterion uses this property along with hasResourceType to define a criterion in the context of related information elements." .
 
 
 ###  http://www.example.com/ffdq#hasResourceType
-:hasResourceType rdf:type owl:ObjectProperty .
+:hasResourceType rdf:type owl:ObjectProperty ;
+                 rdfs:comment "Provides additional metadata, along with the information elements, that describes the level (SingleRecord or MultiRecord) at which the FFDQ concept operates. For example, an enhancementInContext with resource type of MultiRecord could be used to define an Amendment that applies at the level of multiple record values." .
 
 
 ###  http://www.example.com/ffdq#hasSpecification
@@ -143,11 +155,13 @@
                   rdfs:range [ rdf:type owl:Restriction ;
                                owl:onProperty :hasSpecification ;
                                owl:someValuesFrom :Assertion
-                             ] .
+                             ] ;
+                  rdfs:comment "Describes the relationship between a derived FFDQ concept and the fundamental concept of a specification (technical description of a test)." .
 
 
 ###  http://www.example.com/ffdq#hasStatus
-:hasStatus rdf:type owl:ObjectProperty .
+:hasStatus rdf:type owl:ObjectProperty ;
+           rdfs:comment "Used in the DQ Report concept to describe result status. For example, in the case of a Validation result, values could be COMPLIANT or NON_COMPLIANT." .
 
 
 ###  http://www.example.com/ffdq#implementedBy
@@ -159,7 +173,8 @@
                rdfs:range [ rdf:type owl:Restriction ;
                             owl:onProperty :implementedBy ;
                             owl:someValuesFrom :Implementation
-                          ] .
+                          ] ;
+               rdfs:comment "Describes the link between the Implementation concept in FFDQ and the Mechanism that implements some specification (also defined in Implementation)." .
 
 
 ###  http://www.example.com/ffdq#improvedBy
@@ -171,11 +186,15 @@
             rdfs:range [ rdf:type owl:Restriction ;
                          owl:onProperty :improvedBy ;
                          owl:someValuesFrom :ImprovementTarget
-                       ] .
+                       ] ;
+            rdfs:comment """Object property that describes an enhancement, as part of the ImprovementTarget, that would improve data acted upon by some set of measures or validations.
+
+This can be used to determine which measures and validations are improved upon by a given amendment.""" .
 
 
 ###  http://www.example.com/ffdq#measurementProperties
-:measurementProperties rdf:type owl:ObjectProperty .
+:measurementProperties rdf:type owl:ObjectProperty ;
+                       rdfs:comment "Sub properties of this type group object properties that apply to measurement concepts such as MeasurementPolicy (DQ Needs), MeasurementMethod (DQ Solutions) and Measure (DQ Reports)." .
 
 
 ###  http://www.example.com/ffdq#targetedCriterion
@@ -188,7 +207,8 @@
                    rdfs:range [ rdf:type owl:Restriction ;
                                 owl:onProperty :targetedCriterion ;
                                 owl:someValuesFrom :ImprovementTarget
-                              ] .
+                              ] ;
+                   rdfs:comment "The criteria targeted by some enhancement via the ImprovementTarget object." .
 
 
 ###  http://www.example.com/ffdq#targetedDimension
@@ -200,11 +220,13 @@
                    rdfs:range [ rdf:type owl:Restriction ;
                                 owl:onProperty :targetedDimension ;
                                 owl:someValuesFrom :ImprovementTarget
-                              ] .
+                              ] ;
+                   rdfs:comment "The dimension targeted by some enhancement via the ImprovementTarget object." .
 
 
 ###  http://www.example.com/ffdq#validationProperties
-:validationProperties rdf:type owl:ObjectProperty .
+:validationProperties rdf:type owl:ObjectProperty ;
+                      rdfs:comment "Sub properties of this type group object properties that apply to validation concepts such as ValidationPolicy (DQ Needs), ValidationMethod (DQ Solutions) and Validation (DQ Reports)." .
 
 
 #################################################################
@@ -218,11 +240,13 @@
 
 
 ###  http://www.example.com/ffdq#AmendmentMethod
-:AmendmentMethod rdf:type owl:Class .
+:AmendmentMethod rdf:type owl:Class ;
+                 rdfs:comment "The AmendmentMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and an enhancement in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
 ###  http://www.example.com/ffdq#AmendmentPolicy
-:AmendmentPolicy rdf:type owl:Class .
+:AmendmentPolicy rdf:type owl:Class ;
+                 rdfs:comment "The AmendementPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedEnhancement relates to a use case. This relationship defines which ammendments are supported by a given use case." .
 
 
 ###  http://www.example.com/ffdq#Assertion
@@ -273,7 +297,8 @@ The assertion concept consists of a specification (the technical description of 
 
 
 ###  http://www.example.com/ffdq#ImprovementTarget
-:ImprovementTarget rdf:type owl:Class .
+:ImprovementTarget rdf:type owl:Class ;
+                   rdfs:comment "The ImprovementTarget concept in FFDQ describes which measures and validations are improved by some amendment. ImprovementTarget includes relationships between a contextualizedEnhancement (for an ammendment) and one or more contextualizedCriterion (link to validations) or contextualizedDimensions (link to measures)." .
 
 
 ###  http://www.example.com/ffdq#InformationElement
@@ -288,11 +313,13 @@ The assertion concept consists of a specification (the technical description of 
 
 
 ###  http://www.example.com/ffdq#MeasurementMethod
-:MeasurementMethod rdf:type owl:Class .
+:MeasurementMethod rdf:type owl:Class ;
+                   rdfs:comment "The MeasurementMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and a dimension in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
 ###  http://www.example.com/ffdq#MeasurementPolicy
-:MeasurementPolicy rdf:type owl:Class .
+:MeasurementPolicy rdf:type owl:Class ;
+                   rdfs:comment "The MeasurementPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedDimension relates to a use case. This relationship defines which measures are supported by a given use case." .
 
 
 ###  http://www.example.com/ffdq#Mechanism
@@ -301,11 +328,13 @@ The assertion concept consists of a specification (the technical description of 
 
 
 ###  http://www.example.com/ffdq#Profile
-:Profile rdf:type owl:Class .
+:Profile rdf:type owl:Class ;
+         rdfs:comment "Profile in FFDQ is a DQ Needs level concept describing the UseCases that make up some data quality operation such as the behavior of a single actor or workflow producing the relevant assertions." .
 
 
 ###  http://www.example.com/ffdq#Report
-:Report rdf:type owl:Class .
+:Report rdf:type owl:Class ;
+        rdfs:comment "The FFDQ Report concept consists of a set of assertions (measures, validations and amendments) that represent the output of a workflow/actor run." .
 
 
 ###  http://www.example.com/ffdq#ResourceType
@@ -331,7 +360,10 @@ A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_P
 
 
 ###  http://www.example.com/ffdq#UseCase
-:UseCase rdf:type owl:Class .
+:UseCase rdf:type owl:Class ;
+         rdfs:comment """The UseCase concept in FFDQ describes some data quality control use case. The Amendment, Measurement and Validation policies that make up a use case define which assertions cover a given use case.
+
+An example of a UseCase could be \"Check for internal consistency of dates\", with validation policies for checking consistency between atomic date fields and an ammendment such as \"eventDate filled in from verbatim\".""" .
 
 
 ###  http://www.example.com/ffdq#Validation
@@ -341,11 +373,13 @@ A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_P
 
 
 ###  http://www.example.com/ffdq#ValidationMethod
-:ValidationMethod rdf:type owl:Class .
+:ValidationMethod rdf:type owl:Class ;
+                  rdfs:comment "The ValidationMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and a criterion in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
 ###  http://www.example.com/ffdq#ValidationPolicy
-:ValidationPolicy rdf:type owl:Class .
+:ValidationPolicy rdf:type owl:Class ;
+                  rdfs:comment "The ValidationPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedCriterion relates to a use case. This relationship defines which validations are supported by a given use case." .
 
 
 ###  Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi
