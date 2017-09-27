@@ -168,6 +168,9 @@ public class ValidationRunner {
         }
 
         String recordId = record.get(RECORD_ID_FIELD);
+        if (recordId==null) { 
+        	recordId = record.get("Id");
+        }
         json.put("recordId", recordId);
 
         Map<String, String> initialValues = new HashMap<>(record);
