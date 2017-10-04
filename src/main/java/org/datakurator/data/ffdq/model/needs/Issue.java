@@ -1,4 +1,4 @@
-/**  UseCase.java
+/**  Enhancement.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -20,6 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.data.ffdq.model.report.Assertion;
 
 import java.util.UUID;
 
@@ -27,23 +28,24 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:UseCase")
-public class UseCase {
-    private UUID uuid;
+@RDFBean("ffdq:Issue")
+public class Issue {
+    private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
-    private String description;
 
-    public UseCase() {
-        this.uuid = UUID.randomUUID();
+    public Issue() { }
+
+    public Issue(String label) {
+        this.label = label;
     }
 
-    @RDFSubject()
+    @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("rdfs:label")
@@ -55,12 +57,4 @@ public class UseCase {
         this.label = label;
     }
 
-    @RDF("rdfs:comment")
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

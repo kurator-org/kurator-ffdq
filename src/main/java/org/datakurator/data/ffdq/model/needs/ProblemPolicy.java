@@ -1,4 +1,4 @@
-/**  UseCase.java
+/**  AmendmentPolicy.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -20,47 +20,41 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedEnhancement;
+import org.datakurator.data.ffdq.model.solutions.ContextualizedIssue;
 
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+        "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:UseCase")
-public class UseCase {
-    private UUID uuid;
-    private String label;
-    private String description;
+@RDFBean("ffdq:ProblemPolicy")
+public class ProblemPolicy {
+    private UUID uuid = UUID.randomUUID();
 
-    public UseCase() {
-        this.uuid = UUID.randomUUID();
-    }
+    private UseCase useCase;
+    private ContextualizedIssue ci;
 
-    @RDFSubject()
+    @RDFSubject
     public String getId() {
         return "urn:uuid:" + uuid.toString();
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    @RDF("ffdq:hasUseCase")
+    public UseCase getUseCase() {
+        return useCase;
     }
 
-    @RDF("rdfs:label")
-    public String getLabel() {
-        return label;
+    public void setUseCase(UseCase useCase) {
+        this.useCase = useCase;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    @RDF("ffdq:issueInContext")
+    public ContextualizedIssue getIssueInContext() {
+        return ci;
     }
 
-    @RDF("rdfs:comment")
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setIssueInContext(ContextualizedIssue ci) {
+        this.ci = ci;
     }
 }

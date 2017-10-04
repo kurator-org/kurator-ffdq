@@ -15,6 +15,7 @@ import java.util.UUID;
 @RDFBean("ffdq:ImprovementTarget")
 public class ImprovementTarget {
     private Set<ContextualizedCriterion> targetedCriterion = new HashSet<>();
+    private Set<ContextualizedIssue> targetedIssues = new HashSet<>();
     private Set<ContextualizedDimension> targetedDimensions = new HashSet<>();
 
     private ContextualizedEnhancement improvedBy;
@@ -40,6 +41,11 @@ public class ImprovementTarget {
         return targetedCriterion;
     }
 
+    @RDF("ffdq:targetedIssue")
+    public Set<ContextualizedIssue> getContextualizedIssue() {
+        return targetedIssues;
+    }
+
     @RDF("ffdq:improvedBy")
     public ContextualizedEnhancement getImprovedBy() {
         return improvedBy;
@@ -51,6 +57,10 @@ public class ImprovementTarget {
 
     public void setContextualizedCriterion(Set<ContextualizedCriterion> criteria) {
         targetedCriterion = criteria;
+    }
+
+    public void setContextualizedIssue(Set<ContextualizedIssue> issues) {
+        targetedIssues = issues;
     }
 
     public void setImprovedBy(ContextualizedEnhancement ce) {

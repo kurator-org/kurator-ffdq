@@ -141,6 +141,20 @@
                        rdfs:comment "Provides a relationship between FFDQ concepts and the information elements. For example, ContextualizedCriterion uses this property along with hasResourceType to define a criterion in the context of related information elements." .
 
 
+###  http://www.example.com/ffdq#hasIssue
+:hasIssue rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf :problemProperties ;
+          rdfs:domain [ rdf:type owl:Restriction ;
+                        owl:onProperty :hasIssue ;
+                        owl:someValuesFrom :Issue
+                      ] ;
+          rdfs:range [ rdf:type owl:Restriction ;
+                       owl:onProperty :hasIssue ;
+                       owl:someValuesFrom :ContextualizedIssue
+                     ] ;
+          rdfs:comment "Used to link the derived concept of a ContextualizedIssue to the fundamental concept of a Problem." .
+
+
 ###  http://www.example.com/ffdq#hasResourceType
 :hasResourceType rdf:type owl:ObjectProperty ;
                  rdfs:comment "Provides additional metadata, along with the information elements, that describes the level (SingleRecord or MultiRecord) at which the FFDQ concept operates. For example, an enhancementInContext with resource type of MultiRecord could be used to define an Amendment that applies at the level of multiple record values." .
@@ -192,9 +206,31 @@
 This can be used to determine which measures and validations are improved upon by a given amendment.""" .
 
 
+###  http://www.example.com/ffdq#issueInContext
+:issueInContext rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf :problemProperties ;
+                rdfs:domain [ rdf:type owl:Restriction ;
+                              owl:onProperty :issueInContext ;
+                              owl:someValuesFrom :ContextualizedIssue
+                            ] ;
+                rdfs:range [ rdf:type owl:Restriction ;
+                             owl:onProperty :issueInContext ;
+                             owl:someValuesFrom :ProblemMethod
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :issueInContext ;
+                             owl:someValuesFrom :ProblemPolicy
+                           ] ;
+                rdfs:comment "Describes the relationship between a problem concept in FFDQ (needs, solutions, reports) and a ContextualizedIssue." .
+
+
 ###  http://www.example.com/ffdq#measurementProperties
 :measurementProperties rdf:type owl:ObjectProperty ;
                        rdfs:comment "Sub properties of this type group object properties that apply to measurement concepts such as MeasurementPolicy (DQ Needs), MeasurementMethod (DQ Solutions) and Measure (DQ Reports)." .
+
+
+###  http://www.example.com/ffdq#problemProperties
+:problemProperties rdf:type owl:ObjectProperty .
 
 
 ###  http://www.example.com/ffdq#targetedCriterion
@@ -222,6 +258,19 @@ This can be used to determine which measures and validations are improved upon b
                                 owl:someValuesFrom :ImprovementTarget
                               ] ;
                    rdfs:comment "The dimension targeted by some enhancement via the ImprovementTarget object." .
+
+
+###  http://www.example.com/ffdq#targetedIssue
+:targetedIssue rdf:type owl:ObjectProperty ;
+               rdfs:domain [ rdf:type owl:Restriction ;
+                             owl:onProperty :targetedIssue ;
+                             owl:someValuesFrom :Issue
+                           ] ;
+               rdfs:range [ rdf:type owl:Restriction ;
+                            owl:onProperty :targetedIssue ;
+                            owl:someValuesFrom :ImprovementTarget
+                          ] ;
+               rdfs:comment "The issue targeted by some problem via the ImprovementTarget object." .
 
 
 ###  http://www.example.com/ffdq#validationProperties
@@ -271,6 +320,11 @@ The assertion concept consists of a specification (the technical description of 
                            rdfs:comment "Describes an instance of the enhancement concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
 
 
+###  http://www.example.com/ffdq#ContextualizedIssue
+:ContextualizedIssue rdf:type owl:Class ;
+                     rdfs:comment "Describes an instance of the issue concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
+
+
 ###  http://www.example.com/ffdq#Criterion
 :Criterion rdf:type owl:Class ;
            rdfs:comment "Describes the criterion a Validation test uses to determine compliance. For example, \"The value of basisOfRecord of single records must be in the controlled vocabulary\"." .
@@ -306,6 +360,11 @@ The assertion concept consists of a specification (the technical description of 
                     rdfs:comment "The information element in FFDQ can be represented as a single or composite element that consists of one or more terms from a controlled vocabulary (fields actedUpon or consulted by an assertion test)." .
 
 
+###  http://www.example.com/ffdq#Issue
+:Issue rdf:type owl:Class ;
+       rdfs:comment "Describes the Issue that a DQ Problem assertion is focused on. If the conditions described by an issue are identified by a test, the Problem assertion type will have a status of HAS_PROBLEM. Otherwise the DQ Problem will have a status of NO_PROBLEM." .
+
+
 ###  http://www.example.com/ffdq#Measure
 :Measure rdf:type owl:Class ;
          rdfs:subClassOf :Assertion ;
@@ -325,6 +384,21 @@ The assertion concept consists of a specification (the technical description of 
 ###  http://www.example.com/ffdq#Mechanism
 :Mechanism rdf:type owl:Class ;
            rdfs:comment "The FFDQ concept of mechanism describes the entity that performs an assertion test (code, external service, actor, etc.). Tied to a specification via the concept of an Implementation." .
+
+
+###  http://www.example.com/ffdq#Problem
+:Problem rdf:type owl:Class ;
+         rdfs:comment "The DQ report concept describing a test for the negative case. If a problem was found the result has a status of HAS_PROBLEM otherwise the status is NO_PROBLEM." .
+
+
+###  http://www.example.com/ffdq#ProblemMethod
+:ProblemMethod rdf:type owl:Class ;
+               rdfs:comment "The ProblemMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and an issue in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
+
+
+###  http://www.example.com/ffdq#ProblemPolicy
+:ProblemPolicy rdf:type owl:Class ;
+               rdfs:comment "The ProblemPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedIssue relates to a use case. This relationship defines which problems are supported by a given use case." .
 
 
 ###  http://www.example.com/ffdq#Profile
@@ -349,7 +423,7 @@ The assertion concept consists of a specification (the technical description of 
 
 ###  http://www.example.com/ffdq#ResultStatus
 :ResultStatus rdf:type owl:Class ;
-              rdfs:comment """Depending on the assertion type would have values of COMPLIANT or NON_COMPLIANT for a Validation, COMPLETE or NOT_COMPLETE for a Measure and CURATED, FILLED_IN,TRANSPOSED, NO_CHANGE.
+              rdfs:comment """Depending on the assertion type would have values of COMPLIANT or NON_COMPLIANT for a Validation, COMPLETE or NOT_COMPLETE for a Measure, CURATED, FILLED_IN,TRANSPOSED, NO_CHANGE for an Amendment and HAS_PROBLEM NO_PROBLEM for a Problem.
 
 A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_PREREQUISITES_NOT_MET and EXTERNAL_PREREQUISITES_NOT_MET.""" .
 
