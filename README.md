@@ -32,6 +32,57 @@ Run the jar via the following and provide the utility with the options specified
 
 # Using 
 
+## Annotated DQ Class
+
+The higher level use of the framework makes use of Java annotations defined in the ffdq-api project: https://github.com/kurator-org/ffdq-api
+
+To use the annotations, in the project that defines the methods and classes corresponding to a set of assertion tests, add the dependency via maven to your pom.xml file
+
+        <dependency>
+            <groupId>org.datakurator</groupId>
+            <artifactId>ffdq-api</artifactId>
+            <version>1.0.4-SNAPSHOT</version>
+        </dependency>
+        
+Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the mechanism applied to a class:
+
+    @Mechanism(
+        value = "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84",
+        label = "Kurator: Date Validator - DwCEventDQ")
+    public class DwCEventDQ {
+        // ...     
+    }
+
+The mechanism above has a guid value property that uniquely identfies the mechanism and a human readable lable property describing the mechanism.
+
+Next are the method level annotations that map Java code to ffdq concepts by marking a method as one of Validation, Measure, Amendment and defining the Specification and corresponding test GUID.
+
+	@Provides("urn:uuid:da63f836-1fc6-4e96-a612-fa76678cfd6a")
+
+	@Validation(
+			label = "Event Date and Verbatim Consistent",
+			description = "Test to see if the eventDate and verbatimEventDate are consistent.")
+
+	@Specification("If a dwc:eventDate is not empty and the verbatimEventDate is not empty " +
+			       "compare the value of dwc:eventDate with that of dwc:verbatimEventDate, " +
+			       "and assert Compliant if the two represent the same date or date range.")
+
+    public static EventDQValidation eventDateConsistentWithVerbatim(...) {
+        // ...
+    }
+
+The above shows an example using the Validation annotation. Use @Measure or @Amendment with the same @Provides and @Specification for other assertion types.
+
+Lastly, method parameter level annotation are provided for defining how the parameters (the fields acted upon or fields consulted) map to information elements in ffdq defined in terms of a controlled vocabulary such as DWC.
+
+    public static EventDQValidation eventDateConsistentWithVerbatim(
+    		@ActedUpon(value = "dwc:eventDate") String eventDate,
+			@ActedUpon(value = "dwc:verbatimEventDate") String verbatimEventDate) {
+			    // ...
+			}
+
+## Lower level API
+
 Classes are provided to represent Measures, Validations, and Improvements, to relate them to criteria in Context,
 to group these assertions into data quality reports, which are composed of pre-enhancement, enhancement, and 
 post enhancement stages.
