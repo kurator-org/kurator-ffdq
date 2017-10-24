@@ -234,7 +234,7 @@ public class ValidationRunner {
                     }
                 }
 
-                json.put("status.sparql", status.name());
+                json.put("status", status.name());
                 json.put("comment", retVal.getComment());
 
                 reportArr.add(json);
