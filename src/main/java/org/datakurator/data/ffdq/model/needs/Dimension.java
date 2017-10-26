@@ -37,6 +37,10 @@ public class Dimension {
         this.label = label;
     }
 
+    public Dimension() {
+
+    }
+
     @RDFSubject(prefix = "d:")
     public String getId() {
         return label.toLowerCase();

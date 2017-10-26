@@ -46,4 +46,6 @@ public class ResourceType {
         this.label = label;
     }
 
+    public ResourceType() { }
+
 }
