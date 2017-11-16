@@ -54,18 +54,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.filteredpush</groupId>
-            <artifactId>event_date_qc</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.datakurator</groupId>
-            <artifactId>ffdq-api</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.5</version>
@@ -74,6 +62,11 @@
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
         </dependency>
 
         <dependency>
@@ -207,7 +200,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.datakurator.data.ffdq.sparql.QueryUtil</mainClass>
+                                    <mainClass>org.datakurator.ffdq.util.QueryUtil</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

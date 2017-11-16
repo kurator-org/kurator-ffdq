@@ -1,14 +1,9 @@
 package org.datakurator.postprocess.xlsx;
 
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.datakurator.data.provenance.CurationStatus;
-import org.datakurator.ffdq.annotations.Amendment;
 import org.datakurator.postprocess.model.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

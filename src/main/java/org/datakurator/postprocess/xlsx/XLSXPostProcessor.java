@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.datakurator.data.provenance.CurationStatus;
+import org.datakurator.ffdq.model.report.ResultStatus;
 import org.datakurator.postprocess.model.*;
 
 import java.io.*;
@@ -48,8 +48,8 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(CurationStatus.COMPLIANT.toString(), style);
-        styles.put(CurationStatus.COMPLETE.toString(), style);
+        styles.put(ResultStatus.COMPLIANT.toString(), style);
+        styles.put(ResultStatus.COMPLETE.toString(), style);
 
         // Not compliant or not complete styled with red background
         style = wb.createCellStyle();
@@ -57,8 +57,8 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(CurationStatus.NOT_COMPLIANT.toString(), style);
-        styles.put(CurationStatus.NOT_COMPLETE.toString(), style);
+        styles.put(ResultStatus.NOT_COMPLIANT.toString(), style);
+        styles.put(ResultStatus.NOT_COMPLETE.toString(), style);
 
         // Filled in, curated or transposed styled with yellow background
         style = wb.createCellStyle();
@@ -66,9 +66,9 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(CurationStatus.FILLED_IN.toString(), style);
-        styles.put(CurationStatus.CURATED.toString(), style);
-        styles.put(CurationStatus.TRANSPOSED.toString(), style);
+        styles.put(ResultStatus.FILLED_IN.toString(), style);
+        styles.put(ResultStatus.CURATED.toString(), style);
+        styles.put(ResultStatus.TRANSPOSED.toString(), style);
 
         // Unable determine validity styled with grey background
         style = wb.createCellStyle();
@@ -76,8 +76,8 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(CurationStatus.DATA_PREREQUISITES_NOT_MET.toString(), style);
-        styles.put(CurationStatus.EXTERNAL_PREREQUISITES_NOT_MET.toString(), style);
+        styles.put(ResultStatus.DATA_PREREQUISITES_NOT_MET.toString(), style);
+        styles.put(ResultStatus.EXTERNAL_PREREQUISITES_NOT_MET.toString(), style);
     }
 
     public void postprocess(OutputStream out) {
