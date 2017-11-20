@@ -8,6 +8,7 @@ import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.report.ResultValue;
 import org.datakurator.ffdq.rdf.Namespace;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class AmendmentValue implements ResultValue {
     private Map<String, String> value;
 
     public AmendmentValue() {
-
+        value = new HashMap<>();
     }
 
     public AmendmentValue(Map<String, String> value) {
@@ -45,6 +46,14 @@ public class AmendmentValue implements ResultValue {
      */
     public Map<String,String> getValue() {
         return value;
+    }
+
+    public String get(String key) {
+        return value.get(key);
+    }
+
+    public int size() {
+        return value.size();
     }
 
     /**

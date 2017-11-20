@@ -21,6 +21,10 @@ public class NumericalValue implements ResultValue {
         this.value = value;
     }
 
+    public Long longValue() {
+        return value;
+    }
+
     @RDFSubject
     public String getId() {
         return "urn:uuid" + uuid.toString();
