@@ -16,5 +16,51 @@
  */
 package org.datakurator.ffdq.model.report;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
+import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.Mechanism;
+import org.datakurator.ffdq.model.Specification;
+
 public abstract class Assertion {
+    private Specification specification;
+    private Mechanism mechanism;
+
+    private Result result;
+    private DataResource dataResource;
+
+    @RDF("prov:used")
+    public DataResource getDataResource() {
+        return dataResource;
+    }
+
+    public void setDataResource(DataResource dataResource) {
+        this.dataResource = dataResource;
+    }
+
+    @RDF("prov:hadPlan")
+    public Specification getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(Specification specification) {
+        this.specification = specification;
+    }
+
+    @RDF("prov:wasAttributedTo")
+    public Mechanism getMechanism() {
+        return mechanism;
+    }
+
+    public void setMechanism(Mechanism mechanism) {
+        this.mechanism = mechanism;
+    }
+
+    @RDF("prov:generated")
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
 }

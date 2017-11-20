@@ -1,4 +1,4 @@
-package org.datakurator.ffdq.model.result;
+package org.datakurator.ffdq.model.report;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;

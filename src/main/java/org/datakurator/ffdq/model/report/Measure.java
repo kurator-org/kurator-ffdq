@@ -20,10 +20,10 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.result.Result;
-import org.datakurator.ffdq.model.solutions.ContextualizedDimension;
-import org.datakurator.ffdq.model.solutions.Mechanism;
-import org.datakurator.ffdq.model.solutions.Specification;
+import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.context.ContextualizedDimension;
+import org.datakurator.ffdq.model.Mechanism;
+import org.datakurator.ffdq.model.Specification;
 
 import java.util.UUID;
 
@@ -36,12 +36,7 @@ public class Measure extends Assertion {
     private UUID uuid = UUID.randomUUID();
 
     private ContextualizedDimension dimension;
-    private Specification specification;
-    private Mechanism mechanism;
-
     private Amendment informedBy;
-    private Result result;
-    private DataResource dataResource;
 
     @RDFSubject
     public String getId() {
@@ -64,41 +59,5 @@ public class Measure extends Assertion {
 
     public void setInformedBy(Amendment informedBy) {
         this.informedBy = informedBy;
-    }
-
-    @RDF("prov:used")
-    public DataResource getDataResource() {
-        return dataResource;
-    }
-
-    public void setDataResource(DataResource dataResource) {
-        this.dataResource = dataResource;
-    }
-
-    @RDF("prov:hadPlan")
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    public void setSpecification(Specification specification) {
-        this.specification = specification;
-    }
-
-    @RDF("prov:wasAttributedTo")
-    public Mechanism getMechanism() {
-        return mechanism;
-    }
-
-    public void setMechanism(Mechanism mechanism) {
-        this.mechanism = mechanism;
-    }
-
-    @RDF("prov:generated")
-    public Result getResult() {
-        return result;
-    }
-
-    public void setResult(Result result) {
-        this.result = result;
     }
 }

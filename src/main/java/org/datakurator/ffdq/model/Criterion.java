@@ -1,4 +1,4 @@
-/**  InformationElement.java
+/**  Criterion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,37 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.needs;
+package org.datakurator.ffdq.model;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://example.com/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:InformationElement")
-public class InformationElement {
+@RDFBean("ffdq:Criterion")
+public class Criterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
-    private List<URI> composedOf = new ArrayList<>();
+    private String label;
 
-    public InformationElement() { }
+    public Criterion() { }
 
-    public InformationElement(List<URI> uris) {
-        this.composedOf = uris;
+    public Criterion(String label) {
+        this.label = label;
     }
 
-    public InformationElement(URI uri) {
-        composedOf.add(uri);
-    }
-
-    @RDFSubject()
+    @RDFSubject
     public String getId() {
         return id;
     }
@@ -53,16 +47,13 @@ public class InformationElement {
         this.id = id;
     }
 
-    @RDF("ffdq:composedOf")
-    public List<URI> getComposedOf() {
-        return composedOf;
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
     }
 
-    public void setComposedOf(List<URI> composedOf) {
-        this.composedOf = composedOf;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
-    public void addTerm(URI uri) {
-        composedOf.add(uri);
-    }
 }

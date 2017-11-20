@@ -1,4 +1,4 @@
-/**  Criterion.java
+/**  Enhancement.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.needs;
+package org.datakurator.ffdq.model;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
@@ -27,14 +27,14 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:Criterion")
-public class Criterion {
+@RDFBean("ffdq:Enhancement")
+public class Enhancement {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    public Criterion() { }
+    public Enhancement() { }
 
-    public Criterion(String label) {
+    public Enhancement(String label) {
         this.label = label;
     }
 

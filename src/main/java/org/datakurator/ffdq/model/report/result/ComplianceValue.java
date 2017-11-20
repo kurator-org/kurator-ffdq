@@ -1,10 +1,10 @@
-package org.datakurator.ffdq.model.result.measure;
+package org.datakurator.ffdq.model.report.result;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.result.ResultValue;
+import org.datakurator.ffdq.model.report.ResultValue;
 
 import java.util.UUID;
 
@@ -13,11 +13,11 @@ import java.util.UUID;
         "prov = http://www.w3.org/ns/prov#"
 })
 @RDFBean("prov:Entity")
-public class NumericalValue implements ResultValue {
+public class ComplianceValue implements ResultValue {
     private UUID uuid = UUID.randomUUID();
-    private long value;
+    private String value;
 
-    public NumericalValue(long value) {
+    public ComplianceValue(String value) {
         this.value = value;
     }
 
@@ -27,7 +27,10 @@ public class NumericalValue implements ResultValue {
     }
 
     @RDF("prov:value")
-    public long getValue() {
+    public String getValue() {
         return value;
     }
+
+    public static ComplianceValue COMPLIANT = new ComplianceValue("COMPLIANT");
+    public static ComplianceValue NOT_COMPLIANT = new ComplianceValue("NOT_COMPLIANT");
 }

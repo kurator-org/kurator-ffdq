@@ -1,7 +1,7 @@
 package org.datakurator.ffdq.api;
 
-import org.datakurator.ffdq.model.result.ResultState;
-import org.datakurator.ffdq.model.result.ResultValue;
+import org.datakurator.ffdq.model.report.ResultState;
+import org.datakurator.ffdq.model.report.ResultValue;
 
 public class DQResponse<T extends ResultValue> {
     private ResultState resultState;

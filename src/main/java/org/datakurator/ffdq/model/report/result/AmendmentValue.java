@@ -1,15 +1,13 @@
-package org.datakurator.ffdq.model.result.amendment;
+package org.datakurator.ffdq.model.report.result;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.report.DataResource;
-import org.datakurator.ffdq.model.result.ResultValue;
+import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.report.ResultValue;
 import org.datakurator.ffdq.rdf.Namespace;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,15 +16,17 @@ import java.util.UUID;
         "prov = http://www.w3.org/ns/prov#"
 })
 @RDFBean("prov:Entity")
-public class AmendedValues implements ResultValue {
+public class AmendmentValue implements ResultValue {
     private UUID uuid = UUID.randomUUID();
+
+    private int score = 1; // TODO: For ranking of alternatives
     private Map<String, String> value;
 
-    public AmendedValues() {
+    public AmendmentValue() {
 
     }
 
-    public AmendedValues(Map<String, String> value) {
+    public AmendmentValue(Map<String, String> value) {
         this.value = value;
     }
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.needs;
+package org.datakurator.ffdq.model;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
@@ -27,14 +27,14 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:Enhancement")
-public class Enhancement {
+@RDFBean("ffdq:Issue")
+public class Issue {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    public Enhancement() { }
+    public Issue() { }
 
-    public Enhancement(String label) {
+    public Issue(String label) {
         this.label = label;
     }
 

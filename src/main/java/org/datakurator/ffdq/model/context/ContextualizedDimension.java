@@ -1,32 +1,32 @@
-package org.datakurator.ffdq.model.solutions;
+package org.datakurator.ffdq.model.context;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.needs.Enhancement;
-import org.datakurator.ffdq.model.needs.InformationElement;
-import org.datakurator.ffdq.model.needs.ResourceType;
+import org.datakurator.ffdq.model.Dimension;
+import org.datakurator.ffdq.model.InformationElement;
+import org.datakurator.ffdq.model.ResourceType;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:ContextualizedEnhancement")
-public class ContextualizedEnhancement {
+@RDFBean("ffdq:ContextualizedDimension")
+public class ContextualizedDimension {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Enhancement enhancement;
+    private Dimension dimension;
     private InformationElement ie;
     private ResourceType rt;
 
-    public ContextualizedEnhancement() {
+    public ContextualizedDimension() {
 
     }
 
-    public ContextualizedEnhancement(Enhancement enhancement, InformationElement ie, ResourceType rt) {
-        this.enhancement = enhancement;
+    public ContextualizedDimension(Dimension dimension, InformationElement ie, ResourceType rt) {
+        this.dimension = dimension;
         this.ie = ie;
         this.rt = rt;
     }
@@ -58,12 +58,12 @@ public class ContextualizedEnhancement {
         this.rt = rt;
     }
 
-    @RDF("ffdq:hasEnhancement")
-    public Enhancement getEnhancement() {
-        return enhancement;
+    @RDF("ffdq:hasDimension")
+    public Dimension getDimension() {
+        return dimension;
     }
 
-    public void setEnhancement(Enhancement enhancement) {
-        this.enhancement = enhancement;
+    public void setDimension(Dimension dimension) {
+        this.dimension = dimension;
     }
 }

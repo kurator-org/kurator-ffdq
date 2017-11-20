@@ -1,4 +1,4 @@
-/**  ResourceType.java
+/**  InformationElement.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,44 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.needs;
+package org.datakurator.ffdq.model;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "rt = http://example.com/ffdq/rt/"
+        "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:ResourceType")
-public class ResourceType {
-    public static final ResourceType SINGLE_RECORD = new ResourceType("SingleRecord");
-    public static final ResourceType MULTI_RECORD = new ResourceType("MultiRecord");
-
+@RDFBean("ffdq:InformationElement")
+public class InformationElement {
     private String id = "urn:uuid:" + UUID.randomUUID();
-    private String label;
+    private List<URI> composedOf = new ArrayList<>();
 
-    @RDFSubject(prefix = "rt:")
+    public InformationElement() { }
+
+    public InformationElement(List<URI> uris) {
+        this.composedOf = uris;
+    }
+
+    public InformationElement(URI uri) {
+        composedOf.add(uri);
+    }
+
+    @RDFSubject()
     public String getId() {
-        return label;
+        return id;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public ResourceType(String label) {
-        this.label = label;
+    @RDF("ffdq:composedOf")
+    public List<URI> getComposedOf() {
+        return composedOf;
     }
 
-    public ResourceType() { }
-
-    public static ResourceType fromString(String value) {
-        if (value.equalsIgnoreCase(SINGLE_RECORD.label)) return SINGLE_RECORD;
-        else if (value.equalsIgnoreCase(MULTI_RECORD.label)) return MULTI_RECORD;
-        else throw new UnsupportedOperationException("Unable to find an ffdq:ResourceType for value: " + value);
+    public void setComposedOf(List<URI> composedOf) {
+        this.composedOf = composedOf;
     }
 
+    public void addTerm(URI uri) {
+        composedOf.add(uri);
+    }
 }

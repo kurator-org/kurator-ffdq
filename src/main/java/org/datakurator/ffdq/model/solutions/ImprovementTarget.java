@@ -4,6 +4,10 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.context.ContextualizedCriterion;
+import org.datakurator.ffdq.model.context.ContextualizedDimension;
+import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.context.ContextualizedIssue;
 
 import java.util.HashSet;
 import java.util.Set;

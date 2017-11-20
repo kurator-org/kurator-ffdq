@@ -1,32 +1,33 @@
-package org.datakurator.ffdq.model.solutions;
+package org.datakurator.ffdq.model.context;
+
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.needs.Dimension;
-import org.datakurator.ffdq.model.needs.InformationElement;
-import org.datakurator.ffdq.model.needs.ResourceType;
+import org.datakurator.ffdq.model.Criterion;
+import org.datakurator.ffdq.model.InformationElement;
+import org.datakurator.ffdq.model.ResourceType;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "ffdq = http://example.com/ffdq/"
 })
-@RDFBean("ffdq:ContextualizedDimension")
-public class ContextualizedDimension {
+@RDFBean("ffdq:ContextualizedCriterion")
+public class ContextualizedCriterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Dimension dimension;
+    private Criterion criterion;
     private InformationElement ie;
     private ResourceType rt;
 
-    public ContextualizedDimension() {
+    public ContextualizedCriterion() {
 
     }
 
-    public ContextualizedDimension(Dimension dimension, InformationElement ie, ResourceType rt) {
-        this.dimension = dimension;
+    public ContextualizedCriterion(Criterion criterion, InformationElement ie, ResourceType rt) {
+        this.criterion = criterion;
         this.ie = ie;
         this.rt = rt;
     }
@@ -58,12 +59,12 @@ public class ContextualizedDimension {
         this.rt = rt;
     }
 
-    @RDF("ffdq:hasDimension")
-    public Dimension getDimension() {
-        return dimension;
+    @RDF("ffdq:hasCriterion")
+    public Criterion getCriterion() {
+        return criterion;
     }
 
-    public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
+    public void setCriterion(Criterion criterion) {
+        this.criterion = criterion;
     }
 }
