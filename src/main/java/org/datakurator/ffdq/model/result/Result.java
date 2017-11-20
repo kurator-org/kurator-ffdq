@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.report;
+package org.datakurator.ffdq.model.result;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
@@ -30,35 +30,45 @@ import java.util.UUID;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Result")
-public class Result {
+public class Result<T> {
     private UUID uuid = UUID.randomUUID();
 
-    private String comment;
-    private ResultStatus status;
+    private ResultState resultState;
+    private T resultValue;
 
-    private List<Entity> members;
+    private String comment;
+    private boolean isAmbiguous;
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return "urn:uuid" + uuid.toString();
     }
 
-    @RDF("ffdq:hasStatus")
-    public ResultStatus getStatus() {
-        return status;
+    @RDF("ffdq:hasAmbiguity")
+    public Boolean isAmbiguous() {
+        return isAmbiguous;
     }
 
-    public void setStatus(ResultStatus status) {
-        this.status = status;
+    public void setAmbiguous(boolean ambiguous) {
+        isAmbiguous = ambiguous;
     }
 
-    @RDF("prov:hadMember")
-    public List<Entity> getMembers() {
-        return members;
+    @RDF("ffdq:hasState")
+    public void setResultState(ResultState resultState) {
+        this.resultState = resultState;
     }
 
-    public void setMembers(List<Entity> members) {
-        this.members = members;
+    public ResultState getResultState() {
+        return resultState;
+    }
+
+    @RDF("ffdq:hasValue")
+    public void setResultValue(T resultValue) {
+        this.resultValue = resultValue;
+    }
+
+    public T getResultValue() {
+        return resultValue;
     }
 
     @RDF("rdfs:comment")

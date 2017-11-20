@@ -20,6 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.result.Result;
 import org.datakurator.ffdq.model.solutions.ContextualizedCriterion;
 import org.datakurator.ffdq.model.solutions.Mechanism;
 import org.datakurator.ffdq.model.solutions.Specification;

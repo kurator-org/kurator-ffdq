@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.datakurator.ffdq.model.report.ResultStatus;
 import org.datakurator.postprocess.model.*;
 
 import java.io.*;
@@ -48,8 +47,8 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(ResultStatus.COMPLIANT.toString(), style);
-        styles.put(ResultStatus.COMPLETE.toString(), style);
+        styles.put("COMPLIANT", style);
+        styles.put("COMPLETE", style);
 
         // Not compliant or not complete styled with red background
         style = wb.createCellStyle();
@@ -57,8 +56,8 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(ResultStatus.NOT_COMPLIANT.toString(), style);
-        styles.put(ResultStatus.NOT_COMPLETE.toString(), style);
+        styles.put("NOT_COMPLIANT", style);
+        styles.put("NOT_COMPLETE", style);
 
         // Filled in, curated or transposed styled with yellow background
         style = wb.createCellStyle();
@@ -66,9 +65,9 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(ResultStatus.FILLED_IN.toString(), style);
-        styles.put(ResultStatus.CURATED.toString(), style);
-        styles.put(ResultStatus.TRANSPOSED.toString(), style);
+        styles.put("FILLED_IN", style);
+        styles.put("CURATED", style);
+        styles.put("TRANSPOSED", style);
 
         // Unable determine validity styled with grey background
         style = wb.createCellStyle();
@@ -76,8 +75,8 @@ public class XLSXPostProcessor {
         style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put(ResultStatus.DATA_PREREQUISITES_NOT_MET.toString(), style);
-        styles.put(ResultStatus.EXTERNAL_PREREQUISITES_NOT_MET.toString(), style);
+        styles.put("DATA_PREREQUISITES_NOT_MET", style);
+        styles.put("EXTERNAL_PREREQUISITES_NOT_MET", style);
     }
 
     public void postprocess(OutputStream out) {

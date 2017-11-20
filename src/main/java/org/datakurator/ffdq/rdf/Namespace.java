@@ -28,4 +28,30 @@ public class Namespace {
             throw new RuntimeException("Invalid namespace uri: " + uri, e);
         }
     }
+
+
+    public static URI resolvePrefixedTerm(String value) {
+        if (value.indexOf(':') != -1) {
+            // Split string into namespace prefix and term name
+            String[] str = value.split(":");
+
+            String ns = str[0];
+            String term = str[1];
+
+            // lookup namespace if prefix is present
+            String uri = nsPrefixes.get(ns);
+
+            if (uri != null) {
+                try {
+                    return new URI(uri).resolve(term);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException("Invalid namespace uri for information element \"" + value + ": " + uri);
+                }
+            } else {
+                throw new RuntimeException("Could not find namespace uri for prefix: " + ns);
+            }
+        } else {
+            throw new RuntimeException("Invalid information element \"" + value + "\". Must be of the form prefix:term ");
+        }
+    }
 }

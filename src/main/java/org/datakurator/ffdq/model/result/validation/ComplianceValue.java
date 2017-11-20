@@ -1,10 +1,11 @@
-package org.datakurator.ffdq.model.report;
+package org.datakurator.ffdq.model.result.validation;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.needs.InformationElement;
+import org.datakurator.ffdq.model.result.ResultValue;
+import org.datakurator.ffdq.model.result.measure.CompletenessValue;
 
 import java.util.UUID;
 
@@ -13,15 +14,17 @@ import java.util.UUID;
         "prov = http://www.w3.org/ns/prov#"
 })
 @RDFBean("prov:Entity")
-public class Entity {
+public class ComplianceValue implements ResultValue {
     private UUID uuid = UUID.randomUUID();
-
     private String value;
-    private InformationElement informationElement;
+
+    public ComplianceValue(String value) {
+        this.value = value;
+    }
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return "urn:uuid" + uuid.toString();
     }
 
     @RDF("prov:value")
@@ -29,16 +32,6 @@ public class Entity {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @RDF("ffdq:hasInformationElement")
-    public InformationElement getInformationElement() {
-        return informationElement;
-    }
-
-    public void setInformationElement(InformationElement informationElement) {
-        this.informationElement = informationElement;
-    }
+    public static ComplianceValue COMPLIANT = new ComplianceValue("COMPLIANT");
+    public static ComplianceValue NOT_COMPLIANT = new ComplianceValue("NOT_COMPLIANT");
 }

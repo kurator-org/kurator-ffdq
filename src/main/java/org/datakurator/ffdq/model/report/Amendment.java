@@ -20,6 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.result.Result;
 import org.datakurator.ffdq.model.solutions.ContextualizedEnhancement;
 import org.datakurator.ffdq.model.solutions.Mechanism;
 import org.datakurator.ffdq.model.solutions.Specification;
@@ -30,7 +31,7 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("ffdq:DQAmendment")
+@RDFBean("ffdq:Amendment")
 public class Amendment extends Assertion {
     private UUID uuid = UUID.randomUUID();
 
