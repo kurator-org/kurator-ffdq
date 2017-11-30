@@ -2,7 +2,9 @@ package org.datakurator.ffdq.util;
 
 import org.datakurator.ffdq.runner.AssertionTest;
 
+import java.io.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,11 +12,14 @@ import java.util.Map;
  * Created by lowery on 11/16/17.
  */
 public class ClassGenerator {
-    private final String mechanismGuid;
-    private final String mechanismName;
+    private String mechanismGuid;
+    private String mechanismName;
 
-    private final String className;
-    private final String packageName;
+    private String className;
+    private String packageName;
+
+    private Map<String, Integer> currGuids = new HashMap<>();
+    private int testsAdded = 0;
 
     private StringBuilder sb;
 
@@ -28,89 +33,136 @@ public class ClassGenerator {
         sb = new StringBuilder();
         sb.append("package ").append(packageName).append(";\n\n");
 
-        sb.append("import org.datakurator.ffdq.annotations.*;\n\n");
+        sb.append("import org.datakurator.ffdq.annotations.*;\n");
+        sb.append("import org.datakurator.ffdq.api.DQResponse;\n");
+        sb.append("import org.datakurator.ffdq.model.report.result.*;\n\n");
 
         sb.append("@DQClass(\"").append(mechanismGuid).append("\")\n");
         sb.append("public class ").append(className).append(" {\n\n");
     }
 
-    public void addTest(AssertionTest test) {
+    public ClassGenerator(InputStream code) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(code));
 
-        // method name
-        String[] label = test.getLabel().split("[^a-zA-Z\\d:]");
-        String methodName = "";
+        String line = "";
+        int lineNum = 0, classEnd = 0;
 
-        for (int i = 0; i < label.length; i++) {
-            if (i == 0) {
-                methodName += label[i].toLowerCase();
-            } else {
-                methodName += label[i].substring(0, 1).toUpperCase() + label[i].substring(1).toLowerCase();
-            }
+        List<String> lines = new LinkedList<>();
+        while ((line = reader.readLine()) != null) {
+              if (line.contains("@DQProvides")) {
+                  String guid = line.substring(line.indexOf("\"")+1, line.lastIndexOf("\""));
+                  currGuids.put(guid, lineNum+1);
+              }
+
+              if (line.contains("}")) {
+                  classEnd = lineNum;
+              }
+
+            lines.add(line);
+            lineNum++;
         }
 
+        lines.remove(classEnd);
 
-        // return type
-        String retType = "void";
-        switch (test.getAssertionType().toUpperCase()) {
-            case "MEASURE":
-                retType = "EventDQMeasurement";
-                break;
-            case "VALIDATION":
-                retType = "EventDQValidation";
-                break;
-            case "AMENDMENT":
-                retType = "EventDQAmendment";
-                break;
+        sb = new StringBuilder();
+        for (String str : lines) {
+            sb.append(str).append("\n");
         }
-
-        // params
-        Map<String, String> params = new HashMap<>();
-        List<String> ie = test.getInformationElement();
-        for (int i = 0; i < ie.size(); i++) {
-            String term = ie.get(i);
-            String param = term.split(":")[1];
-
-            params.put(term, param);
-        }
-
-        // Javadoc comment first
-        sb.append("    /**\n");
-        sb.append("     * ").append(test.getDescription()).append("\n");
-        sb.append("     *\n");
-        sb.append("     * Provides: ").append(test.getLabel()).append("\n");
-        sb.append("     *\n");
-
-        for (String param : params.values()) {
-            sb.append("     * @param ").append(param).append("\n");
-        }
-
-        sb.append("     * @return ").append(retType).append("\n");
-        sb.append("     */\n");
-        sb.append("    @DQProvides(\"").append(test.getGuid()).append("\")\n");
-        sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
-
-
-        int cnt = 0;
-        for (String term : params.keySet()) {
-            sb.append("@DQParam(\"").append(term).append("\") String ").append(params.get(term));
-
-            if (cnt < ie.size()-1) {
-                sb.append(", ");
-            }
-
-            cnt++;
-        }
-
-        sb.append(") {\n");
-        sb.append("        ").append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
-        sb.append("        // ...\n\n");
-        sb.append("        return result;\n");
-        sb.append("    }\n\n");
     }
 
-    public void writeOut() {
-        sb.append("}\n");
+    public void addTest(AssertionTest test) {
+        if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
+            System.out.println("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
+                    currGuids.get(test.getGuid()));
+        } else {
+            testsAdded++;
 
-        System.out.println(sb.toString());
+            // method name
+            String[] label = test.getLabel().split("[^a-zA-Z\\d:]");
+            String methodName = "";
+
+            for (int i = 0; i < label.length; i++) {
+                if (i == 0) {
+                    methodName += label[i].toLowerCase();
+                } else {
+                    methodName += label[i].substring(0, 1).toUpperCase() + label[i].substring(1).toLowerCase();
+                }
+            }
+
+
+            // return type
+            String retType = "void";
+            switch (test.getAssertionType().toUpperCase()) {
+                case "MEASURE":
+                    if (test.getDimension().equalsIgnoreCase("Completeness")) {
+                        retType = "DQResponse<CompletenessValue>";
+                    } else {
+                        retType = "DQResponse<NumericalValue>";
+                    }
+                    break;
+                case "VALIDATION":
+                    retType = "DQResponse<ComplianceValue>";
+                    break;
+                case "AMENDMENT":
+                    retType = "DQResponse<AmendmentValue>";
+                    break;
+            }
+
+            // params
+            Map<String, String> params = new HashMap<>();
+            List<String> ie = test.getInformationElement();
+            for (int i = 0; i < ie.size(); i++) {
+                String term = ie.get(i);
+                String param = term.split(":")[1];
+
+                params.put(term, param);
+            }
+
+            // Javadoc comment first
+            sb.append("    /**\n");
+            sb.append("     * ").append(test.getDescription()).append("\n");
+            sb.append("     *\n");
+            sb.append("     * Provides: ").append(test.getLabel()).append("\n");
+            sb.append("     *\n");
+
+            for (String param : params.values()) {
+                sb.append("     * @param ").append(param).append("\n");
+            }
+
+            sb.append("     * @return ").append(retType).append("\n");
+            sb.append("     */\n");
+            sb.append("    @DQProvides(\"").append(test.getGuid()).append("\")\n");
+            sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
+
+
+            int cnt = 0;
+            for (String term : params.keySet()) {
+                sb.append("@DQParam(\"").append(term).append("\") String ").append(params.get(term));
+
+                if (cnt < ie.size() - 1) {
+                    sb.append(", ");
+                }
+
+                cnt++;
+            }
+
+            sb.append(") {\n");
+            sb.append("        ").append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
+            sb.append("        // ...\n\n");
+            sb.append("        return result;\n");
+            sb.append("    }\n\n");
+        }
+    }
+
+    public void writeOut(OutputStream out) throws IOException {
+        sb.append("}\n");
+        out.write(sb.toString().getBytes());
+        System.out.println();
+        if (testsAdded > 0) {
+            System.out.println("Added new stub methods for " + testsAdded + " unimplemented tests.");
+        } else {
+            System.out.println("DQ Class is up to date. No new tests added.");
+        }
+
     }
 }

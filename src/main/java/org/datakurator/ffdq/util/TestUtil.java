@@ -33,8 +33,8 @@ public class TestUtil {
 
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
 
-        options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
-        options.addOption("appendClass", null, false, "Append to an existing Java class stub methods for new tests");
+        options.addOption("generateClass", null, true, "Generate a new Java class with stub methods for each test");
+        options.addOption("appendClass", null, true, "Append to an existing Java class stub methods for new tests");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -144,14 +144,25 @@ public class TestUtil {
             model.write(format, out);
 
             //TODO: Class Generator
-            ClassGenerator generator = new ClassGenerator(mechanismGuid, mechanismName, packageName, className);
-            for (AssertionTest test : tests) {
-                generator.addTest(test);
-            }
 
-            generator.writeOut();
-            //boolean generateClass = cmd.hasOption("generateClass");
-            //boolean appendClass = cmd.hasOption("appendClass");
+            if (cmd.hasOption("generateClass")) {
+                ClassGenerator generator = new ClassGenerator(mechanismGuid, mechanismName, packageName, className);
+                for (AssertionTest test : tests) {
+                    generator.addTest(test);
+                }
+
+                String generateOut = cmd.getOptionValue("generateClass");
+                generator.writeOut(new FileOutputStream(generateOut));
+            } else if (cmd.hasOption("appendClass")) {
+                String appendOut = cmd.getOptionValue("appendClass");
+                ClassGenerator generator = new ClassGenerator(new FileInputStream(appendOut));
+
+                for (AssertionTest test : tests) {
+                    generator.addTest(test);
+                }
+
+                generator.writeOut(new FileOutputStream(appendOut));
+            }
         } catch (ParseException e) {
             System.out.println("ERROR: " + e.getMessage() + "\n");
 
