@@ -33,7 +33,7 @@ public class XLSXPostProcessor {
         try {
             reportParser = new DQReportParser(reportStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -221,7 +221,7 @@ public class XLSXPostProcessor {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream("/ffdq.json"));
+        XLSXPostProcessor postProcessor = new XLSXPostProcessor(new FileInputStream("/home/lowery/kurator/kurator-validation/dwca_date_validator_workspace/dq_report.json"));
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
     }
 }

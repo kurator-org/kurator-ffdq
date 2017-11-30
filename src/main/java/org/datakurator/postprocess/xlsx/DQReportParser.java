@@ -241,7 +241,7 @@ public class DQReportParser {
                 } else if (jsonToken.equals(JsonToken.END_OBJECT)) {
                     String type = (String) currAssertion.get("type");
                     String comment = (String) currAssertion.get("comment");
-                    String status = (String) currAssertion.get("status.sparql");
+                    String status = (String) currAssertion.get("status");
                     Context context = (Context) currAssertion.get("context");
 
                     Test test = profile.get(currAssertion.get("name"));
