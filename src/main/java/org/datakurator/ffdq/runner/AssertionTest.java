@@ -1,7 +1,5 @@
 package org.datakurator.ffdq.runner;
 
-import org.datakurator.ffdq.runner.Parameter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -25,7 +23,7 @@ public class AssertionTest {
     // TODO: use these in runner?
     private Class cls;
     private Method method;
-    private List<Parameter> parameters;
+    private List<TestParam> parameters;
 
     public AssertionTest(String guid, String label, String description, String specification, String assertionType,
                          String resourceType, String dimension, List<String> informationElement) {
@@ -59,11 +57,18 @@ public class AssertionTest {
         }
     }
 
+    public AssertionTest(String guid, Class cls, Method method, List<TestParam> parameters) {
+        this.guid = guid;
+        this.cls = cls;
+        this.method = method;
+        this.parameters = parameters;
+    }
+
     public Object invoke(Object instance, Map<String, String> record) throws InvocationTargetException, IllegalAccessException {
         Set<String> keys = record.keySet();
 
         // Check that record contains required fields
-        for (Parameter param : parameters) {
+        for (TestParam param : parameters) {
             if (!keys.contains(param.getTerm())) {
                 // throw new RuntimeException("Record argument missing one or more required fields: " + parameters);
                 // TODO: log warning instead
@@ -75,7 +80,7 @@ public class AssertionTest {
 
         // Map keys to method arguments by term name
         for (int i = 0; i < args.length; i++) {
-            Parameter param = parameters.get(i);
+            TestParam param = parameters.get(i);
 
             String value = record.get(param.getTerm());
             args[i] = value;
@@ -92,27 +97,79 @@ public class AssertionTest {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getSpecification() {
         return specification;
     }
 
+    public void setSpecification(String specification) {
+        this.specification = specification;
+    }
+
     public String getAssertionType() {
         return assertionType;
+    }
+
+    public void setAssertionType(String assertionType) {
+        this.assertionType = assertionType;
     }
 
     public String getResourceType() {
         return resourceType;
     }
 
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+
     public String getDimension() {
         return dimension;
     }
 
+    public void setDimension(String dimension) {
+        this.dimension = dimension;
+    }
+
     public List<String> getInformationElement() {
         return informationElement;
+    }
+
+    public void setInformationElement(List<String> informationElement) {
+        this.informationElement = informationElement;
+    }
+
+    public Class getCls() {
+        return cls;
+    }
+
+    public void setCls(Class cls) {
+        this.cls = cls;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    public List<TestParam> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<TestParam> parameters) {
+        this.parameters = parameters;
     }
 }

@@ -8,11 +8,11 @@ import java.net.URISyntaxException;
 /**
  * Created by lowery on 8/21/17.
  */
-public class Parameter {
+public class TestParam {
     private URI namespace;
     private String term;
 
-    public Parameter(String param) {
+    public TestParam(String param) {
 
         // lookup namespace if prefix is present
         if (param.indexOf(':') != -1) {
