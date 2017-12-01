@@ -10,10 +10,13 @@ import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.report.Assertion;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.runner.AssertionTest;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.eclipse.rdf4j.query.TupleQueryResultHandler;
+import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
@@ -22,7 +25,7 @@ import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -59,14 +62,38 @@ public class FFDQModel {
         }
     }
 
+    public void load(InputStream input, RDFFormat format) throws IOException {
+        // Load RDF data from file
+        Model model = Rio.parse(input, "", format);
+        conn.add(model);
+    }
+
     public void write(RDFFormat format, OutputStream out) {
         RDFWriter writer = Rio.createWriter(format, out);
         try (RepositoryConnection conn = repo.getConnection()) {
             conn.prepareGraphQuery(QueryLanguage.SPARQL,
-                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
+                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " +
+                       "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
         }
     }
 
+    public void executeQuery(String sparql, OutputStream out) {
+        if (sparql.contains("CONSTRUCT")) {
+
+            // Sparql CONSTRUCT
+            RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, out);
+            conn.prepareGraphQuery(QueryLanguage.SPARQL, sparql).evaluate(writer);
+
+        } else if (sparql.contains("SELECT")) {
+
+            // Sparql SELECT
+            TupleQueryResultHandler handler = new SPARQLResultsTSVWriter(out);
+            conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(handler);
+
+        }
+    }
+
+    /*
     public ValidationMethod getValidationMethod(String guid) {
         try (RepositoryConnection conn = repo.getConnection()) {
             TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL,
@@ -121,21 +148,19 @@ public class FFDQModel {
                 System.out.println(rt);
                 System.out.println(ie.getComposedOf());
 
-                /*AssertionTest test = new AssertionTest(
+                AssertionTest test = new AssertionTest(
                         specification.getId(),
                         "",
                         criterion.getLabel(),
                         specification.getLabel(),
-                        "VALIDATION", rt.toString(), null, )*/
+                        "VALIDATION", rt.toString(), null, )
             }
             return null;
             //return (ValidationMethod) fetchBean(id, ValidationMethod.class);
         }
-    }
+    }*/
 
     public static void main(String[] args) {
 
-        //ValidationMethod method = model.getValidationMethod("31d463b4-2a1c-4b90-b6c7-73459d1bad6d");
-        //model.getAllTests();
     }
 }

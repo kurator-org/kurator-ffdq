@@ -2,6 +2,7 @@ package org.datakurator.ffdq.util;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
+import org.datakurator.ffdq.rdf.FFDQModel;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQueryResultHandler;
@@ -37,26 +38,10 @@ public class QueryUtil {
             String input = cmd.getOptionValue("t");
             String output = cmd.getOptionValue("o");
 
-            String sparql = loadSparql(new FileInputStream(cmd.getOptionValue("q")));
-
-            // Execute query and save result to file
-            executeQuery(input, output, sparql);
-        } else {
-            // Print usage
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("ffdq", options);
-        }
-    }
-
-    private static void executeQuery(String input, String output, String sparql) {
-        // Initialize an in-memory store and run SPARQL query
-        Repository repo = new SailRepository(new MemoryStore());
-        repo.initialize();
-
-        try (RepositoryConnection conn = repo.getConnection()) {
-
+            // Default format is turtle
             RDFFormat format = RDFFormat.TURTLE;
 
+            // Get format from file extension
             if (input.endsWith("jsonld")) {
                 format = RDFFormat.JSONLD;
             } else if (input.endsWith("rdf")) {
@@ -65,28 +50,19 @@ public class QueryUtil {
                 format = RDFFormat.TURTLE;
             }
 
-            // Load RDF data from file
-            Model model = Rio.parse(new FileInputStream(input), "", format);
-            conn.add(model);
+            // Load RDF data from file into model
+            FFDQModel model = new FFDQModel();
+            model.load(new FileInputStream(input), format);
 
-            if (sparql.contains("CONSTRUCT")) {
+            // Load sparql query from file
+            String sparql = loadSparql(new FileInputStream(cmd.getOptionValue("q")));
 
-                // Sparql CONSTRUCT
-                RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, new FileOutputStream(output));
-                conn.prepareGraphQuery(QueryLanguage.SPARQL, sparql).evaluate(writer);
-
-            } else if (sparql.contains("SELECT")) {
-
-                // Sparql SELECT
-                TupleQueryResultHandler handler = new SPARQLResultsTSVWriter(new FileOutputStream(output));
-                conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(handler);
-
-            }
-
-            System.out.println("Wrote sparql query to output file: " + output);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            // Execute query and save result to file
+            model.executeQuery(sparql, new FileOutputStream(output));
+        } else {
+            // Print usage
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("ffdq", options);
         }
     }
 
