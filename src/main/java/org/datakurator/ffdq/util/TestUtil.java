@@ -103,7 +103,7 @@ public class TestUtil {
 
                 // Add the specification to an implementation for the current mechanism
                 Implementation implementation = new Implementation(specification, Collections.singletonList(mechanism));
-                model.saveBean(implementation);
+                model.save(implementation);
 
                 // Define measure, validation, and amendment methods
                 switch(test.getAssertionType().toUpperCase()) {
@@ -115,7 +115,7 @@ public class TestUtil {
 
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
-                        model.saveBean(measurementMethod);
+                        model.save(measurementMethod);
                         break;
 
                     case "VALIDATION":
@@ -126,7 +126,7 @@ public class TestUtil {
 
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
-                        model.saveBean(validationMethod);
+                        model.save(validationMethod);
                         break;
 
                     case "AMENDMENT":
@@ -137,7 +137,7 @@ public class TestUtil {
 
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
-                        model.saveBean(amendmentMethod);
+                        model.save(amendmentMethod);
                         break;
                 }
 
