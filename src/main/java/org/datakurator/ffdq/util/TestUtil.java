@@ -15,15 +15,18 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Created by lowery on 11/13/17.
  */
 public class TestUtil {
+    private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
     public static void main(String[] args) throws IOException {
         Options options = new Options();
@@ -33,8 +36,9 @@ public class TestUtil {
 
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
 
-        options.addOption("generateClass", null, true, "Generate a new Java class with stub methods for each test");
-        options.addOption("appendClass", null, true, "Append to an existing Java class stub methods for new tests");
+        options.addOption("srcDir", null, true, "The Java sources root directory (e.g. src/main/java)");
+        options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
+        options.addOption("appendClass", null, false, "Append to an existing Java class stub methods for new tests");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -142,26 +146,48 @@ public class TestUtil {
             // Write rdf to file
             FileOutputStream out = new FileOutputStream(rdfOut);
             model.write(format, out);
+            logger.info("Wrote rdf for tests to: " + new File(rdfOut).getAbsolutePath());
 
-            //TODO: Class Generator
+            // Run DQ Class generation step if generateClass or appendClass options were set
+            boolean generateClass = cmd.hasOption("generateClass");
+            boolean appendClass = cmd.hasOption("appendClass");
 
-            if (cmd.hasOption("generateClass")) {
+            if (generateClass || appendClass) {
+                File javaSrc = loadJavaSource(cmd.getOptionValue("srcDir"), packageName, className);
                 ClassGenerator generator = new ClassGenerator(mechanismGuid, mechanismName, packageName, className);
+
+                // Check if the source file exists, if so try to append if the appendClass option is set
+                // otherwise generate a new class if the generateClass option is set
+                if (javaSrc.exists()) {
+
+                    if (!appendClass) {
+                        throw new RuntimeException("Java source file already exists! Append to existing source via " +
+                                "the \"appendClass\" option.");
+                    } else {
+                        // Initialize to append to an existing DQ Class
+                        generator.init(new FileInputStream(javaSrc));
+                    }
+
+                } else {
+
+                    if (!generateClass) {
+                        throw new RuntimeException("Java source file does not exist! Try generating a new class" +
+                                " via the \"generateClass\" option.");
+                    } else {
+                        // Initialize to generate a new DQ Class
+                        generator.init();
+                    }
+
+                }
+
+                // Add all assertion tests to the DQ Class generator
                 for (AssertionTest test : tests) {
                     generator.addTest(test);
                 }
 
-                String generateOut = cmd.getOptionValue("generateClass");
-                generator.writeOut(new FileOutputStream(generateOut));
-            } else if (cmd.hasOption("appendClass")) {
-                String appendOut = cmd.getOptionValue("appendClass");
-                ClassGenerator generator = new ClassGenerator(new FileInputStream(appendOut));
-
-                for (AssertionTest test : tests) {
-                    generator.addTest(test);
-                }
-
-                generator.writeOut(new FileOutputStream(appendOut));
+                // Write generated class to java source file
+                generator.writeOut(new FileOutputStream(javaSrc));
+                logger.info("Wrote java source file for class to: " + javaSrc.getAbsolutePath());
             }
         } catch (ParseException e) {
             System.out.println("ERROR: " + e.getMessage() + "\n");
@@ -207,6 +233,32 @@ public class TestUtil {
         }
 
         return tests;
+    }
+
+    private static File loadJavaSource(String srcDir, String packageName, String className) {
+        // Convert the Java package name to directory and class name to source file
+        String packageDir = packageName.replaceAll("\\.", File.separator);
+        String sourceFile = className + ".java";
+
+        // Load java source file
+        File sourcesRoot;
+
+        if (srcDir != null) {
+            sourcesRoot = new File(srcDir);
+        } else {
+            // default to current directory if no srcDir was specified
+            sourcesRoot = new File("");
+        }
+
+        File pkgDir = Paths.get(sourcesRoot.getAbsolutePath(), packageDir).toFile();
+        if (!pkgDir.exists()) {
+            pkgDir.mkdirs();
+        }
+
+        logger.info("Using sources root directory: " + sourcesRoot.getAbsolutePath());
+        logger.info("Java package directory: " + packageDir);
+
+        return Paths.get(pkgDir.getAbsolutePath(), sourceFile).toFile();
     }
 
     private static List<String> parseInformationElementStr(String str) {

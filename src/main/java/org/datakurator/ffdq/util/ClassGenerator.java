@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Created by lowery on 11/16/17.
  */
 public class ClassGenerator {
+    private final static Logger logger = Logger.getLogger(ClassGenerator.class.getName());
+
     private String mechanismGuid;
     private String mechanismName;
 
@@ -29,7 +32,12 @@ public class ClassGenerator {
 
         this.packageName = packageName;
         this.className = className;
+    }
 
+    /**
+     * Initialize for generation of a new DQ Class
+     */
+    public void init() {
         sb = new StringBuilder();
         sb.append("package ").append(packageName).append(";\n\n");
 
@@ -41,28 +49,38 @@ public class ClassGenerator {
         sb.append("public class ").append(className).append(" {\n\n");
     }
 
-    public ClassGenerator(InputStream code) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(code));
+    /**
+     * Initialize for appending tests to an existing DQ Class
+     *
+     * @param javaSrc java source file to append to
+     */
+    public void init(InputStream javaSrc) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(javaSrc));
 
         String line = "";
         int lineNum = 0, classEnd = 0;
 
         List<String> lines = new LinkedList<>();
-        while ((line = reader.readLine()) != null) {
-              if (line.contains("@DQProvides")) {
-                  String guid = line.substring(line.indexOf("\"")+1, line.lastIndexOf("\""));
-                  currGuids.put(guid, lineNum+1);
-              }
 
-              if (line.contains("}")) {
-                  classEnd = lineNum;
-              }
+        try {
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("@DQProvides")) {
+                    String guid = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
+                    currGuids.put(guid, lineNum + 1);
+                }
 
-            lines.add(line);
-            lineNum++;
+                if (line.contains("}")) {
+                    classEnd = lineNum;
+                }
+
+                lines.add(line);
+                lineNum++;
+            }
+
+            lines.remove(classEnd);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load Java source file", e);
         }
-
-        lines.remove(classEnd);
 
         sb = new StringBuilder();
         for (String str : lines) {
@@ -72,7 +90,7 @@ public class ClassGenerator {
 
     public void addTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
-            System.out.println("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
+            logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
                     currGuids.get(test.getGuid()));
         } else {
             testsAdded++;
@@ -159,9 +177,9 @@ public class ClassGenerator {
         out.write(sb.toString().getBytes());
         System.out.println();
         if (testsAdded > 0) {
-            System.out.println("Added new stub methods for " + testsAdded + " unimplemented tests.");
+            logger.info("Added new stub methods for " + testsAdded + " unimplemented tests.");
         } else {
-            System.out.println("DQ Class is up to date. No new tests added.");
+            logger.info("DQ Class is up to date. No new tests added.");
         }
 
     }
