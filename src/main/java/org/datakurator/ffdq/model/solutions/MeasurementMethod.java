@@ -13,39 +13,14 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/"
 })
 @RDFBean("ffdq:MeasurementMethod")
-public class MeasurementMethod {
-    private String id = "urn:uuid:" + UUID.randomUUID();
-
-    private Specification specification;
+public class MeasurementMethod extends AssertionMethod {
     private ContextualizedDimension cd;
 
     public MeasurementMethod() { }
 
-    public MeasurementMethod(String id) {
-        this.id = id;
-    }
-
     public MeasurementMethod(Specification specification, ContextualizedDimension contextualizedDimension) {
         this.specification = specification;
         this.cd = contextualizedDimension;
-    }
-
-    @RDFSubject
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @RDF("ffdq:hasSpecification")
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    public void setSpecification(Specification specification) {
-        this.specification = specification;
     }
 
     @RDF("ffdq:dimensionInContext")

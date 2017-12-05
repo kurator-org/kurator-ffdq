@@ -13,39 +13,14 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/"
 })
 @RDFBean("ffdq:ValidationMethod")
-public class ValidationMethod {
-    private String id = "urn:uuid:" + UUID.randomUUID();
-
-    private Specification specification;
+public class ValidationMethod extends AssertionMethod {
     private ContextualizedCriterion cc;
 
     public ValidationMethod() { }
 
-    public ValidationMethod(String id) {
-        this.id = id;
-    }
-
     public ValidationMethod(Specification specification, ContextualizedCriterion contextualizedCriterion) {
         this.specification = specification;
         this.cc = contextualizedCriterion;
-    }
-
-    @RDFSubject
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @RDF("ffdq:hasSpecification")
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    public void setSpecification(Specification specification) {
-        this.specification = specification;
     }
 
     @RDF("ffdq:criterionInContext")

@@ -7,7 +7,10 @@ import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
+import org.datakurator.ffdq.model.context.ContextualizedDimension;
+import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
+import org.datakurator.ffdq.model.solutions.AssertionMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
@@ -23,10 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TestRunner {
     private Class cls;
@@ -43,63 +43,105 @@ public class TestRunner {
                 String mechanismGuid = "urn:uuid:" + ((DQClass) annotation).value();
 
                 // process methods
-                processMethods();
+                Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
+                processMethods(cls, definedTests);
 
-                for (ValidationMethod validationMethod : model.findValidationMethods(mechanismGuid)) {
-                    Specification specification = validationMethod.getSpecification();
-
-                    ContextualizedCriterion cc = validationMethod.getContextualizedCriterion();
-                    InformationElement informationElement = cc.getInformationElements();
+                for (String testGuid : tests.keySet()) {
+                    Specification specification = definedTests.get(testGuid);
+                    AssertionMethod assertionMethod = model.findMethodForSpecification(testGuid);
 
                     AssertionTest test = tests.get(specification.getId());
-
-//                    for (URI uri : informationElement.getComposedOf()) {
-//                        System.out.println(uri);
-//                    }
-//
-//                    for (TestParam param : test.getParameters()) {
-//                        System.out.println(param.getURI());
-//                    }
-
                     test.setSpecification(specification.getLabel());
-                    test.setAssertionType("VALIDATION");
 
-                    System.out.println(test.getMethod().getName());
-                }
+                    if (assertionMethod instanceof ValidationMethod) {
+                        ValidationMethod validationMethod = (ValidationMethod) assertionMethod;
 
-                for (MeasurementMethod measurementMethod : model.findMeasurementMethods(mechanismGuid)) {
-                    Specification specification = measurementMethod.getSpecification();
-                    AssertionTest test = tests.get(specification.getId());
+                        ContextualizedCriterion cc = validationMethod.getContextualizedCriterion();
+                        InformationElement informationElement = cc.getInformationElements();
 
-                    test.setSpecification(specification.getLabel());
-                    test.setAssertionType("MEASURE");
+                        validateParameters(test, informationElement);
 
-                    System.out.println(test.getMethod().getName());
-                }
+                        test.setAssertionType("VALIDATION");
+                    } else if (assertionMethod instanceof MeasurementMethod) {
+                        MeasurementMethod measurementMethod = (MeasurementMethod) assertionMethod;
 
-                for (AmendmentMethod amendmentMethod : model.findAmendmentMethods(mechanismGuid)) {
-                    Specification specification = amendmentMethod.getSpecification();
-                    AssertionTest test = tests.get(specification.getId());
+                        ContextualizedDimension cd = measurementMethod.getContextualizedDimension();
+                        InformationElement informationElement = cd.getInformationElements();
 
-                    test.setSpecification(specification.getLabel());
-                    test.setAssertionType("AMENDMENT");
+                        test.setAssertionType("MEASURE");
+                    } else if (assertionMethod instanceof AmendmentMethod) {
+                        AmendmentMethod amendmentMethod = (AmendmentMethod) assertionMethod;
 
-                    System.out.println(test.getMethod().getName());
+                        ContextualizedEnhancement ce = amendmentMethod.getContextualizedEnhancement();
+                        InformationElement informationElement = ce.getInformationElements();
+
+                        test.setAssertionType("AMENDMENT");
+                    }
                 }
             }
         }
     }
 
-    private void processMethods() {
-        for (Method method : cls.getMethods()) {
-            for (Annotation annotation : method.getAnnotations()) {
+    private void validateParameters(AssertionTest test, InformationElement informationElement) {
+        Set<URI> implementedParams = new HashSet<>();
+        Set<URI> definedParams = new HashSet<>();
+
+        Map<URI, TestParam> testParams = new HashMap<>();
+        for (TestParam param : test.getParameters()) {
+            testParams.put(param.getURI(), param);
+        }
+
+        for (URI uri : informationElement.getComposedOf()) {
+
+        }
+    }
+
+    private void processMethods(Class cls, Map<String, Specification> definedTests) {
+
+        HashMap<String, Method> implementedTests = new HashMap<>();
+
+        for (Method javaMethod : cls.getMethods()) {
+            for (Annotation annotation : javaMethod.getAnnotations()) {
                 if (annotation instanceof DQProvides) {
                     String guid = "urn:uuid:" + ((DQProvides) annotation).value();
-
-                    List<TestParam> params = processParameters(method);
-                    tests.put(guid, new AssertionTest(guid, cls, method, params));
+                    implementedTests.put(guid, javaMethod);
                 }
             }
+        }
+
+        Set<String> definedGuids = new HashSet<>(definedTests.keySet());
+        Set<String> implementedGuids = new HashSet<>(implementedTests.keySet());
+
+        if (!implementedGuids.containsAll(definedGuids)) {
+            System.out.println("Java class missing implementation for tests defined in RDF!");
+
+            Set<String> missingGuids = new HashSet<>(definedGuids);
+            missingGuids.removeAll(implementedGuids);
+
+            for (String guid : missingGuids) {
+                System.out.println("Missing corresponding method in " + cls + " for test \"" + definedTests.get(guid).getLabel() + "\": " + guid.substring(guid.lastIndexOf(":")+1));
+                implementedTests.remove(guid);
+            }
+        }
+
+        if (!definedGuids.containsAll(implementedGuids)) {
+            System.out.println("Tests declared in Java class via @DQProvides missing corresponding definitions in the RDF!");
+
+            Set<String> missingGuids = new HashSet<>(implementedGuids);
+            missingGuids.removeAll(definedGuids);
+
+            for (String guid : missingGuids) {
+                System.out.println("Missing definition in RDF for Java method \"" + implementedTests.get(guid).getName() + "\" in " + cls + ": " + guid.substring(guid.lastIndexOf(":")+1));
+                implementedTests.remove(guid);
+            }
+        }
+
+        // now add the tests that have both a corresponding implementation and a definition in the rdf
+        for (String guid : implementedTests.keySet()) {
+            Method method = implementedTests.get(guid);
+
+            List<TestParam> params = processParameters(method);
+            tests.put(guid, new AssertionTest(guid, cls, method, params));
         }
     }
 

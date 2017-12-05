@@ -21,8 +21,10 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class BaseModel {
     private Repository repo;
@@ -61,8 +63,22 @@ public class BaseModel {
         }
     }
 
-    public List findAll(Class cls, String sparql, String field) {
-        List rdfBeans = new LinkedList<>();
+    public Object findOne(Class cls, String sparql, String field) {
+        try {
+            TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+
+            BindingSet solution = result.next();
+            String id = solution.getValue(field).stringValue();
+
+            Resource r = manager.getResource(id, cls);
+            return manager.get(r);
+        } catch (RDFBeanException e) {
+            throw new RuntimeException("Could not fetch the rdf bean instance.", e);
+        }
+    }
+
+    public Map findAll(Class cls, String sparql, String field) {
+        Map rdfBeans = new HashMap();
 
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
 
@@ -71,7 +87,7 @@ public class BaseModel {
             String id = solution.getValue(field).stringValue();
 
             Object rdfBean = findOne(id, cls);
-            rdfBeans.add(rdfBean);
+            rdfBeans.put(id, rdfBean);
         }
 
         return rdfBeans;
@@ -104,5 +120,9 @@ public class BaseModel {
             conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate(handler);
 
         }
+    }
+
+    public TupleQueryResult executeQuery(String sparql) {
+         return conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
     }
 }

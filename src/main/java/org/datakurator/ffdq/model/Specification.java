@@ -31,12 +31,14 @@ import java.util.UUID;
 public class Specification {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
+    private String description;
 
     public Specification() { }
 
-    public Specification(String id, String label) {
+    public Specification(String id, String label, String description) {
         this.id = "urn:uuid:" + id;
         this.label = label;
+        this.description = description;
     }
 
     @RDFSubject
@@ -55,5 +57,14 @@ public class Specification {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @RDF("rdfs:description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

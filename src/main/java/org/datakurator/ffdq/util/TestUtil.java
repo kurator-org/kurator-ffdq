@@ -91,7 +91,7 @@ public class TestUtil {
             for (AssertionTest test : tests) {
 
                 // Define elementary concepts first
-                Specification specification = new Specification(test.getGuid(), test.getSpecification());
+                Specification specification = new Specification(test.getGuid(), test.getLabel(), test.getSpecification());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
                 InformationElement informationElement = new InformationElement();

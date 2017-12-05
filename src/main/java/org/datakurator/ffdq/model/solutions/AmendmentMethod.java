@@ -13,39 +13,14 @@ import java.util.UUID;
         "ffdq = http://example.com/ffdq/"
 })
 @RDFBean("ffdq:AmendmentMethod")
-public class AmendmentMethod {
-    private String id = "urn:uuid:" + UUID.randomUUID();
-
-    private Specification specification;
+public class AmendmentMethod extends AssertionMethod {
     private ContextualizedEnhancement ce;
 
     public AmendmentMethod() { }
 
-    public AmendmentMethod(String id) {
-        this.id = id;
-    }
-
     public AmendmentMethod(Specification specification, ContextualizedEnhancement contextualizedEnhancement) {
         this.specification = specification;
         this.ce = contextualizedEnhancement;
-    }
-
-    @RDFSubject
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @RDF("ffdq:hasSpecification")
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    public void setSpecification(Specification specification) {
-        this.specification = specification;
     }
 
     @RDF("ffdq:enhancementInContext")
