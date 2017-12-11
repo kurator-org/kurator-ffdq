@@ -52,20 +52,20 @@ public class Result<T> {
         isAmbiguous = ambiguous;
     }
 
-    @RDF("ffdq:hasState")
     public void setResultState(ResultState resultState) {
         this.resultState = resultState;
     }
 
+    @RDF("ffdq:hasState")
     public ResultState getResultState() {
         return resultState;
     }
 
-    @RDF("ffdq:hasValue")
     public void setResultValue(T resultValue) {
         this.resultValue = resultValue;
     }
 
+    @RDF("ffdq:hasValue")
     public T getResultValue() {
         return resultValue;
     }
