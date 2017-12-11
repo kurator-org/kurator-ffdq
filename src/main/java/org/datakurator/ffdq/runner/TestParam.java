@@ -2,6 +2,7 @@ package org.datakurator.ffdq.runner;
 
 import org.datakurator.ffdq.rdf.Namespace;
 
+import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -12,12 +13,17 @@ public class TestParam {
     private URI namespace;
     private String term;
 
-    public TestParam(String param) {
+    private Parameter parameter;
+    private int index;
+
+    public TestParam(String value, int index, Parameter parameter) {
+        this.parameter = parameter;
+        this.index = index;
 
         // lookup namespace if prefix is present
-        if (param.indexOf(':') != -1) {
+        if (value.indexOf(':') != -1) {
             // Split string into namespace prefix and term name
-            String[] str = param.split(":");
+            String[] str = value.split(":");
 
             String ns = str[0];
             this.term = str[1];
@@ -26,10 +32,10 @@ public class TestParam {
                 // Lookup namespace and resolve URI for the term
                 this.namespace = new URI(Namespace.nsPrefixes.get(ns));
             } catch (URISyntaxException e) {
-                throw new RuntimeException("Unable to resolve term: " + param);
+                throw new RuntimeException("Unable to resolve term: " + value);
             }
         } else {
-            this.term = param;
+            this.term = value;
         }
     }
 
@@ -39,6 +45,14 @@ public class TestParam {
 
     public String getTerm() {
         return term;
+    }
+
+    public String getName() {
+        return parameter.getName();
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     @Override

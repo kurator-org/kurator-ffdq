@@ -11,6 +11,10 @@ import java.util.Set;
  * Created by lowery on 11/16/17.
  */
 public class AssertionTest {
+    public static final String MEASURE = "MEASURE";
+    public static final String VALIDATION = "VALIDATION";
+    public static final String AMENDMENT = "AMENDMENT";
+
     private String guid;
     private String label;
     private String description;
@@ -57,8 +61,9 @@ public class AssertionTest {
         }
     }
 
-    public AssertionTest(String guid, Class cls, Method method, List<TestParam> parameters) {
+    public AssertionTest(String guid, String assertionType, Class cls, Method method, List<TestParam> parameters) {
         this.guid = guid;
+        this.assertionType = assertionType;
         this.cls = cls;
         this.method = method;
         this.parameters = parameters;
