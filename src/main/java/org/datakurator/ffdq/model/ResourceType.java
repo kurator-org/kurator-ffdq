@@ -16,6 +16,7 @@
  */
 package org.datakurator.ffdq.model;
 
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
@@ -23,7 +24,8 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "rt = http://example.com/ffdq/rt/"
+        "rt = http://example.com/ffdq/rt/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:ResourceType")
 public class ResourceType {
@@ -40,6 +42,15 @@ public class ResourceType {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public ResourceType(String label) {

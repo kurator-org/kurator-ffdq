@@ -3,9 +3,7 @@ package org.datakurator.ffdq.runner;
 import org.datakurator.ffdq.annotations.DQClass;
 import org.datakurator.ffdq.annotations.DQParam;
 import org.datakurator.ffdq.annotations.DQProvides;
-import org.datakurator.ffdq.model.InformationElement;
-import org.datakurator.ffdq.model.Mechanism;
-import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
@@ -19,6 +17,7 @@ import org.datakurator.postprocess.model.Assertion;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.filteredpush.qc.date.DwCEventDQ;
 
+import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -107,48 +106,64 @@ public class TestRunner {
         for (String guid : implementedTests.keySet()) {
             Method method = implementedTests.get(guid);
 
+            // Create an instance of AssertionTest
+            AssertionTest test = new AssertionTest(guid, cls, method);
+
+            // Add metadata for specification
+            Specification specification = definedTests.get(guid);
+            test.setSpecification(specification.getLabel());
+
+            // TODO: Assumed to be single record for now
+            test.setResourceType(AssertionTest.SINGLE_RECORD);
+
             // Get the assertion method from the model and add metadata to the test
             AssertionMethod assertionMethod = model.findMethodForSpecification(guid);
+
+            ResourceType resourceType;
             InformationElement informationElement;
-            String assertionType;
 
             if (assertionMethod instanceof ValidationMethod) {
 
                 ValidationMethod validationMethod = (ValidationMethod) assertionMethod;
-                assertionType = AssertionTest.VALIDATION;
+                test.setAssertionType(AssertionTest.VALIDATION);
 
                 ContextualizedCriterion cc = validationMethod.getContextualizedCriterion();
+                test.setDescription(cc.getCriterion().getLabel());
+                test.setResourceType(cc.getResourceType().getLabel());
+
                 informationElement = cc.getInformationElements();
 
             } else if (assertionMethod instanceof MeasurementMethod) {
 
                 MeasurementMethod measurementMethod = (MeasurementMethod) assertionMethod;
-                assertionType = AssertionTest.MEASURE;
+                test.setAssertionType(AssertionTest.MEASURE);
 
                 ContextualizedDimension cd = measurementMethod.getContextualizedDimension();
+                test.setDimension(cd.getDimension().getLabel());
+                test.setResourceType(cd.getResourceType().getLabel());
+
                 informationElement = cd.getInformationElements();
 
             } else if (assertionMethod instanceof AmendmentMethod) {
 
                 AmendmentMethod amendmentMethod = (AmendmentMethod) assertionMethod;
-                assertionType = AssertionTest.AMENDMENT;
+                test.setAssertionType(AssertionTest.AMENDMENT);
 
                 ContextualizedEnhancement ce = amendmentMethod.getContextualizedEnhancement();
+                test.setDescription(ce.getEnhancement().getLabel());
+                test.setResourceType(ce.getResourceType().getLabel());
+
                 informationElement = ce.getInformationElements();
 
             } else {
                 throw new UnsupportedOperationException("Unsupported assertion type: " + assertionMethod.getClass());
             }
 
-            // Process parameter level annotations and create an instance of AssertionTest
+            // Process parameter level annotations
             List<TestParam> params = processParameters(method, informationElement);
-            AssertionTest test = new AssertionTest(guid, assertionType, cls, method, params);
+            test.setParameters(params);
 
-            // Add metadata for specification
-            Specification specification = definedTests.get(guid);
-            test.setSpecification(specification.getLabel());
-
-            tests.put(guid, new AssertionTest(guid, assertionType, cls, method, params));
+            tests.put(guid, test);
         }
     }
 

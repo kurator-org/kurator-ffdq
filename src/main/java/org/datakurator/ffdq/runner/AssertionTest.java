@@ -15,6 +15,9 @@ public class AssertionTest {
     public static final String VALIDATION = "VALIDATION";
     public static final String AMENDMENT = "AMENDMENT";
 
+    public static final String SINGLE_RECORD = "SINGLERECORD";
+    public static final String MULTI_RECORD = "MULTIRECORD";
+
     private String guid;
     private String label;
     private String description;
@@ -42,12 +45,12 @@ public class AssertionTest {
         this.informationElement = informationElement;
 
         // Validate
-        if (!Arrays.asList("SINGLERECORD", "MULTIRECORD").contains(resourceType.toUpperCase())) {
+        if (!Arrays.asList(SINGLE_RECORD, MULTI_RECORD).contains(resourceType.toUpperCase())) {
             throw new IllegalArgumentException("Invalid value for resource type \"" + assertionType + "\" for test: "
                     + guid);
         }
 
-        if (assertionType.equalsIgnoreCase("MEASURE") && (dimension.isEmpty() || dimension == null)) {
+        if (assertionType.equalsIgnoreCase(MEASURE) && (dimension.isEmpty() || dimension == null)) {
             throw new IllegalArgumentException("Test is defined to be a measure but is missing a value for \"Dimension\": " + guid);
         }
 
@@ -55,18 +58,16 @@ public class AssertionTest {
             throw new IllegalArgumentException("No information elements declared for test: " + guid);
         }
 
-        if (!Arrays.asList("MEASURE", "VALIDATION", "AMENDMENT").contains(assertionType.toUpperCase())) {
+        if (!Arrays.asList(MEASURE, VALIDATION, AMENDMENT).contains(assertionType.toUpperCase())) {
             throw new IllegalArgumentException("Invalid value for assertion type \"" + assertionType + "\" for test: "
                     + guid);
         }
     }
 
-    public AssertionTest(String guid, String assertionType, Class cls, Method method, List<TestParam> parameters) {
+    public AssertionTest(String guid, Class cls, Method method) {
         this.guid = guid;
-        this.assertionType = assertionType;
         this.cls = cls;
         this.method = method;
-        this.parameters = parameters;
     }
 
     public Object invoke(Object instance, Map<String, String> record) throws InvocationTargetException, IllegalAccessException {
@@ -176,5 +177,22 @@ public class AssertionTest {
 
     public void setParameters(List<TestParam> parameters) {
         this.parameters = parameters;
+    }
+
+    @Override
+    public String toString() {
+        return "AssertionTest{" +
+                "guid='" + guid + '\'' +
+                ", label='" + label + '\'' +
+                ", description='" + description + '\'' +
+                ", specification='" + specification + '\'' +
+                ", assertionType='" + assertionType + '\'' +
+                ", resourceType='" + resourceType + '\'' +
+                ", dimension='" + dimension + '\'' +
+                ", informationElement=" + informationElement +
+                ", cls=" + cls +
+                ", method=" + method +
+                ", parameters=" + parameters +
+                '}';
     }
 }
