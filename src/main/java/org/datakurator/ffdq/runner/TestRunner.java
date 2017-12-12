@@ -174,8 +174,12 @@ public class TestRunner {
             }
 
             // Process parameter level annotations
-            List<TestParam> params = processParameters(method, informationElement);
-            test.setParameters(params);
+            try {
+                List<TestParam> params = processParameters(method, informationElement);
+                test.setParameters(params);
+            } catch (Exception e) {
+                throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." + method.getName(), e);
+            }
 
             tests.put(guid, test);
         }

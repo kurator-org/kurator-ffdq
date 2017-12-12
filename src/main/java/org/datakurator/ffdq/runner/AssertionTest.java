@@ -46,7 +46,7 @@ public class AssertionTest {
 
         // Validate
         if (!Arrays.asList(SINGLE_RECORD, MULTI_RECORD).contains(resourceType.toUpperCase())) {
-            throw new IllegalArgumentException("Invalid value for resource type \"" + assertionType + "\" for test: "
+            throw new IllegalArgumentException("Invalid value for resource type \"" + resourceType + "\" for test: "
                     + guid);
         }
 

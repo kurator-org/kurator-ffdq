@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
  * Created by lowery on 8/21/17.
  */
 public class TestParam {
+    private final String value;
     private URI namespace;
     private String term;
 
@@ -19,24 +20,14 @@ public class TestParam {
     public TestParam(String value, int index, Parameter parameter) {
         this.parameter = parameter;
         this.index = index;
+        this.value = value;
 
-        // lookup namespace if prefix is present
-        if (value.indexOf(':') != -1) {
-            // Split string into namespace prefix and term name
-            String[] str = value.split(":");
+        // Lookup namespace and resolve URI for the term
+        this.namespace = Namespace.resolvePrefixedTerm(value);
 
-            String ns = str[0];
-            this.term = str[1];
-
-            try {
-                // Lookup namespace and resolve URI for the term
-                this.namespace = new URI(Namespace.nsPrefixes.get(ns));
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Unable to resolve term: " + value);
-            }
-        } else {
-            this.term = value;
-        }
+        // Split string into namespace prefix and term name
+        String[] str = value.split(":");
+        this.term = str[1];
     }
 
     public URI getURI() {
