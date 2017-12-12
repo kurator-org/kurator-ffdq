@@ -394,11 +394,6 @@ public class TestRunner {
 
         try {
             DQResponse response = (DQResponse) test.invoke(instance, record);
-
-            if (response.getResultState() == null) {
-                throw new RuntimeException("Response object returned by " + test.getCls().getName() + "." + test.getMethod().getName() + " has a null value for resultState when run on input data: " + actedUpon);
-            }
-
             Result result = new Result();
 
             model.save(response.getResultState());

@@ -10,6 +10,7 @@ public class DQResponse<T extends ResultValue> {
     private StringBuffer resultComment;
 
     public DQResponse() {
+        resultState = ResultState.NOT_RUN;
         resultComment = new StringBuffer();
     }
 
