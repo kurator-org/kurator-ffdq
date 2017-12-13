@@ -34,7 +34,7 @@ Run the jar via the following and provide the utility with the options specified
 
 This utility provides authors of actors a way to convert the spreadsheet of standardized tests into FFDQ RDF and/or Java classes containing stub methods for implementing tests.
 
-The utility takes a csv file with each row representing a single test and properties file with metadata about the mechanism as inputs. Examples for the Date Validator can be found at `data/DwCEventDQ.csv` and `data/DwCEventDQ.properties`.
+The utility takes a csv file with each row representing a single test and a properties file with metadata about the mechanism as inputs. Examples for the Date Validator can be found at `data/DwCEventDQ.csv` and `data/DwCEventDQ.properties`.
 
 ## Configuration
 
@@ -85,165 +85,75 @@ For example, to run the utility on the example data provided in this project use
 
 # Using 
 
-## Annotated DQ Class
+# Annotated DQ Class
 
-The higher level use of the framework makes use of Java annotations defined in the ffdq-api project: https://github.com/kurator-org/ffdq-api
+The higher level use of the framework makes use of Java annotations defined in the org.datakurator.ffdq.annotations package.
 
 To use the annotations, in the project that defines the methods and classes corresponding to a set of assertion tests, add the dependency via maven to your pom.xml file
 
         <dependency>
             <groupId>org.datakurator</groupId>
-            <artifactId>ffdq-api</artifactId>
+            <artifactId>kurator-ffdq</artifactId>
             <version>1.0.4-SNAPSHOT</version>
         </dependency>
         
-Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the mechanism applied to a class:
+Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the @DQClass annotation applied to a class:
 
-    @Mechanism(
-        value = "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84",
-        label = "Kurator: Date Validator - DwCEventDQ")
+    @DQClass("urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84")
     public class DwCEventDQ {
         // ...     
     }
 
-The mechanism above has a guid value property that uniquely identfies the mechanism and a human readable lable property describing the mechanism.
+The mechanism above has a guid value property that uniquely identifies the mechanism. This is tied to metadata in RDF about the mechanism.
 
-Next are the method level annotations that map Java code to ffdq concepts by marking a method as one of Validation, Measure, Amendment and defining the Specification and corresponding test GUID.
+Next is the method level annotation that maps Java code to FFDQ concepts by associating a method implementing a test with the specification GUID.
 
-	@Provides("urn:uuid:da63f836-1fc6-4e96-a612-fa76678cfd6a")
-
-	@Validation(
-			label = "Event Date and Verbatim Consistent",
-			description = "Test to see if the eventDate and verbatimEventDate are consistent.")
-
-	@Specification("If a dwc:eventDate is not empty and the verbatimEventDate is not empty " +
-			       "compare the value of dwc:eventDate with that of dwc:verbatimEventDate, " +
-			       "and assert Compliant if the two represent the same date or date range.")
-
-    public static EventDQValidation eventDateConsistentWithVerbatim(...) {
+	@DQProvides("urn:uuid:da63f836-1fc6-4e96-a612-fa76678cfd6a")
+    public static DQResponse<ComplianceValue> eventDateConsistentWithVerbatim(...) {
         // ...
     }
-
-The above shows an example using the Validation annotation. Use @Measure or @Amendment with the same @Provides and @Specification for other assertion types.
-
-Lastly, method parameter level annotation are provided for defining how the parameters (the fields acted upon or fields consulted) map to information elements in ffdq defined in terms of a controlled vocabulary such as DWC.
+    
+Lastly, the method parameter level annotation is provided for defining how the parameters (the fields acted upon or fields consulted) map to information elements in ffdq defined in terms of a controlled vocabulary such as DWC. The value for this annotation must contain the namespace prefix (e.g. dwc:eventDate).
 
     public static EventDQValidation eventDateConsistentWithVerbatim(
-    		@ActedUpon(value = "dwc:eventDate") String eventDate,
-			@ActedUpon(value = "dwc:verbatimEventDate") String verbatimEventDate) {
+    		@DQParam("dwc:eventDate") String eventDate,
+			@DQParam("dwc:verbatimEventDate") String verbatimEventDate) {
 			    // ...
 			}
+    
+Depending of the type of assertion, the generic return type DQResponse can be parameterized with the following. Examples usage of each parameterized type below.
+
+For Measures, depending on the dimension, use `DQResponse<NumericalValue>`: 
+
+    DQResponse<NumericalValue> result = new DQResponse<>();
+    long seconds = DateUtils.measureDurationSeconds(eventDate);
+    result.setValue(new NumericalValue(seconds));
+    result.setResultState(ResultState.RUN_HAS_RESULT);
+
+or for the dimension of Completeness use `DQResponse<CompletenessValue>`:
+
+    DQResponse<CompletenessValue> result = new DQResponse<>();
+    result.setValue(CompletenessValue.COMPLETE);
+    result.addComment("Value provided for eventDate.");
+    result.setResultState(ResultState.RUN_HAS_RESULT);
+    
+For Validations use `DQResponse<ComplianceValue>`:
+
+    DQResponse<ComplianceValue> result = new DQResponse<>();
+    result.setValue(ComplianceValue.COMPLIANT);
+    result.addComment("Provided value for day '" + day + "' is an integer in the range 1 to 31.");
+    result.setResultState(ResultState.RUN_HAS_RESULT);
+
+For Amendments use `DQResponse<AmendmentValue>` and add changed values to an instance of AmendmentValue:
+
+    DQResponse<AmendmentValue> result = new DQResponse<>();
+    AmendmentValue extractedValues = new AmendmentValue();
+	extractedValues.addResult("dwc:eventDate", DateUtils.createEventDateFromStartEnd(startDate, endDate));
+    result.setValue(extractedValues);
+    result.setResultState(ResultState.CHANGED);
 
 ## Lower level API
 
-Classes are provided to represent Measures, Validations, and Improvements, to relate them to criteria in Context,
-to group these assertions into data quality reports, which are composed of pre-enhancement, enhancement, and 
-post enhancement stages.
-
-Here is an example of the use of these classes taken from FP-KurationServices DateValidator:
-
-    public static BaseRecord validateEventConsistencyWithContext(String recordId, String eventDate, String year, String month,
-                                                                 String day, String startDayOfYear, String endDayOfYear,
-                                                                 String eventTime, String verbatimEventDate) {
-
-       FFDQRecord record = new FFDQRecord();
-
-       // store the values initialy encountered in the data.
-       Map<String, String> initialValues = new HashMap<>();
-       initialValues.put("eventDate", eventDate);
-       initialValues.put("year", year);
-       initialValues.put("month", month);
-       initialValues.put("day", day);
-       initialValues.put("startDayOfYear", startDayOfYear);
-       initialValues.put("endDayOfYear", endDayOfYear);
-       initialValues.put("eventTime", eventTime);
-       initialValues.put("verbatimEventDate", verbatimEventDate);
-       record.setInitialValues(initialValues);   
-
-       GlobalContext globalContext = new GlobalContext(DateValidator.class.getSimpleName(), DateValidator.getActorName());
-       record.setGlobalContext(globalContext);
-
-       // Start pre enhancement stage
-       record.startStage(CurationStage.PRE_ENHANCEMENT);
-
-       // call some methods that perform measures and validations
-       checkContainsEventTime(record);   // see below 
-       checkEventDateCompleteness(record);
-       checkDurationInSeconds(record);
-
-       validateConsistencyWithAtomicParts(record);
-       validateVerbatimEventDate(record);
-       validateConsistencyWithEventTime(record);
-
-        // Start enhancement stage
-        record.startStage(CurationStage.ENHANCEMENT);
-
-        if (DateUtils.isEmpty(record.getEventDate())) {
-            fillInFromAtomicParts(record);
-        }
-
-        // Start post enhancement stage
-        record.startStage(CurationStage.POST_ENHANCEMENT);
-
-        checkContainsEventTime(record);
-        checkEventDateCompleteness(record);
-        checkDurationInSeconds(record);
-
-        validateConsistencyWithAtomicParts(record);
-        validateVerbatimEventDate(record);
-        validateConsistencyWithEventTime(record);
-
-        return record;
-    }
-
-    /** 
-     * This is a measure, it measures to see if an event date contains a time.
-     *
-    private static void checkContainsEventTime(DateFragment record) {
-        FieldContext fields = new FieldContext();
-        fields.setActedUpon("eventDate");
-        fields.setConsulted("eventTime");
-
-        NamedContext eventDateContainsEventTime = new NamedContext("eventDateContainsEventTime", fields);
-        Measure m = record.assertMeasure(eventDateContainsEventTime);
-
-        if (!DateUtils.isEmpty(record.getEventDate())) {
-            if (DateUtils.containsTime(record.getEventDate())) {
-                // Measure.complete() makes the assertion COMPLETE with a comment.
-                m.complete("dwc:eventDate contains eventTime");
-            } else {
-                // Measure.incomplete() makes the assertion NOT_COMPLETE with a comment.
-                m.incomplete("dwc:eventDate does not contain eventTime");
-            }
-        } else {
-            // Measure.prereqUnmet() makes the assertion DATA_PREREQUISITES_NOT_MET with a comment.
-            m.prereqUnmet("dwc:eventDate does not contain a value.");
-        }
-    }
-
-A data quality report can then be serialized with the DQReportBuilder
-
-     InputStream config = DateValidatorTest.class.getResourceAsStream("/ffdq-assertions.json");
-     DQReportBuilder builder = new DQReportBuilder(config);
-     DQReport report = builder.createReport(testResult);
-     StringWriter writer = new StringWriter();
-     report.write(writer);
-
-A configuration definition (from FP-KurationServices src/main/resources/ffdq-assertions.json) for
-the measure checkContainsEventTime() above, is:
-
-    {
-      "context": {
-        "name": "eventDateContainsEventTime"
-      },
-
-      "dimension": "Completeness",
-      "specification": "Check that ${context.fieldsActedUpon} matches an ISO date that contains a time",
-      "mechanism": "Kurator: ${actor.class} - ${actor.name}"
-    },
-
-
-Conversion of the data quality report to a human readable form would then require subsequent processing.
 
 
 # Maintainer deployment: 
