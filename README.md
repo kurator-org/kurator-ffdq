@@ -20,7 +20,7 @@ Available from maven central.
 
 # QueryUtil
 
-A command-line utility is provided at `target/kurator-ffdq-1.0.3-jar-with-dependencies.jar` for running sparql queries 
+A command-line utility is provided at `target/kurator-ffdq-1.0.4-jar-with-dependencies.jar` for running sparql queries 
 on sample rdf data. Example sparql query files can be found in the `competencyquestions/sparql` directory relative to the
 project root and example turtle and jsonld files can be found in `competencyquestions/rdf`.
 
@@ -28,7 +28,60 @@ To view competency questions and example rdf see the readme at: https://github.c
 
 Run the jar via the following and provide the utility with the options specified below or run with no options to see usage.
 
-`java -jar kurator-ffdq-1.0.3.jar -t ../competencyquestions/rdf/example.jsonld -q ../competencyquestions/sparql/results.sparql -o results.tsv`
+`java -jar kurator-ffdq-1.0.4.jar -t ../competencyquestions/rdf/example.jsonld -q ../competencyquestions/sparql/results.sparql -o results.tsv`
+
+# Test spreadsheet utility
+
+This utility provides authors of actors a way to convert the spreadsheet of standardized tests into FFDQ RDF and/or Java classes containing stub methods for implementing tests.
+
+The utility takes a csv file with each row representing a single test and properties file with metadata about the mechanism as inputs. Examples for the Date Validator can be found at `data/DwCEventDQ.csv` and `data/DwCEventDQ.properties`.
+
+## Configuration
+
+The properties file must contain a guid that uniquely identifies and a human readable name for the mechanism implementing the tests. In order to use class generation, a Java package and class name must be specified for the implementation.
+
+    ffdq.mechanism.guid=b844059f-87cf-4c31-b4d7-9a52003eef84
+    ffdq.mechanism.name=Kurator: Date Validator - DwCEventDQ
+    ffdq.mechanism.javaPackage=org.filteredpush.qc.date
+    ffdq.mechanism.javaClass=DwCEventDQ
+
+## Test CSV Format
+
+The csv file containing the test metadata defines the following metadata :
+
+* **GUID** - The test guid
+* **Label** - Human readable name of the test
+* **Description** - Describes the test conditions (pass/fail). This value is used to define the Criterion for a Validation or the Enhancement for an Amendment. 
+* **Specification** - Technical description of expected behavior when running the test
+* **Type** - The assertion type. Must be one of the values `Measure`, `Validation` or `Amendment`
+* **Resource Type** - Either `SingleRecord` or `MultiRecord`
+* **Dimension** - Defines the data quality dimension of a test for Measures, can be one of `Value`, `Vocab Match`, `Completeness`, `Accuracy`, `Precision` or `Uniqueness`
+* **Information Element** - Term or list of terms from a controlled vocabulary that a test acts upon. Must contain the namespace prefix (e.g. "dwc:eventDate, dwc:verbatimEventDate")
+* **Source** - Source of the tests
+* **Example Implementation** - Link to the source code on GitHub, SourceForge, etc
+
+## Running
+
+To run the utility use the `test-util.sh` shell script with the following required options:
+
+* **config <arg>** - Properties file defining the mechanism to use
+* **in <arg>** - Input CSV file containing list of tests
+* **out <arg>** - Output file for the rdf representation of the tests
+
+The default format is turtle but this can be changes via the following option:
+
+* **format <arg>** - Output format (RDFXML, TURTLE, JSON-LD)
+
+By default the utility only generates the rdf. In order to generate a new Java class or append new tests to an existing one, you can also specify the following options:
+ 
+* **generateClass** - Generate a new Java class with stub methods for each test
+* **appendClass** - Append to an existing Java class stub methods for new tests
+* **srcDir <arg>** - The Java sources root directory (e.g. src/main/java)
+
+For example, to run the utility on the example data provided in this project use the following command:
+
+`./test-util.sh -config data/DwCEventDQ.properties -in data/DwCEventDQ.csv -out data/DwCEventDQ.ttl -srcDir event_date_qc/src/main/java -appendClass` 
+
 
 # Using 
 
