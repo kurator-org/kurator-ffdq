@@ -80,10 +80,29 @@ By default the utility only generates the rdf. In order to generate a new Java c
 
 For example, to run the utility on the example data provided in this project use the following command:
 
-`./test-util.sh -config data/DwCEventDQ.properties -in data/DwCEventDQ.csv -out data/DwCEventDQ.ttl -srcDir event_date_qc/src/main/java -appendClass` 
+    ./test-util.sh -config data/DwCEventDQ.properties -in data/DwCEventDQ.csv -out data/DwCEventDQ.ttl -srcDir event_date_qc/src/main/java -appendClass
 
+# Test Runner
 
-# Using 
+After generating FFDQ rdf from the spreadsheet of tests and implementing methods tied to test GUIDs in the DQClass, the test runner utility can be used to produce rdf containing FFDQ report concepts for describing the results.
+
+Using the options below, run the utility from the directory containing the jar files(s) that include the annotated DQ Classes (e.g. event_date_qc-1.0.4-SNAPSHOT.jar)
+
+* **cls <arg>** - Fully qualified name of Java class on the classpath to run tests from
+* **rdf <arg>** - Input file containing the rdf representation of the tests
+* **in <arg>** - Input occurrence tsv data file
+* **out <arg>** - Output file for the rdf representation of the dq report
+* **format <arg>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
+
+For example, run from the command line via:
+
+    cd ~/event_date_qc/target
+    ~/kurator-ffdq/test-runner.sh -cls org.filteredpush.qc.date.DwCEventDQ -rdf ../conf/DwCEventDQ.ttl -in ~/Downloads/occurrence.txt -out dq-report.ttl
+
+Using the query utility mentioned above along with the postprocess.sparql query, you can create a tsv query result for previewing the report:
+
+    ~/kurator-ffdq/query-util.sh -q ~/kurator-ffdq/competencyquestions/sparql/postprocess.sparql -t dq-report.ttl -o result.tsv
+    libreoffice result.tsv
 
 # Annotated DQ Class
 
@@ -152,116 +171,7 @@ For Amendments use `DQResponse<AmendmentValue>` and add changed values to an ins
     result.setValue(extractedValues);
     result.setResultState(ResultState.CHANGED);
 
-## Lower level API
-
-Classes are provided to represent Measures, Validations, and Improvements, to relate them to criteria in Context,
-to group these assertions into data quality reports, which are composed of pre-enhancement, enhancement, and 
-post enhancement stages.
-
-Here is an example of the use of these classes taken from FP-KurationServices DateValidator:
-
-    public static BaseRecord validateEventConsistencyWithContext(String recordId, String eventDate, String year, String month,
-                                                                 String day, String startDayOfYear, String endDayOfYear,
-                                                                 String eventTime, String verbatimEventDate) {
-
-       FFDQRecord record = new FFDQRecord();
-
-       // store the values initialy encountered in the data.
-       Map<String, String> initialValues = new HashMap<>();
-       initialValues.put("eventDate", eventDate);
-       initialValues.put("year", year);
-       initialValues.put("month", month);
-       initialValues.put("day", day);
-       initialValues.put("startDayOfYear", startDayOfYear);
-       initialValues.put("endDayOfYear", endDayOfYear);
-       initialValues.put("eventTime", eventTime);
-       initialValues.put("verbatimEventDate", verbatimEventDate);
-       record.setInitialValues(initialValues);   
-
-       GlobalContext globalContext = new GlobalContext(DateValidator.class.getSimpleName(), DateValidator.getActorName());
-       record.setGlobalContext(globalContext);
-
-       // Start pre enhancement stage
-       record.startStage(CurationStage.PRE_ENHANCEMENT);
-
-       // call some methods that perform measures and validations
-       checkContainsEventTime(record);   // see below 
-       checkEventDateCompleteness(record);
-       checkDurationInSeconds(record);
-
-       validateConsistencyWithAtomicParts(record);
-       validateVerbatimEventDate(record);
-       validateConsistencyWithEventTime(record);
-
-        // Start enhancement stage
-        record.startStage(CurationStage.ENHANCEMENT);
-
-        if (DateUtils.isEmpty(record.getEventDate())) {
-            fillInFromAtomicParts(record);
-        }
-
-        // Start post enhancement stage
-        record.startStage(CurationStage.POST_ENHANCEMENT);
-
-        checkContainsEventTime(record);
-        checkEventDateCompleteness(record);
-        checkDurationInSeconds(record);
-
-        validateConsistencyWithAtomicParts(record);
-        validateVerbatimEventDate(record);
-        validateConsistencyWithEventTime(record);
-
-        return record;
-    }
-
-    /** 
-     * This is a measure, it measures to see if an event date contains a time.
-     *
-    private static void checkContainsEventTime(DateFragment record) {
-        FieldContext fields = new FieldContext();
-        fields.setActedUpon("eventDate");
-        fields.setConsulted("eventTime");
-
-        NamedContext eventDateContainsEventTime = new NamedContext("eventDateContainsEventTime", fields);
-        Measure m = record.assertMeasure(eventDateContainsEventTime);
-
-        if (!DateUtils.isEmpty(record.getEventDate())) {
-            if (DateUtils.containsTime(record.getEventDate())) {
-                // Measure.complete() makes the assertion COMPLETE with a comment.
-                m.complete("dwc:eventDate contains eventTime");
-            } else {
-                // Measure.incomplete() makes the assertion NOT_COMPLETE with a comment.
-                m.incomplete("dwc:eventDate does not contain eventTime");
-            }
-        } else {
-            // Measure.prereqUnmet() makes the assertion DATA_PREREQUISITES_NOT_MET with a comment.
-            m.prereqUnmet("dwc:eventDate does not contain a value.");
-        }
-    }
-
-A data quality report can then be serialized with the DQReportBuilder
-
-     InputStream config = DateValidatorTest.class.getResourceAsStream("/ffdq-assertions.json");
-     DQReportBuilder builder = new DQReportBuilder(config);
-     DQReport report = builder.createReport(testResult);
-     StringWriter writer = new StringWriter();
-     report.write(writer);
-
-A configuration definition (from FP-KurationServices src/main/resources/ffdq-assertions.json) for
-the measure checkContainsEventTime() above, is:
-
-    {
-      "context": {
-        "name": "eventDateContainsEventTime"
-      },
-
-      "dimension": "Completeness",
-      "specification": "Check that ${context.fieldsActedUpon} matches an ISO date that contains a time",
-      "mechanism": "Kurator: ${actor.class} - ${actor.name}"
-    },
-
-
-Conversion of the data quality report to a human readable form would then require subsequent processing.
+# Lower level API
 
 
 # Maintainer deployment: 
