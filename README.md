@@ -28,6 +28,12 @@ To view competency questions and example rdf see the readme at: https://github.c
 
 Run the jar via the following and provide the utility with the options specified below or run with no options to see usage.
 
+* **-o,--out \<arg\>** - Output file for query result.
+* **-q,--query \<arg\>** - File containing sparql query.
+* **-t,--triples \<arg\>** - File containing triples (jsonld or turtle).
+
+For example:
+
 `java -jar kurator-ffdq-1.0.4.jar -t ../competencyquestions/rdf/example.jsonld -q ../competencyquestions/sparql/results.sparql -o results.tsv`
 
 # Test spreadsheet utility
@@ -64,19 +70,19 @@ The csv file containing the test metadata defines the following metadata :
 
 To run the utility use the `test-util.sh` shell script with the following required options:
 
-* **config <arg>** - Properties file defining the mechanism to use
-* **in <arg>** - Input CSV file containing list of tests
-* **out <arg>** - Output file for the rdf representation of the tests
+* **config \<arg\>** - Properties file defining the mechanism to use
+* **in \<arg\>** - Input CSV file containing list of tests
+* **out \<arg\>** - Output file for the rdf representation of the tests
 
-The default format is turtle but this can be changes via the following option:
+The default format is turtle but this can be changed via the following option:
 
-* **format <arg>** - Output format (RDFXML, TURTLE, JSON-LD)
+* **format \<arg\>** - Output format (RDFXML, TURTLE, JSON-LD)
 
 By default the utility only generates the rdf. In order to generate a new Java class or append new tests to an existing one, you can also specify the following options:
  
 * **generateClass** - Generate a new Java class with stub methods for each test
 * **appendClass** - Append to an existing Java class stub methods for new tests
-* **srcDir <arg>** - The Java sources root directory (e.g. src/main/java)
+* **srcDir \<arg\>** - The Java sources root directory (e.g. src/main/java)
 
 For example, to run the utility on the example data provided in this project use the following command:
 
@@ -84,22 +90,22 @@ For example, to run the utility on the example data provided in this project use
 
 # Test Runner
 
-After generating FFDQ rdf from the spreadsheet of tests and implementing methods tied to test GUIDs in the DQClass, the test runner utility can be used to produce rdf containing FFDQ report concepts for describing the results.
+After generating FFDQ RDF from the spreadsheet of tests and implementing methods tied to test GUIDs in the DQClass, the test runner utility can be used to produce rdf containing report concepts for describing the results.
 
 Using the options below, run the utility from the directory containing the jar files(s) that include the annotated DQ Classes (e.g. event_date_qc-1.0.4-SNAPSHOT.jar)
 
-* **cls <arg>** - Fully qualified name of Java class on the classpath to run tests from
-* **rdf <arg>** - Input file containing the rdf representation of the tests
-* **in <arg>** - Input occurrence tsv data file
-* **out <arg>** - Output file for the rdf representation of the dq report
-* **format <arg>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
+* **cls \<arg\>** - Fully qualified name of Java class on the classpath to run tests from
+* **rdf \<arg\>** - Input file containing the rdf representation of the tests
+* **in \<arg\>** - Input occurrence tsv data file
+* **out \<arg\>** - Output file for the rdf representation of the dq report
+* **format \<arg\>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
 
 For example, run from the command line via:
 
     cd ~/event_date_qc/target
     ~/kurator-ffdq/test-runner.sh -cls org.filteredpush.qc.date.DwCEventDQ -rdf ../conf/DwCEventDQ.ttl -in ~/Downloads/occurrence.txt -out dq-report.ttl
 
-Using the query utility mentioned above along with the postprocess.sparql query, you can create a tsv query result for previewing the report:
+Using the query utility mentioned above along with the `postprocess.sparql` query, you can create a tsv query result for previewing the report:
 
     ~/kurator-ffdq/query-util.sh -q ~/kurator-ffdq/competencyquestions/sparql/postprocess.sparql -t dq-report.ttl -o result.tsv
     libreoffice result.tsv
@@ -173,6 +179,7 @@ For Amendments use `DQResponse<AmendmentValue>` and add changed values to an ins
 
 # Lower level API
 
+See classes in the org.datakurator.ffdq.model package.
 
 # Maintainer deployment: 
 
