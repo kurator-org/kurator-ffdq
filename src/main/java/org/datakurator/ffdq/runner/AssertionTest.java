@@ -77,7 +77,7 @@ public class AssertionTest {
         for (TestParam param : parameters) {
             if (!keys.contains(param.getTerm())) {
                 // throw new RuntimeException("Record argument missing one or more required fields: " + parameters);
-                // TODO: log warning instead
+                // TODO: warning isntead of exception
             }
         }
 
@@ -89,7 +89,7 @@ public class AssertionTest {
             TestParam param = parameters.get(i);
 
             String value = record.get(param.getTerm());
-            args[i] = value;
+            args[param.getIndex()] = value;
         }
 
         return method.invoke(instance, args);

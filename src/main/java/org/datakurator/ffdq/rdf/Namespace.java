@@ -11,6 +11,9 @@ import java.util.Map;
 public class Namespace {
     public static final String DWC = "http://rs.tdwg.org/dwc/terms/";
     public static final String DCTERMS = "http://purl.org/dc/terms/";
+    public static final String DWCIRI = "http://rs.tdwg.org/dwc/iri/";
+
+    public static final String NONE = "http://datakurator.org/none/";
 
     public static final Map<String, String> nsPrefixes;
 
@@ -19,6 +22,9 @@ public class Namespace {
 
         nsPrefixes.put("dcterms", DCTERMS);
         nsPrefixes.put("dwc", DWC);
+        nsPrefixes.put("dwciri", DWCIRI);
+
+        nsPrefixes.put("none", NONE);
     }
 
     public void set(String prefix, String uri) {

@@ -37,8 +37,10 @@ WHERE {
     ?state rdfs:label ?status .
 
     # Result value
-    ?result ffdq:hasValue ?val .
-    ?val prov:value ?value .
+    OPTIONAL {
+        ?result ffdq:hasValue ?val .
+        ?val prov:value ?value
+    } .
 
     # Result comment
     ?result rdfs:comment ?comment

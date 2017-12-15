@@ -15,6 +15,7 @@ import org.datakurator.ffdq.model.report.Amendment;
 import org.datakurator.ffdq.model.report.Measure;
 import org.datakurator.ffdq.model.report.Result;
 import org.datakurator.ffdq.model.report.Validation;
+import org.datakurator.ffdq.model.report.result.AmendmentValue;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
@@ -48,7 +49,7 @@ public class TestRunner {
         this.model = model;
 
         for (Annotation annotation : cls.getAnnotations()) {
-            System.out.println(annotation);
+
             // Find the class level annotation and get the value for mechanism guid
             if (annotation instanceof DQClass) {
 
@@ -190,7 +191,6 @@ public class TestRunner {
 
         int index = 0;
         for (Parameter parameter : method.getParameters()) {
-            index++;
 
             for (Annotation annotation : parameter.getAnnotations()) {
                 if (annotation instanceof DQParam) {
@@ -201,6 +201,7 @@ public class TestRunner {
                     testParams.put(param.getURI(), param);
                 }
             }
+            index++;
         }
 
         Set<URI> implementedParams = new HashSet<>(testParams.keySet());
@@ -326,6 +327,7 @@ public class TestRunner {
 
             // create a dq report object
             DataResource dataResource = new DataResource(record);
+            model.save(dataResource);
 
             for (MeasurementMethod measurementMethod : measures) {
                 Specification specification = measurementMethod.getSpecification();
@@ -404,6 +406,13 @@ public class TestRunner {
             result.setResultState(response.getResultState());
 
             if (response.getValue() != null) {
+                Object value = response.getValue();
+
+                if (value instanceof AmendmentValue) {
+                    DataResource dataResource = ((AmendmentValue) value).getDataResource();
+                    model.save(dataResource);
+                }
+
                 model.save(response.getValue());
                 result.setResultValue(response.getValue());
             }

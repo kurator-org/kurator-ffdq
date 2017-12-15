@@ -20,6 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,9 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "dwc = http://rs.tdwg.org/dwc/terms/",
-        "dcterms = http://purl.org/dc/terms/"
+        "dcterms = http://purl.org/dc/terms/",
+        "dwciri = " + Namespace.DWCIRI,
+        "none = " + Namespace.NONE
 })
 @RDFBean("dwc:Occurrence")
 public class DataResource {
@@ -86,6 +89,24 @@ public class DataResource {
 
     public void setType(String type) {
         record.put("type", type);
+    }
+
+    @RDF("dwc:startDate")
+    public String getStartDate(String startDate) {
+        return record.get("startDate");
+    }
+
+    public void setStartDate(String startDate) {
+        this.record.put("startDate", startDate);
+    }
+
+    @RDF("dwc:endDate")
+    public String getEndDate(String endDate) {
+        return record.get("endDate");
+    }
+
+    public void setEndDate(String endDate) {
+        this.record.put("endDate", endDate);
     }
 
     @RDF("dcterms:modified")
@@ -186,7 +207,7 @@ public class DataResource {
         record.put("dynamicProperties", dynamicProperties);
     }
 
-    @RDF("dwc:occurrenceID")
+    @RDF("dwciri:occurrenceID")
     public String getOccurrenceID() {
         return record.get("occurrenceID");
     }
