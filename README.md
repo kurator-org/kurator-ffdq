@@ -4,7 +4,15 @@ A library that provides support for using the FFDQ framework for making data qua
 
 [![DOI](https://zenodo.org/badge/72672241.svg)](https://zenodo.org/badge/latestdoi/72672241)
 
-# TODO: overview of utilities and library functionality
+The core of the library provides a set of model classes for serializing/deserializing Java Bean representations of FFDQ concepts to/from rdf in a number of formats. These model classes are located under the `org.datakurator.ffdq.model` packages.
+
+Also provided is a set of utilities that make use of the model classes to generate rdf and run tests implemented in Java. These utilities, listed in order of intended use, are:
+
+* **test-util** - when starting with a csv file that lists a set of standardized tests, run this utility as the first step to generate FFDQ RDF and/or Java classes with stub methods for implementing the tests. The output of this utility can be used with the test-runner described below.
+* **test-runner** - takes the FFDQ RDF containing test metadata and a Java annotated class that implements the tests and runs each to produce an RDF report suitable for postprocessing.
+* **query-util** - can be used with any of the RDF output from the above along with the SPARQL queries found in `competencyquestions/sparql` to query FFDQ instance documents and produce a tsv result file.
+
+See the sections below for more information and usage.
 
 # Include using maven
 
@@ -22,7 +30,7 @@ Available from maven central.
 
 # QueryUtil
 
-A command-line utility is provided at `target/kurator-ffdq-1.0.4-jar-with-dependencies.jar` for running sparql queries 
+A command-line utility is provided at `query-util.sh` for running sparql queries 
 on sample rdf data. Example sparql query files can be found in the `competencyquestions/sparql` directory relative to the
 project root and example turtle and jsonld files can be found in `competencyquestions/rdf`.
 
@@ -30,13 +38,13 @@ To view competency questions and example rdf see the readme at: https://github.c
 
 Run the jar via the following and provide the utility with the options specified below or run with no options to see usage.
 
-* **-o,--out \<arg\>** - Output file for query result.
-* **-q,--query \<arg\>** - File containing sparql query.
-* **-t,--triples \<arg\>** - File containing triples (jsonld or turtle).
+* **-q,--query \<arg\>** - Input file containing sparql query.
+* **-t,--triples \<arg\>** - Input rdf file containing triples (jsonld or turtle).
+* **-o,--out \<arg\>** - Output tsv file for query result.
 
 For example:
 
-`java -jar kurator-ffdq-1.0.4.jar -t ../competencyquestions/rdf/example.jsonld -q ../competencyquestions/sparql/results.sparql -o results.tsv`
+`./query-util.sh -t competencyquestions/rdf/example.jsonld -q competencyquestions/sparql/results.sparql -o results.tsv`
 
 # Test spreadsheet utility
 
@@ -86,7 +94,7 @@ By default the utility only generates the rdf. In order to generate a new Java c
 * **appendClass** - Append to an existing Java class stub methods for new tests
 * **srcDir \<arg\>** - The Java sources root directory (e.g. src/main/java)
 
-#TODO: reference javaPackage relative to 
+When using the class generation feature via the `generateClass` or `appendClass` options, the class is located by using the `ffdq.mechanism.javaPackage` property from the config file to determine the package directory relative the Java sources root directory specified by the `srcDir` option.
 
 For example, to run the utility on the example data provided in this project use the following command:
 
@@ -104,7 +112,7 @@ Using the options below, run the utility from the directory containing the jar f
 * **out \<arg\>** - Output file for the rdf representation of the dq report
 * **format \<arg\>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
 
-#TODO: latest versions of the class in the jar
+Classes from all jar files present in the working directory when running the utility are included on the classpath by default. In order to avoid class loader conflicts, ensure that the jar file that contains the DQClass specified by the cls option is the latest version.
 
 For example, run from the command line via:
 
