@@ -4,6 +4,8 @@ A library that provides support for using the FFDQ framework for making data qua
 
 [![DOI](https://zenodo.org/badge/72672241.svg)](https://zenodo.org/badge/latestdoi/72672241)
 
+# TODO: overview of utilities and library functionality
+
 # Include using maven
 
 Available from maven central.
@@ -84,6 +86,8 @@ By default the utility only generates the rdf. In order to generate a new Java c
 * **appendClass** - Append to an existing Java class stub methods for new tests
 * **srcDir \<arg\>** - The Java sources root directory (e.g. src/main/java)
 
+#TODO: reference javaPackage relative to 
+
 For example, to run the utility on the example data provided in this project use the following command:
 
     ./test-util.sh -config data/DwCEventDQ.properties -in data/DwCEventDQ.csv -out data/DwCEventDQ.ttl -srcDir event_date_qc/src/main/java -appendClass
@@ -99,6 +103,8 @@ Using the options below, run the utility from the directory containing the jar f
 * **in \<arg\>** - Input occurrence tsv data file
 * **out \<arg\>** - Output file for the rdf representation of the dq report
 * **format \<arg\>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
+
+#TODO: latest versions of the class in the jar
 
 For example, run from the command line via:
 
