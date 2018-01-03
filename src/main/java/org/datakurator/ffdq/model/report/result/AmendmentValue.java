@@ -5,6 +5,7 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.DwcOccurrence;
 import org.datakurator.ffdq.model.report.ResultValue;
 import org.datakurator.ffdq.rdf.Namespace;
 
@@ -38,7 +39,7 @@ public class AmendmentValue implements ResultValue {
 
     @RDF("prov:value")
     public DataResource getDataResource() {
-        return new DataResource(value);
+        return new DwcOccurrence(value);
     }
 
     /**

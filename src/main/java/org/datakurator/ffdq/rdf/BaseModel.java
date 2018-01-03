@@ -5,6 +5,7 @@ import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQueryResult;
@@ -16,6 +17,7 @@ import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.io.IOException;
@@ -43,6 +45,10 @@ public class BaseModel {
     public void load(InputStream input, RDFFormat format) throws IOException {
         // Load RDF data from file
         Model model = Rio.parse(input, "", format);
+        conn.add(model);
+    }
+
+    public void load(Model model) {
         conn.add(model);
     }
 
@@ -124,5 +130,15 @@ public class BaseModel {
 
     public TupleQueryResult executeQuery(String sparql) {
          return conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+    }
+
+    public void getResource(String subject) {
+        Model model = new LinkedHashModel();
+
+        try (RepositoryConnection conn = repo.getConnection()) {
+            conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " +
+                            "CONSTRUCT { ?s ?p ?o } WHERE { <" + subject + "> ?p ?o } ").evaluate(new StatementCollector(model));
+        }
     }
 }

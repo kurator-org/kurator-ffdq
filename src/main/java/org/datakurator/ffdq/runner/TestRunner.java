@@ -21,6 +21,13 @@ import org.datakurator.ffdq.model.solutions.AssertionMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
+import org.datakurator.ffdq.rdf.Namespace;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.util.ModelBuilder;
+import org.eclipse.rdf4j.model.vocabulary.FOAF;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.*;
@@ -305,7 +312,7 @@ public class TestRunner {
             Iterable<CSVRecord> records = CSVFormat.newFormat('\t').withFirstRecordAsHeader().parse(reader);
 
             for (CSVRecord record : records) {
-                runner.run(record.toMap());
+                runner.run(new DwcOccurrence(record.toMap()));
             }
 
             // Write dq report as rdf
@@ -321,25 +328,24 @@ public class TestRunner {
         }
     }
 
-        private void run(Map<String, String> record) {
+        private void run(DataResource dataResource) {
         try {
             Object instance = cls.newInstance();
 
-            // create a dq report object
-            DataResource dataResource = new DataResource(record);
-            model.save(dataResource);
+            model.load(dataResource.asModel());
 
+            // create a dq report object
             for (MeasurementMethod measurementMethod : measures) {
                 Specification specification = measurementMethod.getSpecification();
                 ContextualizedDimension dimension = measurementMethod.getContextualizedDimension();
 
                 AssertionTest test = tests.get(specification.getId());
-                Result result = invokeTest(test, instance, record);
+                Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Measure measure = new Measure();
 
                 measure.setDimension(dimension);
-                measure.setDataResource(dataResource);
+                measure.setDataResource(dataResource.getURI());
                 measure.setMechanism(mechanism);
                 measure.setSpecification(specification);
                 measure.setResult(result);
@@ -352,12 +358,12 @@ public class TestRunner {
                 ContextualizedCriterion criterion = validationMethod.getContextualizedCriterion();
 
                 AssertionTest test = tests.get(specification.getId());
-                Result result = invokeTest(test, instance, record);
+                Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Validation validation = new Validation();
 
                 validation.setCriterion(criterion);
-                validation.setDataResource(dataResource);
+                validation.setDataResource(dataResource.getURI());
                 validation.setMechanism(mechanism);
                 validation.setSpecification(specification);
                 validation.setResult(result);
@@ -370,12 +376,12 @@ public class TestRunner {
                 ContextualizedEnhancement enhancement = amendmentMethod.getContextualizedEnhancement();
 
                 AssertionTest test = tests.get(specification.getId());
-                Result result = invokeTest(test, instance, record);
+                Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Amendment amendment = new Amendment();
 
                 amendment.setEnhancement(enhancement);
-                amendment.setDataResource(dataResource);
+                amendment.setDataResource(dataResource.getURI());
                 amendment.setMechanism(mechanism);
                 amendment.setSpecification(specification);
                 amendment.setResult(result);
@@ -410,7 +416,7 @@ public class TestRunner {
 
                 if (value instanceof AmendmentValue) {
                     DataResource dataResource = ((AmendmentValue) value).getDataResource();
-                    model.save(dataResource);
+                    model.load(dataResource.asModel());
                 }
 
                 model.save(response.getValue());

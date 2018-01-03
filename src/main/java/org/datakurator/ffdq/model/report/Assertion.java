@@ -21,19 +21,21 @@ import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.Specification;
 
+import java.net.URI;
+
 public abstract class Assertion {
     private Specification specification;
     private Mechanism mechanism;
 
     private Result result;
-    private DataResource dataResource;
+    private URI dataResource;
 
     @RDF("prov:used")
-    public DataResource getDataResource() {
+    public URI getDataResource() {
         return dataResource;
     }
 
-    public void setDataResource(DataResource dataResource) {
+    public void setDataResource(URI dataResource) {
         this.dataResource = dataResource;
     }
 
