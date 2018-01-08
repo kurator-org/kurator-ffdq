@@ -33,14 +33,18 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Measure")
 public class Measure extends Assertion {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ContextualizedDimension dimension;
     private Amendment informedBy;
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:dimensionInContext")

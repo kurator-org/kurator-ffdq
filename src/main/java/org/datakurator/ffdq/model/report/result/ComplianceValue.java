@@ -14,7 +14,7 @@ import java.util.UUID;
 })
 @RDFBean("prov:Entity")
 public class ComplianceValue implements ResultValue {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid" + UUID.randomUUID();
     private String value;
 
     public ComplianceValue(String value) {
@@ -23,12 +23,20 @@ public class ComplianceValue implements ResultValue {
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("prov:value")
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public static ComplianceValue COMPLIANT = new ComplianceValue("COMPLIANT");

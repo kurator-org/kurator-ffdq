@@ -14,8 +14,12 @@ import java.util.UUID;
 })
 @RDFBean("prov:Entity")
 public class NumericalValue implements ResultValue {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid" + UUID.randomUUID();
     private long value;
+
+    public NumericalValue() {
+
+    }
 
     public NumericalValue(long value) {
         this.value = value;
@@ -27,11 +31,19 @@ public class NumericalValue implements ResultValue {
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("prov:value")
-    public long getValue() {
+    public Object getValue() {
         return value;
+    }
+
+    public void setValue(long value) {
+        this.value = value;
     }
 }

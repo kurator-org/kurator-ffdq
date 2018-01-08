@@ -30,7 +30,7 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Result")
 public class Result<T> {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ResultState resultState;
     private T resultValue;
@@ -40,7 +40,11 @@ public class Result<T> {
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:hasAmbiguity")

@@ -33,13 +33,17 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Amendment")
 public class Amendment extends Assertion {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ContextualizedEnhancement enhancement;
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:enhancementInContext")

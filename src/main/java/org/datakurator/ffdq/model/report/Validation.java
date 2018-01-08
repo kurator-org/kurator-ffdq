@@ -33,14 +33,18 @@ import java.util.UUID;
 })
 @RDFBean("ffdq:Validation")
 public class Validation extends Assertion {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ContextualizedCriterion criterion;
     private Amendment informedBy;
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid:" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("ffdq:criterionInContext")

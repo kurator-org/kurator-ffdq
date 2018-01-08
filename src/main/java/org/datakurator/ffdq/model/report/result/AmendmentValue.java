@@ -9,6 +9,7 @@ import org.datakurator.ffdq.model.DwcOccurrence;
 import org.datakurator.ffdq.model.report.ResultValue;
 import org.datakurator.ffdq.rdf.Namespace;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -19,42 +20,56 @@ import java.util.UUID;
 })
 @RDFBean("prov:Entity")
 public class AmendmentValue implements ResultValue {
-    private UUID uuid = UUID.randomUUID();
+    private String id = "urn:uuid" + UUID.randomUUID();
 
     private int score = 1; // TODO: For ranking of alternatives
-    private Map<String, String> value;
+    private Object value;
+    private DwcOccurrence record;
 
     public AmendmentValue() {
-        value = new HashMap<>();
+        this.record = new DwcOccurrence();
     }
 
     public AmendmentValue(Map<String, String> value) {
-        this.value = value;
+        this.record = new DwcOccurrence(value);
     }
 
     @RDFSubject
     public String getId() {
-        return "urn:uuid" + uuid.toString();
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @RDF("prov:value")
-    public DataResource getDataResource() {
-        return new DwcOccurrence(value);
-    }
+    public Object getValue() {
+        if (this.value == null) {
+            return record.getURI();
+        }
 
-    /**
-     * @return the result
-     */
-    public Map<String,String> getValue() {
         return value;
     }
 
+    public void setValue(Object value) {
+        if (value instanceof URI) {
+            this.record.setURI((URI)value);
+        } else {
+            this.value = value;
+        }
+    }
+
+    public DataResource getDataResource() {
+        return record;
+    }
+
     public String get(String key) {
-        return value.get(key);
+        return record.asMap().get(key);
     }
 
     public int size() {
-        return value.size();
+        return record.asMap().size();
     }
 
     /**
@@ -65,8 +80,8 @@ public class AmendmentValue implements ResultValue {
      */
     public void addResult(String key, String value) {
         // Check that the term is valid and contains the prefix
-        Namespace.resolvePrefixedTerm(key);
+        URI uri = Namespace.resolvePrefixedTerm(key);
 
-        this.value.put(key, value);
+        this.record.put(uri, value);
     }
 }

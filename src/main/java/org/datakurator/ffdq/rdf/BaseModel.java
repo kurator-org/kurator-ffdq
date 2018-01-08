@@ -132,13 +132,15 @@ public class BaseModel {
          return conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
     }
 
-    public void getResource(String subject) {
+    public Model getResource(String subject) {
         Model model = new LinkedHashModel();
 
         try (RepositoryConnection conn = repo.getConnection()) {
             conn.prepareGraphQuery(QueryLanguage.SPARQL,
                     "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " +
-                            "CONSTRUCT { ?s ?p ?o } WHERE { <" + subject + "> ?p ?o } ").evaluate(new StatementCollector(model));
+                            "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . FILTER( ?s = <" + subject + "> ) } ").evaluate(new StatementCollector(model));
         }
+
+        return model;
     }
 }

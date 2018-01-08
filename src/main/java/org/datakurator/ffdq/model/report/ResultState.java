@@ -20,14 +20,26 @@ public class ResultState {
         this.label = label;
     }
 
+    public ResultState() {
+        // default constructor
+    }
+
     @RDFSubject(prefix = "rs:")
     public String getId() {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @RDF("rdfs:label")
     public String getLabel() {
         return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public static ResultState RUN_HAS_RESULT = new ResultState("HAS_RESULT");

@@ -6,8 +6,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.datakurator.postprocess.model.*;
+import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.report.*;
+import org.datakurator.ffdq.model.report.result.AmendmentValue;
+import org.datakurator.ffdq.model.report.result.ComplianceValue;
+import org.datakurator.ffdq.rdf.FFDQModel;
+import org.eclipse.rdf4j.rio.RDFFormat;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.*;
 
@@ -15,7 +21,7 @@ import java.util.*;
  * Created by lowery on 2/17/2017.
  */
 public class XLSXPostProcessor {
-    private DQReportParser reportParser;
+    private FFDQModel model;
     private List<String> header;
 
     private static Map<String, CellStyle> styles = new HashMap<>();
@@ -30,9 +36,10 @@ public class XLSXPostProcessor {
 
     public XLSXPostProcessor(InputStream reportStream) {
         try {
-            reportParser = new DQReportParser(reportStream);
+            model = new FFDQModel();
+            model.load(reportStream, RDFFormat.TURTLE);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Could not load dq report from file", e);
         }
     }
 
@@ -99,9 +106,55 @@ public class XLSXPostProcessor {
 
         createSummarySheet(workbook, summaryText);
 
+        // Get all data resources (initial values)
+        List<DataResource> dataResources = model.findDataResources();
+
+        for (DataResource dataResource : dataResources) {
+            // Get the assertions for each data resource
+            List<Assertion> measures = model.findAssertions(dataResource, Measure.class);
+            List<Assertion> validations = model.findAssertions(dataResource, Validation.class);
+            List<Assertion> amendments = model.findAssertions(dataResource, Amendment.class);
+
+            Map<String, String> record = dataResource.asMap();
+
+            Set<String> headers = record.keySet();
+
+            for (Assertion assertion : measures) {
+                Measure measure = (Measure) assertion;
+                Result result = measure.getResult();
+
+                ResultValue value = (ResultValue) result.getResultValue();
+                ResultState state = result.getResultState();
+
+                //System.out.println(value + " : " + state.getLabel());
+            }
+
+            for (Assertion assertion : validations) {
+                Validation validation = (Validation) assertion;
+                Result result = validation.getResult();
+
+                ResultValue value = (ResultValue) result.getResultValue();
+                ResultState state = result.getResultState();
+
+                //System.out.println(validation.getCriterion().getInformationElements().getComposedOf());
+                //System.out.println(value + " : " + state.getLabel() + " : " + result.getComment());
+            }
+
+            for (Assertion assertion : amendments) {
+                Amendment amendment = (Amendment) assertion;
+                Result result = amendment.getResult();
+
+                ResultValue value = (ResultValue) result.getResultValue();
+                ResultState state = result.getResultState();
+
+                if (state.getLabel().equalsIgnoreCase("CHANGED")) {
+                    //System.out.println(result.getComment());
+                }
+            }
+        }
 
         try {
-            while(reportParser.next()) {
+            /*while(reportParser.next()) {
 
                 if (initialValuesSummary == null) {
                     initialValuesSummary = new ReportSummary(reportParser.getDataResourceFields(), "Initial Values", workbook, styles);
@@ -188,7 +241,7 @@ public class XLSXPostProcessor {
                 measureSummary.postprocess(reportParser.getMeasures(), initialValues, recordId);
                 amendmentSummary.postprocess(reportParser.getAmendments(), initialValues, recordId);
 
-            }
+            }*/
 
             workbook.write(out);
             out.close();
@@ -220,7 +273,7 @@ public class XLSXPostProcessor {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        XLSXPostProcessor postProcessor = new XLSXPostProcessor(DQReportParser.class.getResourceAsStream("/ffdq.json"));
+        XLSXPostProcessor postProcessor = new XLSXPostProcessor(new FileInputStream("/home/lowery/ffdq/event_date_qc/report.ttl"));
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
     }
 }

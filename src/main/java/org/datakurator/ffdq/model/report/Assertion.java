@@ -17,12 +17,19 @@
 package org.datakurator.ffdq.model.report;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
+import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.Specification;
 
 import java.net.URI;
 
+@RDFNamespaces({
+        "ffdq = http://example.com/ffdq/",
+        "prov = http://www.w3.org/ns/prov#"
+})
+@RDFBean("ffdq:Assertion")
 public abstract class Assertion {
     private Specification specification;
     private Mechanism mechanism;

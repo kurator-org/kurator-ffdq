@@ -1,8 +1,12 @@
 package org.datakurator.ffdq.model;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.datakurator.ffdq.rdf.Namespace;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.util.ModelBuilder;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,18 +16,48 @@ import java.util.UUID;
 
 public class DwcOccurrence implements DataResource {
     private ModelBuilder builder;
+
     private Map<String, String> record;
+    private Model model;
 
     private String uuid = "urn:uuid:" + UUID.randomUUID().toString();;
     private URI subject;
+
+    public DwcOccurrence() {
+        this.builder = new ModelBuilder();
+
+        builder.setNamespace("ffdq", "http://example.com/ffdq/");
+
+        try {
+            subject = new URI(uuid);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        builder.defaultGraph().add(subject.toString(), RDF.TYPE, "ffdq:DataResource");
+    }
+
+    public DwcOccurrence(Model model) {
+        this.model = model;
+
+        try {
+            this.subject = new URI(((Resource) model.subjects().toArray()[0]).stringValue());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     public DwcOccurrence(Map<String, String> record) {
         this.record = record;
         this.builder = new ModelBuilder();
 
-        // TODO: Consolidate DwcOccurrence and FlatDarwinCore
+        builder.setNamespace("ffdq", "http://example.com/ffdq/");
+        
+        try {
+            subject = new URI(uuid);
+        } catch (URISyntaxException e1) { throw new RuntimeException(e1); }
 
-        try { subject = new URI(uuid); } catch (URISyntaxException e1) { }
+        builder.defaultGraph().add(subject.toString(), RDF.TYPE, "ffdq:DataResource");
 
         for (String term : record.keySet()) {
             if (mapping.containsKey(term)) {
@@ -33,6 +67,10 @@ public class DwcOccurrence implements DataResource {
                 builder.defaultGraph().add(subject.toString(), predicate.toString(), object);
             }
         }
+    }
+
+    public void put(URI term, String value) {
+        builder.defaultGraph().add(subject.toString(), term.toString(), value);
     }
 
     public void setURI(URI uri) {
@@ -46,12 +84,35 @@ public class DwcOccurrence implements DataResource {
 
     @Override
     public Map<String, String> asMap() {
+        if (record == null && model != null) {
+            record = new HashMap<>();
+
+            Map<String, String> reverseMapping = new HashMap<>();
+
+            for (String term : mapping.keySet()) {
+                reverseMapping.put(mapping.get(term).toString(), term);
+            }
+
+            for (Statement statement : model) {
+                String predicate = statement.getPredicate().toString();
+
+                String term = reverseMapping.get(predicate);
+                String value = statement.getObject().stringValue();
+
+                record.put(term, value);
+            }
+        }
+
         return record;
     }
 
     @Override
     public Model asModel() {
-        return builder.build();
+        if (model == null) {
+            model = builder.build();
+        }
+
+        return model;
     }
 
     private static Map<String, URI> mapping = new HashMap<>();
