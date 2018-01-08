@@ -28,6 +28,32 @@ import java.util.logging.Logger;
 public class TestUtil {
     private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
+    private final static String CSV_HEADER_LABEL;
+    private final static String CSV_HEADER_DESCRIPTION;
+    private final static String CSV_HEADER_SPECIFICATION;
+    private final static String CSV_HEADER_ASSERTION;
+    private final static String CSV_HEADER_RESOURCE_TYPE;
+    private final static String CSV_HEADER_DIMENSION;
+    private final static String CSV_HEADER_INFO_ELEMENT;
+
+    static {
+        Properties properties = new Properties();
+        try {
+            properties.load(TestUtil.class.getResourceAsStream("/config.properties"));
+
+            CSV_HEADER_LABEL = properties.getProperty("csv.header.label");
+            CSV_HEADER_DESCRIPTION = properties.getProperty("csv.header.description");
+            CSV_HEADER_SPECIFICATION = properties.getProperty("csv.header.specification");
+            CSV_HEADER_ASSERTION = properties.getProperty("csv.header.assertion");
+            CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
+            CSV_HEADER_DIMENSION = properties.getProperty("csv.header.dimension");
+            CSV_HEADER_INFO_ELEMENT = properties.getProperty("csv.header.informationElement");
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize properties from file config.properties", e);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         Options options = new Options();
         options.addRequiredOption("config", null, true, "Properties file defining the mechanism to use");
@@ -211,25 +237,29 @@ public class TestUtil {
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader);
 
         for (CSVRecord record : records) {
-            // Parse and validate csv records
-            String guid = record.get("GUID");
+            try {
+                // Parse and validate csv records
+                String guid = record.get("GUID");
 
-            if (guid.isEmpty() || guid == null) {
-                throw new IllegalArgumentException("Missing required GUID for test #" + record.getRecordNumber());
+                if (guid.isEmpty() || guid == null) {
+                    throw new IllegalArgumentException("Missing required GUID for test #" + record.getRecordNumber());
+                }
+
+                String label = record.get(CSV_HEADER_LABEL);
+                String description = record.get(CSV_HEADER_DESCRIPTION);
+                String specification = record.get(CSV_HEADER_SPECIFICATION);
+                String assertionType = record.get(CSV_HEADER_ASSERTION);
+                String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
+                String dimension = record.get(CSV_HEADER_DIMENSION);
+                String informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
+
+                AssertionTest test = new AssertionTest(guid, label, description, specification, assertionType, resourceType,
+                        dimension, parseInformationElementStr(informationElement));
+
+                tests.add(test);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Could not find column header in input csv, the config.properties file might have incorrect mappings.", e);
             }
-
-            String label = record.get("Label");
-            String description = record.get("Description");
-            String specification = record.get("Specification");
-            String assertionType = record.get("Type");
-            String resourceType = record.get("Resource Type");
-            String dimension = record.get("Dimension");
-            String informationElement = record.get("Information Element");
-
-            AssertionTest test = new AssertionTest(guid, label, description, specification, assertionType, resourceType,
-                    dimension, parseInformationElementStr(informationElement));
-
-            tests.add(test);
         }
 
         return tests;
