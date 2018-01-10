@@ -7,6 +7,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.DwcOccurrence;
+import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.model.report.result.AmendmentValue;
 import org.datakurator.ffdq.model.report.result.ComplianceValue;
@@ -106,25 +108,42 @@ public class XLSXPostProcessor {
 
         createSummarySheet(workbook, summaryText);
 
-        // Get all data resources (initial values)
+        // Get all data resources (initial values) associated with assertions in the report
         List<DataResource> dataResources = model.findDataResources();
 
+        // Obtain headers from the first record
+        Set<String> headers = dataResources.get(0).asMap().keySet();
+
+        System.out.println(headers);
+
         for (DataResource dataResource : dataResources) {
+            DwcOccurrence record = (DwcOccurrence) dataResource;
+            String recordId = record.getRecordId();
+
             // Get the assertions for each data resource
             List<Assertion> measures = model.findAssertions(dataResource, Measure.class);
             List<Assertion> validations = model.findAssertions(dataResource, Validation.class);
             List<Assertion> amendments = model.findAssertions(dataResource, Amendment.class);
 
-            Map<String, String> record = dataResource.asMap();
+            Map<String, String> initialValues = dataResource.asMap();
+            Map<String, String> finalValues = new HashMap<>(initialValues);
 
-            Set<String> headers = record.keySet();
+            System.out.println(initialValues);
 
             for (Assertion assertion : measures) {
-                Measure measure = (Measure) assertion;
-                Result result = measure.getResult();
+                Specification specification = assertion.getSpecification();
+                String test = specification.getLabel();
 
-                Entity value = result.getValue();
+                Result result = assertion.getResult();
+
                 ResultState state = result.getResultState();
+                Entity value = result.getValue();
+
+                String status = determineStatus(state, value);
+
+                System.out.println(recordId + ", " + test + ", " + status);
+
+                Measure measure = (Measure) assertion;
 
                 if (value != null) {
                     //System.out.println(value.getValue() + " : " + state.getLabel());
@@ -142,6 +161,8 @@ public class XLSXPostProcessor {
                  //   System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
                 }
 
+
+
                 //System.out.println(validation.getCriterion().getInformationElements().getComposedOf());
                 //System.out.println(value + " : " + state.getLabel() + " : " + result.getComment());
             }
@@ -155,7 +176,7 @@ public class XLSXPostProcessor {
                 ResultState state = result.getResultState();
 
                 if (value != null) {
-                    System.out.println(amendment.getDataResource() + " : " + value.getValue());
+                    //System.out.println(amendment.getDataResource() + " : " + value.getValue());
                     //System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
                 }
             }
@@ -260,6 +281,30 @@ public class XLSXPostProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String determineStatus(ResultState state, Entity value) {
+        String status = null;
+
+        if (state.equals(ResultState.RUN_HAS_RESULT)) {
+            if (value.getValue() instanceof String) {
+                // Measures or Validations with result: COMPLETE, NOT_COMPLETE, COMPLIANT, NOT_COMPLIANT
+                status = (String) value.getValue();
+            } else if (value.getValue() instanceof Long || value.getValue() instanceof Integer) {
+                // Measurement value, use status HAS_RESULT
+                status = state.getLabel();
+            }
+        } else if (state.equals(ResultState.INTERNAL_PREREQUISITES_NOT_MET) ||
+                state.equals(ResultState.EXTERNAL_PREREQUISITES_NOT_MET) ||
+                state.equals(ResultState.UNABLE_CURATE)) {
+            // Use state as status, one of the error conditions: INTERNAL_PREREQUISITES_NOT_MET, EXTERNAL_PREREQUISITES_NOT_MET,
+            // UNABLE_CURATE
+            status = state.getLabel();
+        } else {
+            status = "*"+state.getLabel();
+        }
+
+        return status;
     }
 
     private void createSummarySheet(SXSSFWorkbook workbook, String summaryText) {

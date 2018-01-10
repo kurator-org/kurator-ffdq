@@ -53,4 +53,13 @@ public class ResultState {
     public static ResultState FILLED_IN = new ResultState("FILLED_IN");
     public static ResultState TRANSPOSED = new ResultState("TRANSPOSED");
     public static ResultState NO_CHANGE = new ResultState("NO_CHANGE");
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ResultState) {
+            return this.getId().equals(((ResultState)obj).getId());
+        }
+
+        return false;
+    }
 }
