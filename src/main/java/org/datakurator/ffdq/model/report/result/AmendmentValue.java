@@ -14,50 +14,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
-        "prov = http://www.w3.org/ns/prov#"
-})
-@RDFBean("prov:Entity")
-public class AmendmentValue implements ResultValue {
+public class AmendmentValue extends ResultValue {
     private String id = "urn:uuid" + UUID.randomUUID();
 
     private int score = 1; // TODO: For ranking of alternatives
-    private Object value;
+
     private DwcOccurrence record;
 
     public AmendmentValue() {
-        this.record = new DwcOccurrence();
+        record = new DwcOccurrence();
+        setValue(record.getURI());
     }
 
     public AmendmentValue(Map<String, String> value) {
         this.record = new DwcOccurrence(value);
-    }
-
-    @RDFSubject
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @RDF("prov:value")
-    public Object getValue() {
-        if (this.value == null) {
-            return record.getURI();
-        }
-
-        return value;
-    }
-
-    public void setValue(Object value) {
-        if (value instanceof URI) {
-            this.record.setURI((URI)value);
-        } else {
-            this.value = value;
-        }
+        setValue(record.getURI());
     }
 
     public DataResource getDataResource() {

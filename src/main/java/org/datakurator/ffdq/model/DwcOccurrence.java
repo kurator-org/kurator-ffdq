@@ -1,6 +1,5 @@
 package org.datakurator.ffdq.model;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.datakurator.ffdq.rdf.Namespace;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;

@@ -29,11 +29,13 @@ import java.util.UUID;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Result")
-public class Result<T> {
+public class Result<T extends ResultValue> {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ResultState resultState;
     private T resultValue;
+
+    private Entity value;
 
     private String comment;
     private boolean isAmbiguous;
@@ -65,11 +67,20 @@ public class Result<T> {
         return resultState;
     }
 
-    public void setResultValue(T resultValue) {
-        this.resultValue = resultValue;
+    @RDF("ffdq:hasValue")
+    public Entity getValue() {
+        return this.value;
     }
 
-    @RDF("ffdq:hasValue")
+    public void setValue(Entity value) {
+        this.value = value;
+    }
+
+    public void setResultValue(T resultValue) {
+        this.resultValue = resultValue;
+        this.value = new Entity(resultValue);
+    }
+
     public T getResultValue() {
         return resultValue;
     }

@@ -11,10 +11,7 @@ import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
-import org.datakurator.ffdq.model.report.Amendment;
-import org.datakurator.ffdq.model.report.Measure;
-import org.datakurator.ffdq.model.report.Result;
-import org.datakurator.ffdq.model.report.Validation;
+import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.model.report.result.AmendmentValue;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
@@ -412,15 +409,15 @@ public class TestRunner {
             result.setResultState(response.getResultState());
 
             if (response.getValue() != null) {
-                Object value = response.getValue();
+                ResultValue value = response.getValue();
 
                 if (value instanceof AmendmentValue) {
                     DataResource dataResource = ((AmendmentValue) value).getDataResource();
                     model.load(dataResource.asModel());
                 }
 
-                model.save(response.getValue());
-                result.setResultValue(response.getValue());
+                model.save(new Entity(value));
+                result.setResultValue(value);
             }
 
             result.setComment(response.getComment());
