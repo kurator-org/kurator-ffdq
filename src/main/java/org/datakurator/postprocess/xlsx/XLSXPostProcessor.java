@@ -123,18 +123,24 @@ public class XLSXPostProcessor {
                 Measure measure = (Measure) assertion;
                 Result result = measure.getResult();
 
-                ResultValue value = (ResultValue) result.getResultValue();
+                Entity value = result.getValue();
                 ResultState state = result.getResultState();
 
-                //System.out.println(value + " : " + state.getLabel());
+                if (value != null) {
+                    //System.out.println(value.getValue() + " : " + state.getLabel());
+                }
             }
 
             for (Assertion assertion : validations) {
                 Validation validation = (Validation) assertion;
                 Result result = validation.getResult();
 
-                ResultValue value = (ResultValue) result.getResultValue();
+                Entity value = result.getValue();
                 ResultState state = result.getResultState();
+
+                if (value != null) {
+                 //   System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
+                }
 
                 //System.out.println(validation.getCriterion().getInformationElements().getComposedOf());
                 //System.out.println(value + " : " + state.getLabel() + " : " + result.getComment());
@@ -144,11 +150,13 @@ public class XLSXPostProcessor {
                 Amendment amendment = (Amendment) assertion;
                 Result result = amendment.getResult();
 
-                ResultValue value = (ResultValue) result.getResultValue();
+
+                Entity value = result.getValue();
                 ResultState state = result.getResultState();
 
-                if (state.getLabel().equalsIgnoreCase("CHANGED")) {
-                    //System.out.println(result.getComment());
+                if (value != null) {
+                    System.out.println(amendment.getDataResource() + " : " + value.getValue());
+                    //System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
                 }
             }
         }

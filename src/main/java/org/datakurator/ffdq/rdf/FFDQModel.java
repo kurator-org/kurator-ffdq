@@ -50,7 +50,7 @@ public class FFDQModel extends BaseModel {
 
         String sparql = "PREFIX ffdq: <http://example.com/ffdq/> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
-                "SELECT ?dataResource WHERE { " +
+                "SELECT DISTINCT ?dataResource WHERE { " +
                 "?assertion prov:used ?dataResource " +
                 "}";
 
