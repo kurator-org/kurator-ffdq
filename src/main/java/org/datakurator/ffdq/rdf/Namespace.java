@@ -24,6 +24,7 @@ public class Namespace {
         nsPrefixes.put("dwc", DWC);
         nsPrefixes.put("dwciri", DWCIRI);
 
+        nsPrefixes.put("dwcloud", NONE);
         nsPrefixes.put("none", NONE);
     }
 
