@@ -29,13 +29,6 @@ public class XLSXPostProcessor {
     private static Map<String, CellStyle> styles = new HashMap<>();
     private static Map<String, Integer> actedUponCols = new HashMap<>();
 
-    private ReportSummary initialValuesSummary;
-    private ReportSummary finalValuesSummary;
-
-    private AssertionSummary validationSummary;
-    private AssertionSummary measureSummary;
-    private AssertionSummary amendmentSummary;
-
     public XLSXPostProcessor(InputStream reportStream) {
         try {
             model = new FFDQModel();
