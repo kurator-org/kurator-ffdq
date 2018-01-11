@@ -7,16 +7,15 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.datakurator.ffdq.model.DataResource;
-import org.datakurator.ffdq.model.DwcOccurrence;
+import org.datakurator.dwcloud.DwcOccurrence;
 import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.report.*;
-import org.datakurator.ffdq.model.report.result.AmendmentValue;
-import org.datakurator.ffdq.model.report.result.ComplianceValue;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
-import javax.xml.crypto.Data;
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -26,7 +25,9 @@ public class XLSXPostProcessor {
     private FFDQModel model;
     private List<String> header;
 
-    private static Map<String, CellStyle> styles = new HashMap<>();
+    private Workbook workbook;
+    private Map<String, CellStyle> styles = new HashMap<>();
+
     private static Map<String, Integer> actedUponCols = new HashMap<>();
 
     public XLSXPostProcessor(InputStream reportStream) {
@@ -38,7 +39,7 @@ public class XLSXPostProcessor {
         }
     }
 
-    private static void initStyles(Workbook wb) {
+    public void initStyles(SXSSFWorkbook wb) {
         // White font
         Font font = wb.createFont();
         font.setColor(HSSFColor.WHITE.index);
@@ -99,10 +100,13 @@ public class XLSXPostProcessor {
                 "\n" +
                 "The 'Measures' sheet contains the value of any measurements performed (i.e. precision, completeness).";
 
-        createSummarySheet(workbook, summaryText);
+        createSummarySheet(summaryText);
 
         // Get all data resources (initial values) associated with assertions in the report
         List<DataResource> dataResources = model.findDataResources();
+
+        // Create the initial values sheet
+        // ......
 
         // Obtain headers from the first record
         Set<String> headers = dataResources.get(0).asMap().keySet();
@@ -132,7 +136,7 @@ public class XLSXPostProcessor {
                 ResultState state = result.getResultState();
                 Entity value = result.getValue();
 
-                String status = determineStatus(state, value);
+                String status = determineRowStatus(state, value);
 
                 System.out.println(recordId + ", " + test + ", " + status);
 
@@ -276,7 +280,117 @@ public class XLSXPostProcessor {
         }
     }
 
-    private String determineStatus(ResultState state, Entity value) {
+
+    private void createSummarySheet(String summaryText) {
+        SXSSFSheet summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
+
+        // Wrap text on the summary page
+        CellStyle summaryStyle = workbook.createCellStyle();
+        summaryStyle.setWrapText(true);
+
+        // Add the summary text to the cell
+        Row summaryRow = summarySheet.createRow(1);
+        Cell summaryCell = summaryRow.createCell(1);
+
+        summaryCell.setCellValue(summaryText);
+        summaryCell.setCellStyle(summaryStyle);
+
+        // Create a merged region from (1,1) to (7,9) for the summary text
+        summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
+    }
+
+    private void createInitialValuesSheet(List<DataResource> dataResources) {
+        SXSSFSheet initialValuesSheet = (SXSSFSheet) workbook.createSheet("Initial Values");
+
+        for (int i = 0; i < dataResources.size(); i++) {
+            // Create a row for each data resource
+            Row initialValuesRow = initialValuesSheet.createRow(i);
+
+            // Get the initial values from the data resource map and add values to cells
+            DataResource dataResource = dataResources.get(i);
+
+            int colNum = 0;
+            Map<String, String> initialValues = dataResource.asMap();
+
+            for (String field : initialValues.keySet())  {
+                Cell initialValuesCell = initialValuesRow.createCell(colNum);
+
+                initialValuesCell.setCellValue(initialValues.get(field));
+                colNum++;
+            }
+        }
+    }
+
+    private void createMeasuresSheet(Map<String, Measure> measures) {
+        List<String> fields = new ArrayList<>();
+
+        SXSSFSheet measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
+
+        int rowNum = 0;
+        for (String recordId : measures.keySet()) {
+            Measure measure = measures.get(recordId);
+
+            // Measurement assertion row
+            Row measuresRow = measuresSheet.createRow(rowNum);
+
+            // Get the test name from the specification
+            Specification specification = measure.getSpecification();
+            String test = specification.getLabel();
+
+            // Measurement result
+            Result result = measure.getResult();
+
+            // Determine row status from state and value
+            ResultState state = result.getResultState();
+            Entity value = result.getValue();
+
+            String status = determineRowStatus(state, value);
+            String comment = result.getComment();
+
+            // Create assertion metadata cells
+            measuresRow.createCell(0).setCellValue(recordId);
+            measuresRow.createCell(1).setCellValue(test);
+            measuresRow.createCell(2).setCellValue(status);
+            measuresRow.createCell(3).setCellValue(comment);
+
+            // Get the list of fields actedUpon from the information elements
+            ContextualizedDimension context = measure.getDimension();
+            for (String field : fieldsFromContext(context)) {
+
+                // Lookup column index for field and create cell for the values
+                if (!fields.contains(field)) {
+                    fields.add(field);
+                }
+
+                int i = fields.indexOf(field);
+
+                Cell measuresCell = measuresRow.createCell(i);
+
+                // Set cell value and style based on status
+                measuresCell.setCellValue(value.toString());
+                measuresCell.setCellStyle(styles.get(status));
+            }
+
+            System.out.println(recordId + ", " + test + ", " + status);
+        }
+
+    }
+
+    private List<String> fieldsFromContext(ContextualizedDimension context) {
+        List<String> fields = new ArrayList<>();
+
+        List<URI> ie = context.getInformationElements().getComposedOf();
+        for (URI uri : ie) {
+            String path = uri.getPath();
+            String field = path.substring(path.lastIndexOf('/') + 1);
+
+            fields.add(field);
+        }
+
+        return fields;
+    }
+
+    private String determineRowStatus(ResultState state, Entity value) {
         String status = null;
 
         if (state.equals(ResultState.RUN_HAS_RESULT)) {
@@ -300,23 +414,6 @@ public class XLSXPostProcessor {
         return status;
     }
 
-    private void createSummarySheet(SXSSFWorkbook workbook, String summaryText) {
-        SXSSFSheet summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
-
-        // Wrap text on the summary page
-        CellStyle summaryStyle = workbook.createCellStyle();
-        summaryStyle.setWrapText(true);
-
-        // Add the summary text to the cell
-        Row summaryRow = summarySheet.createRow(1);
-        Cell summaryCell = summaryRow.createCell(1);
-
-        summaryCell.setCellValue(summaryText);
-        summaryCell.setCellStyle(summaryStyle);
-
-        // Create a merged region from (1,1) to (7,9) for the summary text
-        summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
-    }
 
     public static void main(String[] args) throws FileNotFoundException {
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(new FileInputStream("/home/lowery/ffdq/event_date_qc/report.ttl"));

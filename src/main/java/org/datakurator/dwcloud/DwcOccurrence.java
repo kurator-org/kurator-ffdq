@@ -1,7 +1,7 @@
-package org.datakurator.ffdq.model;
+package org.datakurator.dwcloud;
 
-import org.datakurator.ffdq.rdf.Namespace;
-import org.datakurator.ffdq.util.Vocabulary;
+import org.datakurator.dwcloud.Vocabulary;
+import org.datakurator.ffdq.model.DataResource;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
@@ -10,7 +10,6 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

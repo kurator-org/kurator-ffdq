@@ -1,16 +1,11 @@
 package org.datakurator.ffdq.model.report.result;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.DataResource;
-import org.datakurator.ffdq.model.DwcOccurrence;
+import org.datakurator.dwcloud.DwcOccurrence;
 import org.datakurator.ffdq.model.report.ResultValue;
 import org.datakurator.ffdq.rdf.Namespace;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 

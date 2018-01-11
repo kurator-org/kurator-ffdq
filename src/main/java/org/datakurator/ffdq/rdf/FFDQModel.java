@@ -1,20 +1,11 @@
 package org.datakurator.ffdq.rdf;
 
-import org.apache.poi.ss.formula.functions.T;
+import org.datakurator.dwcloud.DwcOccurrence;
 import org.datakurator.ffdq.model.*;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.report.Assertion;
-import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
-import org.datakurator.ffdq.model.solutions.MeasurementMethod;
-import org.datakurator.ffdq.model.solutions.ValidationMethod;
-import org.datakurator.ffdq.runner.AssertionTest;
-import org.datakurator.postprocess.model.Measure;
-import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.BindingSet;
-import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQueryResult;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 import java.util.*;
 

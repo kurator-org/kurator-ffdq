@@ -1,4 +1,4 @@
-package org.datakurator.ffdq.util;
+package org.datakurator.dwcloud;
 
 import org.datakurator.ffdq.rdf.Namespace;
 
