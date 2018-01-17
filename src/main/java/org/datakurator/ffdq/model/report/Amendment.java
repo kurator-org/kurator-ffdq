@@ -1,4 +1,4 @@
-/**  DQAmendment.java
+/**  Amendment.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -20,10 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
-import org.datakurator.ffdq.model.Mechanism;
-import org.datakurator.ffdq.model.Specification;
 
 import java.util.UUID;
 

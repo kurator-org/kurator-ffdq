@@ -1,3 +1,19 @@
+/** TestRunner.java
+ *
+ * Copyright 2017 President and Fellows of Harvard College
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.datakurator.ffdq.runner;
 
 import org.apache.commons.cli.*;
@@ -29,8 +45,11 @@ import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class TestRunner {
+    private final static Logger logger = Logger.getLogger(TestRunner.class.getName());
+
     private Class cls;
     private FFDQModel model;
 
@@ -42,7 +61,7 @@ public class TestRunner {
     private List<MeasurementMethod> measures = new ArrayList<>();
     private List<AmendmentMethod> amendments = new ArrayList<>();
 
-    public TestRunner(Class cls, FFDQModel model) throws URISyntaxException {
+    public TestRunner(Class cls, FFDQModel model) {
         this.cls = cls;
         this.model = model;
 
@@ -87,13 +106,15 @@ public class TestRunner {
         // Check that all tests defined for the current mechanism in the FFDQ rdf correspond to a DQClass method
         // that implements the test
         if (!implementedGuids.containsAll(definedGuids)) {
-            System.out.println("Java class missing implementation for tests defined in RDF!");
+            logger.warning("Java class missing implementation for tests defined in RDF!");
 
             Set<String> missingGuids = new HashSet<>(definedGuids);
             missingGuids.removeAll(implementedGuids);
 
             for (String guid : missingGuids) {
-                System.out.println("Missing corresponding method in " + cls + " for test \"" + definedTests.get(guid).getLabel() + "\": " + guid.substring(guid.lastIndexOf(":")+1));
+                logger.warning("Missing corresponding method in " + cls + " for test \"" +
+                        definedTests.get(guid).getLabel() + "\": " + guid.substring(guid.lastIndexOf(":")+1));
+
                 implementedTests.remove(guid);
             }
         }
@@ -101,13 +122,17 @@ public class TestRunner {
         // Check that all test method in the DQClass have associated metadata in the form of Measurement, Validation,
         // and Amendment Methods in the FFDQ rdf
         if (!definedGuids.containsAll(implementedGuids)) {
-            System.out.println("Tests declared in Java class via @DQProvides missing corresponding definitions in the RDF!");
+            logger.warning("Tests declared in Java class via @DQProvides missing corresponding definitions " +
+                    "in the RDF!");
 
             Set<String> missingGuids = new HashSet<>(implementedGuids);
             missingGuids.removeAll(definedGuids);
 
             for (String guid : missingGuids) {
-                System.out.println("Missing definition in RDF for Java method \"" + implementedTests.get(guid).getName() + "\" in " + cls + ": " + guid.substring(guid.lastIndexOf(":")+1));
+                logger.warning("Missing definition in RDF for Java method \"" +
+                        implementedTests.get(guid).getName() + "\" in " + cls + ": " +
+                        guid.substring(guid.lastIndexOf(":")+1));
+
                 implementedTests.remove(guid);
             }
         }
@@ -177,7 +202,8 @@ public class TestRunner {
                 List<TestParam> params = processParameters(method, informationElement);
                 test.setParameters(params);
             } catch (Exception e) {
-                throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." + method.getName(), e);
+                throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." +
+                        method.getName(), e);
             }
 
             tests.put(guid, test);
@@ -206,19 +232,23 @@ public class TestRunner {
         Set<URI> definedParams = new HashSet<>(informationElement.getComposedOf());
 
         if (!implementedParams.containsAll(definedParams)) {
-            System.out.println("Information elements defined in RDF missing corresponding method parameter in DQClass!");
+            System.out.println("Information elements defined in RDF missing corresponding method parameter in " +
+                    "DQClass!");
 
             Set<URI> missingParams = new HashSet<>(definedParams);
             missingParams.removeAll(implementedParams);
 
             for (URI uri : missingParams) {
-                System.out.println("Class " + cls.getName() + " missing method parameter for information element: " + uri);
+                System.out.println("Class " + cls.getName() + " missing method parameter for information element: " +
+                        uri);
+
                 testParams.remove(uri);
             }
         }
 
         if (!definedParams.containsAll(implementedParams)) {
-            System.out.println("Method parameters annotated with DQParam missing corresponding information elements in RDF!");
+            logger.warning("Method parameters annotated with DQParam missing corresponding information elements " +
+                    "in RDF!");
 
             Set<URI> missingParams = new HashSet<>(implementedParams);
             missingParams.removeAll(definedParams);
@@ -227,7 +257,9 @@ public class TestRunner {
                 // Parameter variable name
                 TestParam param = testParams.get(uri);
 
-                System.out.println("Missing information element in rdf \"" + uri + "\" for arg " + param.getIndex() + " (" + param.getTerm() + ") of method " + cls.getName() + "." + method.getName());
+                logger.warning("Missing information element in rdf \"" + uri + "\" for arg " + param.getIndex() +
+                        " (" + param.getTerm() + ") of method " + cls.getName() + "." + method.getName());
+
                 testParams.remove(uri);
             }
         }
@@ -238,12 +270,17 @@ public class TestRunner {
     public static void main(String[] args) throws IOException, URISyntaxException {
         Options options = new Options();
         options.addRequiredOption("in", null, true, "Input occurrence tsv data file");
-        options.addRequiredOption("out", null, true, "Output file for the rdf representation of the dq report");
+        options.addRequiredOption("out", null, true, "Output file for the rdf " +
+                "representation of the dq report");
 
-        options.addOption("format", null, true, "Input/output rdf format (RDFXML, TURTLE, JSON-LD)");
+        options.addOption("format", null, true, "Input/output rdf format (RDFXML, " +
+                "TURTLE, JSON-LD)");
 
-        options.addRequiredOption("rdf", null, true, "Input file containing the rdf representation of the tests");
-        options.addRequiredOption("cls", null, true, "Fully qualified name of Java class on the classpath to run tests from");
+        options.addRequiredOption("rdf", null, true, "Input file containing the rdf " +
+                "representation of the tests");
+
+        options.addRequiredOption("cls", null, true, "Fully qualified name of Java class" +
+                " on the classpath to run tests from");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -419,7 +456,8 @@ public class TestRunner {
 
             return result;
         } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + "." + test.getMethod().getName(), e);
+            throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + "." +
+                    test.getMethod().getName(), e);
         }
     }
 }

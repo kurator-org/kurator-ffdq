@@ -19,7 +19,6 @@ package org.datakurator.ffdq.model.report;
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.Specification;
 

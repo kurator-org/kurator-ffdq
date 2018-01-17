@@ -1,4 +1,4 @@
-/**  Enhancement.java
+/**  Issue.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *

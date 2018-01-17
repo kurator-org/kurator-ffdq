@@ -1,29 +1,34 @@
+/** QueryUtil.java
+ *
+ * Copyright 2017 President and Fellows of Harvard College
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.datakurator.ffdq.util;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.datakurator.ffdq.rdf.FFDQModel;
-import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.query.QueryLanguage;
-import org.eclipse.rdf4j.query.TupleQueryResultHandler;
-import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.RDFWriter;
-import org.eclipse.rdf4j.rio.Rio;
-import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.io.*;
-import java.net.URISyntaxException;
 
 /**
  * Execute sparql queries on the ffdq rdf model
  */
 public class QueryUtil {
 
-    public static void main(String[] args) throws URISyntaxException, ParseException, IOException {
+    public static void main(String[] args) throws ParseException, IOException {
         Options options = new Options();
 
         options.addOption("t", "triples", true, "File containing triples (jsonld or turtle).");

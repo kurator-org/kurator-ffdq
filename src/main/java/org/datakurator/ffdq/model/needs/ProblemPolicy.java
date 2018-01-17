@@ -1,4 +1,4 @@
-/**  AmendmentPolicy.java
+/**  ProblemPolicy.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *

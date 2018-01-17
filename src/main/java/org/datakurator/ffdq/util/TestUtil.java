@@ -1,3 +1,19 @@
+/** TestUtil.java
+ *
+ * Copyright 2017 President and Fellows of Harvard College
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.datakurator.ffdq.util;
 
 import org.apache.commons.cli.*;
@@ -7,9 +23,12 @@ import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.solutions.AmendmentMethod;
+import org.datakurator.ffdq.model.solutions.Implementation;
+import org.datakurator.ffdq.model.solutions.MeasurementMethod;
+import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
-import org.datakurator.ffdq.model.solutions.*;
 import org.datakurator.ffdq.runner.AssertionTest;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
@@ -22,9 +41,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-/**
- * Created by lowery on 11/13/17.
- */
 public class TestUtil {
     private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
