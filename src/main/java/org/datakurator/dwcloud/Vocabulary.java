@@ -16,28 +16,36 @@
  */
 package org.datakurator.dwcloud;
 
+import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
+import org.datakurator.ffdq.runner.TestRunner;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class Vocabulary {
+    private static final String VOCAB_PROPERTY = "org.datakurator.dwcloud.vocab";
+    private static final String ID_TERM_PROPERTY = "org.datakurator.dwcloud.idTerm";
+
     private Map<String, Integer> header;
 
     private String idTerm;
     private Map<String, URI> mapping = new HashMap<>();
 
-    public Vocabulary(String vocabFile, String idTerm) {
-
+    public Vocabulary(String vocabUrl, String idTerm) {
         this.idTerm = idTerm;
 
+        // Check to see if id term is of the form "prefix:term" and is resolvable to a valid namespace.
+        // The following method call will throw a RuntimeException otherwise.
+        Namespace.resolvePrefixedTerm(idTerm);
+
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(vocabFile).openStream()));
+            InputStream vocabStream = new URL(vocabUrl).openStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(vocabStream));
 
             String line;
             while ((line = reader.readLine()) != null) {
@@ -63,7 +71,26 @@ public class Vocabulary {
 
             reader.close();
         } catch (IOException e) {
-            throw new RuntimeException("Error loading mapping from darwin cloud vocab file: " + vocabFile.toString(), e);
+            throw new RuntimeException("Error loading mapping from darwin cloud vocab file: " + vocabUrl, e);
+        }
+    }
+
+    public Vocabulary(File vocabFile, String idTerm) {
+        this(vocabFile.toURI().toString(), idTerm);
+    }
+
+    public static Vocabulary defaultInstance() {
+        try {
+            Properties properties = new Properties();
+            properties.load(TestRunner.class.getResourceAsStream("/config.properties"));
+
+            // Get the dwcloud vocabulary and record id term (e.g. dwc:occurrenceID from config
+            String vocabUrl = properties.getProperty(VOCAB_PROPERTY);
+            String idTerm = properties.getProperty(ID_TERM_PROPERTY);
+
+            return new Vocabulary(vocabUrl, idTerm);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize properties from file config.properties", e);
         }
     }
 

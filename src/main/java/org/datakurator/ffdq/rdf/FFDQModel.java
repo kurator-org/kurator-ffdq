@@ -16,7 +16,7 @@
  */
 package org.datakurator.ffdq.rdf;
 
-import org.datakurator.dwcloud.DwcOccurrence;
+import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.report.Assertion;
@@ -30,6 +30,11 @@ import java.util.*;
  * Created by lowery on 11/14/17.
  */
 public class FFDQModel extends BaseModel {
+    private final Vocabulary vocab;
+
+    public FFDQModel() {
+        this.vocab = Vocabulary.defaultInstance();
+    }
 
     public Map<String, Specification> findSpecificationsForMechanism(String mechanismGuid) {
         Set<String> guids = new HashSet<>();
@@ -68,7 +73,7 @@ public class FFDQModel extends BaseModel {
             BindingSet bindingSet = result.next();
             String uri = bindingSet.getValue("dataResource").stringValue();
 
-            DataResource dataResource = new DwcOccurrence(getResource(uri));
+            DataResource dataResource = new DataResource(vocab);
             dataResources.add(dataResource);
         }
 
@@ -87,5 +92,9 @@ public class FFDQModel extends BaseModel {
         Map<String, Assertion> assertions = findAll(cls, sparql, "assertion");
 
         return new ArrayList<>(assertions.values());
+    }
+
+    public Vocabulary getVocab() {
+        return vocab;
     }
 }

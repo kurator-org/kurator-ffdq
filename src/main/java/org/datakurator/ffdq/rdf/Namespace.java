@@ -41,7 +41,7 @@ public class Namespace {
         nsPrefixes.put("none", NONE);
     }
 
-    public void set(String prefix, String uri) {
+    public static void set(String prefix, String uri) {
         try {
             nsPrefixes.put(prefix, new URI(uri).toString());
         } catch (URISyntaxException e) {

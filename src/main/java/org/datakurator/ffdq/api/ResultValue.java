@@ -1,4 +1,4 @@
-/** NumericalValue.java
+/** ResultValue.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,17 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.report.result;
+package org.datakurator.ffdq.api;
 
-import org.datakurator.ffdq.model.report.ResultValue;
+import org.datakurator.ffdq.model.report.Entity;
 
-public class NumericalValue extends ResultValue {
-
-    public NumericalValue(long value) {
-        setValue(value);
-    }
-
-    public Long longValue() {
-        return (Long) getValue();
-    }
+public interface ResultValue {
+    Object getObject();
+    Entity getEntity();
 }

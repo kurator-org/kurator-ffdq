@@ -14,14 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.report.result;
+package org.datakurator.ffdq.api.result;
 
-import org.datakurator.ffdq.model.report.ResultValue;
+import org.datakurator.ffdq.api.ResultValue;
+import org.datakurator.ffdq.model.report.Entity;
 
-public class ComplianceValue extends ResultValue {
+public class ComplianceValue implements ResultValue {
+    private final String value;
 
-    public ComplianceValue(String value) {
-        setValue(value);
+    private ComplianceValue(String value) {
+        if (value.equalsIgnoreCase("COMPLIANT") || value.equalsIgnoreCase("NOT_COMPLIANT")) {
+            this.value = value;
+        } else {
+            throw new IllegalArgumentException("Invalid value " + value + " for a validation result. Must be either " +
+                    "\"COMPLIANT\" or \"NOT_COMPLIANT\".");
+        }
+    }
+
+    @Override
+    public String getObject() {
+        return value;
+    }
+
+    @Override
+    public Entity getEntity() {
+        Entity entity = new Entity();
+        entity.setValue(value);
+
+        return entity;
     }
 
     public static ComplianceValue COMPLIANT = new ComplianceValue("COMPLIANT");

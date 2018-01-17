@@ -19,7 +19,7 @@ package org.datakurator.ffdq.runner;
 import org.apache.commons.cli.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.datakurator.dwcloud.DwcOccurrence;
+import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.annotations.DQClass;
 import org.datakurator.ffdq.annotations.DQParam;
 import org.datakurator.ffdq.annotations.DQProvides;
@@ -29,7 +29,8 @@ import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 import org.datakurator.ffdq.model.report.*;
-import org.datakurator.ffdq.model.report.result.AmendmentValue;
+import org.datakurator.ffdq.api.result.AmendmentValue;
+import org.datakurator.ffdq.api.ResultValue;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
@@ -314,17 +315,18 @@ public class TestRunner {
                 }
             }
 
+            // Initialize the the ffdq model
+            FFDQModel model = new FFDQModel();
+
             // Load test definitions from rdf file into model
             File rdfFile = new File(rdfIn);
-
             if (!rdfFile.exists()) {
                 throw new FileNotFoundException("RDF input file not found: " + rdfFile.getAbsolutePath());
             }
 
-            FFDQModel model = new FFDQModel();
             model.load(new FileInputStream(rdfFile), format);
 
-            // Init test runner instance
+            // Initialize test runner instance
             Class cls = TestRunner.class.getClassLoader().loadClass(dqClass);
             TestRunner runner = new TestRunner(cls, model);
 
@@ -340,7 +342,7 @@ public class TestRunner {
             Iterable<CSVRecord> records = CSVFormat.newFormat('\t').withFirstRecordAsHeader().parse(reader);
 
             for (CSVRecord record : records) {
-                runner.run(new DwcOccurrence(record.toMap()));
+                runner.run(record.toMap());
             }
 
             // Write dq report as rdf
@@ -356,11 +358,13 @@ public class TestRunner {
         }
     }
 
-        private void run(DataResource dataResource) {
+    private void run(Map<String, String> record) {
+        // Create a new data resource from the record and load triples via model
+        DataResource dataResource = new DataResource(model.getVocab(), record);
+        model.load(dataResource.asModel());
+
         try {
             Object instance = cls.newInstance();
-
-            model.load(dataResource.asModel());
 
             // create a dq report object
             for (MeasurementMethod measurementMethod : measures) {
@@ -441,14 +445,18 @@ public class TestRunner {
 
             if (response.getValue() != null) {
                 ResultValue value = response.getValue();
+                Entity entity = new Entity();
 
                 if (value instanceof AmendmentValue) {
-                    DataResource dataResource = ((AmendmentValue) value).getDataResource();
+                    // Load amended values from the data resource into model
+                    Map<String, String> amendedValues = ((AmendmentValue) value).getObject();
+                    DataResource dataResource = new DataResource(model.getVocab(), amendedValues);
+
                     model.load(dataResource.asModel());
                 }
 
-                model.save(new Entity(value));
-                result.setResultValue(value);
+                result.setValue(value.getEntity());
+                model.save(entity);
             }
 
             result.setComment(response.getComment());

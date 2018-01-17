@@ -16,10 +16,19 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.eclipse.rdf4j.model.Model;
+import org.datakurator.dwcloud.Vocabulary;
+import org.datakurator.ffdq.rdf.Namespace;
+import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.util.ModelBuilder;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Data Resource is an instance of data and the target to the DQ assessment and management.
@@ -38,10 +47,110 @@ import java.util.Map;
  * @see <a href="https://doi.org/10.1371/journal.pone.0178731">https://doi.org/10.1371/journal.pone.0178731</a>
  *
  */
+public class DataResource {
+    private Vocabulary vocab;
 
-public interface DataResource {
-    URI getURI();
+    private ModelBuilder builder = new ModelBuilder().setNamespace("ffdq", "http://example.com/ffdq/");
+    private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-    Map<String, String> asMap();
-    Model asModel();
+    private Model model;
+    private IRI subject;
+
+    public DataResource(Vocabulary vocab) {
+        // Create data resource subject iri from generated uuid
+        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+
+        // Set an rdf type of ffdq:DataResource
+        subject = valueFactory.createIRI(uuid);
+        builder.defaultGraph().add(subject, RDF.TYPE, "ffdq:DataResource");
+
+        this.vocab = vocab;
+    }
+
+    public DataResource(Vocabulary vocab, Model model) {
+        Resource[] resources = (Resource[]) model.subjects().toArray();
+
+        // Expects a model that contains only the data resource
+        if (resources.length != 1) {
+            throw new IllegalArgumentException("Model must contain exactly one resource, " + resources.length +
+                    " found.");
+        }
+
+        // Data resource subject is the uri of the first resource in the model
+        this.subject = valueFactory.createIRI(resources[0].stringValue());
+
+        this.vocab = vocab;
+        this.model = model;
+    }
+
+    public DataResource(Vocabulary vocab, Map<String, String> record) {
+        // Create data resource subject iri from generated uuid
+        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+
+        // Set an rdf type of ffdq:DataResource
+        subject = valueFactory.createIRI(uuid);
+        builder.defaultGraph().add(subject, RDF.TYPE, "ffdq:DataResource");
+
+        // Add triples from the key value pairs in the map
+        for (String term : record.keySet()) {
+
+            URI uri = vocab.getURI(term);  // Lookup the term uri via dwcloud vocab
+
+            IRI predicate = valueFactory.createIRI(uri.toString());
+            String object = record.get(term);
+
+            builder.defaultGraph().add(subject, predicate, object);
+
+        }
+
+        this.vocab = vocab;
+    }
+
+    public String get(String term) {
+        // Resolve term and create predicate iri
+        URI uri = Namespace.resolvePrefixedTerm(term);
+        IRI predicate = valueFactory.createIRI(uri.toString());
+
+        // Get the first value from the model
+        Set<Value> values = model.filter(subject, predicate, null).objects();
+        String value = values.toArray()[0].toString();
+
+        return value;
+    }
+
+    public void put(URI term, String value) {
+        IRI predicate = valueFactory.createIRI(term.toString());
+        builder.defaultGraph().add(subject, predicate, value);
+    }
+
+    public URI getURI() {
+        try {
+            return new URI(subject.stringValue());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Subject is not a valid uri", e);
+        }
+    }
+
+    public String getRecordId() {
+        // Use the id term set in vocab to find the id
+        return get(vocab.getIdTerm());
+    }
+
+    public Map<String, String> asMap() {
+        Map<String, String> record = new HashMap<>();
+
+        // Iterate over model statements and convert to map
+        for (Statement statement : model) {
+            String term = statement.getPredicate().getLocalName();
+            String value = statement.getObject().stringValue();
+
+            record.put(term, value);
+        }
+
+        return record;
+    }
+
+    public Model asModel() {
+        return model;
+    }
 }

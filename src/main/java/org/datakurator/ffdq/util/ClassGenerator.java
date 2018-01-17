@@ -56,7 +56,7 @@ public class ClassGenerator {
 
         sb.append("import org.datakurator.ffdq.annotations.*;\n");
         sb.append("import org.datakurator.ffdq.api.DQResponse;\n");
-        sb.append("import org.datakurator.ffdq.model.report.result.*;\n\n");
+        sb.append("import org.datakurator.ffdq.api.result.*;\n\n");
 
         sb.append("@DQClass(\"").append(mechanismGuid).append("\")\n");
         sb.append("public class ").append(className).append(" {\n\n");

@@ -1,4 +1,4 @@
-/** ResultValue.java
+/** NumericalValue.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,27 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.report;
+package org.datakurator.ffdq.api.result;
 
-import java.util.UUID;
+import org.datakurator.ffdq.api.ResultValue;
+import org.datakurator.ffdq.model.report.Entity;
 
-public class ResultValue {
-    private String id = "urn:uuid" + UUID.randomUUID();
-    private Object value;
+public class NumericalValue implements ResultValue {
+    private final Number value;
 
-    public String getId() {
-        return id;
+    public NumericalValue(Number value) {
+        this.value = value;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Object getValue() {
+    @Override
+    public Number getObject() {
         return value;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    @Override
+    public Entity getEntity() {
+        Entity entity = new Entity();
+        entity.setValue(value.toString());
+
+        return entity;
     }
 }

@@ -32,15 +32,6 @@ public class Entity {
     private String id = "urn:uuid" + UUID.randomUUID();
     private Object value;
 
-    public Entity() {
-
-    }
-
-    public Entity(ResultValue value) {
-        this.id = value.getId();
-        this.value = value.getValue();
-    }
-
     @RDFSubject
     public String getId() {
         return id;

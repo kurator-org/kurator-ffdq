@@ -22,7 +22,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.datakurator.dwcloud.DwcOccurrence;
+import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
@@ -39,6 +39,7 @@ import java.util.*;
  */
 public class XLSXPostProcessor {
     private FFDQModel model;
+
     private List<String> header;
 
     private Workbook workbook;
@@ -46,13 +47,8 @@ public class XLSXPostProcessor {
 
     private static Map<String, Integer> actedUponCols = new HashMap<>();
 
-    public XLSXPostProcessor(InputStream reportStream) {
-        try {
-            model = new FFDQModel();
-            model.load(reportStream, RDFFormat.TURTLE);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not load dq report from file", e);
-        }
+    public XLSXPostProcessor(FFDQModel model) {
+        this.model = model;
     }
 
     public void initStyles(SXSSFWorkbook wb) {
@@ -130,8 +126,7 @@ public class XLSXPostProcessor {
         System.out.println(headers);
 
         for (DataResource dataResource : dataResources) {
-            DwcOccurrence record = (DwcOccurrence) dataResource;
-            String recordId = record.getRecordId();
+            String recordId = dataResource.getRecordId();
 
             // Get the assertions for each data resource
             List<Assertion> measures = model.findAssertions(dataResource, Measure.class);
@@ -149,7 +144,7 @@ public class XLSXPostProcessor {
 
                 Result result = assertion.getResult();
 
-                ResultState state = result.getResultState();
+                ResultState state = result.getState();
                 Entity value = result.getValue();
 
                 String status = determineRowStatus(state, value);
@@ -168,7 +163,7 @@ public class XLSXPostProcessor {
                 Result result = validation.getResult();
 
                 Entity value = result.getValue();
-                ResultState state = result.getResultState();
+                ResultState state = result.getState();
 
                 if (value != null) {
                  //   System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
@@ -186,7 +181,7 @@ public class XLSXPostProcessor {
 
 
                 Entity value = result.getValue();
-                ResultState state = result.getResultState();
+                ResultState state = result.getState();
 
                 if (value != null) {
                     //System.out.println(amendment.getDataResource() + " : " + value.getValue());
@@ -357,7 +352,7 @@ public class XLSXPostProcessor {
             Result result = measure.getResult();
 
             // Determine row status from state and value
-            ResultState state = result.getResultState();
+            ResultState state = result.getState();
             Entity value = result.getValue();
 
             String status = determineRowStatus(state, value);
@@ -431,8 +426,11 @@ public class XLSXPostProcessor {
     }
 
 
-    public static void main(String[] args) throws FileNotFoundException {
-        XLSXPostProcessor postProcessor = new XLSXPostProcessor(new FileInputStream("/home/lowery/ffdq/event_date_qc/report.ttl"));
+    public static void main(String[] args) throws IOException {
+        FFDQModel model = new FFDQModel();
+        model.load(new FileInputStream("/home/lowery/ffdq/event_date_qc/report.ttl"), RDFFormat.TURTLE);
+
+        XLSXPostProcessor postProcessor = new XLSXPostProcessor(model);
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
     }
 }

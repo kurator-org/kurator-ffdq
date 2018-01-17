@@ -14,14 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.report.result;
+package org.datakurator.ffdq.api.result;
 
-import org.datakurator.ffdq.model.report.ResultValue;
+import org.datakurator.ffdq.api.ResultValue;
+import org.datakurator.ffdq.model.report.Entity;
 
-public class CompletenessValue extends ResultValue {
+public class CompletenessValue implements ResultValue {
+    private final String value;
 
     private CompletenessValue(String value) {
-        setValue(value);
+        if (value.equalsIgnoreCase("COMPLETE") || value.equalsIgnoreCase("NOT_COMPLETE")) {
+            this.value = value;
+        } else {
+            throw new IllegalArgumentException("Invalid value " + value + " for a measurement result. Must be either " +
+                    "\"COMPLETE\" or \"NOT_COMPLETE\".");
+        }
+    }
+
+    @Override
+    public String getObject() {
+        return value;
+    }
+
+    @Override
+    public Entity getEntity() {
+        Entity entity = new Entity();
+        entity.setValue(value);
+
+        return entity;
     }
 
     public static CompletenessValue COMPLETE = new CompletenessValue("COMPLETE");

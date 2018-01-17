@@ -20,6 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.api.ResultValue;
 
 import java.util.UUID;
 
@@ -29,12 +30,10 @@ import java.util.UUID;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Result")
-public class Result<T extends ResultValue> {
+public class Result {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private ResultState resultState;
-    private T resultValue;
-
+    private ResultState state;
     private Entity value;
 
     private String comment;
@@ -58,13 +57,13 @@ public class Result<T extends ResultValue> {
         isAmbiguous = ambiguous;
     }
 
-    public void setResultState(ResultState resultState) {
-        this.resultState = resultState;
+    public void setResultState(ResultState state) {
+        this.state = state;
     }
 
     @RDF("ffdq:hasState")
-    public ResultState getResultState() {
-        return resultState;
+    public ResultState getState() {
+        return state;
     }
 
     @RDF("ffdq:hasValue")
@@ -74,15 +73,6 @@ public class Result<T extends ResultValue> {
 
     public void setValue(Entity value) {
         this.value = value;
-    }
-
-    public void setResultValue(T resultValue) {
-        this.resultValue = resultValue;
-        this.value = new Entity(resultValue);
-    }
-
-    public T getResultValue() {
-        return resultValue;
     }
 
     @RDF("rdfs:comment")
