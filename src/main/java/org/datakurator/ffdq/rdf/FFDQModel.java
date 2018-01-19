@@ -25,6 +25,8 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -84,21 +86,7 @@ public class FFDQModel extends BaseModel {
         return dataResources;
     }
 
-    public List<Assertion> findAssertions(DataResource dataResource, Class<? extends Assertion> cls) {
-        String sparql = "PREFIX ffdq: <http://example.com/ffdq/> " +
-                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
-                "SELECT ?assertion ?type WHERE { " +
-                "?assertion prov:used <" + dataResource.getURI() + "> . " +
-                "?assertion a ffdq:" + cls.getSimpleName() + " " +
-                "}";
-
-
-        Map<String, Assertion> assertions = findAll(cls, sparql, "assertion");
-
-        return new ArrayList<>(assertions.values());
-    }
-
-    public List<String> fieldsActedUpon(Class<? extends Assertion> cls) {
+    public List<String> findFieldsByAssertionType(Class<? extends Assertion> cls) {
         List<String> fields = new ArrayList<>();
 
         String sparql = "PREFIX ffdq: <http://example.com/ffdq/> " +
@@ -122,6 +110,52 @@ public class FFDQModel extends BaseModel {
         }
 
         return fields;
+    }
+
+    public List<URI> listDataResourcesByURI() {
+        List<URI> dataResources = new ArrayList<>();
+
+        String sparql = "PREFIX ffdq: <http://example.com/ffdq/> " +
+                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+                "SELECT DISTINCT ?dataResource WHERE { " +
+                "?assertion prov:used ?dataResource " +
+                "}";
+
+        TupleQueryResult result = executeQuery(sparql);
+
+        while(result.hasNext()) {
+            BindingSet bindingSet = result.next();
+            String uri = bindingSet.getValue("dataResource").stringValue();
+
+            try {
+                dataResources.add(new URI(uri));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Invalid DataResource uri: " + uri);
+            }
+        }
+
+        return dataResources;
+    }
+
+    public List<Assertion> findAssertionsForDataResource(DataResource dataResource, Class<? extends Assertion> cls) {
+        String sparql = "PREFIX ffdq: <http://example.com/ffdq/> " +
+                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+                "SELECT ?assertion ?type WHERE { " +
+                "?assertion prov:used <" + dataResource.getURI() + "> . " +
+                "?assertion a ffdq:" + cls.getSimpleName() + " " +
+                "}";
+
+
+        Map<String, Assertion> assertions = findAll(cls, sparql, "assertion");
+
+        return new ArrayList<>(assertions.values());
+    }
+
+    public DataResource findDataResource(URI uri) {
+        Model model = getResource(uri.toString());
+        DataResource dataResource = new DataResource(vocab, model);
+
+        return dataResource;
     }
 
     public Vocabulary getVocab() {

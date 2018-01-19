@@ -134,9 +134,9 @@ public class XLSXPostProcessor {
             String recordId = dataResource.getRecordId();
 
             // Get the assertions for each data resource
-            List<Assertion> measures = model.findAssertions(dataResource, Measure.class);
-            List<Assertion> validations = model.findAssertions(dataResource, Validation.class);
-            List<Assertion> amendments = model.findAssertions(dataResource, Amendment.class);
+            List<Assertion> measures = model.findAssertionsForDataResource(dataResource, Measure.class);
+            List<Assertion> validations = model.findAssertionsForDataResource(dataResource, Validation.class);
+            List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, Amendment.class);
 
             createMeasuresSheet(measures, dataResource);
 
@@ -339,7 +339,7 @@ public class XLSXPostProcessor {
 
     private void createMeasuresSheet(List<Assertion> measures, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        List<String> fields = model.fieldsActedUpon(Measure.class);
+        List<String> fields = model.findFieldsByAssertionType(Measure.class);
 
         SXSSFSheet measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
 
