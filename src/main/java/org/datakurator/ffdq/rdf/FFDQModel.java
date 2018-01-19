@@ -21,6 +21,7 @@ import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.report.Assertion;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 
@@ -33,6 +34,8 @@ public class FFDQModel extends BaseModel {
     private final Vocabulary vocab;
 
     public FFDQModel() {
+        super();
+
         this.vocab = Vocabulary.defaultInstance();
     }
 
@@ -73,7 +76,8 @@ public class FFDQModel extends BaseModel {
             BindingSet bindingSet = result.next();
             String uri = bindingSet.getValue("dataResource").stringValue();
 
-            DataResource dataResource = new DataResource(vocab);
+            Model model = getResource(uri);
+            DataResource dataResource = new DataResource(vocab, model);
             dataResources.add(dataResource);
         }
 
@@ -92,6 +96,32 @@ public class FFDQModel extends BaseModel {
         Map<String, Assertion> assertions = findAll(cls, sparql, "assertion");
 
         return new ArrayList<>(assertions.values());
+    }
+
+    public List<String> fieldsActedUpon(Class<? extends Assertion> cls) {
+        List<String> fields = new ArrayList<>();
+
+        String sparql = "PREFIX ffdq: <http://example.com/ffdq/> " +
+                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+                "SELECT DISTINCT ?field WHERE { " +
+                "?assertion a ffdq:" + cls.getSimpleName() + " . " +
+                "{ ?assertion ffdq:dimensionInContext ?context } UNION " +
+                "{ ?assertion ffdq:criterionInContext ?context } UNION " +
+                "{ ?assertion ffdq:enhancementInContext ?context } . " +
+                "?context ffdq:hasInformationElement ?ie . " +
+                "?ie ffdq:composedOf ?field " +
+        "}";
+
+        TupleQueryResult result = executeQuery(sparql);
+
+        while(result.hasNext()) {
+            BindingSet bindingSet = result.next();
+            String field = bindingSet.getValue("field").stringValue();
+
+            fields.add(field);
+        }
+
+        return fields;
     }
 
     public Vocabulary getVocab() {

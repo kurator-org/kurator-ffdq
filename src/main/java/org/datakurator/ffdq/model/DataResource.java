@@ -25,10 +25,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Data Resource is an instance of data and the target to the DQ assessment and management.
@@ -68,16 +65,21 @@ public class DataResource {
     }
 
     public DataResource(Vocabulary vocab, Model model) {
-        Resource[] resources = (Resource[]) model.subjects().toArray();
+        List<Resource> resources = new ArrayList<>();
+        for (Object obj : model.subjects().toArray()) {
+            if (obj instanceof Resource) {
+                resources.add((Resource) obj);
+            }
+        }
 
         // Expects a model that contains only the data resource
-        if (resources.length != 1) {
-            throw new IllegalArgumentException("Model must contain exactly one resource, " + resources.length +
+        if (resources.size() != 1) {
+            throw new IllegalArgumentException("Model must contain exactly one resource, " + resources.size() +
                     " found.");
         }
 
         // Data resource subject is the uri of the first resource in the model
-        this.subject = valueFactory.createIRI(resources[0].stringValue());
+        this.subject = valueFactory.createIRI(resources.get(0).stringValue());
 
         this.vocab = vocab;
         this.model = model;
@@ -104,12 +106,12 @@ public class DataResource {
         }
 
         this.vocab = vocab;
+        this.model = builder.build();
     }
 
-    public String get(String term) {
+    public String get(URI term) {
         // Resolve term and create predicate iri
-        URI uri = Namespace.resolvePrefixedTerm(term);
-        IRI predicate = valueFactory.createIRI(uri.toString());
+        IRI predicate = valueFactory.createIRI(term.toString());
 
         // Get the first value from the model
         Set<Value> values = model.filter(subject, predicate, null).objects();
@@ -118,9 +120,16 @@ public class DataResource {
         return value;
     }
 
-    public void put(URI term, String value) {
-        IRI predicate = valueFactory.createIRI(term.toString());
-        builder.defaultGraph().add(subject, predicate, value);
+    public String get(String term) {
+        // Resolve term and create predicate iri
+        URI uri = vocab.getURI(term);
+        IRI predicate = valueFactory.createIRI(uri.toString());
+
+        // Get the first value from the model
+        Set<Value> values = model.filter(subject, predicate, null).objects();
+        String value = values.toArray()[0].toString();
+
+        return value;
     }
 
     public URI getURI() {

@@ -17,9 +17,7 @@
 package org.datakurator.ffdq.api.result;
 
 import org.datakurator.ffdq.api.ResultValue;
-import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.report.Entity;
-import org.datakurator.ffdq.rdf.Namespace;
 
 import java.net.URI;
 import java.net.URISyntaxException;

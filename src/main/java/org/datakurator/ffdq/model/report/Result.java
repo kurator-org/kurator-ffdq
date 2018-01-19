@@ -20,7 +20,6 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.api.ResultValue;
 
 import java.util.UUID;
 
@@ -57,21 +56,21 @@ public class Result {
         isAmbiguous = ambiguous;
     }
 
-    public void setResultState(ResultState state) {
-        this.state = state;
-    }
-
     @RDF("ffdq:hasState")
     public ResultState getState() {
         return state;
     }
 
+    public void setState(ResultState state) {
+        this.state = state;
+    }
+
     @RDF("ffdq:hasValue")
-    public Entity getValue() {
+    public Entity getEntity() {
         return this.value;
     }
 
-    public void setValue(Entity value) {
+    public void setEntity(Entity value) {
         this.value = value;
     }
 

@@ -16,7 +16,6 @@
  */
 package org.datakurator.dwcloud;
 
-import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
 import org.datakurator.ffdq.runner.TestRunner;
 

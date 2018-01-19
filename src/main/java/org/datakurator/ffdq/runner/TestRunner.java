@@ -19,18 +19,17 @@ package org.datakurator.ffdq.runner;
 import org.apache.commons.cli.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.annotations.DQClass;
 import org.datakurator.ffdq.annotations.DQParam;
 import org.datakurator.ffdq.annotations.DQProvides;
 import org.datakurator.ffdq.api.DQResponse;
+import org.datakurator.ffdq.api.ResultValue;
+import org.datakurator.ffdq.api.result.AmendmentValue;
 import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 import org.datakurator.ffdq.model.report.*;
-import org.datakurator.ffdq.api.result.AmendmentValue;
-import org.datakurator.ffdq.api.ResultValue;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
@@ -441,7 +440,7 @@ public class TestRunner {
             Result result = new Result();
 
             model.save(response.getResultState());
-            result.setResultState(response.getResultState());
+            result.setState(response.getResultState());
 
             if (response.getValue() != null) {
                 ResultValue value = response.getValue();
@@ -455,7 +454,7 @@ public class TestRunner {
                     model.load(dataResource.asModel());
                 }
 
-                result.setValue(value.getEntity());
+                result.setEntity(value.getEntity());
                 model.save(entity);
             }
 
