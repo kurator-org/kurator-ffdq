@@ -19,7 +19,6 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
-import org.filteredpush.qc.date.DwCEventDQ;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -47,7 +46,7 @@ public class DQClassHandler {
         this(factory, new String[] { }, cls);
     }
 
-    public DQClassHandler(RDFBeanFactory factory, String[] guids, Class<DwCEventDQ> cls) {
+    public DQClassHandler(RDFBeanFactory factory, String[] guids, Class cls) {
         this.guids = guids;
         this.rdfFactory = factory;
         this.cls = cls;
@@ -168,7 +167,7 @@ public class DQClassHandler {
     }
 
     public static void main(String[] args) throws IOException, RDFBeanException {
-        String[] testGuids = new String[]{"urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"};
+        /*String[] testGuids = new String[]{"urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"};
 
         RDFBeanFactory factory = new RDFBeanFactory();
 
@@ -190,6 +189,6 @@ public class DQClassHandler {
             handler.run(record);
         }
 
-        factory.write(RDFFormat.TURTLE, System.out);
+        factory.write(RDFFormat.TURTLE, System.out);*/
     }
 }
