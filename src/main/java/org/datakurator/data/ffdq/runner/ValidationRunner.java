@@ -4,6 +4,7 @@ import org.datakurator.data.ffdq.assertions.Result;
 import org.datakurator.data.provenance.BaseRecord;
 import org.datakurator.data.provenance.CurationStatus;
 import org.datakurator.ffdq.annotations.*;
+import org.datakurator.ffdq.annotations.Parameter;
 import org.datakurator.ffdq.api.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,6 +29,7 @@ public class ValidationRunner {
     private long count = 0;
 
     private Map<String, String> fields;
+    private Map<String, Object> params;
 
     private Class cls;
 
@@ -37,9 +39,10 @@ public class ValidationRunner {
 
     private Writer writer;
 
-    public ValidationRunner(Class cls, Writer writer) {
+    public ValidationRunner(Class cls, Writer writer, Map<String, Object> params) {
         this.cls = cls;
         //this.fields = fields;
+        this.params = params;
         this.writer = writer;
 
         for (Annotation annotation : cls.getDeclaredAnnotations()) {
@@ -75,6 +78,10 @@ public class ValidationRunner {
                         Consulted consulted = (Consulted) annotation;
                         param.setTerm(consulted.value());
                         param.setUsage(ValidationParam.CONSULTED);
+                    } else if (annotation.annotationType().equals(Parameter.class)) {
+                        Parameter parameter = (Parameter) annotation;
+                        param.setTerm(parameter.name());
+                        param.setUsage(ValidationParam.WORKFLOW_PARAM);
                     }
 
                     test.addParam(param);
@@ -365,9 +372,9 @@ public class ValidationRunner {
         System.out.println("Wrote dq report containing " + count + " assertions.");
     }
 
-    private String[] assembleArgs(ValidationTest test, Map<String, String> record) {
+    private Object[] assembleArgs(ValidationTest test, Map<String, String> record) {
             List<ValidationParam> inputs = test.getInputs();
-            String[] args = new String[inputs.size()];
+            Object[] args = new Object[inputs.size()];
 
             Map<String, String> dwcRecord = new HashMap<String, String>();
             for (String term : record.keySet()) {
@@ -377,10 +384,23 @@ public class ValidationRunner {
 
             for (int i = 0; i < args.length; i++) {
                 ValidationParam input = inputs.get(i);
-                String term = input.getTerm();
-                String value = dwcRecord.get(term);
 
-                args[i] = value;
+                if (input.getUsage() == ValidationParam.ACTED_UPON || input.getUsage() == ValidationParam.CONSULTED) {
+                    // This is a method argument that has a value mapped from input data
+                    String term = input.getTerm();
+                    String value = dwcRecord.get(term);
+
+                    args[i] = value;
+                } else if (input.getUsage() == ValidationParam.WORKFLOW_PARAM) {
+                    // This is a method argument that has a value mapped to a workflow parameter
+                    String name = input.getTerm();
+                    Object value = params.get(name);
+
+                    args[i] = value;
+
+                    System.out.println("Parameter value from workflow \"" + name + "\" substituted for argument #" + i+1 + " of test method: value=" + value);
+                }
+
             }
 
             return args;

@@ -6,6 +6,7 @@ package org.datakurator.data.ffdq.runner;
 public class ValidationParam {
     public static final int ACTED_UPON = 0;
     public static final int CONSULTED = 1;
+    public static final int WORKFLOW_PARAM = 2;
 
     private String term;
     private String value;
