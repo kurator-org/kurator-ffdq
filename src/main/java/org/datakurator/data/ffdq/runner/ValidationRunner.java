@@ -39,6 +39,10 @@ public class ValidationRunner {
 
     private Writer writer;
 
+    public ValidationRunner(Class cls, Writer writer) {
+        this(cls, writer, new HashMap<>());
+    }
+
     public ValidationRunner(Class cls, Writer writer, Map<String, Object> params) {
         this.cls = cls;
         //this.fields = fields;
