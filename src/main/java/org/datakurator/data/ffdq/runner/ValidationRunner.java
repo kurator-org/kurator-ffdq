@@ -281,7 +281,7 @@ public class ValidationRunner {
                 status = CurationStatus.DATA_PREREQUISITES_NOT_MET;
             }
 
-            json.put("value", value);
+            json.put("value", value != null ?  value.toString() : "");
             json.put("status", status.name());
             json.put("comment", retVal.getComment());
 
