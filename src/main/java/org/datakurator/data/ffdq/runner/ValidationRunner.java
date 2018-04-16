@@ -401,8 +401,6 @@ public class ValidationRunner {
                     Object value = params.get(name);
 
                     args[i] = value;
-
-                    System.out.println("Parameter value from workflow \"" + name + "\" substituted for argument #" + i+1 + " of test method: value=" + value);
                 }
 
             }
