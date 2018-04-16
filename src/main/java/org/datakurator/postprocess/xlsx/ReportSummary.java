@@ -56,7 +56,8 @@ public class ReportSummary {
             String status = state.get(field);
 
             Cell cell = row.createCell(i);
-            cell.setCellValue(value);
+
+            cell.setCellValue(value != null ? value : "");
 
             if (status != null) {
                 if (styles.containsKey(status)) {
