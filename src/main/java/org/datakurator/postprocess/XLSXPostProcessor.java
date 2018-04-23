@@ -50,6 +50,9 @@ public class XLSXPostProcessor {
 
     private static Map<String, Integer> actedUponCols = new HashMap<>();
 
+
+    int measuresSheetRowNum = 1;
+
     public XLSXPostProcessor(FFDQModel model) {
         this.model = model;
     }
@@ -124,6 +127,7 @@ public class XLSXPostProcessor {
         // ......
 
         // Create the measures sheet
+        Sheet measuresSheet = createMeasuresSheet();
 
         // Obtain headers from the first record
         Set<String> headers = dataResources.get(0).asMap().keySet();
@@ -138,7 +142,9 @@ public class XLSXPostProcessor {
             List<Assertion> validations = model.findAssertionsForDataResource(dataResource, Validation.class);
             List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, Amendment.class);
 
-            createMeasuresSheet(measures, dataResource);
+            // TODO: add support to postprocessor for issues
+
+            initMeasuresSheet(measuresSheet, measures, dataResource);
 
             Map<String, String> initialValues = dataResource.asMap();
             Map<String, String> finalValues = new HashMap<>(initialValues);
@@ -159,7 +165,7 @@ public class XLSXPostProcessor {
                 Measure measure = (Measure) assertion;
 
                 if (value != null) {
-                    //System.out.println(value.getValue() + " : " + state.getLabel());
+                    System.out.println(value.getValue() + " : " + state.getLabel());
                 }
             }
 
@@ -176,8 +182,8 @@ public class XLSXPostProcessor {
 
 
 
-                //System.out.println(validation.getCriterion().getInformationElements().getComposedOf());
-                //System.out.println(value + " : " + state.getLabel() + " : " + result.getComment());
+                System.out.println(validation.getCriterion().getInformationElements().getComposedOf());
+                System.out.println(value + " : " + state.getLabel() + " : " + result.getComment());
             }
 
             for (Assertion assertion : amendments) {
@@ -189,8 +195,8 @@ public class XLSXPostProcessor {
                 ResultState state = result.getState();
 
                 if (value != null) {
-                    //System.out.println(amendment.getDataResource() + " : " + value.getValue());
-                    //System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
+                    System.out.println(amendment.getDataResource() + " : " + value.getValue());
+                    System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
                 }
             }
         }
@@ -337,10 +343,7 @@ public class XLSXPostProcessor {
         }
     }
 
-    private void createMeasuresSheet(List<Assertion> measures, DataResource dataResource) {
-        // Get the list of fields actedUpon from the information elements
-        List<String> fields = model.findFieldsByAssertionType(Measure.class);
-
+    private SXSSFSheet createMeasuresSheet() {
         SXSSFSheet measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
 
         // Create the header row
@@ -352,13 +355,19 @@ public class XLSXPostProcessor {
         headerRow.createCell(3).setCellValue("Value");
         headerRow.createCell(4).setCellValue("Comment");
 
-        int rowNum = 1;
+        return measuresSheet;
+    }
+
+    private void initMeasuresSheet(Sheet measuresSheet, List<Assertion> measures, DataResource dataResource) {
+        // Get the list of fields actedUpon from the information elements
+        List<String> fields = model.findFieldsByAssertionType(Measure.class);
+
         for (Assertion assertion : measures) {
             Measure measure = (Measure) assertion;
             String recordId = dataResource.getRecordId();
 
             // Measurement assertion row
-            Row measuresRow = measuresSheet.createRow(rowNum);
+            Row measuresRow = measuresSheet.createRow(measuresSheetRowNum++);
 
             // Get the test name from the specification
             Specification specification = measure.getSpecification();
@@ -372,7 +381,12 @@ public class XLSXPostProcessor {
             Entity entity = result.getEntity();
 
             String status = determineRowStatus(state, entity);
-            String value = String.valueOf(entity.getValue());
+            String value = "";
+
+            if (entity != null && entity.getValue() != null) {
+                value = entity.getValue().toString();
+            }
+
             String comment = result.getComment();
 
             // Create assertion metadata cells
@@ -405,6 +419,9 @@ public class XLSXPostProcessor {
 
             System.out.println(recordId + ", " + test + ", " + status);
         }
+
+        // empty row between blocks of measures
+        measuresSheetRowNum++;
 
     }
 
@@ -449,7 +466,7 @@ public class XLSXPostProcessor {
 
     public static void main(String[] args) throws IOException {
         FFDQModel model = new FFDQModel();
-        model.load(new FileInputStream("/home/lowery/IdeaProjects/event_date_qc/report.ttl"), RDFFormat.TURTLE);
+        model.load(new FileInputStream("/home/lowery/ffdq/event_date_qc/report.ttl"), RDFFormat.TURTLE);
 
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(model);
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));
