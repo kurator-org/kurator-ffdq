@@ -211,4 +211,6 @@ After this, you will need to login to the sonatype oss repository hosting nexus 
 
 Certain Java classes dedicated to fundamental concepts in the Fitness For Use framework have Java comments that credit a paper by Veiga et al available at: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178731
 
+FFDQ is a sort of acronym for XXXX
+
 An example is: https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/java/org/datakurator/data/ffdq/model/report/DataResource.java
