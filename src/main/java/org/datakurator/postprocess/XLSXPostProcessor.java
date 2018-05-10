@@ -22,11 +22,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.datakurator.ffdq.api.result.AmendmentValue;
 import org.datakurator.ffdq.model.DataResource;
+import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.rdf.FFDQModel;
+import org.datakurator.ffdq.rdf.Namespace;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.FileInputStream;
@@ -52,6 +55,10 @@ public class XLSXPostProcessor {
 
 
     int measuresSheetRowNum = 1;
+    int validationsSheetRowNum = 1;
+
+    int initialValuesSheetRowNum = 1;
+    int finalValuesSheetRowNum = 1;
 
     public XLSXPostProcessor(FFDQModel model) {
         this.model = model;
@@ -124,15 +131,21 @@ public class XLSXPostProcessor {
         List<DataResource> dataResources = model.findDataResources();
 
         // Create the initial values sheet
-        // ......
+        Sheet initialValuesSheet = createInitialValuesSheet(dataResources);
+
+        // Create the final values sheet
+        Sheet finalValuesSheet = createFinalValuesSheet(dataResources);
 
         // Create the measures sheet
         Sheet measuresSheet = createMeasuresSheet();
 
-        // Obtain headers from the first record
-        Set<String> headers = dataResources.get(0).asMap().keySet();
+        // Create the validations sheet
+        Sheet validationsSheet = createValidationsSheet();
 
-        System.out.println(headers);
+        // Obtain headers from the first record
+        // Set<String> headers = dataResources.get(0).asMap().keySet();
+
+        // System.out.println(headers);
 
         for (DataResource dataResource : dataResources) {
             String recordId = dataResource.getRecordId();
@@ -142,12 +155,26 @@ public class XLSXPostProcessor {
             List<Assertion> validations = model.findAssertionsForDataResource(dataResource, Validation.class);
             List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, Amendment.class);
 
+            // Initialize the validation states for initial and final values
+            Map<String, ValidationState> initialValues = new HashMap<>();
+            Map<String, ValidationState> finalValues = new HashMap<>();
+
+            Map<String, String> dataResourceValues = dataResource.asMap();
+            for (String key : dataResourceValues.keySet()) {
+                ValidationState initialValue = new ValidationState();
+                ValidationState finalValue = new ValidationState();
+
+                initialValue.setValue(dataResourceValues.get(key));
+                initialValues.put(key, initialValue);
+
+                finalValue.setValue(dataResourceValues.get(key));
+                finalValues.put(key, finalValue);
+            }
+
             // TODO: add support to postprocessor for issues
 
             initMeasuresSheet(measuresSheet, measures, dataResource);
-
-            Map<String, String> initialValues = dataResource.asMap();
-            Map<String, String> finalValues = new HashMap<>(initialValues);
+            initValidationsSheet(validationsSheet, validations, dataResource);
 
             for (Assertion assertion : measures) {
                 Specification specification = assertion.getSpecification();
@@ -160,13 +187,13 @@ public class XLSXPostProcessor {
 
                 String status = determineRowStatus(state, value);
 
-                System.out.println(recordId + ", " + test + ", " + status);
+                //System.out.println(recordId + ", " + test + ", " + status);
 
                 Measure measure = (Measure) assertion;
 
-                if (value != null) {
-                    System.out.println(value.getValue() + " : " + state.getLabel());
-                }
+                //if (value != null) {
+                    //System.out.println(value.getValue() + " : " + state.getLabel());
+               // }
             }
 
             for (Assertion assertion : validations) {
@@ -176,30 +203,86 @@ public class XLSXPostProcessor {
                 Entity value = result.getEntity();
                 ResultState state = result.getState();
 
-                if (value != null) {
-                 //   System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
+                List<URI> composedOf = validation.getCriterion().getInformationElements().getComposedOf();
+                for (URI uri : composedOf) {
+                    String term = uri.getPath();
+                    term = term.substring(term.lastIndexOf("/")+1);
+
+                    if (value != null) {
+                        String status = value.getValue().toString();
+
+                        //System.out.println(term + " : " + status);
+                        initialValues.get(term).setStatus(status);
+                    } else {
+                        initialValues.get(term).setStatus(state.getLabel());
+                    }
                 }
 
-
-
-                System.out.println(validation.getCriterion().getInformationElements().getComposedOf());
-                System.out.println(value + " : " + state.getLabel() + " : " + result.getComment());
+               // if (value != null) {
+                //    System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
+                //}
             }
 
             for (Assertion assertion : amendments) {
                 Amendment amendment = (Amendment) assertion;
                 Result result = amendment.getResult();
 
-
                 Entity value = result.getEntity();
                 ResultState state = result.getState();
 
-                if (value != null) {
-                    System.out.println(amendment.getDataResource() + " : " + value.getValue());
-                    System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
+                List<URI> composedOf = amendment.getEnhancement().getInformationElements().getComposedOf();
+
+                if (value != null && state != null) {
+                    Map<String, String> amendedValues = model.findDataResource((URI) value.getValue()).asMap();
+
+                    for (String term : amendedValues.keySet()) {
+                        finalValues.get(term).setValue(amendedValues.get(term));
+                        finalValues.get(term).setStatus(state.getLabel());
+                    }
+
+                } else if (state != null && !state.equals(ResultState.NO_CHANGE)) {
+                    for (URI uri : composedOf) {
+                        String term = uri.getPath();
+                        term = term.substring(term.lastIndexOf("/") + 1);
+
+                        finalValues.get(term).setStatus(state.getLabel());
+                    }
+
                 }
+
+                //if (value != null) {
+                    //System.out.println(amendment.getDataResource() + " : " + value.getValue());
+                    //System.out.println(value.getValue() + " : " + state.getLabel() + " : " + result.getComment());
+               // }
+            }
+
+            // Add rows to initial and final values sheets
+            Row initialValuesRow = initialValuesSheet.createRow(initialValuesSheetRowNum++);
+
+            int colNum = 0;
+            for (ValidationState validationState : initialValues.values()) {
+                Cell initialValuesCell = initialValuesRow.createCell(colNum);
+
+                initialValuesCell.setCellValue(validationState.getValue());
+                initialValuesCell.setCellStyle(styles.get(validationState.getStatus()));
+
+                colNum++;
+            }
+
+            Row finalValuesRow = finalValuesSheet.createRow(finalValuesSheetRowNum++);
+
+            colNum = 0;
+            for (ValidationState validationState : finalValues.values()) {
+                Cell finalValuesCell = finalValuesRow.createCell(colNum);
+
+                finalValuesCell.setCellValue(validationState.getValue());
+                finalValuesCell.setCellStyle(styles.get(validationState.getStatus()));
+
+                colNum++;
             }
         }
+
+
 
         try {
             /*while(reportParser.next()) {
@@ -302,6 +385,20 @@ public class XLSXPostProcessor {
         }
     }
 
+    private Sheet createFinalValuesSheet(List<DataResource> dataResources) {
+        SXSSFSheet finalValuesSheet = (SXSSFSheet) workbook.createSheet("Final Values");
+
+        // Obtain headers from the first record
+        Object[] headers = dataResources.get(0).asMap().keySet().toArray();
+
+        Row headerRow = finalValuesSheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            headerRow.createCell(i).setCellValue(headers[i].toString());
+        }
+
+        return finalValuesSheet;
+    }
+
 
     private void createSummarySheet(String summaryText) {
         SXSSFSheet summarySheet = (SXSSFSheet) workbook.createSheet("Summary");
@@ -321,12 +418,22 @@ public class XLSXPostProcessor {
         summarySheet.addMergedRegion(new CellRangeAddress(1,7,1,9));
     }
 
-    private void createInitialValuesSheet(List<DataResource> dataResources) {
+    private SXSSFSheet createInitialValuesSheet(List<DataResource> dataResources) {
         SXSSFSheet initialValuesSheet = (SXSSFSheet) workbook.createSheet("Initial Values");
 
-        for (int i = 0; i < dataResources.size(); i++) {
+        // Obtain headers from the first record
+        Object[] headers = dataResources.get(0).asMap().keySet().toArray();
+
+        Row headerRow = initialValuesSheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            headerRow.createCell(i).setCellValue(headers[i].toString());
+        }
+
+/*        int rowOffset = 1; // offset due to first row used as header
+
+       for (int i = 0; i < dataResources.size(); i++) {
             // Create a row for each data resource
-            Row initialValuesRow = initialValuesSheet.createRow(i);
+            Row initialValuesRow = initialValuesSheet.createRow(i+rowOffset);
 
             // Get the initial values from the data resource map and add values to cells
             DataResource dataResource = dataResources.get(i);
@@ -340,7 +447,9 @@ public class XLSXPostProcessor {
                 initialValuesCell.setCellValue(initialValues.get(field));
                 colNum++;
             }
-        }
+        }*/
+
+        return initialValuesSheet;
     }
 
     private SXSSFSheet createMeasuresSheet() {
@@ -380,14 +489,20 @@ public class XLSXPostProcessor {
             ResultState state = result.getState();
             Entity entity = result.getEntity();
 
-            String status = determineRowStatus(state, entity);
+            // String status = determineRowStatus(state, entity);
+            String status = "";
             String value = "";
 
             if (entity != null && entity.getValue() != null) {
                 value = entity.getValue().toString();
             }
 
+            if (state != null) {
+                status = state.getLabel();
+            }
+
             String comment = result.getComment();
+            System.out.println(comment);
 
             // Create assertion metadata cells
             measuresRow.createCell(0).setCellValue(recordId);
@@ -406,7 +521,7 @@ public class XLSXPostProcessor {
 
                 int i = fields.indexOf(field);
 
-                Cell measuresCell = measuresRow.createCell(i+4);
+                Cell measuresCell = measuresRow.createCell(i+5);
 
                 // Set cell value and style based on status
                 try {
@@ -422,6 +537,95 @@ public class XLSXPostProcessor {
 
         // empty row between blocks of measures
         measuresSheetRowNum++;
+
+    }
+
+
+    private SXSSFSheet createValidationsSheet() {
+        SXSSFSheet validationsSheet = (SXSSFSheet) workbook.createSheet("Validations");
+
+        // Create the header row
+        Row headerRow = validationsSheet.createRow(0);
+
+        headerRow.createCell(0).setCellValue("Record Id");
+        headerRow.createCell(1).setCellValue("Test Name");
+        headerRow.createCell(2).setCellValue("Status");
+        headerRow.createCell(3).setCellValue("Value");
+        headerRow.createCell(4).setCellValue("Comment");
+
+        return validationsSheet;
+    }
+
+    private void initValidationsSheet(Sheet validationsSheet, List<Assertion> validations, DataResource dataResource) {
+        // Get the list of fields actedUpon from the information elements
+        List<String> fields = model.findFieldsByAssertionType(Validation.class);
+        System.out.println(fields);
+
+        for (Assertion assertion : validations) {
+            Validation validation = (Validation) assertion;
+            String recordId = dataResource.getRecordId();
+
+            // Validation assertion row
+            Row validationsRow = validationsSheet.createRow(validationsSheetRowNum++);
+
+            // Get the test name from the specification
+            Specification specification = validation.getSpecification();
+            String test = specification.getLabel();
+
+            // Validation result
+            Result result = validation.getResult();
+
+            // Determine row status from state and value
+            ResultState state = result.getState();
+            Entity entity = result.getEntity();
+
+            // String status = determineRowStatus(state, entity);
+            String status = "";
+            String value = "";
+
+            if (entity != null && entity.getValue() != null) {
+                value = entity.getValue().toString();
+            }
+
+            if (state != null) {
+                status = state.getLabel();
+            }
+
+            String comment = result.getComment();
+
+            // Create assertion metadata cells
+            validationsRow.createCell(0).setCellValue(recordId);
+            validationsRow.createCell(1).setCellValue(test);
+            validationsRow.createCell(2).setCellValue(status);
+            validationsRow.createCell(3).setCellValue(value);
+            validationsRow.createCell(4).setCellValue(comment);
+
+            //ContextualizedDimension context = measure.getDimension();
+            for (String field : fields) {
+
+                // Lookup column index for field and create cell for the values
+                //if (!fields.contains(field)) {
+                //    fields.add(field);
+                //}
+
+                int i = fields.indexOf(field);
+
+                Cell validationsCell = validationsRow.createCell(i+5);
+
+                // Set cell value and style based on status
+                try {
+                    validationsCell.setCellValue(dataResource.get(new URI(field)));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                validationsCell.setCellStyle(styles.get(status));
+            }
+
+            System.out.println(recordId + ", " + test + ", " + status);
+        }
+
+        // empty row between blocks of measures
+        validationsSheetRowNum++;
 
     }
 
@@ -466,7 +670,7 @@ public class XLSXPostProcessor {
 
     public static void main(String[] args) throws IOException {
         FFDQModel model = new FFDQModel();
-        model.load(new FileInputStream("/home/lowery/ffdq/event_date_qc/report.ttl"), RDFFormat.TURTLE);
+        model.load(new FileInputStream("/home/lowery/IdeaProjects/event_date_qc/target/dq-report.ttl"), RDFFormat.TURTLE);
 
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(model);
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));

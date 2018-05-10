@@ -61,4 +61,8 @@ public class DQResponse<T extends ResultValue> {
     public void setValue(T value) {
         this.value = value;
     }
+
+    public Object getObject() {
+        return value.getObject();
+    }
 }
