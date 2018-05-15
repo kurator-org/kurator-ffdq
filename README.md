@@ -136,9 +136,9 @@ To use the annotations, in the project that defines the methods and classes corr
             <version>1.0.4-SNAPSHOT</version>
         </dependency>
         
-Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the @DQClass annotation applied to a class:
+Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the @Mechanism annotation applied to a class:
 
-    @DQClass("urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84")
+    @Mechanism("urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84")
     public class DwCEventDQ {
         // ...     
     }
@@ -147,7 +147,7 @@ The mechanism above has a guid value property that uniquely identifies the mecha
 
 Next is the method level annotation that maps Java code to FFDQ concepts by associating a method implementing a test with the specification GUID.
 
-	@DQProvides("urn:uuid:da63f836-1fc6-4e96-a612-fa76678cfd6a")
+	@Provides("urn:uuid:da63f836-1fc6-4e96-a612-fa76678cfd6a")
     public static DQResponse<ComplianceValue> eventDateConsistentWithVerbatim(...) {
         // ...
     }
@@ -155,8 +155,8 @@ Next is the method level annotation that maps Java code to FFDQ concepts by asso
 Lastly, the method parameter level annotation is provided for defining how the parameters (the fields acted upon or fields consulted) map to information elements in ffdq defined in terms of a controlled vocabulary such as DWC. The value for this annotation must contain the namespace prefix (e.g. dwc:eventDate).
 
     public static EventDQValidation eventDateConsistentWithVerbatim(
-    		@DQParam("dwc:eventDate") String eventDate,
-			@DQParam("dwc:verbatimEventDate") String verbatimEventDate) {
+    		@ActedUpon("dwc:eventDate") String eventDate,
+			@ActedUpon("dwc:verbatimEventDate") String verbatimEventDate) {
 			    // ...
 			}
     

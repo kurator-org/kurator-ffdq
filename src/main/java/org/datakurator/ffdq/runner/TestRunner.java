@@ -19,9 +19,9 @@ package org.datakurator.ffdq.runner;
 import org.apache.commons.cli.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.datakurator.ffdq.annotations.DQClass;
-import org.datakurator.ffdq.annotations.DQParam;
-import org.datakurator.ffdq.annotations.DQProvides;
+import org.datakurator.ffdq.annotations.ActedUpon;
+import org.datakurator.ffdq.annotations.Consulted;
+import org.datakurator.ffdq.annotations.Provides;
 import org.datakurator.ffdq.api.DQResponse;
 import org.datakurator.ffdq.api.ResultValue;
 import org.datakurator.ffdq.api.result.AmendmentValue;
@@ -68,10 +68,16 @@ public class TestRunner {
         for (Annotation annotation : cls.getAnnotations()) {
 
             // Find the class level annotation and get the value for mechanism guid
-            if (annotation instanceof DQClass) {
+            if (annotation instanceof org.datakurator.ffdq.annotations.Mechanism) {
 
-                String mechanismGuid = "urn:uuid:" + ((DQClass) annotation).value();
+                String mechanismGuid = ((org.datakurator.ffdq.annotations.Mechanism) annotation).value();
                 mechanism = (Mechanism) model.findOne(mechanismGuid, Mechanism.class);
+
+                // check to see if the annotation has a label value and override value from rdf if present
+                String mechanismLabel = ((org.datakurator.ffdq.annotations.Mechanism) annotation).label();
+                if (mechanismLabel != null) {
+                    mechanism.setLabel(mechanismLabel);
+                }
 
                 // Query the FFDQ model for test specifications implemented by the mechanism tied to the DQClass
                 Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
@@ -86,16 +92,66 @@ public class TestRunner {
 
     private void processMethods(Class cls, Map<String, Specification> definedTests) {
 
-        HashMap<String, Method> implementedTests = new HashMap<>();
+        HashMap<String, AssertionTest> implementedTests = new HashMap<>();
 
         // Get the test guid (specification) defined in the DQProvides method level annotation
         for (Method javaMethod : cls.getMethods()) {
+            AssertionTest test = new AssertionTest();
+            test.setMethod(javaMethod);
 
             for (Annotation annotation : javaMethod.getAnnotations()) {
-                if (annotation instanceof DQProvides) {
-                    String guid = "urn:uuid:" + ((DQProvides) annotation).value();
-                    implementedTests.put(guid, javaMethod);
-                }
+
+                if (annotation instanceof Provides) {
+                    String guid = ((Provides) annotation).value();
+
+                    test.setGuid(guid);
+                    implementedTests.put(guid, test);
+                } else if (annotation instanceof Measure) {
+                        String description = ((org.datakurator.ffdq.annotations.Measure) annotation).description();
+                        String dimension = ((org.datakurator.ffdq.annotations.Measure) annotation).dimension().toString();
+                        String label = ((org.datakurator.ffdq.annotations.Measure) annotation).label();
+
+                        if (description != null) {
+                            test.setDescription(description);
+                        }
+
+                        if (dimension != null) {
+                            test.setDimension(dimension);
+                        }
+
+                        if (label != null) {
+                            test.setLabel(label);
+                        }
+                    } else if (annotation instanceof org.datakurator.ffdq.annotations.Validation) {
+                        String description = ((org.datakurator.ffdq.annotations.Validation) annotation).description();
+                        String label = ((org.datakurator.ffdq.annotations.Validation) annotation).label();
+
+                        if (description != null) {
+                            test.setDescription(description);
+                        }
+
+                        if (label != null) {
+                            test.setLabel(label);
+                        }
+
+                        test.setDescription(description);
+                        test.setLabel(label);
+                    } else if (annotation instanceof org.datakurator.ffdq.annotations.Amendment) {
+                        String description = ((org.datakurator.ffdq.annotations.Amendment) annotation).description();
+                        String label = ((org.datakurator.ffdq.annotations.Amendment) annotation).label();
+
+                        if (description != null) {
+                            test.setDescription(description);
+                        }
+
+                        if (label != null) {
+                            test.setLabel(label);
+                        }
+                    } else if (annotation instanceof org.datakurator.ffdq.annotations.Specification) {
+                        String specification = ((org.datakurator.ffdq.annotations.Specification) annotation).value();
+
+                        test.setSpecification(specification);
+                    }
             }
 
         }
@@ -130,7 +186,7 @@ public class TestRunner {
 
             for (String guid : missingGuids) {
                 logger.warning("Missing definition in RDF for Java method \"" +
-                        implementedTests.get(guid).getName() + "\" in " + cls + ": " +
+                        implementedTests.get(guid).getLabel() + "\" in " + cls + ": " +
                         guid.substring(guid.lastIndexOf(":")+1));
 
                 implementedTests.remove(guid);
@@ -139,14 +195,13 @@ public class TestRunner {
 
         // Include only tests that have both a corresponding implementation in the class and a definition in the rdf
         for (String guid : implementedTests.keySet()) {
-            Method method = implementedTests.get(guid);
-
-            // Create an instance of AssertionTest
-            AssertionTest test = new AssertionTest(guid, cls, method);
+            AssertionTest test = implementedTests.get(guid);
 
             // Add metadata for specification
-            Specification specification = definedTests.get(guid);
-            test.setSpecification(specification.getLabel());
+            if (test.getSpecification() == null) {
+                Specification specification = definedTests.get(guid);
+                test.setSpecification(specification.getLabel());
+            }
 
             // TODO: Assumed to be single record for now
             test.setResourceType(AssertionTest.SINGLE_RECORD);
@@ -164,7 +219,10 @@ public class TestRunner {
                 validations.add(validationMethod);
 
                 ContextualizedCriterion cc = validationMethod.getContextualizedCriterion();
-                test.setDescription(cc.getCriterion().getLabel());
+                if (test.getDescription() == null) {
+                    test.setDescription(cc.getCriterion().getLabel());
+                }
+
                 test.setResourceType(cc.getResourceType().getLabel());
 
                 informationElement = cc.getInformationElements();
@@ -176,7 +234,9 @@ public class TestRunner {
                 measures.add(measurementMethod);
 
                 ContextualizedDimension cd = measurementMethod.getContextualizedDimension();
-                test.setDimension(cd.getDimension().getLabel());
+                if (test.getDimension() == null) {
+                    test.setDimension(cd.getDimension().getLabel());
+                }
                 test.setResourceType(cd.getResourceType().getLabel());
 
                 informationElement = cd.getInformationElements();
@@ -188,7 +248,10 @@ public class TestRunner {
                 amendments.add(amendmentMethod);
 
                 ContextualizedEnhancement ce = amendmentMethod.getContextualizedEnhancement();
-                test.setDescription(ce.getEnhancement().getLabel());
+                if (test.getDescription() == null) {
+                    test.setDescription(ce.getEnhancement().getLabel());
+                }
+
                 test.setResourceType(ce.getResourceType().getLabel());
 
                 informationElement = ce.getInformationElements();
@@ -198,6 +261,7 @@ public class TestRunner {
             }
 
             // Process parameter level annotations
+            Method method = test.getMethod();
             try {
                 List<TestParam> params = processParameters(method, informationElement);
                 test.setParameters(params);
@@ -205,8 +269,6 @@ public class TestRunner {
                 throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." +
                         method.getName(), e);
             }
-
-            tests.put(guid, test);
         }
     }
 
@@ -217,8 +279,15 @@ public class TestRunner {
         for (Parameter parameter : method.getParameters()) {
 
             for (Annotation annotation : parameter.getAnnotations()) {
-                if (annotation instanceof DQParam) {
-                    String term = ((DQParam) annotation).value();
+                if (annotation instanceof ActedUpon || annotation instanceof Consulted) {
+                    String term = null;
+
+                    // Get the term name from annotation value
+                    if (annotation instanceof ActedUpon) {
+                        term = ((ActedUpon) annotation).value();
+                    } else if (annotation instanceof Consulted) {
+                        term = ((Consulted) annotation).value();
+                    }
 
                     // Create a parameter from the annotation value and the variable name
                     TestParam param = new TestParam(term, index, parameter);

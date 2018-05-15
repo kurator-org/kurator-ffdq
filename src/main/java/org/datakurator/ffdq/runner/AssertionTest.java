@@ -44,6 +44,10 @@ public class AssertionTest {
     private Method method;
     private List<TestParam> parameters;
 
+    public AssertionTest() {
+        // default constructor for test runner
+    }
+
     public AssertionTest(String guid, String label, String description, String specification, String assertionType,
                          String resourceType, String dimension, List<String> informationElement) {
 
@@ -105,6 +109,10 @@ public class AssertionTest {
         }
 
         return method.invoke(instance, args);
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getGuid() {
