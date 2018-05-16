@@ -52,13 +52,16 @@ public class ClassGenerator {
      */
     public void init() {
         sb = new StringBuilder();
+
+        sb.append("/* NOTE: requires the ffdq-api dependecy in the maven pom.xml */\n\n");
         sb.append("package ").append(packageName).append(";\n\n");
 
         sb.append("import org.datakurator.ffdq.annotations.*;\n");
         sb.append("import org.datakurator.ffdq.api.DQResponse;\n");
+        sb.append("import org.datakurator.ffdq.model.ResultState;\n");
         sb.append("import org.datakurator.ffdq.api.result.*;\n\n");
 
-        sb.append("@DQClass(\"").append(mechanismGuid).append("\")\n");
+        sb.append("@Mechanism(\"").append(mechanismGuid).append("\")\n");
         sb.append("public class ").append(className).append(" {\n\n");
     }
 
@@ -77,7 +80,7 @@ public class ClassGenerator {
 
         try {
             while ((line = reader.readLine()) != null) {
-                if (line.contains("@DQProvides")) {
+                if (line.contains("@Provides(")) {
                     String guid = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
                     currGuids.put(guid, lineNum + 1);
                 }
@@ -162,13 +165,13 @@ public class ClassGenerator {
 
             sb.append("     * @return ").append(retType).append("\n");
             sb.append("     */\n");
-            sb.append("    @DQProvides(\"").append(test.getGuid()).append("\")\n");
+            sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
 
             int cnt = 0;
             for (String term : params.keySet()) {
-                sb.append("@DQParam(\"").append(term).append("\") String ").append(params.get(term));
+                sb.append("@ActedUpon(\"").append(term).append("\") String ").append(params.get(term));
 
                 if (cnt < ie.size() - 1) {
                     sb.append(", ");
