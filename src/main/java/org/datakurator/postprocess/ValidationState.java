@@ -1,7 +1,7 @@
 package org.datakurator.postprocess;
 
 public class ValidationState {
-    private String value;
+    private String value = "";
     private String status;
 
     public void setValue(String value) {

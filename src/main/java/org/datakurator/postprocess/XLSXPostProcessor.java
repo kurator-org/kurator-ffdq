@@ -24,6 +24,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.datakurator.ffdq.api.result.AmendmentValue;
 import org.datakurator.ffdq.model.*;
+import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.rdf.FFDQModel;
@@ -57,6 +58,7 @@ public class XLSXPostProcessor {
 
     int initialValuesSheetRowNum = 1;
     int finalValuesSheetRowNum = 1;
+    private List<String> fields;
 
     public XLSXPostProcessor(FFDQModel model) {
         this.model = model;
@@ -128,6 +130,9 @@ public class XLSXPostProcessor {
         // Get all data resources (initial values) associated with assertions in the report
         List<DataResource> dataResources = model.findDataResources();
 
+        // Get fields from first data resource
+        fields = new ArrayList<String>(dataResources.get(0).asMap().keySet());
+
         // Create the initial values sheet
         Sheet initialValuesSheet = createInitialValuesSheet(dataResources);
 
@@ -135,10 +140,10 @@ public class XLSXPostProcessor {
         Sheet finalValuesSheet = createFinalValuesSheet(dataResources);
 
         // Create the measures sheet
-        Sheet measuresSheet = createMeasuresSheet();
+        Sheet measuresSheet = createMeasuresSheet(fields);
 
         // Create the validations sheet
-        Sheet validationsSheet = createValidationsSheet();
+        Sheet validationsSheet = createValidationsSheet(fields);
 
         // Obtain headers from the first record
         // Set<String> headers = dataResources.get(0).asMap().keySet();
@@ -206,10 +211,12 @@ public class XLSXPostProcessor {
                     String term = uri.getPath();
                     term = term.substring(term.lastIndexOf("/")+1);
 
+                    if (!initialValues.containsKey(term)) {
+                        initialValues.put(term, new ValidationState());
+                    }
                     if (value != null) {
                         String status = value.getValue().toString();
 
-                        //System.out.println(term + " : " + status);
                         initialValues.get(term).setStatus(status);
                     } else {
                         initialValues.get(term).setStatus(state.getLabel());
@@ -231,17 +238,24 @@ public class XLSXPostProcessor {
                 List<URI> composedOf = amendment.getEnhancement().getInformationElements().getComposedOf();
 
                 if (value != null && state != null) {
-                    Map<String, String> amendedValues = model.findDataResource((URI) value.getValue()).asMap();
+                    DataResource dr = model.findDataResource((URI) value.getValue());
 
-                    for (String term : amendedValues.keySet()) {
-                        finalValues.get(term).setValue(amendedValues.get(term));
-                        finalValues.get(term).setStatus(state.getLabel());
+                    if (dr != null) {
+                        Map<String, String> amendedValues = dr.asMap();
+
+                        for (String term : amendedValues.keySet()) {
+                            finalValues.get(term).setValue(amendedValues.get(term));
+                            finalValues.get(term).setStatus(state.getLabel());
+                        }
                     }
-
                 } else if (state != null && !state.equals(ResultState.NO_CHANGE)) {
                     for (URI uri : composedOf) {
                         String term = uri.getPath();
                         term = term.substring(term.lastIndexOf("/") + 1);
+
+                        if (!finalValues.containsKey(term)) {
+                            finalValues.put(term, new ValidationState());
+                        }
 
                         finalValues.get(term).setStatus(state.getLabel());
                     }
@@ -450,7 +464,7 @@ public class XLSXPostProcessor {
         return initialValuesSheet;
     }
 
-    private SXSSFSheet createMeasuresSheet() {
+    private SXSSFSheet createMeasuresSheet(List<String> fields) {
         SXSSFSheet measuresSheet = (SXSSFSheet) workbook.createSheet("Measures");
 
         // Create the header row
@@ -462,12 +476,16 @@ public class XLSXPostProcessor {
         headerRow.createCell(3).setCellValue("Value");
         headerRow.createCell(4).setCellValue("Comment");
 
+        for (int i = 0; i < fields.size(); i++) {
+            headerRow.createCell(i+5).setCellValue(fields.get(i));
+        }
+
         return measuresSheet;
     }
 
     private void initMeasuresSheet(Sheet measuresSheet, List<Assertion> measures, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        List<String> fields = model.findFieldsByAssertionType(Measure.class);
+        //List<String> fields = model.findFieldsByAssertionType(Measure.class);
 
         for (Assertion assertion : measures) {
             Measure measure = (Measure) assertion;
@@ -500,7 +518,6 @@ public class XLSXPostProcessor {
             }
 
             String comment = result.getComment();
-            System.out.println(comment);
 
             // Create assertion metadata cells
             measuresRow.createCell(0).setCellValue(recordId);
@@ -509,28 +526,35 @@ public class XLSXPostProcessor {
             measuresRow.createCell(3).setCellValue(value);
             measuresRow.createCell(4).setCellValue(comment);
 
+            Map<String, String> values = dataResource.asMap();
+
+            for (int i = 0; i < fields.size(); i++) {
+                Cell cell = measuresRow.createCell(i+5);
+                cell.setCellValue(values.get(fields.get(i)));
+                cell.setCellStyle(styles.get(status));
+            }
             //ContextualizedDimension context = measure.getDimension();
-            for (String field : fields) {
+            //for (String field : fields) {
 
                 // Lookup column index for field and create cell for the values
                 //if (!fields.contains(field)) {
                 //    fields.add(field);
                 //}
 
-                int i = fields.indexOf(field);
+                //int i = fields.indexOf(field);
 
-                Cell measuresCell = measuresRow.createCell(i+5);
+                //Cell measuresCell = measuresRow.createCell(i+5);
 
                 // Set cell value and style based on status
-                try {
-                    measuresCell.setCellValue(dataResource.get(new URI(field)));
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-                measuresCell.setCellStyle(styles.get(status));
-            }
+               // try {
+             //       measuresCell.setCellValue(dataResource.get(new URI(field)));
+             //   } catch (URISyntaxException e) {
+            //        e.printStackTrace();
+           //     }
+            //    measuresCell.setCellStyle(styles.get(status));
+            //}
 
-            System.out.println(recordId + ", " + test + ", " + status);
+            //System.out.println(recordId + ", " + test + ", " + status);
         }
 
         // empty row between blocks of measures
@@ -539,7 +563,7 @@ public class XLSXPostProcessor {
     }
 
 
-    private SXSSFSheet createValidationsSheet() {
+    private SXSSFSheet createValidationsSheet(List<String> fields) {
         SXSSFSheet validationsSheet = (SXSSFSheet) workbook.createSheet("Validations");
 
         // Create the header row
@@ -551,13 +575,16 @@ public class XLSXPostProcessor {
         headerRow.createCell(3).setCellValue("Value");
         headerRow.createCell(4).setCellValue("Comment");
 
+        for (int i = 0; i < fields.size(); i++) {
+            headerRow.createCell(i+5).setCellValue(fields.get(i));
+        }
+
         return validationsSheet;
     }
 
     private void initValidationsSheet(Sheet validationsSheet, List<Assertion> validations, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        List<String> fields = model.findFieldsByAssertionType(Validation.class);
-        System.out.println(fields);
+        //List<String> fields = model.findFieldsByAssertionType(Validation.class);
 
         for (Assertion assertion : validations) {
             Validation validation = (Validation) assertion;
@@ -599,27 +626,39 @@ public class XLSXPostProcessor {
             validationsRow.createCell(4).setCellValue(comment);
 
             //ContextualizedDimension context = measure.getDimension();
-            for (String field : fields) {
+            //for (String field : fields) {
 
                 // Lookup column index for field and create cell for the values
                 //if (!fields.contains(field)) {
                 //    fields.add(field);
                 //}
 
-                int i = fields.indexOf(field);
+                //int i = fields.indexOf(field);
 
-                Cell validationsCell = validationsRow.createCell(i+5);
+                //Cell validationsCell = validationsRow.createCell(i+5);
 
                 // Set cell value and style based on status
-                try {
-                    validationsCell.setCellValue(dataResource.get(new URI(field)));
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
+                //try {
+              //      validationsCell.setCellValue(dataResource.get(new URI(field)));
+                //} catch (URISyntaxException e) {
+               //     e.printStackTrace();
+               // }
+                //validationsCell.setCellStyle(styles.get(status));
+            //}
+
+            Map<String, String> values = dataResource.asMap();
+            List<String> actedUpon = fieldsFromValidationContext(validation.getCriterion());
+
+            for (int i = 0; i < fields.size(); i++) {
+                Cell cell = validationsRow.createCell(i+5);
+                cell.setCellValue(values.get(fields.get(i)));
+
+                if (actedUpon.contains(fields.get(i))) {
+                    cell.setCellStyle(styles.get(status));
                 }
-                validationsCell.setCellStyle(styles.get(status));
             }
 
-            System.out.println(recordId + ", " + test + ", " + status);
+            //System.out.println(recordId + ", " + test + ", " + status);
         }
 
         // empty row between blocks of measures
@@ -627,7 +666,22 @@ public class XLSXPostProcessor {
 
     }
 
-    private List<String> fieldsFromContext(ContextualizedDimension context) {
+    private List<String> fieldsFromMeasureContext(ContextualizedDimension context) {
+        List<String> fields = new ArrayList<>();
+
+        List<URI> ie = context.getInformationElements().getComposedOf();
+        for (URI uri : ie) {
+            String path = uri.getPath();
+            String field = path.substring(path.lastIndexOf('/') + 1);
+
+            fields.add(field);
+        }
+
+        return fields;
+    }
+
+
+    private List<String> fieldsFromValidationContext(ContextualizedCriterion context) {
         List<String> fields = new ArrayList<>();
 
         List<URI> ie = context.getInformationElements().getComposedOf();
@@ -668,7 +722,7 @@ public class XLSXPostProcessor {
 
     public static void main(String[] args) throws IOException {
         FFDQModel model = new FFDQModel();
-        model.load(new FileInputStream("/home/lowery/IdeaProjects/event_date_qc/target/dq-report.ttl"), RDFFormat.TURTLE);
+        model.load(new FileInputStream("/home/lowery/IdeaProjects/event_date_qc/target/report.ttl"), RDFFormat.TURTLE);
 
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(model);
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));

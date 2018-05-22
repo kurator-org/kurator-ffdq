@@ -153,6 +153,11 @@ public class FFDQModel extends BaseModel {
 
     public DataResource findDataResource(URI uri) {
         Model model = getResource(uri.toString());
+
+        if (model.subjects().size() == 0) {
+            return null;
+        }
+
         DataResource dataResource = new DataResource(vocab, model);
 
         return dataResource;
