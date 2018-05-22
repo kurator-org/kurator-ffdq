@@ -37,12 +37,16 @@ public class TestParam {
         this.index = index;
         this.value = value;
 
-        // Lookup namespace and resolve URI for the term
-        this.namespace = Namespace.resolvePrefixedTerm(value);
+        if (value.contains(":")) {
+            // Lookup namespace and resolve URI for the term
+            this.namespace = Namespace.resolvePrefixedTerm(value);
 
-        // Split string into namespace prefix and term name
-        String[] str = value.split(":");
-        this.term = str[1];
+            // Split string into namespace prefix and term name
+            String[] str = value.split(":");
+            this.term = str[1];
+        } else {
+            this.term = value;
+        }
     }
 
     public URI getURI() {

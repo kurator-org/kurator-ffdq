@@ -62,6 +62,10 @@ public class TestRunner {
     private List<AmendmentMethod> amendments = new ArrayList<>();
 
     public TestRunner(Class cls, FFDQModel model) {
+        this(cls, model, new HashMap<>());
+    }
+
+    public TestRunner(Class cls, FFDQModel model, Map<String, Object> params) {
         this.cls = cls;
         this.model = model;
 
@@ -269,11 +273,14 @@ public class TestRunner {
                 throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." +
                         method.getName(), e);
             }
+
+            tests.put(guid, test);
         }
     }
 
     private List<TestParam> processParameters(Method method, InformationElement informationElement) {
         Map<URI, TestParam> testParams = new HashMap<>();
+        List<TestParam> params = new ArrayList<>();
 
         int index = 0;
         for (Parameter parameter : method.getParameters()) {
@@ -292,6 +299,12 @@ public class TestRunner {
                     // Create a parameter from the annotation value and the variable name
                     TestParam param = new TestParam(term, index, parameter);
                     testParams.put(param.getURI(), param);
+                    params.add(param);
+                } else if (annotation instanceof org.datakurator.ffdq.annotations.Parameter) {
+                    String term = ((org.datakurator.ffdq.annotations.Parameter) annotation).name();
+
+                    TestParam param = new TestParam(term, index, parameter);
+                    params.add(param);
                 }
             }
             index++;
@@ -333,7 +346,7 @@ public class TestRunner {
             }
         }
 
-        return new ArrayList<>(testParams.values());
+        return params;
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException {

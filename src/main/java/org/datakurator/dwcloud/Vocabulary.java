@@ -66,6 +66,7 @@ public class Vocabulary {
                         mapping.put(term, Namespace.resolvePrefixedTerm(ns + ":" + term));
                     }
                 }
+                
             }
 
             reader.close();
@@ -98,6 +99,8 @@ public class Vocabulary {
 
         if (term.equalsIgnoreCase("id")) {
             uri = Namespace.resolvePrefixedTerm(idTerm);
+        } else if (term.contains(":")){
+            uri = mapping.get(term.split(":")[1]);
         } else {
             uri = mapping.get(term);
         }
