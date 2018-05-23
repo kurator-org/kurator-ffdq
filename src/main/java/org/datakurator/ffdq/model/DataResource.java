@@ -86,8 +86,14 @@ public class DataResource {
     }
 
     public DataResource(Vocabulary vocab, Map<String, String> record) {
-        // Create data resource subject iri from generated uuid
-        String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        this(null, vocab, record);
+    }
+
+    public DataResource(String uuid, Vocabulary vocab, Map<String, String> record) {
+        if (uuid == null) {
+            // Create data resource subject iri from generated uuid
+            uuid = "urn:uuid:" + UUID.randomUUID().toString();
+        }
 
         // Set an rdf type of ffdq:DataResource
         subject = valueFactory.createIRI(uuid);
@@ -115,7 +121,7 @@ public class DataResource {
 
         // Get the first value from the model
         Set<Value> values = model.filter(subject, predicate, null).objects();
-        String value = values.toArray()[0].toString();
+        String value = ((Value) values.toArray()[0]).stringValue();
 
         return value;
     }
@@ -127,7 +133,7 @@ public class DataResource {
 
         // Get the first value from the model
         Set<Value> values = model.filter(subject, predicate, null).objects();
-        String value = values.toArray()[0].toString();
+        String value = ((Value) values.toArray()[0]).stringValue();
 
         return value;
     }
@@ -153,7 +159,9 @@ public class DataResource {
             String term = statement.getPredicate().getLocalName();
             String value = statement.getObject().stringValue();
 
-            record.put(term, value);
+            if (!term.equals("type")) {
+                record.put(term, value);
+            }
         }
 
         return record;

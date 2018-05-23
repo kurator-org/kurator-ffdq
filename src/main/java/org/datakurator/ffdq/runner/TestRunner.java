@@ -526,17 +526,20 @@ public class TestRunner {
 
             if (response.getValue() != null) {
                 ResultValue value = response.getValue();
-                Entity entity = new Entity();
+                Entity entity = value.getEntity();
 
                 if (value instanceof AmendmentValue) {
+                    // Data Resource id from entity value
+                    URI uri = (URI) entity.getValue();
+
                     // Load amended values from the data resource into model
                     Map<String, String> amendedValues = ((AmendmentValue) value).getObject();
-                    DataResource dataResource = new DataResource(model.getVocab(), amendedValues);
+                    DataResource dataResource = new DataResource(uri.toString(), model.getVocab(), amendedValues);
 
                     model.load(dataResource.asModel());
                 }
 
-                result.setEntity(value.getEntity());
+                result.setEntity(entity);
                 model.save(entity);
             }
 
