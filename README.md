@@ -4,6 +4,16 @@ A library that provides support for using the FFDQ framework for making data qua
 
 [![DOI](https://zenodo.org/badge/72672241.svg)](https://zenodo.org/badge/latestdoi/72672241)
 
+The core of the library provides a set of model classes for serializing/deserializing Java Bean representations of FFDQ concepts to/from rdf in a number of formats. These model classes are located under the `org.datakurator.ffdq.model` packages.
+
+Also provided is a set of utilities that make use of the model classes to generate rdf and run tests implemented in Java. These utilities, listed in order of intended use, are:
+
+* **test-util** - when starting with a csv file that lists a set of standardized tests, run this utility as the first step to generate FFDQ RDF and/or Java classes with stub methods for implementing the tests. The output of this utility can be used with the test-runner described below.
+* **test-runner** - takes the FFDQ RDF containing test metadata and a Java annotated class that implements the tests and runs each to produce an RDF report suitable for postprocessing.
+* **query-util** - can be used with any of the RDF output from the above along with the SPARQL queries found in `competencyquestions/sparql` to query FFDQ instance documents and produce a tsv result file.
+
+See the sections below for more information and usage.
+
 # Include using maven
 
 Available from maven central.
@@ -20,7 +30,7 @@ Available from maven central.
 
 # QueryUtil
 
-A command-line utility is provided at `target/kurator-ffdq-1.0.3-jar-with-dependencies.jar` for running sparql queries 
+A command-line utility is provided at `query-util.sh` for running sparql queries 
 on sample rdf data. Example sparql query files can be found in the `competencyquestions/sparql` directory relative to the
 project root and example turtle and jsonld files can be found in `competencyquestions/rdf`.
 
@@ -28,170 +38,162 @@ To view competency questions and example rdf see the readme at: https://github.c
 
 Run the jar via the following and provide the utility with the options specified below or run with no options to see usage.
 
-`java -jar kurator-ffdq-1.0.3.jar -t ../competencyquestions/rdf/example.jsonld -q ../competencyquestions/sparql/results.sparql -o results.tsv`
+* **-q,--query \<arg\>** - Input file containing sparql query.
+* **-t,--triples \<arg\>** - Input rdf file containing triples (jsonld or turtle).
+* **-o,--out \<arg\>** - Output tsv file for query result.
 
-# Using 
+For example:
 
-## Annotated DQ Class
+`./query-util.sh -t competencyquestions/rdf/example.jsonld -q competencyquestions/sparql/results.sparql -o results.tsv`
 
-The higher level use of the framework makes use of Java annotations defined in the ffdq-api project: https://github.com/kurator-org/ffdq-api
+# Test spreadsheet utility
+
+This utility provides authors of actors a way to convert the spreadsheet of standardized tests into FFDQ RDF and/or Java classes containing stub methods for implementing tests.
+
+The utility takes a csv file with each row representing a single test and a properties file with metadata about the mechanism as inputs. Examples for the Date Validator can be found at `data/DwCEventDQ.csv` and `data/DwCEventDQ.properties`.
+
+## Configuration
+
+The properties file must contain a guid that uniquely identifies and a human readable name for the mechanism implementing the tests. In order to use class generation, a Java package and class name must be specified for the implementation.
+
+    ffdq.mechanism.guid=b844059f-87cf-4c31-b4d7-9a52003eef84
+    ffdq.mechanism.name=Kurator: Date Validator - DwCEventDQ
+    ffdq.mechanism.javaPackage=org.filteredpush.qc.date
+    ffdq.mechanism.javaClass=DwCEventDQ
+
+## Test CSV Format
+
+The csv file containing the test metadata defines the following metadata :
+
+* **GUID** - The test guid
+* **Label** - Human readable name of the test
+* **Description** - Describes the test conditions (pass/fail). This value is used to define the Criterion for a Validation or the Enhancement for an Amendment. 
+* **Specification** - Technical description of expected behavior when running the test
+* **Type** - The assertion type. Must be one of the values `Measure`, `Validation` or `Amendment`
+* **Resource Type** - Either `SingleRecord` or `MultiRecord`
+* **Dimension** - Defines the data quality dimension of a test for Measures, can be one of `Value`, `Vocab Match`, `Completeness`, `Accuracy`, `Precision` or `Uniqueness`
+* **Information Element** - Term or list of terms from a controlled vocabulary that a test acts upon. Must contain the namespace prefix (e.g. "dwc:eventDate, dwc:verbatimEventDate")
+* **Source** - Source of the tests
+* **Example Implementation** - Link to the source code on GitHub, SourceForge, etc
+
+## Running
+
+To run the utility use the `test-util.sh` shell script with the following required options:
+
+* **config \<arg\>** - Properties file defining the mechanism to use
+* **in \<arg\>** - Input CSV file containing list of tests
+* **out \<arg\>** - Output file for the rdf representation of the tests
+
+The default format is turtle but this can be changed via the following option:
+
+* **format \<arg\>** - Output format (RDFXML, TURTLE, JSON-LD)
+
+By default the utility only generates the rdf. In order to generate a new Java class or append new tests to an existing one, you can also specify the following options:
+ 
+* **generateClass** - Generate a new Java class with stub methods for each test
+* **appendClass** - Append to an existing Java class stub methods for new tests
+* **srcDir \<arg\>** - The Java sources root directory (e.g. src/main/java)
+
+When using the class generation feature via the `generateClass` or `appendClass` options, the class is located by using the `ffdq.mechanism.javaPackage` property from the config file to determine the package directory relative the Java sources root directory specified by the `srcDir` option.
+
+For example, to run the utility on the example data provided in this project use the following command:
+
+    ./test-util.sh -config data/DwCEventDQ.properties -in data/DwCEventDQ.csv -out data/DwCEventDQ.ttl -srcDir event_date_qc/src/main/java -appendClass
+
+# Test Runner
+
+After generating FFDQ RDF from the spreadsheet of tests and implementing methods tied to test GUIDs in the DQClass, the test runner utility can be used to produce rdf containing report concepts for describing the results.
+
+Using the options below, run the utility from the directory containing the jar files(s) that include the annotated DQ Classes (e.g. event_date_qc-1.0.4-SNAPSHOT.jar)
+
+* **cls \<arg\>** - Fully qualified name of Java class on the classpath to run tests from
+* **rdf \<arg\>** - Input file containing the rdf representation of the tests
+* **in \<arg\>** - Input occurrence tsv data file
+* **out \<arg\>** - Output file for the rdf representation of the dq report
+* **format \<arg\>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
+
+Classes from all jar files present in the working directory when running the utility are included on the classpath by default. In order to avoid class loader conflicts, ensure that the jar file that contains the DQClass specified by the cls option is the latest version.
+
+For example, run from the command line via:
+
+    cd ~/event_date_qc/target
+    ~/kurator-ffdq/test-runner.sh -cls org.filteredpush.qc.date.DwCEventDQ -rdf ../conf/DwCEventDQ.ttl -in ~/Downloads/occurrence.txt -out dq-report.ttl
+
+Using the query utility mentioned above along with the `postprocess.sparql` query, you can create a tsv query result for previewing the report:
+
+    ~/kurator-ffdq/query-util.sh -q ~/kurator-ffdq/competencyquestions/sparql/postprocess.sparql -t dq-report.ttl -o result.tsv
+    libreoffice result.tsv
+
+# Annotated DQ Class
+
+The higher level use of the framework makes use of Java annotations defined in the org.datakurator.ffdq.annotations package.
 
 To use the annotations, in the project that defines the methods and classes corresponding to a set of assertion tests, add the dependency via maven to your pom.xml file
 
         <dependency>
             <groupId>org.datakurator</groupId>
-            <artifactId>ffdq-api</artifactId>
+            <artifactId>kurator-ffdq</artifactId>
             <version>1.0.4-SNAPSHOT</version>
         </dependency>
         
-Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the mechanism applied to a class:
+Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the @Mechanism annotation applied to a class:
 
-    @Mechanism(
-        value = "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84",
-        label = "Kurator: Date Validator - DwCEventDQ")
+    @Mechanism("urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84")
     public class DwCEventDQ {
         // ...     
     }
 
-The mechanism above has a guid value property that uniquely identfies the mechanism and a human readable lable property describing the mechanism.
+The mechanism above has a guid value property that uniquely identifies the mechanism. This is tied to metadata in RDF about the mechanism.
 
-Next are the method level annotations that map Java code to ffdq concepts by marking a method as one of Validation, Measure, Amendment and defining the Specification and corresponding test GUID.
+Next is the method level annotation that maps Java code to FFDQ concepts by associating a method implementing a test with the specification GUID.
 
 	@Provides("urn:uuid:da63f836-1fc6-4e96-a612-fa76678cfd6a")
-
-	@Validation(
-			label = "Event Date and Verbatim Consistent",
-			description = "Test to see if the eventDate and verbatimEventDate are consistent.")
-
-	@Specification("If a dwc:eventDate is not empty and the verbatimEventDate is not empty " +
-			       "compare the value of dwc:eventDate with that of dwc:verbatimEventDate, " +
-			       "and assert Compliant if the two represent the same date or date range.")
-
-    public static EventDQValidation eventDateConsistentWithVerbatim(...) {
+    public static DQResponse<ComplianceValue> eventDateConsistentWithVerbatim(...) {
         // ...
     }
-
-The above shows an example using the Validation annotation. Use @Measure or @Amendment with the same @Provides and @Specification for other assertion types.
-
-Lastly, method parameter level annotation are provided for defining how the parameters (the fields acted upon or fields consulted) map to information elements in ffdq defined in terms of a controlled vocabulary such as DWC.
+    
+Lastly, the method parameter level annotation is provided for defining how the parameters (the fields acted upon or fields consulted) map to information elements in ffdq defined in terms of a controlled vocabulary such as DWC. The value for this annotation must contain the namespace prefix (e.g. dwc:eventDate).
 
     public static EventDQValidation eventDateConsistentWithVerbatim(
-    		@ActedUpon(value = "dwc:eventDate") String eventDate,
-			@ActedUpon(value = "dwc:verbatimEventDate") String verbatimEventDate) {
+    		@ActedUpon("dwc:eventDate") String eventDate,
+			@ActedUpon("dwc:verbatimEventDate") String verbatimEventDate) {
 			    // ...
 			}
+    
+Depending of the type of assertion, the generic return type DQResponse can be parameterized with the following. Examples usage of each parameterized type below.
 
-## Lower level API
+For Measures, depending on the dimension, use `DQResponse<NumericalValue>`: 
 
-Classes are provided to represent Measures, Validations, and Improvements, to relate them to criteria in Context,
-to group these assertions into data quality reports, which are composed of pre-enhancement, enhancement, and 
-post enhancement stages.
+    DQResponse<NumericalValue> result = new DQResponse<>();
+    long seconds = DateUtils.measureDurationSeconds(eventDate);
+    result.setValue(new NumericalValue(seconds));
+    result.setResultState(ResultState.RUN_HAS_RESULT);
 
-Here is an example of the use of these classes taken from FP-KurationServices DateValidator:
+or for the dimension of Completeness use `DQResponse<CompletenessValue>`:
 
-    public static BaseRecord validateEventConsistencyWithContext(String recordId, String eventDate, String year, String month,
-                                                                 String day, String startDayOfYear, String endDayOfYear,
-                                                                 String eventTime, String verbatimEventDate) {
+    DQResponse<CompletenessValue> result = new DQResponse<>();
+    result.setValue(CompletenessValue.COMPLETE);
+    result.addComment("Value provided for eventDate.");
+    result.setResultState(ResultState.RUN_HAS_RESULT);
+    
+For Validations use `DQResponse<ComplianceValue>`:
 
-       FFDQRecord record = new FFDQRecord();
+    DQResponse<ComplianceValue> result = new DQResponse<>();
+    result.setValue(ComplianceValue.COMPLIANT);
+    result.addComment("Provided value for day '" + day + "' is an integer in the range 1 to 31.");
+    result.setResultState(ResultState.RUN_HAS_RESULT);
 
-       // store the values initialy encountered in the data.
-       Map<String, String> initialValues = new HashMap<>();
-       initialValues.put("eventDate", eventDate);
-       initialValues.put("year", year);
-       initialValues.put("month", month);
-       initialValues.put("day", day);
-       initialValues.put("startDayOfYear", startDayOfYear);
-       initialValues.put("endDayOfYear", endDayOfYear);
-       initialValues.put("eventTime", eventTime);
-       initialValues.put("verbatimEventDate", verbatimEventDate);
-       record.setInitialValues(initialValues);   
+For Amendments use `DQResponse<AmendmentValue>` and add changed values to an instance of AmendmentValue:
 
-       GlobalContext globalContext = new GlobalContext(DateValidator.class.getSimpleName(), DateValidator.getActorName());
-       record.setGlobalContext(globalContext);
+    DQResponse<AmendmentValue> result = new DQResponse<>();
+    AmendmentValue extractedValues = new AmendmentValue();
+	extractedValues.addResult("dwc:eventDate", DateUtils.createEventDateFromStartEnd(startDate, endDate));
+    result.setValue(extractedValues);
+    result.setResultState(ResultState.CHANGED);
 
-       // Start pre enhancement stage
-       record.startStage(CurationStage.PRE_ENHANCEMENT);
+# Lower level API
 
-       // call some methods that perform measures and validations
-       checkContainsEventTime(record);   // see below 
-       checkEventDateCompleteness(record);
-       checkDurationInSeconds(record);
-
-       validateConsistencyWithAtomicParts(record);
-       validateVerbatimEventDate(record);
-       validateConsistencyWithEventTime(record);
-
-        // Start enhancement stage
-        record.startStage(CurationStage.ENHANCEMENT);
-
-        if (DateUtils.isEmpty(record.getEventDate())) {
-            fillInFromAtomicParts(record);
-        }
-
-        // Start post enhancement stage
-        record.startStage(CurationStage.POST_ENHANCEMENT);
-
-        checkContainsEventTime(record);
-        checkEventDateCompleteness(record);
-        checkDurationInSeconds(record);
-
-        validateConsistencyWithAtomicParts(record);
-        validateVerbatimEventDate(record);
-        validateConsistencyWithEventTime(record);
-
-        return record;
-    }
-
-    /** 
-     * This is a measure, it measures to see if an event date contains a time.
-     *
-    private static void checkContainsEventTime(DateFragment record) {
-        FieldContext fields = new FieldContext();
-        fields.setActedUpon("eventDate");
-        fields.setConsulted("eventTime");
-
-        NamedContext eventDateContainsEventTime = new NamedContext("eventDateContainsEventTime", fields);
-        Measure m = record.assertMeasure(eventDateContainsEventTime);
-
-        if (!DateUtils.isEmpty(record.getEventDate())) {
-            if (DateUtils.containsTime(record.getEventDate())) {
-                // Measure.complete() makes the assertion COMPLETE with a comment.
-                m.complete("dwc:eventDate contains eventTime");
-            } else {
-                // Measure.incomplete() makes the assertion NOT_COMPLETE with a comment.
-                m.incomplete("dwc:eventDate does not contain eventTime");
-            }
-        } else {
-            // Measure.prereqUnmet() makes the assertion DATA_PREREQUISITES_NOT_MET with a comment.
-            m.prereqUnmet("dwc:eventDate does not contain a value.");
-        }
-    }
-
-A data quality report can then be serialized with the DQReportBuilder
-
-     InputStream config = DateValidatorTest.class.getResourceAsStream("/ffdq-assertions.json");
-     DQReportBuilder builder = new DQReportBuilder(config);
-     DQReport report = builder.createReport(testResult);
-     StringWriter writer = new StringWriter();
-     report.write(writer);
-
-A configuration definition (from FP-KurationServices src/main/resources/ffdq-assertions.json) for
-the measure checkContainsEventTime() above, is:
-
-    {
-      "context": {
-        "name": "eventDateContainsEventTime"
-      },
-
-      "dimension": "Completeness",
-      "specification": "Check that ${context.fieldsActedUpon} matches an ISO date that contains a time",
-      "mechanism": "Kurator: ${actor.class} - ${actor.name}"
-    },
-
-
-Conversion of the data quality report to a human readable form would then require subsequent processing.
-
+See classes in the org.datakurator.ffdq.model package.
 
 # Maintainer deployment: 
 

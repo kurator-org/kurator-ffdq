@@ -6,7 +6,7 @@
 
     <groupId>org.datakurator</groupId>
     <artifactId>kurator-ffdq</artifactId>
-    <version>1.0.4</version>
+    <version>2.0-SNAPSHOT</version>
     <name>kurator-ffdq</name>
     <description>Data quality assertion framework. Provides utilities for capturing provenance data and generation of data quality reports using FFDQ.</description>
     <url>http://wiki.datakurator.org/</url>
@@ -56,9 +56,8 @@
         <dependency>
             <groupId>org.datakurator</groupId>
             <artifactId>ffdq-api</artifactId>
-            <version>1.0.4</version>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -68,6 +67,11 @@
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
         </dependency>
 
         <dependency>
@@ -124,6 +128,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.11</version>
         </dependency>
 
         <!-- for xls postprocessing -->
@@ -201,7 +211,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.datakurator.data.ffdq.sparql.QueryUtil</mainClass>
+                                    <mainClass>org.datakurator.ffdq.runner.TestRunner</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

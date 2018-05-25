@@ -1,0 +1,50 @@
+# Simple query for producing a report of all
+# dq assertions and results
+
+PREFIX ffdq: <http://example.com/ffdq/>
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dc: <http://purl.org/dc/terms/>
+
+SELECT DISTINCT ?identifier ?type ?test ?status ?value ?comment
+
+WHERE {
+
+    # Validations, Measures and Amendments
+
+    { ?assertion a ffdq:Validation } UNION
+    { ?assertion a ffdq:Measure } UNION
+    { ?assertion a ffdq:Amendment } .
+
+    # Get the type, specification, data resource
+    # and result for each assertion
+
+    ?assertion rdf:type ?type .
+    ?assertion prov:hadPlan ?specification .
+    ?assertion prov:used ?resource .
+    ?assertion prov:generated ?result .
+
+    # Get the identifier for occurrence records
+    # from the data resource
+    ?resource dc:identifier ?identifier .
+
+    # Test name from the specification label
+    ?specification rdfs:label ?test .
+
+    # Result state
+    ?result ffdq:hasState ?state .
+    ?state rdfs:label ?status .
+
+    # Result value
+    OPTIONAL {
+        ?result ffdq:hasValue ?val .
+        ?val prov:value ?value
+    } .
+
+    # Result comment
+    ?result rdfs:comment ?comment
+
+}
+
+ORDER BY ?identifier ?type

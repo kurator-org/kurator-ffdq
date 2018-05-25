@@ -39,7 +39,7 @@ WHERE {
     ?cc ffdq:hasInformationElement ?vie .
     ?vie ffdq:composedOf ?term .
 
-    # Find the result status.sparql and comment
+    # Find the result status and comment
     # from the validations
 
     ?validation prov:generated ?r .
