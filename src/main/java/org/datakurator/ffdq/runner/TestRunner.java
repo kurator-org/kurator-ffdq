@@ -439,7 +439,7 @@ public class TestRunner {
         }
     }
 
-    private void run(Map<String, String> record) {
+    public void run(Map<String, String> record) {
         // Create a new data resource from the record and load triples via model
         DataResource dataResource = new DataResource(model.getVocab(), record);
         model.load(dataResource.asModel());
