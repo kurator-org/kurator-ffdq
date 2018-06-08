@@ -22,6 +22,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.datakurator.ffdq.api.result.AmendmentValue;
 import org.datakurator.ffdq.api.result.CompletenessValue;
 import org.datakurator.ffdq.model.*;
@@ -159,40 +160,11 @@ public class XLSXPostProcessor {
             List<Assertion> validations = model.findAssertionsForDataResource(dataResource, Validation.class);
             List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, Amendment.class);
 
-            // Initialize the validation states for initial and final values
-            Map<String, ValidationState> initialValues = new HashMap<>();
-            Map<String, ValidationState> finalValues = new HashMap<>();
-
-            Map<String, String> dataResourceValues = dataResource.asMap();
-            for (String key : dataResourceValues.keySet()) {
-                ValidationState initialValue = new ValidationState();
-                ValidationState finalValue = new ValidationState();
-
-                initialValue.setValue(dataResourceValues.get(key));
-                initialValues.put(key, initialValue);
-
-                finalValue.setValue(dataResourceValues.get(key));
-                finalValues.put(key, finalValue);
-            }
-
             // TODO: add support to postprocessor for issues
 
             initMeasuresSheet(measuresSheet, measures, dataResource);
             initValidationsSheet(validationsSheet, initialValuesSheet, validations, dataResource);
             initAmendmentsSheet(amendmentsSheet, finalValuesSheet, amendments, dataResource);
-
-            // Add rows to initial and final values sheets
-            Row initialValuesRow = initialValuesSheet.createRow(initialValuesSheetRowNum++);
-
-            int colNum = 0;
-            for (ValidationState validationState : initialValues.values()) {
-                Cell initialValuesCell = initialValuesRow.createCell(colNum);
-
-                initialValuesCell.setCellValue(validationState.getValue());
-                initialValuesCell.setCellStyle(styles.get(validationState.getStatus()));
-
-                colNum++;
-            }
         }
 
         try {
@@ -217,6 +189,8 @@ public class XLSXPostProcessor {
         for (int i = 0; i < headers.length; i++) {
             headerRow.createCell(i).setCellValue(headers[i].toString());
         }
+
+        headerRow.createCell(headers.length).setCellValue("Flags");
 
         return finalValuesSheet;
     }
@@ -354,11 +328,18 @@ public class XLSXPostProcessor {
         return validationsSheet;
     }
 
-    private void initValidationsSheet(Sheet validationsSheet, Sheet initialValues, List<Assertion> validations, DataResource dataResource) {
+    private void initValidationsSheet(Sheet validationsSheet, Sheet initialValuesSheet, List<Assertion> validations, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
         //List<String> fields = model.findFieldsByAssertionType(Validation.class);
 
+        List<Map<String, ValidationState>> allInitialValues = new ArrayList<>();
+
+        List<String> allFlags = new ArrayList<>();
+
         for (Assertion assertion : validations) {
+            // Initialize the validation states for initial and final values
+            Map<String, ValidationState> initialValues = new HashMap<>();
+
             Validation validation = (Validation) assertion;
             String recordId = dataResource.getRecordId();
 
@@ -377,15 +358,20 @@ public class XLSXPostProcessor {
             Entity entity = result.getEntity();
 
             // String status = determineRowStatus(state, entity);
-            String status = "";
-            String value = "";
+            String assertionStatus = "";
+            String assertionValue = "";
 
             if (entity != null && entity.getValue() != null) {
-                value = entity.getValue().toString();
+                assertionValue = entity.getValue().toString();
             }
 
             if (state != null) {
-                status = state.getLabel();
+                assertionStatus = state.getLabel();
+            }
+
+            // Add flag string
+            if (assertionValue.equals("NOT_COMPLIANT")) {
+                allFlags.add(test + "_" + assertionValue);
             }
 
             String comment = result.getComment();
@@ -393,8 +379,8 @@ public class XLSXPostProcessor {
             // Create assertion metadata cells
             validationsRow.createCell(0).setCellValue(recordId);
             validationsRow.createCell(1).setCellValue(test);
-            validationsRow.createCell(2).setCellValue(status);
-            validationsRow.createCell(3).setCellValue(value);
+            validationsRow.createCell(2).setCellValue(assertionStatus);
+            validationsRow.createCell(3).setCellValue(assertionValue);
             validationsRow.createCell(4).setCellValue(comment);
 
             // Get values from validation and add color coding based on status to fields acted upon
@@ -402,20 +388,97 @@ public class XLSXPostProcessor {
             List<String> actedUpon = fieldsFromValidationContext(validation.getCriterion());
 
             for (int i = 0; i < fields.size(); i++) {
+                String field = fields.get(i);
+                String value = values.get(field);
+
+                if (!initialValues.containsKey(field)) {
+                    initialValues.put(field, new ValidationState());
+                }
+
                 Cell cell = validationsRow.createCell(i+5);
-                cell.setCellValue(values.get(fields.get(i)));
+                cell.setCellValue(value);
+
+                ValidationState initialValue = initialValues.get(field);
+
+                // Put validation state for each field into initialValues map
+                initialValues.put(field, initialValue);
+                initialValue.setValue(value);
 
                 if (actedUpon.contains(fields.get(i))) {
-                    if (value.equals("COMPLIANT") || value.equals("NOT_COMPLIANT")) {
+                    if (assertionValue.equals("COMPLIANT") || assertionValue.equals("NOT_COMPLIANT")) {
                         // If the value COMPLIANT or NOT_COMPLIANT is present use value for color coding
-                        cell.setCellStyle(styles.get(value));
+                        cell.setCellStyle(styles.get(assertionValue));
+                        initialValue.setStatus(assertionValue);
                     } else {
                         // Otherwise use status
-                        cell.setCellStyle(styles.get(status));
+                        cell.setCellStyle(styles.get(assertionStatus));
+                        initialValue.setStatus(assertionStatus);
                     }
                 }
             }
+
+            allInitialValues.add(initialValues);
         }
+
+        // Add rows to initial values sheets
+        Row initialValuesRow = initialValuesSheet.createRow(initialValuesSheetRowNum++);
+
+        int colNum = 0;
+        for (String field : fields) {
+
+            boolean validFlag = false;
+            boolean failureFlag = false;
+            boolean prerequisitesNotMetFlag = false;
+
+            for (Map<String, ValidationState> initialValues : allInitialValues) {
+                ValidationState initialValue = initialValues.get(field);
+
+                if (initialValue.getStatus() != null) {
+                    if (initialValue.getStatus().equals("COMPLIANT")) {
+                        validFlag = true;
+                    }
+
+                    if (initialValue.getStatus().equals("NOT_COMPLIANT")) {
+                        failureFlag = true;
+                    }
+
+                    if (initialValue.getStatus().equals("UNABLE_CURATE") ||
+                            initialValue.getStatus().equals("DATA_PREREQUISITES_NOT_MET") ||
+                            initialValue.getStatus().equals("EXTERNAL_PREREQUISITES_NOT_MET")) {
+
+                        prerequisitesNotMetFlag = true;
+                    }
+                }
+            }
+
+            String value = dataResource.asMap().get(field);
+            Cell initialValuesCell = initialValuesRow.createCell(colNum);
+            initialValuesCell.setCellValue(value);
+
+            if (value != null && !value.isEmpty()) {
+                if (prerequisitesNotMetFlag) {
+                    initialValuesCell.setCellStyle(styles.get("UNABLE_CURATE"));
+                }
+
+                if (validFlag) {
+                    initialValuesCell.setCellStyle(styles.get("COMPLIANT"));
+                }
+
+                if (failureFlag) {
+                    initialValuesCell.setCellStyle(styles.get("NOT_COMPLIANT"));
+                }
+            }
+
+            colNum++;
+        }
+
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(HSSFColor.YELLOW.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        Cell flagsCell = initialValuesRow.createCell(colNum);
+        flagsCell.setCellValue(allFlags.toString());
+        flagsCell.setCellStyle(style);
 
         // empty row between blocks of measures
         validationsSheetRowNum++;
@@ -439,7 +502,7 @@ public class XLSXPostProcessor {
         return amendmentsSheet;
     }
 
-    private void initAmendmentsSheet(Sheet amendmentsSheet, Sheet finalValuesSheet, List<Assertion> validations, DataResource dataResource) {
+    private void initAmendmentsSheet(Sheet amendmentsSheet, Sheet finalValuesSheet, List<Assertion> amendments, DataResource dataResource) {
         Map<String, ValidationState> finalValues = new HashMap<>();
         Map<String, String> prevValues = dataResource.asMap();
 
@@ -451,7 +514,10 @@ public class XLSXPostProcessor {
             finalValues.put(field, validationState);
         }
 
-        for (Assertion assertion : validations) {
+        // All amendment flags
+        List<String> allFlags = new ArrayList<>();
+
+        for (Assertion assertion : amendments) {
             Amendment amendment = (Amendment) assertion;
             String recordId = dataResource.getRecordId();
 
@@ -479,6 +545,11 @@ public class XLSXPostProcessor {
 
             if (state != null) {
                 status = state.getLabel();
+            }
+
+            // Append any status but NO_CHANGE to flags string
+            if (!status.equals("NO_CHANGE")) {
+                allFlags.add(test + "_" + status);
             }
 
             String comment = result.getComment();
@@ -524,6 +595,16 @@ public class XLSXPostProcessor {
 
             colNum++;
         }
+
+        // Last column for flags
+        // Not compliant or not complete styled with red background
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(HSSFColor.YELLOW.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+        Cell flagSummary = finalValuesRow.createCell(colNum);
+        flagSummary.setCellValue(allFlags.toString());
+        flagSummary.setCellStyle(style);
 
         // empty row between blocks of measures
         amendmentsSheetRowNum++;
@@ -601,7 +682,7 @@ public class XLSXPostProcessor {
 
     public static void main(String[] args) throws IOException {
         FFDQModel model = new FFDQModel();
-        model.load(new FileInputStream("/home/lowery/IdeaProjects/event_date_qc/target/report.ttl"), RDFFormat.TURTLE);
+        model.load(new FileInputStream("/home/lowery/Downloads/dq_report.rdf"), RDFFormat.TURTLE);
 
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(model);
         postProcessor.postprocess(new FileOutputStream("tempsxssf.xlsx"));

@@ -19,4 +19,11 @@ public class ValidationState {
     public String getStatus() {
         return status;
     }
+
+    public String toString() {
+        return "ValidationState{" +
+                "value='" + value + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
