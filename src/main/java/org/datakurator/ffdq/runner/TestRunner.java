@@ -102,6 +102,7 @@ public class TestRunner {
         for (Method javaMethod : cls.getMethods()) {
             AssertionTest test = new AssertionTest();
             test.setMethod(javaMethod);
+            test.setCls(cls);
 
             for (Annotation annotation : javaMethod.getAnnotations()) {
 
@@ -110,7 +111,7 @@ public class TestRunner {
 
                     test.setGuid(guid);
                     implementedTests.put(guid, test);
-                } else if (annotation instanceof Measure) {
+                } else if (annotation instanceof org.datakurator.ffdq.annotations.Measure) {
                         String description = ((org.datakurator.ffdq.annotations.Measure) annotation).description();
                         String dimension = ((org.datakurator.ffdq.annotations.Measure) annotation).dimension().toString();
                         String label = ((org.datakurator.ffdq.annotations.Measure) annotation).label();
@@ -453,12 +454,7 @@ public class TestRunner {
                 ContextualizedDimension dimension = measurementMethod.getContextualizedDimension();
 
                 AssertionTest test = tests.get(specification.getId());
-                if (test==null) { 
-                	throw new RunnerException("Unable to find test by specification.id for " + measurementMethod.getSpecification().getLabel());
-                }
-                if (test.getMethod()==null) { 
-                	throw new RunnerException("Unable to find test method by specification.id for " + measurementMethod.getSpecification().getLabel());
-                }
+
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Measure measure = new Measure();
@@ -477,12 +473,7 @@ public class TestRunner {
                 ContextualizedCriterion criterion = validationMethod.getContextualizedCriterion();
 
                 AssertionTest test = tests.get(specification.getId());
-                if (test==null) { 
-                	throw new RunnerException("Unable to find test by specification.id for " + validationMethod.getSpecification().getLabel());
-                }
-                if (test.getMethod()==null) { 
-                	throw new RunnerException("Unable to find test method by specification.id for " + validationMethod.getSpecification().getLabel());
-                }
+
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Validation validation = new Validation();
@@ -501,12 +492,7 @@ public class TestRunner {
                 ContextualizedEnhancement enhancement = amendmentMethod.getContextualizedEnhancement();
 
                 AssertionTest test = tests.get(specification.getId());
-                if (test==null) { 
-                	throw new RunnerException("Unable to find test by specification.id for " + amendmentMethod.getSpecification().getLabel());
-                }
-                if (test.getMethod()==null) { 
-                	throw new RunnerException("Unable to find test method by specification.id for " + amendmentMethod.getSpecification().getLabel());
-                }
+
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Amendment amendment = new Amendment();
@@ -520,23 +506,15 @@ public class TestRunner {
                 model.save(amendment);
             }
         } catch (RunnerException ex) {
+            // This probably results from an exception being thrown by code running in the test method
             logger.warning(ex.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {
+            // This probably indicates that the asserted class or method hasn't been found.
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
         }
     }
 
-    private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) {
-    	try { 
-    	    test.getCls().getName();
-    	    test.getMethod().getName();
-    	} catch (NullPointerException ex) { 
-    		if (test==null) { 
-    		   logger.warning("TestRunner.invokeTest() given a null AssertionTest.");
-    		} else { 
-    		   logger.warning("TestRunner.invokeTest() given a test ("+ test.getGuid() +") with a null method" );
-    		}
-    	}
+    private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) throws RunnerException {
         Map<String, String> actedUpon = new HashMap<>();
 
         for (TestParam param : test.getParameters()) {
@@ -576,27 +554,8 @@ public class TestRunner {
             model.save(result);
 
             return result;
-        } catch (InvocationTargetException | IllegalAccessException e) {
-        	logger.warning(e.toString());
-        	logger.warning(e.getMessage());
-        	String testClass = "";
-        	try { 
-        		testClass = test.getCls().getName();
-        	} catch (NullPointerException ex) { 
-        		testClass = "[test.getCls()=null]";
-        	}
-        	String testMethod = "";
-        	try { 
-        		testMethod = test.getCls().getName();
-        	} catch (NullPointerException ex) { 
-        		testMethod = "[test.getMethod()=null]";
-        	}        	
-        	
-        	if (test!=null) { 
-                throw new RuntimeException("Could not invoke test method: " + testClass + "." + testMethod, e);
-        	} else { 
-                throw new RuntimeException("Could not invoke test method: on null test", e);
-        	}
+        } catch (InvocationTargetException e) {
+            throw new RunnerException("Exception occured originating from test method: " + test.getMethod().getName(), e);
         }
     }
 }

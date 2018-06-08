@@ -86,7 +86,7 @@ public class AssertionTest {
         this.method = method;
     }
 
-    public Object invoke(Object instance, Map<String, String> record) throws InvocationTargetException, IllegalAccessException {
+    public Object invoke(Object instance, Map<String, String> record) throws InvocationTargetException {
         Set<String> keys = record.keySet();
 
         // Check that record contains required fields
@@ -108,7 +108,11 @@ public class AssertionTest {
             args[param.getIndex()] = value;
         }
 
-        return method.invoke(instance, args);
+        try {
+            return method.invoke(instance, args);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Could not invoke test method: " + cls + "." + method, e);
+        }
     }
 
     public void setGuid(String guid) {
