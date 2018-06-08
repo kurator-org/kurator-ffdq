@@ -456,6 +456,9 @@ public class TestRunner {
                 if (test==null) { 
                 	throw new RunnerException("Unable to find test by specification.id for " + measurementMethod.getSpecification().getLabel());
                 }
+                if (test.getMethod()==null) { 
+                	throw new RunnerException("Unable to find test method by specification.id for " + measurementMethod.getSpecification().getLabel());
+                }
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Measure measure = new Measure();
@@ -477,6 +480,9 @@ public class TestRunner {
                 if (test==null) { 
                 	throw new RunnerException("Unable to find test by specification.id for " + validationMethod.getSpecification().getLabel());
                 }
+                if (test.getMethod()==null) { 
+                	throw new RunnerException("Unable to find test method by specification.id for " + validationMethod.getSpecification().getLabel());
+                }
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Validation validation = new Validation();
@@ -497,6 +503,9 @@ public class TestRunner {
                 AssertionTest test = tests.get(specification.getId());
                 if (test==null) { 
                 	throw new RunnerException("Unable to find test by specification.id for " + amendmentMethod.getSpecification().getLabel());
+                }
+                if (test.getMethod()==null) { 
+                	throw new RunnerException("Unable to find test method by specification.id for " + amendmentMethod.getSpecification().getLabel());
                 }
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
@@ -568,9 +577,14 @@ public class TestRunner {
 
             return result;
         } catch (InvocationTargetException | IllegalAccessException e) {
+        	logger.warning(e.toString());
         	logger.warning(e.getMessage());
-            throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + "." +
-                    test.getMethod().getName(), e);
+        	if (test.getMethod()!=null) { 
+                throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + "." +
+                        test.getMethod().getName(), e);
+        	} else { 
+                throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + ".[null]", e);
+        	}
         }
     }
 }
