@@ -528,7 +528,7 @@ public class TestRunner {
 
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) {
     	try { 
-    	    test.getClass().getName();
+    	    test.getCls().getName();
     	    test.getMethod().getName();
     	} catch (NullPointerException ex) { 
     		if (test==null) { 
@@ -579,11 +579,23 @@ public class TestRunner {
         } catch (InvocationTargetException | IllegalAccessException e) {
         	logger.warning(e.toString());
         	logger.warning(e.getMessage());
-        	if (test.getMethod()!=null) { 
-                throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + "." +
-                        test.getMethod().getName(), e);
+        	String testClass = "";
+        	try { 
+        		testClass = test.getCls().getName();
+        	} catch (NullPointerException ex) { 
+        		testClass = "[test.getCls()=null]";
+        	}
+        	String testMethod = "";
+        	try { 
+        		testMethod = test.getCls().getName();
+        	} catch (NullPointerException ex) { 
+        		testMethod = "[test.getMethod()=null]";
+        	}        	
+        	
+        	if (test!=null) { 
+                throw new RuntimeException("Could not invoke test method: " + testClass + "." + testMethod, e);
         	} else { 
-                throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + ".[null]", e);
+                throw new RuntimeException("Could not invoke test method: on null test", e);
         	}
         }
     }
