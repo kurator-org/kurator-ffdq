@@ -508,6 +508,11 @@ public class TestRunner {
     }
 
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) {
+    	try { 
+    	    logger.info(test.getClass().getName());
+    	} catch (NullPointerException ex) { 
+    		logger.warning("TestRunner.invokeTest() given a null AssertionTest."); 
+    	}
         Map<String, String> actedUpon = new HashMap<>();
 
         for (TestParam param : test.getParameters()) {
@@ -548,6 +553,7 @@ public class TestRunner {
 
             return result;
         } catch (InvocationTargetException | IllegalAccessException e) {
+        	logger.warning(e.getMessage());
             throw new RuntimeException("Could not invoke test method: " + test.getCls().getName() + "." +
                     test.getMethod().getName(), e);
         }
