@@ -520,8 +520,13 @@ public class TestRunner {
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) {
     	try { 
     	    test.getClass().getName();
+    	    test.getMethod().getName();
     	} catch (NullPointerException ex) { 
-    		logger.warning("TestRunner.invokeTest() given a null AssertionTest."); 
+    		if (test==null) { 
+    		   logger.warning("TestRunner.invokeTest() given a null AssertionTest.");
+    		} else { 
+    		   logger.warning("TestRunner.invokeTest() given a test ("+ test.getGuid() +") with a null method" );
+    		}
     	}
         Map<String, String> actedUpon = new HashMap<>();
 
