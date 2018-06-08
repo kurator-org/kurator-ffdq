@@ -587,7 +587,7 @@ public class TestRunner {
         	}
         	String testMethod = "";
         	try { 
-        		testMethod = test.getCls().getName();
+        		testMethod = test.getMethod().getName();
         	} catch (NullPointerException ex) { 
         		testMethod = "[test.getMethod()=null]";
         	}        	
