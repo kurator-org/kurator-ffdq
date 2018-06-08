@@ -453,6 +453,9 @@ public class TestRunner {
                 ContextualizedDimension dimension = measurementMethod.getContextualizedDimension();
 
                 AssertionTest test = tests.get(specification.getId());
+                if (test==null) { 
+                	throw new RunnerException("Unable to find test by specification.id for " + measurementMethod.getSpecification().getLabel());
+                }
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Measure measure = new Measure();
@@ -471,6 +474,9 @@ public class TestRunner {
                 ContextualizedCriterion criterion = validationMethod.getContextualizedCriterion();
 
                 AssertionTest test = tests.get(specification.getId());
+                if (test==null) { 
+                	throw new RunnerException("Unable to find test by specification.id for " + validationMethod.getSpecification().getLabel());
+                }
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Validation validation = new Validation();
@@ -489,6 +495,9 @@ public class TestRunner {
                 ContextualizedEnhancement enhancement = amendmentMethod.getContextualizedEnhancement();
 
                 AssertionTest test = tests.get(specification.getId());
+                if (test==null) { 
+                	throw new RunnerException("Unable to find test by specification.id for " + amendmentMethod.getSpecification().getLabel());
+                }
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
                 Amendment amendment = new Amendment();
@@ -501,7 +510,8 @@ public class TestRunner {
 
                 model.save(amendment);
             }
-
+        } catch (RunnerException ex) {
+            logger.warning(ex.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
         }
@@ -509,7 +519,7 @@ public class TestRunner {
 
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) {
     	try { 
-    	    logger.info(test.getClass().getName());
+    	    test.getClass().getName();
     	} catch (NullPointerException ex) { 
     		logger.warning("TestRunner.invokeTest() given a null AssertionTest."); 
     	}
