@@ -60,6 +60,10 @@ public class Dimension {
     }
 
     public static Dimension VALUE = new Dimension("Value");
+    public static Dimension CONFORMANCE = new Dimension("Conformance");
+    public static Dimension RESOLUTION = new Dimension("Resolution");
+    public static Dimension CONSISTENCY = new Dimension("Likelyhood");
+    public static Dimension LIKELYHOOD = new Dimension("Consistency");
     public static Dimension VOCAB_MATCH = new Dimension("Vocab Match");
     public static Dimension COMPLETENESS = new Dimension("Completeness");
     public static Dimension ACCURACY = new Dimension("Accuracy");
@@ -69,6 +73,10 @@ public class Dimension {
     public static Dimension fromString(String value) {
         if (value.equalsIgnoreCase(VALUE.getLabel())) return VALUE;
         else if (value.equalsIgnoreCase(VOCAB_MATCH.getLabel())) return VOCAB_MATCH;
+        else if (value.equalsIgnoreCase(CONFORMANCE.getLabel())) return CONFORMANCE;
+        else if (value.equalsIgnoreCase(CONSISTENCY.getLabel())) return CONSISTENCY;
+        else if (value.equalsIgnoreCase(RESOLUTION.getLabel())) return RESOLUTION;
+        else if (value.equalsIgnoreCase(LIKELYHOOD.getLabel())) return LIKELYHOOD;
         else if (value.equalsIgnoreCase(COMPLETENESS.getLabel())) return COMPLETENESS;
         else if (value.equalsIgnoreCase(ACCURACY.getLabel())) return ACCURACY;
         else if (value.equalsIgnoreCase(PRECISION.getLabel())) return PRECISION;

@@ -25,6 +25,7 @@ public class Namespace {
     public static final String DWC = "http://rs.tdwg.org/dwc/terms/";
     public static final String DCTERMS = "http://purl.org/dc/terms/";
     public static final String DWCIRI = "http://rs.tdwg.org/dwc/iri/";
+    public static final String DC = "http://purl.org/dc/elements/1.1/";
 
     public static final String NONE = "http://datakurator.org/none/";
 
@@ -36,6 +37,7 @@ public class Namespace {
         nsPrefixes.put("dcterms", DCTERMS);
         nsPrefixes.put("dwc", DWC);
         nsPrefixes.put("dwciri", DWCIRI);
+        nsPrefixes.put("dc", DC);
 
         nsPrefixes.put("dwcloud", NONE);
         nsPrefixes.put("none", NONE);
