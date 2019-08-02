@@ -1,6 +1,6 @@
 # Given a use case find the mechanisms used
 
-PREFIX ffdq: <http://example.com/ffdq/>
+PREFIX ffdq: <http://rs.tdwg.org/ffdq/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 

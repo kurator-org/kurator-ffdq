@@ -2,7 +2,7 @@
 # "DAY_POSSIBLE_FOR_MONTH_YEAR". Also contains an example result for a single occurrence record row that was found to be
 # valid
 
-@base <http://example.com/> .
+@base <http://rs.tdwg.org/> .
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -11,7 +11,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix fn: <http://www.w3.org/2005/xpath-functions#> .
 @prefix dwc: <http://rs.tdwg.org/dwc/terms/> .
-@prefix ffdq: <http://example.com/ffdq/> .
+@prefix ffdq: <http://rs.tdwg.org/ffdq/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 
@@ -35,7 +35,7 @@
     ffdq:hasResourceType <#single-record> .
 
 # ResourceType can be single or multi record
-<#single-record> a <http://example.com/rt/SingleRecord> .
+<#single-record> a <http://rs.tdwg.org/rt/SingleRecord> .
 
 # The InformationElements describe how terms from a controlled vocabulary (darwin core) relate to fields acted upon by the test
 <#year> a ffdq:InformationElement ;
