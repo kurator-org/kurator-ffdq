@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://rs.tdwg.org/ffdq/"
 })
 @RDFBean("ffdq:ImprovementTarget")
 public class ImprovementTarget {

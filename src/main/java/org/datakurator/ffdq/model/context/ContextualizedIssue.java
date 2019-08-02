@@ -27,7 +27,7 @@ import org.datakurator.ffdq.model.ResourceType;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://rs.tdwg.org/ffdq/"
 })
 @RDFBean("ffdq:ContextualizedIssue")
 public class ContextualizedIssue {

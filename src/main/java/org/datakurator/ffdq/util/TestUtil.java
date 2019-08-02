@@ -15,6 +15,7 @@ import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
 import org.datakurator.ffdq.runner.AssertionTest;
+import org.datakurator.ffdq.runner.UnsupportedTypeException;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
 import java.io.*;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TestUtil {
@@ -258,7 +260,12 @@ public class TestUtil {
                         dimension, parseInformationElementStr(informationElement));
 
                 tests.add(test);
+            } catch (UnsupportedTypeException e) {
+            	// skip record if not supported.
+            	logger.log(Level.WARNING, "Unsupported Type, skipping test #" + record.getRecordNumber());
+            	logger.log(Level.WARNING, e.getMessage(), e);
             } catch (IllegalArgumentException e) {
+            	logger.log(Level.INFO, e.getMessage(), e);
                 throw new RuntimeException("Could not find column header in input csv, the config.properties file might have incorrect mappings.", e);
             }
         }

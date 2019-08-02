@@ -25,7 +25,7 @@ import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
+        "ffdq = http://rs.tdwg.org/ffdq/",
         "prov = http://www.w3.org/ns/prov#"
 })
 @RDFBean("ffdq:Validation")

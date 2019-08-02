@@ -24,8 +24,9 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
-        "d = http://example.com/ffdq/dimension/",
+        "ffdq = http://rs.tdwg.org/ffdq/",
+        "bdq = http://rs.tdwg.org/bdq/",
+        "d = http://rs.tdwg.org/ffdq/dimension/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Dimension")
@@ -69,6 +70,7 @@ public class Dimension {
     public static Dimension ACCURACY = new Dimension("Accuracy");
     public static Dimension PRECISION = new Dimension("Precision");
     public static Dimension UNIQUENESS = new Dimension("Uniqueness");
+    public static Dimension RELIABILITY = new Dimension("Reliability");
 
     public static Dimension fromString(String value) {
         if (value.equalsIgnoreCase(VALUE.getLabel())) return VALUE;
@@ -81,6 +83,7 @@ public class Dimension {
         else if (value.equalsIgnoreCase(ACCURACY.getLabel())) return ACCURACY;
         else if (value.equalsIgnoreCase(PRECISION.getLabel())) return PRECISION;
         else if (value.equalsIgnoreCase(UNIQUENESS.getLabel())) return UNIQUENESS;
+        else if (value.equalsIgnoreCase(RELIABILITY.getLabel())) return RELIABILITY;
         else throw new UnsupportedOperationException("Unable to find an ffdq:Dimension for value: " + value);
     }
 }

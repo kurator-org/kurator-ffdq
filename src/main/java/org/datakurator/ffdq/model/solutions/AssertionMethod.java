@@ -25,7 +25,7 @@ import org.datakurator.ffdq.model.Specification;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/"
+        "ffdq = http://rs.tdwg.org/ffdq/"
 })
 @RDFBean("ffdq:AssertionMethod")
 public class AssertionMethod {

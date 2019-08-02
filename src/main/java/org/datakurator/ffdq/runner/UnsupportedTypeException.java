@@ -1,6 +1,6 @@
-/**  Profile.java
- *
- * Copyright 2017 President and Fellows of Harvard College
+/**  UnsupportedTypeException.java
+ * 
+ * Copyright 2019 President and Fellows of Harvard College
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.needs;
+package org.datakurator.ffdq.runner;
 
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+/**
+ * Exception intended to flag types asserted in input CSV that are not supported
+ * by the org.datakurator.ffdq.model 
+ * 
+ * @author Paul J. Morris
+ */
+public class UnsupportedTypeException extends Exception {
 
-@RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/ffdq/"
-})
-@RDFBean("ffdq:Profile")
-public class Profile {
+	public UnsupportedTypeException(String message) {
+		super(message);
+	}
+
 }

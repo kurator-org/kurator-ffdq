@@ -24,7 +24,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "rt = http://example.com/ffdq/rt/",
+        "rt = http://rs.tdwg.org/ffdq/rt/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:ResourceType")

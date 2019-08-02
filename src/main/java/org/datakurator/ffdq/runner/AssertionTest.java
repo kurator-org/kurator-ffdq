@@ -27,6 +27,7 @@ public class AssertionTest {
     public static final String MEASURE = "MEASURE";
     public static final String VALIDATION = "VALIDATION";
     public static final String AMENDMENT = "AMENDMENT";
+    public static final String NOTIFICATION = "NOTIFICATION";
 
     public static final String SINGLE_RECORD = "SINGLERECORD";
     public static final String MULTI_RECORD = "MULTIRECORD";
@@ -49,7 +50,7 @@ public class AssertionTest {
     }
 
     public AssertionTest(String guid, String label, String description, String specification, String assertionType,
-                         String resourceType, String dimension, List<String> informationElement) {
+                         String resourceType, String dimension, List<String> informationElement) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
@@ -75,8 +76,11 @@ public class AssertionTest {
         }
 
         if (!Arrays.asList(MEASURE, VALIDATION, AMENDMENT).contains(assertionType.toUpperCase())) {
-            throw new IllegalArgumentException("Invalid value for assertion type \"" + assertionType + "\" for test: "
-                    + guid);
+            if (Arrays.asList(NOTIFICATION).contains(assertionType.toUpperCase())) {
+                throw new UnsupportedTypeException("Unsupupported value for assertion type \"" + assertionType + "\" in test: " + guid);
+            } else { 
+                throw new IllegalArgumentException("Invalid value for assertion type \"" + assertionType + "\" for test: " + guid);
+            }
         }
     }
 

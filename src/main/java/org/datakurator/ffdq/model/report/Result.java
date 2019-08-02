@@ -26,7 +26,7 @@ import org.datakurator.ffdq.model.ResultState;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://example.com/ffdq/",
+        "ffdq = http://rs.tdwg.org/ffdq/",
         "prov = http://www.w3.org/ns/prov#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
