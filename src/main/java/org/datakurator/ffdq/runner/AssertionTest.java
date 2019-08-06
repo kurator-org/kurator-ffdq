@@ -18,6 +18,7 @@ package org.datakurator.ffdq.runner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,8 @@ public class AssertionTest {
     private String assertionType;
     private String resourceType;
     private String dimension;
-    private List<String> informationElement;
+    private List<String> informationElement;  // will be java class parameters
+    private List<String> testParameters;      // parameters specified in the test to change its behavior.
 
     private Class cls;
     private Method method;
@@ -50,7 +52,7 @@ public class AssertionTest {
     }
 
     public AssertionTest(String guid, String label, String description, String specification, String assertionType,
-                         String resourceType, String dimension, List<String> informationElement) throws UnsupportedTypeException {
+                         String resourceType, String dimension, List<String> informationElement, List<String> testParameters) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
@@ -60,6 +62,8 @@ public class AssertionTest {
         this.resourceType = resourceType;
         this.dimension = dimension;
         this.informationElement = informationElement;
+        this.testParameters = testParameters;
+        
 
         // Validate
         if (!Arrays.asList(SINGLE_RECORD, MULTI_RECORD).contains(resourceType.toUpperCase())) {
@@ -183,7 +187,25 @@ public class AssertionTest {
         this.informationElement = informationElement;
     }
 
-    public Class getCls() {
+    /**
+	 * @return the testParameters that alter the behavior of the test.
+	 */
+	public List<String> getTestParameters() {
+		return testParameters;
+	}
+
+	/**
+	 * @param testParameters the testParameters to set to alter the behavior of the test.
+	 */
+	public void setTestParameters(List<String> testParameters) {
+		if (testParameters!=null && testParameters.size()>0 && !testParameters.get(1).equals("")) { 
+		    this.testParameters = testParameters;
+		} else { 
+			this.testParameters = new ArrayList<String>();
+		}
+	}
+
+	public Class getCls() {
         return cls;
     }
 
@@ -199,10 +221,12 @@ public class AssertionTest {
         this.method = method;
     }
 
+    /** the information elements as inputs to the test **/
     public List<TestParam> getParameters() {
         return parameters;
     }
 
+    /** These are the information elements as inputs **/
     public void setParameters(List<TestParam> parameters) {
         this.parameters = parameters;
     }
@@ -217,7 +241,8 @@ public class AssertionTest {
                 ", assertionType='" + assertionType + '\'' +
                 ", resourceType='" + resourceType + '\'' +
                 ", dimension='" + dimension + '\'' +
-                ", informationElement=" + informationElement +
+                ", informationElement=" + informationElement.toString() +
+                ", testParameters=" + testParameters.toString() + 
                 ", cls=" + cls +
                 ", method=" + method +
                 ", parameters=" + parameters +

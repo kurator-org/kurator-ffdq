@@ -38,6 +38,7 @@ public class TestUtil {
     private final static String CSV_HEADER_RESOURCE_TYPE;
     private final static String CSV_HEADER_DIMENSION;
     private final static String CSV_HEADER_INFO_ELEMENT;
+    private final static String CSV_HEADER_TEST_PARMETERS;
 
     static {
         Properties properties = new Properties();
@@ -51,6 +52,7 @@ public class TestUtil {
             CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
             CSV_HEADER_DIMENSION = properties.getProperty("csv.header.dimension");
             CSV_HEADER_INFO_ELEMENT = properties.getProperty("csv.header.informationElement");
+            CSV_HEADER_TEST_PARMETERS = properties.getProperty("csv.header.testParameters");
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -255,9 +257,10 @@ public class TestUtil {
                 String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
                 String dimension = record.get(CSV_HEADER_DIMENSION);
                 String informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
+                String testParameters = record.get(CSV_HEADER_TEST_PARMETERS);
 
                 AssertionTest test = new AssertionTest(guid, label, description, specification, assertionType, resourceType,
-                        dimension, parseInformationElementStr(informationElement));
+                        dimension, parseInformationElementStr(informationElement), parseTestParametersString(testParameters));
 
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
@@ -273,7 +276,9 @@ public class TestUtil {
         return tests;
     }
 
-    private static File loadJavaSource(String srcDir, String packageName, String className) {
+
+
+	private static File loadJavaSource(String srcDir, String packageName, String className) {
         // Convert the Java package name to directory and class name to source file
         String packageDir = packageName.replaceAll("\\.", File.separator);
         String sourceFile = className + ".java";
@@ -299,6 +304,25 @@ public class TestUtil {
         return Paths.get(pkgDir.getAbsolutePath(), sourceFile).toFile();
     }
 
+	/**
+	 * Test Parameters are not currently structured, this method is a stub
+	 * in case parsing is added.
+	 * 
+	 * @param testParameters string containing information about testParameters.
+	 * @return
+	 */
+    private static List<String> parseTestParametersString(String testParameters) {
+		List<String> result = new ArrayList<String>();
+		result.add(testParameters);
+		return result;
+	}	
+	
+    /**
+     * Information Elements are expected to be a comma delmited list of namespace:name pairs.
+     * 
+     * @param str the input string containing information elements
+     * @return input elements as a list of strings, each element containing one namespace:name pair.
+     */
     private static List<String> parseInformationElementStr(String str) {
         List<String> infoElems = new ArrayList<>();
 

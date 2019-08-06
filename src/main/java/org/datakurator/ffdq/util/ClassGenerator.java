@@ -17,9 +17,11 @@
 package org.datakurator.ffdq.util;
 
 import org.datakurator.ffdq.runner.AssertionTest;
+import org.datakurator.ffdq.runner.TestParam;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +144,7 @@ public class ClassGenerator {
                     break;
             }
 
-            // params
+            // params  (these are the information elements as test inputs).
             Map<String, String> params = new HashMap<>();
             List<String> ie = test.getInformationElement();
             for (int i = 0; i < ie.size(); i++) {
@@ -159,8 +161,9 @@ public class ClassGenerator {
             sb.append("     * Provides: ").append(test.getLabel()).append("\n");
             sb.append("     *\n");
 
-            for (String param : params.values()) {
-                sb.append("     * @param ").append(param).append("\n");
+            for (String key : params.keySet()) {
+            	String param = params.get(key);
+                sb.append("     * @param ").append(param).append(" the provided ").append(key).append(" to evaluate\n");
             }
 
             sb.append("     * @return ").append(retType).append("\n");
@@ -180,9 +183,40 @@ public class ClassGenerator {
                 cnt++;
             }
 
+            List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
+            
             sb.append(") {\n");
             sb.append("        ").append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
-            sb.append("        // ...\n\n");
+            sb.append("        //TODO:  Implement specification").append("\n");
+            // Split the specification into words on whitespace, then print specification in lines with
+            // the last word boundary being before character 55 in the string (plus an indent and comment chars).
+            Iterator<String> i = specificationWords.iterator();
+            StringBuffer specificationLine = new StringBuffer();
+            while (i.hasNext()) { 
+            	specificationLine.append(i.next()).append(" ");
+            	if (specificationLine.length()>55) { 
+            	     sb.append("        // ").append(specificationLine.toString()).append("\n");
+            	     specificationLine = new StringBuffer();
+            	}
+            }
+            sb.append("        //").append(specificationLine.toString()).append("\n");
+            sb.append("\n");
+            // Test Parameters change the behavior of the test.
+            if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 
+            	StringBuilder testParamCommentLines = new StringBuilder();
+            	Iterator<String> ipar = test.getTestParameters().iterator();
+            	while (ipar.hasNext()) { 
+            		String testParam = ipar.next();
+            		if (testParam!=null && testParam.trim().length()>0) { 
+            			testParamCommentLines.append("        // ").append(testParam).append("\n");
+            		}
+            	}
+            	if (testParamCommentLines.length()>0) { 
+            		sb.append("        //TODO: Parameters. This test is defined as parameterized.").append("\n");
+            		sb.append(testParamCommentLines);
+            		sb.append("\n");
+            	}
+            }
             sb.append("        return result;\n");
             sb.append("    }\n\n");
         }

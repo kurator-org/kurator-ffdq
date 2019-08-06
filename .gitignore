@@ -12,3 +12,5 @@ buildNumber.properties
 .settings/
 .idea/
 *.iml
+generate/
+testsuite/
