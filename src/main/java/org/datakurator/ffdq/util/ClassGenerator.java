@@ -17,7 +17,6 @@
 package org.datakurator.ffdq.util;
 
 import org.datakurator.ffdq.runner.AssertionTest;
-import org.datakurator.ffdq.runner.TestParam;
 
 import java.io.*;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class ClassGenerator {
         sb.append("import org.datakurator.ffdq.model.ResultState;\n");
         sb.append("import org.datakurator.ffdq.api.result.*;\n\n");
 
-        sb.append("@Mechanism(\"").append(mechanismGuid).append("\")\n");
+        sb.append("@Mechanism(value=\"").append(mechanismGuid).append("\",label=\"").append(mechanismName).append("\")\n");
         sb.append("public class ").append(className).append(" {\n\n");
     }
 
