@@ -25,7 +25,8 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "rt = http://rs.tdwg.org/ffdq/rt/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#",
+        "ffdq = http://rs.tdwg.org/ffdq/",
 })
 @RDFBean("ffdq:ResourceType")
 public class ResourceType {
