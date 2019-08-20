@@ -14,3 +14,4 @@ buildNumber.properties
 *.iml
 generate/
 testsuite/
+competencyquestions/rdf/catalog-v001.xml
