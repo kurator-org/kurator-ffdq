@@ -127,19 +127,24 @@ public class ClassGenerator {
 
             // return type
             String retType = "void";
+            String retTypeJavaDoc = null;   // Javadoc @return throws error when given generics.
             switch (test.getAssertionType().toUpperCase()) {
                 case "MEASURE":
                     if (test.getDimension().equalsIgnoreCase("Completeness")) {
                         retType = "DQResponse<CompletenessValue>";
+                        retTypeJavaDoc = "DQResponse the response of type CompletenessValue ";
                     } else {
                         retType = "DQResponse<NumericalValue>";
+                        retTypeJavaDoc = "DQResponse the response of type NumericalValue ";
                     }
                     break;
                 case "VALIDATION":
                     retType = "DQResponse<ComplianceValue>";
+                    retTypeJavaDoc = "DQResponse the response of type ComplianceValue ";
                     break;
                 case "AMENDMENT":
                     retType = "DQResponse<AmendmentValue>";
+                    retTypeJavaDoc = "DQResponse the response of type AmendmentValue";
                     break;
             }
 
@@ -164,8 +169,10 @@ public class ClassGenerator {
             	String param = params.get(key);
                 sb.append("     * @param ").append(param).append(" the provided ").append(key).append(" to evaluate\n");
             }
-
-            sb.append("     * @return ").append(retType).append("\n");
+            
+            if (retTypeJavaDoc!=null) { 
+                sb.append("     * @return ").append(retTypeJavaDoc).append(" to return\n");
+            }
             sb.append("     */\n");
             sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
