@@ -23,7 +23,7 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/ffdq/"
+        "ffdq = http://rs.tdwg.org/ffdq#"
 })
 @RDFBean("ffdq:AmendmentMethod")
 public class AmendmentMethod extends AssertionMethod {

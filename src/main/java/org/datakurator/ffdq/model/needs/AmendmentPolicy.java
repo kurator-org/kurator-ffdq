@@ -25,7 +25,7 @@ import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/ffdq/"
+        "ffdq = http://rs.tdwg.org/ffdq#"
 })
 @RDFBean("ffdq:AmendmentPolicy")
 public class AmendmentPolicy {

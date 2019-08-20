@@ -27,6 +27,7 @@ public class Namespace {
     public static final String DWCIRI = "http://rs.tdwg.org/dwc/iri/";
     public static final String DC = "http://purl.org/dc/elements/1.1/";
     public static final String BDQ = "http://rs.tdwg.org/bdq/terms/";   
+    public static final String FFDQ = "http://rs.tdwg.org/ffdq#";   
 
     public static final String NONE = "http://datakurator.org/none/";
 
