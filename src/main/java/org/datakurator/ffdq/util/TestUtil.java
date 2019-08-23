@@ -71,6 +71,8 @@ public class TestUtil {
         options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
         options.addOption("appendClass", null, false, "Append to an existing Java class stub methods for new tests");
 
+        options.addOption("generatePython", null, false, "Generate a new Python class with stub methods for each test");
+        
         try {
             CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args);
@@ -179,26 +181,31 @@ public class TestUtil {
             model.write(format, out);
             logger.info("Wrote rdf for tests to: " + new File(rdfOut).getAbsolutePath());
 
+            // Generate python if requested.
+            boolean generatePython = cmd.hasOption("generatePython");
+            
+            // Proof of concept python generation
+            if (generatePython) { 
+            	String sourceFile = className + ".py";
+            	File pythonSrc = new File(sourceFile);
+            	if (!pythonSrc.exists()) {  
+            		PythonClassGenerator generator = new PythonClassGenerator(mechanismGuid, mechanismName, packageName, className);
+            		generator.init();
+            		for (AssertionTest test : tests) {
+            			generator.addTest(test);
+            		}
+
+            		// Write generated class to java source file
+            		generator.writeOut(new FileOutputStream(pythonSrc));
+            		logger.info("Wrote python source file for class to: " + pythonSrc.getAbsolutePath());
+            	} else { 
+            		logger.info("Warning: Did not generate python code.  Python source file exists: " + pythonSrc.getAbsolutePath());
+            	}
+            }
+            
             // Run DQ Class generation step if generateClass or appendClass options were set
             boolean generateClass = cmd.hasOption("generateClass");
             boolean appendClass = cmd.hasOption("appendClass");
-
-            // TODO: Make python generation work through a command line option
-            // test python generation
-            if (generateClass) { 
-            	String sourceFile = className + ".py";
-                File pythonSrc = new File(sourceFile);
-                PythonClassGenerator generator = new PythonClassGenerator(mechanismGuid, mechanismName, packageName, className);
-            	generator.init();
-                for (AssertionTest test : tests) {
-                    generator.addTest(test);
-                }
-
-                // Write generated class to java source file
-                generator.writeOut(new FileOutputStream(pythonSrc));
-                logger.info("Wrote python source file for class to: " + pythonSrc.getAbsolutePath());
-            }
-            
             if (generateClass || appendClass) {
                 File javaSrc = loadJavaSource(cmd.getOptionValue("srcDir"), packageName, className);
                 JavaClassGenerator generator = new JavaClassGenerator(mechanismGuid, mechanismName, packageName, className);

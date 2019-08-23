@@ -16,10 +16,12 @@
  */
 package org.datakurator.dwcloud;
 
+import org.apache.commons.io.FileUtils;
 import org.datakurator.ffdq.rdf.Namespace;
 import org.datakurator.ffdq.runner.TestRunner;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
@@ -43,7 +45,22 @@ public class Vocabulary {
         Namespace.resolvePrefixedTerm(idTerm);
 
         try {
-            InputStream vocabStream = new URL(vocabUrl).openStream();
+        	boolean usingLocalCopy = false;
+        	URL urlVocabUrl = new URL(vocabUrl);
+        	String vocabFilename = urlVocabUrl.getFile();
+            InputStream vocabStream = null;
+        	try { 
+        		vocabStream = urlVocabUrl.openStream();
+        	} catch (IOException e) { 
+        		// if we can't access the remote file, try to see if we have a local copy to work with.
+        		File vocabCache = new File(new File(vocabFilename).getName());
+        		if (vocabCache.exists() && vocabCache.canRead()) { 
+        			vocabStream = new FileInputStream(vocabCache);
+        			usingLocalCopy = true;
+        		} else { 
+        			throw e;
+        		}
+        	}
             BufferedReader reader = new BufferedReader(new InputStreamReader(vocabStream));
 
             String line;
@@ -68,8 +85,17 @@ public class Vocabulary {
                 }
                 
             }
-
+            
             reader.close();
+            
+            if (!usingLocalCopy) {
+            	// store a local copy of the remote file.
+        	    File vocabCache = new File(new File(vocabFilename).getName());
+                FileUtils.copyURLToFile(urlVocabUrl, vocabCache);
+            }
+            
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: Incorrectly fromed URL for darwin cloud vocab file: " + vocabUrl, e);
         } catch (IOException e) {
             throw new RuntimeException("Error loading mapping from darwin cloud vocab file: " + vocabUrl, e);
         }
