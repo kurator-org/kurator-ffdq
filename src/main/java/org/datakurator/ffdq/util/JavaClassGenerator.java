@@ -13,6 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * @author David Lowery
+ * @author Paul J. Morris
  */
 package org.datakurator.ffdq.util;
 
@@ -26,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class ClassGenerator {
-    private final static Logger logger = Logger.getLogger(ClassGenerator.class.getName());
+public class JavaClassGenerator {
+    private final static Logger logger = Logger.getLogger(JavaClassGenerator.class.getName());
 
     private String mechanismGuid;
     private String mechanismName;
@@ -40,7 +43,7 @@ public class ClassGenerator {
 
     private StringBuilder sb;
 
-    public ClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className) {
+    public JavaClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className) {
         this.mechanismGuid = mechanismGuid;
         this.mechanismName = mechanismName;
 

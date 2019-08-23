@@ -183,9 +183,25 @@ public class TestUtil {
             boolean generateClass = cmd.hasOption("generateClass");
             boolean appendClass = cmd.hasOption("appendClass");
 
+            // TODO: Make python generation work through a command line option
+            // test python generation
+            if (generateClass) { 
+            	String sourceFile = className + ".py";
+                File pythonSrc = new File(sourceFile);
+                PythonClassGenerator generator = new PythonClassGenerator(mechanismGuid, mechanismName, packageName, className);
+            	generator.init();
+                for (AssertionTest test : tests) {
+                    generator.addTest(test);
+                }
+
+                // Write generated class to java source file
+                generator.writeOut(new FileOutputStream(pythonSrc));
+                logger.info("Wrote python source file for class to: " + pythonSrc.getAbsolutePath());
+            }
+            
             if (generateClass || appendClass) {
                 File javaSrc = loadJavaSource(cmd.getOptionValue("srcDir"), packageName, className);
-                ClassGenerator generator = new ClassGenerator(mechanismGuid, mechanismName, packageName, className);
+                JavaClassGenerator generator = new JavaClassGenerator(mechanismGuid, mechanismName, packageName, className);
 
                 // Check if the source file exists, if so try to append if the appendClass option is set
                 // otherwise generate a new class if the generateClass option is set
