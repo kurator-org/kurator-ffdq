@@ -195,7 +195,7 @@ public class TestUtil {
             			generator.addTest(test);
             		}
 
-            		// Write generated class to java source file
+            		// Write generated class to python source file
             		generator.writeOut(new FileOutputStream(pythonSrc));
             		logger.info("Wrote python source file for class to: " + pythonSrc.getAbsolutePath());
             	} else { 
