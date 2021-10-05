@@ -68,12 +68,12 @@ public class XLSXPostProcessor {
     public void initStyles(SXSSFWorkbook wb) {
         // White font
         Font font = wb.createFont();
-        font.setColor(HSSFColor.WHITE.index);
+        font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
 
         // Compliant or complete styled with green background
         CellStyle style = wb.createCellStyle();
-        style.setFillForegroundColor(HSSFColor.GREEN.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREEN.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setFont(font);
 
         styles.put("COMPLIANT", style);
@@ -81,8 +81,8 @@ public class XLSXPostProcessor {
 
         // Not compliant or not complete styled with red background
         style = wb.createCellStyle();
-        style.setFillForegroundColor(HSSFColor.RED.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.RED.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setFont(font);
 
         styles.put("NOT_COMPLIANT", style);
@@ -90,8 +90,8 @@ public class XLSXPostProcessor {
 
         // Filled in, curated or transposed styled with yellow background
         style = wb.createCellStyle();
-        style.setFillForegroundColor(HSSFColor.DARK_YELLOW.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.DARK_YELLOW.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setFont(font);
 
         styles.put("FILLED_IN", style);
@@ -100,8 +100,8 @@ public class XLSXPostProcessor {
 
         // Unable determine validity styled with grey background
         style = wb.createCellStyle();
-        style.setFillForegroundColor(HSSFColor.GREY_40_PERCENT.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setFont(font);
 
         styles.put("DATA_PREREQUISITES_NOT_MET", style);
@@ -473,8 +473,8 @@ public class XLSXPostProcessor {
         }
 
         CellStyle style = workbook.createCellStyle();
-        style.setFillForegroundColor(HSSFColor.YELLOW.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.YELLOW.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         Cell flagsCell = initialValuesRow.createCell(colNum);
         flagsCell.setCellValue(allFlags.toString());
@@ -599,8 +599,8 @@ public class XLSXPostProcessor {
         // Last column for flags
         // Not compliant or not complete styled with red background
         CellStyle style = workbook.createCellStyle();
-        style.setFillForegroundColor(HSSFColor.YELLOW.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.YELLOW.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         Cell flagSummary = finalValuesRow.createCell(colNum);
         flagSummary.setCellValue(allFlags.toString());
