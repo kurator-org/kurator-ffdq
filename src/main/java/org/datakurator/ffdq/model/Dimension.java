@@ -63,8 +63,8 @@ public class Dimension {
     public static Dimension VALUE = new Dimension("Value");
     public static Dimension CONFORMANCE = new Dimension("Conformance");
     public static Dimension RESOLUTION = new Dimension("Resolution");
-    public static Dimension CONSISTENCY = new Dimension("Likelyhood");
-    public static Dimension LIKELYHOOD = new Dimension("Consistency");
+    public static Dimension CONSISTENCY = new Dimension("Consistency");
+    public static Dimension LIKELYHOOD = new Dimension("Likelyhood");
     public static Dimension VOCAB_MATCH = new Dimension("Vocab Match");
     public static Dimension COMPLETENESS = new Dimension("Completeness");
     public static Dimension ACCURACY = new Dimension("Accuracy");
