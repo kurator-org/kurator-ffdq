@@ -16,3 +16,6 @@ generate/
 testsuite/
 competencyquestions/rdf/catalog-v001.xml
 darwin_cloud.txt
+name_tests.csv
+space_tests.csv
+time_tests.csv
