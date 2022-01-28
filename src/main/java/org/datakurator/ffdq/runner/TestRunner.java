@@ -446,7 +446,7 @@ public class TestRunner {
         model.load(dataResource.asModel());
 
         try {
-            Object instance = cls.newInstance();
+            Object instance = cls.getDeclaredConstructor().newInstance();
 
             // create a dq report object
             for (MeasurementMethod measurementMethod : measures) {
@@ -511,7 +511,19 @@ public class TestRunner {
         } catch (InstantiationException | IllegalAccessException e) {
             // This probably indicates that the asserted class or method hasn't been found.
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
-        }
+        } catch (IllegalArgumentException e) {
+        	logger.warning(e.getMessage());
+            throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
+		} catch (InvocationTargetException e) {
+        	logger.warning(e.getMessage());
+            throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
+		} catch (NoSuchMethodException e) {
+        	logger.warning(e.getMessage());
+            throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
+		} catch (SecurityException e) {
+        	logger.warning(e.getMessage());
+            throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
+		}
     }
 
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) throws RunnerException {
