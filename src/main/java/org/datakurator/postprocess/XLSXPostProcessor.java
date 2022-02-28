@@ -663,16 +663,17 @@ public class XLSXPostProcessor {
                 // Measurement value, use status HAS_RESULT
                 status = state.getLabel();
             }
-        } else if (state.equals(ResultState.CHANGED) ||
+        } else if (state.equals(ResultState.AMENDED) ||
                 state.equals(ResultState.FILLED_IN) ||
                 state.equals(ResultState.TRANSPOSED)){
-            // Use state as status, one of the amended states: CHANGED, FILLED_IN, TRANSPOSED
+            // Use state as status, one of the amended states: AMENDED, FILLED_IN, TRANSPOSED
             status = state.getLabel();
+        } else if (state.equals(ResultState.NOT_AMENDED) || 
+        		state.equals(ResultState.AMBIGUOUS)) { 
+        	status = state.getLabel();
         } else if (state.equals(ResultState.INTERNAL_PREREQUISITES_NOT_MET) ||
-                state.equals(ResultState.EXTERNAL_PREREQUISITES_NOT_MET) ||
-                state.equals(ResultState.UNABLE_CURATE)) {
-            // Use state as status, one of the error conditions: INTERNAL_PREREQUISITES_NOT_MET, EXTERNAL_PREREQUISITES_NOT_MET,
-            // UNABLE_CURATE
+                state.equals(ResultState.EXTERNAL_PREREQUISITES_NOT_MET) ) {
+            // Use state as status, one of the error conditions: INTERNAL_PREREQUISITES_NOT_MET, EXTERNAL_PREREQUISITES_NOT_MET.
             status = state.getLabel();
         }
 
