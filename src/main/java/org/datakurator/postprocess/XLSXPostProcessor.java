@@ -104,7 +104,7 @@ public class XLSXPostProcessor {
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setFont(font);
 
-        styles.put("DATA_PREREQUISITES_NOT_MET", style);
+        styles.put("INTERNAL_PREREQUISITES_NOT_MET", style);
         styles.put("EXTERNAL_PREREQUISITES_NOT_MET", style);
     }
 
@@ -443,7 +443,7 @@ public class XLSXPostProcessor {
                     }
 
                     if (initialValue.getStatus().equals("UNABLE_CURATE") ||
-                            initialValue.getStatus().equals("DATA_PREREQUISITES_NOT_MET") ||
+                            initialValue.getStatus().equals("INTERNAL_PREREQUISITES_NOT_MET") ||
                             initialValue.getStatus().equals("EXTERNAL_PREREQUISITES_NOT_MET")) {
 
                         prerequisitesNotMetFlag = true;
@@ -660,7 +660,7 @@ public class XLSXPostProcessor {
                 // Measures or Validations with result: COMPLETE, NOT_COMPLETE, COMPLIANT, NOT_COMPLIANT
                 status = (String) value.getValue();
             } else if (value.getValue() instanceof Long || value.getValue() instanceof Integer) {
-                // Measurement value, use status HAS_RESULT
+                // Measurement value, use status RUN_HAS_RESULT
                 status = state.getLabel();
             }
         } else if (state.equals(ResultState.AMENDED) ||
