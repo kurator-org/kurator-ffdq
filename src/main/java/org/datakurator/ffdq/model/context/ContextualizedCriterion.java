@@ -36,6 +36,7 @@ public class ContextualizedCriterion {
     private Criterion criterion;
     private InformationElement ie;
     private ResourceType rt;
+    private String label;
 
     public ContextualizedCriterion() {
 
@@ -45,6 +46,14 @@ public class ContextualizedCriterion {
         this.criterion = criterion;
         this.ie = ie;
         this.rt = rt;
+        label = criterion.getLabel() +  " for " + ie.toString() + " in " + rt.getLabel();
+    }
+    
+    public ContextualizedCriterion(Criterion criterion, InformationElement ie, ResourceType rt, String label) {
+        this.criterion = criterion;
+        this.ie = ie;
+        this.rt = rt;
+        this.label = label;
     }
 
     @RDFSubject
@@ -82,4 +91,14 @@ public class ContextualizedCriterion {
     public void setCriterion(Criterion criterion) {
         this.criterion = criterion;
     }
+    
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+    
 }
