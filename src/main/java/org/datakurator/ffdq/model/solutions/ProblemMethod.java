@@ -36,6 +36,11 @@ public class ProblemMethod {
     private ContextualizedIssue ci;
 
     public ProblemMethod() { }
+    
+    public ProblemMethod(Specification specification, ContextualizedIssue ci) { 
+    	this.specification = specification;
+    	this.ci = ci;
+    }
 
     public ProblemMethod(String id) {
         this.id = id;

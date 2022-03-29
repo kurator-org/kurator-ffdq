@@ -36,6 +36,12 @@ public class ContextualizedIssue {
     private Issue issue;
     private InformationElement ie;
     private ResourceType rt;
+    
+    public ContextualizedIssue(Issue issue, InformationElement ie, ResourceType rt) {
+    	this.issue = issue;
+    	this.ie = ie;
+    	this.rt = rt;
+    }
 
     @RDFSubject
     public String getId() {

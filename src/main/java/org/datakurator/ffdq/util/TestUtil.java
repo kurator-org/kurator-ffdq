@@ -8,9 +8,11 @@ import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.context.ContextualizedIssue;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.Implementation;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
+import org.datakurator.ffdq.model.solutions.ProblemMethod;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
@@ -171,6 +173,16 @@ public class TestUtil {
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         model.save(amendmentMethod);
+                        break;
+                    case "ISSUE":
+
+                        // Define an enhancement in the context of resource type and info elements
+                        Issue issue = new Issue(test.getDescription());
+                        ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, resourceType);
+
+                        // Define an amendment method, a specification tied to a criterion in context
+                        ProblemMethod problemMethod = new ProblemMethod(specification, ci);
+                        model.save(problemMethod);
                         break;
                 }
 
