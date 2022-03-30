@@ -131,6 +131,7 @@ public class JavaClassGenerator {
             // return type
             String retType = "void";
             String retTypeJavaDoc = null;   // Javadoc @return throws error when given generics.
+            StringBuilder descriptorAnnotation = new StringBuilder();
             switch (test.getAssertionType().toUpperCase()) {
                 case "MEASURE":
                     if (test.getDimension().equalsIgnoreCase("Completeness")) {
@@ -140,14 +141,26 @@ public class JavaClassGenerator {
                         retType = "DQResponse<NumericalValue>";
                         retTypeJavaDoc = "DQResponse the response of type NumericalValue ";
                     }
+                    descriptorAnnotation.append("@Measure(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
                 case "VALIDATION":
                     retType = "DQResponse<ComplianceValue>";
                     retTypeJavaDoc = "DQResponse the response of type ComplianceValue ";
+                    descriptorAnnotation.append("@Validation(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
                 case "AMENDMENT":
                     retType = "DQResponse<AmendmentValue>";
                     retTypeJavaDoc = "DQResponse the response of type AmendmentValue";
+                    descriptorAnnotation.append("@Amendment(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append(test.getDescription()).append("\")");
+                    break;
+                case "ISSUE":
+                    retType = "DQResponse<IssueValue>";
+                    retTypeJavaDoc = "DQResponse the response of type IssueValue";
+                    descriptorAnnotation.append("@Issue(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
             }
 
@@ -177,6 +190,7 @@ public class JavaClassGenerator {
                 sb.append("     * @return ").append(retTypeJavaDoc).append(" to return\n");
             }
             sb.append("     */\n");
+            sb.append("    ").append(descriptorAnnotation).append("\n");
             sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
@@ -208,7 +222,7 @@ public class JavaClassGenerator {
             	     specificationLine = new StringBuffer();
             	}
             }
-            sb.append("        //").append(specificationLine.toString()).append("\n");
+            sb.append("        // ").append(specificationLine.toString()).append("\n");
             sb.append("\n");
             // Test Parameters change the behavior of the test.
             if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 
