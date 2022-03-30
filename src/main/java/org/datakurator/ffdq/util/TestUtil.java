@@ -35,6 +35,7 @@ public class TestUtil {
 
     private final static String CSV_HEADER_LABEL;
     private final static String CSV_HEADER_DESCRIPTION;
+    private final static String CSV_HEADER_CRITERION_LABEL;
     private final static String CSV_HEADER_SPECIFICATION;
     private final static String CSV_HEADER_ASSERTION;
     private final static String CSV_HEADER_RESOURCE_TYPE;
@@ -49,6 +50,7 @@ public class TestUtil {
 
             CSV_HEADER_LABEL = properties.getProperty("csv.header.label");
             CSV_HEADER_DESCRIPTION = properties.getProperty("csv.header.description");
+            CSV_HEADER_CRITERION_LABEL = properties.getProperty("csv.header.criterionLabel");
             CSV_HEADER_SPECIFICATION = properties.getProperty("csv.header.specification");
             CSV_HEADER_ASSERTION = properties.getProperty("csv.header.assertion");
             CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
@@ -143,43 +145,44 @@ public class TestUtil {
                 // Define measure, validation, and amendment methods
                 switch(test.getAssertionType().toUpperCase()) {
                     case "MEASURE":
-
                         // Define a dimension in the context of resource type and info elements
                         Dimension dimension = Dimension.fromString(test.getDimension());
+                        dimension.setLabel(test.getCriterionLabel());
                         ContextualizedDimension cd = new ContextualizedDimension(dimension, informationElement, resourceType);
-
+                        cd.setLabel(test.getDescription() + " Measure of " + test.getDimension() +  " for " + resourceType.getLabel());
+                        cd.setComment(test.getDescription());
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
                         model.save(measurementMethod);
                         break;
 
                     case "VALIDATION":
-
                         // Define a criterion in the context of resource type and info elements
-                        Criterion criterion = new Criterion(test.getDescription());
+                        Criterion criterion = new Criterion(test.getCriterionLabel());
                         ContextualizedCriterion cc = new ContextualizedCriterion(criterion, informationElement, resourceType);
-
+                        cc.setLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
+                        cc.setComment(test.getDescription());
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
                         model.save(validationMethod);
                         break;
 
                     case "AMENDMENT":
-
                         // Define an enhancement in the context of resource type and info elements
-                        Enhancement enhancement = new Enhancement(test.getDescription());
+                        Enhancement enhancement = new Enhancement(test.getCriterionLabel());
                         ContextualizedEnhancement ce = new ContextualizedEnhancement(enhancement, informationElement, resourceType);
-
+                        ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
+                        ce.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         model.save(amendmentMethod);
                         break;
                     case "ISSUE":
-
                         // Define an enhancement in the context of resource type and info elements
-                        Issue issue = new Issue(test.getDescription());
+                        Issue issue = new Issue(test.getCriterionLabel());
                         ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, resourceType);
-
+                        ci.setLabel(test.getDescription() + " Issue for " + resourceType.getLabel());
+                        ci.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
                         ProblemMethod problemMethod = new ProblemMethod(specification, ci);
                         model.save(problemMethod);
@@ -287,14 +290,17 @@ public class TestUtil {
 
                 String label = record.get(CSV_HEADER_LABEL);
                 String description = record.get(CSV_HEADER_DESCRIPTION);
+                String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
                 String specification = record.get(CSV_HEADER_SPECIFICATION);
                 String assertionType = record.get(CSV_HEADER_ASSERTION);
                 String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
                 String dimension = record.get(CSV_HEADER_DIMENSION);
                 String informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
                 String testParameters = record.get(CSV_HEADER_TEST_PARMETERS);
+                logger.log(Level.FINE, assertionType);
+                logger.log(Level.FINE, label);
 
-                AssertionTest test = new AssertionTest(guid, label, description, specification, assertionType, resourceType,
+                AssertionTest test = new AssertionTest(guid, label, description, criterionLabel, specification, assertionType, resourceType,
                         dimension, parseInformationElementStr(informationElement), parseTestParametersString(testParameters));
 
                 tests.add(test);

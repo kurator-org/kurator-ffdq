@@ -59,7 +59,7 @@ public class Specification {
         this.label = label;
     }
 
-    @RDF("rdfs:description")
+    @RDF("rdfs:comment")
     public String getDescription() {
         return description;
     }

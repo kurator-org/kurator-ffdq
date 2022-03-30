@@ -28,7 +28,7 @@ public class AssertionTest {
     public static final String MEASURE = "MEASURE";
     public static final String VALIDATION = "VALIDATION";
     public static final String AMENDMENT = "AMENDMENT";
-    public static final String NOTIFICATION = "NOTIFICATION";
+    public static final String ISSUE = "ISSUE";
 
     public static final String SINGLE_RECORD = "SINGLERECORD";
     public static final String MULTI_RECORD = "MULTIRECORD";
@@ -36,6 +36,7 @@ public class AssertionTest {
     private String guid;
     private String label;
     private String description;
+    private String criterionLabel;
     private String specification;
     private String assertionType;
     private String resourceType;
@@ -51,12 +52,13 @@ public class AssertionTest {
         // default constructor for test runner
     }
 
-    public AssertionTest(String guid, String label, String description, String specification, String assertionType,
+    public AssertionTest(String guid, String label, String description, String criterionLabel, String specification, String assertionType,
                          String resourceType, String dimension, List<String> informationElement, List<String> testParameters) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
         this.description = description;
+        this.setCriterionLabel(criterionLabel);
         this.specification = specification;
         this.assertionType = assertionType;
         this.resourceType = resourceType;
@@ -79,12 +81,8 @@ public class AssertionTest {
             throw new IllegalArgumentException("No information elements declared for test: " + guid);
         }
 
-        if (!Arrays.asList(MEASURE, VALIDATION, AMENDMENT).contains(assertionType.toUpperCase())) {
-            if (Arrays.asList(NOTIFICATION).contains(assertionType.toUpperCase())) {
-                throw new UnsupportedTypeException("Unsupupported value for assertion type \"" + assertionType + "\" in test: " + guid);
-            } else { 
-                throw new IllegalArgumentException("Invalid value for assertion type \"" + assertionType + "\" for test: " + guid);
-            }
+        if (!Arrays.asList(MEASURE, VALIDATION, AMENDMENT, ISSUE).contains(assertionType.toUpperCase())) {
+            throw new IllegalArgumentException("Invalid value for assertion type \"" + assertionType + "\" for test: " + guid);
         }
     }
 
@@ -147,7 +145,15 @@ public class AssertionTest {
         this.description = description;
     }
 
-    public String getSpecification() {
+    public String getCriterionLabel() {
+		return criterionLabel;
+	}
+
+	public void setCriterionLabel(String criterionLabel) {
+		this.criterionLabel = criterionLabel;
+	}
+
+	public String getSpecification() {
         return specification;
     }
 

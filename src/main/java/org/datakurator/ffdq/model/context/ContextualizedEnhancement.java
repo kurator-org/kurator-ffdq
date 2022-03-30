@@ -27,7 +27,8 @@ import org.datakurator.ffdq.model.ResourceType;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/ffdq#"
+        "ffdq = http://rs.tdwg.org/ffdq#",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:ContextualizedEnhancement")
 public class ContextualizedEnhancement {
@@ -36,6 +37,8 @@ public class ContextualizedEnhancement {
     private Enhancement enhancement;
     private InformationElement ie;
     private ResourceType rt;
+    private String label;
+    private String comment;
 
     public ContextualizedEnhancement() {
 
@@ -82,4 +85,22 @@ public class ContextualizedEnhancement {
     public void setEnhancement(Enhancement enhancement) {
         this.enhancement = enhancement;
     }
+
+    @RDF("rdfs:label")
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
+    @RDF("rdfs:comment")
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }
