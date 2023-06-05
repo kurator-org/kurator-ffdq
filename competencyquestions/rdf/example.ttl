@@ -11,7 +11,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix fn: <http://www.w3.org/2005/xpath-functions#> .
 @prefix dwc: <http://rs.tdwg.org/dwc/terms/> .
-@prefix ffdq: <http://rs.tdwg.org/ffdq/> .
+@prefix ffdq: <http://rs.tdwg.org/bdq/ffdq/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 

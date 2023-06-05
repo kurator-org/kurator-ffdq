@@ -27,7 +27,7 @@ import org.datakurator.ffdq.model.ResourceType;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/ffdq#",
+        "ffdq = http://rs.tdwg.org/bdq/ffdq#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:ContextualizedEnhancement")
