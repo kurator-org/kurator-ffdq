@@ -130,6 +130,14 @@ public class AssertionTest {
     public String getGuid() {
         return guid;
     }
+    
+    public String getGuidTDWGNamespace()  {
+    	if (guid==null) { 
+    		return guid;
+    	} else { 
+    		return "https://rs.tdwg.org/bdq/terms/" + guid.replace("urn:uuid:","");
+    	}
+    }
 
     public String getLabel() {
         return label;

@@ -193,7 +193,7 @@ public class JavaClassGenerator {
             sb.append("     */\n");
             sb.append("    ").append(descriptorAnnotation).append("\n");
             sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
-            sb.append("    @ProvidesVersion(\"").append(test.getGuid()).append("/").append(test.getVersion()).append("\")\n");
+            sb.append("    @ProvidesVersion(\"").append(test.getGuidTDWGNamespace()).append("/").append(test.getVersion()).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
 
