@@ -228,6 +228,7 @@ class DwCTG2DQ:
             sb.append("\t").append("\t").append("").append(test.getDescription()).append("\n");
             sb.append("\t").append("\t").append("\n");
             sb.append("\t").append("\t").append("Provides: ").append(test.getLabel()).append(" \n");
+            sb.append("\t").append("\t").append("Version: ").append(test.getVersion()).append(" \n");
             sb.append("\t").append("\t").append("\n");
             for (String key : params.keySet()) {
             	String param = params.get(key);
@@ -242,8 +243,8 @@ class DwCTG2DQ:
             sb.append("\t").append("\t").append("'''\n");
             sb.append("\n");
 
-            // Provides = "0493bcfb-652e-4d17-815b-b0cce0742fbe"
-            sb.append("\t").append("\t").append("Provides = { \"id\":\"").append(test.getGuid()).append("\", \"label\":\"").append(test.getGuid()).append("\" }\n");
+            // Provides = "0493bcfb-652e-4d17-815b-b0cce0742fbe/yyyy-mm-dd"
+            sb.append("\t").append("\t").append("Provides = { \"id\":\"").append(test.getGuid()).append("/").append(test.getVersion()).append("\", \"label\":\"").append(test.getGuid()).append("\" }\n");
             
             // result = ComplianceValue();
             sb.append("\t").append("\t").append("result = ").append(retType).append("()").append("\n\n");

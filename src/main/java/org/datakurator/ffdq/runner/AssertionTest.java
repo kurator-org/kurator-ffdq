@@ -35,6 +35,7 @@ public class AssertionTest {
 
     private String guid;
     private String label;
+    private String version;  // from date test was last updated.
     private String description;
     private String criterionLabel;
     private String specification;
@@ -52,11 +53,12 @@ public class AssertionTest {
         // default constructor for test runner
     }
 
-    public AssertionTest(String guid, String label, String description, String criterionLabel, String specification, String assertionType,
+    public AssertionTest(String guid, String label, String version, String description, String criterionLabel, String specification, String assertionType,
                          String resourceType, String dimension, List<String> informationElement, List<String> testParameters) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
+        this.version = version;
         this.description = description;
         this.setCriterionLabel(criterionLabel);
         this.specification = specification;
@@ -137,6 +139,14 @@ public class AssertionTest {
         this.label = label;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }    
+    
     public String getDescription() {
         return description;
     }
@@ -242,6 +252,7 @@ public class AssertionTest {
         return "AssertionTest{" +
                 "guid='" + guid + '\'' +
                 ", label='" + label + '\'' +
+                ", version='" + version + '\'' +
                 ", description='" + description + '\'' +
                 ", specification='" + specification + '\'' +
                 ", assertionType='" + assertionType + '\'' +

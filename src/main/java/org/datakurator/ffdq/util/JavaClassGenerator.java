@@ -179,6 +179,7 @@ public class JavaClassGenerator {
             sb.append("     * ").append(test.getDescription()).append("\n");
             sb.append("     *\n");
             sb.append("     * Provides: ").append(test.getLabel()).append("\n");
+            sb.append("     * Version: ").append(test.getVersion()).append("\n");
             sb.append("     *\n");
 
             for (String key : params.keySet()) {
@@ -191,7 +192,7 @@ public class JavaClassGenerator {
             }
             sb.append("     */\n");
             sb.append("    ").append(descriptorAnnotation).append("\n");
-            sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
+            sb.append("    @Provides(\"").append(test.getGuid()).append("/").append(test.getVersion()).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
 

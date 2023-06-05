@@ -34,6 +34,7 @@ public class TestUtil {
     private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
     private final static String CSV_HEADER_LABEL;
+    private final static String CSV_HEADER_VERSION;
     private final static String CSV_HEADER_DESCRIPTION;
     private final static String CSV_HEADER_CRITERION_LABEL;
     private final static String CSV_HEADER_SPECIFICATION;
@@ -49,6 +50,7 @@ public class TestUtil {
             properties.load(TestUtil.class.getResourceAsStream("/config.properties"));
 
             CSV_HEADER_LABEL = properties.getProperty("csv.header.label");
+            CSV_HEADER_VERSION = properties.getProperty("csv.header.version");
             CSV_HEADER_DESCRIPTION = properties.getProperty("csv.header.description");
             CSV_HEADER_CRITERION_LABEL = properties.getProperty("csv.header.criterionLabel");
             CSV_HEADER_SPECIFICATION = properties.getProperty("csv.header.specification");
@@ -289,6 +291,7 @@ public class TestUtil {
                 }
 
                 String label = record.get(CSV_HEADER_LABEL);
+                String version = record.get(CSV_HEADER_VERSION);
                 String description = record.get(CSV_HEADER_DESCRIPTION);
                 String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
                 String specification = record.get(CSV_HEADER_SPECIFICATION);
@@ -300,7 +303,7 @@ public class TestUtil {
                 logger.log(Level.FINE, assertionType);
                 logger.log(Level.FINE, label);
 
-                AssertionTest test = new AssertionTest(guid, label, description, criterionLabel, specification, assertionType, resourceType,
+                AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, assertionType, resourceType,
                         dimension, parseInformationElementStr(informationElement), parseTestParametersString(testParameters));
 
                 tests.add(test);
