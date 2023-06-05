@@ -24,7 +24,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq#",
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:Issue")

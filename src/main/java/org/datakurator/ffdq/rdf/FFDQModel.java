@@ -44,7 +44,7 @@ public class FFDQModel extends BaseModel {
     public Map<String, Specification> findSpecificationsForMechanism(String mechanismGuid) {
         Set<String> guids = new HashSet<>();
 
-        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/ffdq#> " +
+        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/> " +
                 "SELECT ?specification " +
                 "WHERE { ?implementation ffdq:implementedBy <" + mechanismGuid + "> . " +
                 "?implementation ffdq:hasSpecification ?specification }";
@@ -53,7 +53,7 @@ public class FFDQModel extends BaseModel {
     }
 
     public AssertionMethod findMethodForSpecification(String testGuid) {
-        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/ffdq#> " +
+        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/> " +
                 "SELECT ?method WHERE { " +
                 "{ ?method a ffdq:MeasurementMethod } UNION " +
                 "{ ?method a ffdq:ValidationMethod } UNION " +
@@ -66,7 +66,7 @@ public class FFDQModel extends BaseModel {
     public List<DataResource> findDataResources() {
         List<DataResource> dataResources = new ArrayList<>();
 
-        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/ffdq#> " +
+        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT DISTINCT ?dataResource WHERE { " +
                 "?assertion prov:used ?dataResource " +
@@ -89,7 +89,7 @@ public class FFDQModel extends BaseModel {
     public List<String> findFieldsByAssertionType(Class<? extends Assertion> cls) {
         List<String> fields = new ArrayList<>();
 
-        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/ffdq#> " +
+        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT DISTINCT ?field WHERE { " +
                 "?assertion a ffdq:" + cls.getSimpleName() + " . " +
@@ -115,7 +115,7 @@ public class FFDQModel extends BaseModel {
     public List<URI> listDataResourcesByURI() {
         List<URI> dataResources = new ArrayList<>();
 
-        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/ffdq#> " +
+        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT DISTINCT ?dataResource WHERE { " +
                 "?assertion prov:used ?dataResource " +
@@ -138,7 +138,7 @@ public class FFDQModel extends BaseModel {
     }
 
     public List<Assertion> findAssertionsForDataResource(DataResource dataResource, Class<? extends Assertion> cls) {
-        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/ffdq#> " +
+        String sparql = "PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT ?assertion ?type WHERE { " +
                 "?assertion prov:used <" + dataResource.getURI() + "> . " +

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq#"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
 })
 @RDFBean("ffdq:Implementation")
 public class Implementation {

@@ -47,7 +47,7 @@ import java.util.*;
 public class DataResource {
     private Vocabulary vocab;
 
-    private ModelBuilder builder = new ModelBuilder().setNamespace("ffdq", "http://rs.tdwg.org/bdq/ffdq#");
+    private ModelBuilder builder = new ModelBuilder().setNamespace("ffdq", "http://rs.tdwg.org/bdq/ffdq/");
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     private Model model;

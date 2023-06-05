@@ -23,7 +23,7 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq#"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
 })
 @RDFBean("ffdq:MeasurementMethod")
 public class MeasurementMethod extends AssertionMethod {

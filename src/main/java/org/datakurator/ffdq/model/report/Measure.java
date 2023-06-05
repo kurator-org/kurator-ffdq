@@ -25,7 +25,7 @@ import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq#",
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
         "prov = http://www.w3.org/ns/prov#"
 })
 @RDFBean("ffdq:Measure")

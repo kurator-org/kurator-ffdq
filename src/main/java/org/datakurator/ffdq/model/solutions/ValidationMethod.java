@@ -23,7 +23,7 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq#"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
 })
 @RDFBean("ffdq:ValidationMethod")
 public class ValidationMethod extends AssertionMethod {

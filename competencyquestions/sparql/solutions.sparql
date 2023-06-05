@@ -1,6 +1,6 @@
 # Report on all standardized tests defined as assertion methods
 
-PREFIX ffdq: <http://rs.tdwg.org/ffdq/>
+PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
