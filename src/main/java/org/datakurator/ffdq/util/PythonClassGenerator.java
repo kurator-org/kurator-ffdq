@@ -243,8 +243,9 @@ class DwCTG2DQ:
             sb.append("\t").append("\t").append("'''\n");
             sb.append("\n");
 
-            // Provides = "0493bcfb-652e-4d17-815b-b0cce0742fbe/yyyy-mm-dd"
-            sb.append("\t").append("\t").append("Provides = { \"id\":\"").append(test.getGuid()).append("/").append(test.getVersion()).append("\", \"label\":\"").append(test.getGuid()).append("\" }\n");
+            // Provides = "0493bcfb-652e-4d17-815b-b0cce0742fbe"
+            // ProvidesVersion = "0493bcfb-652e-4d17-815b-b0cce0742fbe/yyyy-mm-dd"
+            sb.append("\t").append("\t").append("Provides = { \"id\":\"").append(test.getGuid()).append("\", \"version\":\"").append(test.getGuid()).append("/").append(test.getVersion()).append("\"").append(", \"label\":\"").append(test.getGuid()).append("\" }\n");
             
             // result = ComplianceValue();
             sb.append("\t").append("\t").append("result = ").append(retType).append("()").append("\n\n");
