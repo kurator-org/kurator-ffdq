@@ -142,7 +142,9 @@ public class JavaClassGenerator {
                         retTypeJavaDoc = "DQResponse the response of type NumericalValue ";
                     }
                     descriptorAnnotation.append("@Measure(label=\"").append(test.getLabel()).append("\", description=\"");
-                    descriptorAnnotation.append(test.getDescription()).append("\")");
+                    descriptorAnnotation.append(test.getDescription()).append("\"");
+                    descriptorAnnotation.append(", dimension= Dimension." + test.getDimension().toUpperCase());
+                    descriptorAnnotation.append(")");
                     break;
                 case "VALIDATION":
                     retType = "DQResponse<ComplianceValue>";
