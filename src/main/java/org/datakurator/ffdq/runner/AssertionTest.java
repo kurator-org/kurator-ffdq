@@ -155,6 +155,11 @@ public class AssertionTest {
         this.version = version;
     }    
     
+    public String getProvidesVersion() { 
+    	StringBuilder retval = new StringBuilder();
+    	return retval.append(this.getGuidTDWGNamespace()).append("/").append(this.version).toString();
+    }
+    
     public String getDescription() {
         return description;
     }

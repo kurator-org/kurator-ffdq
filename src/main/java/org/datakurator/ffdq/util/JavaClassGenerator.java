@@ -39,6 +39,7 @@ public class JavaClassGenerator {
     private String packageName;
 
     private Map<String, Integer> currGuids = new HashMap<>();
+    private Map<String, Integer> currVersions = new HashMap<>();
     private int testsAdded = 0;
 
     private StringBuilder sb;
@@ -88,6 +89,10 @@ public class JavaClassGenerator {
                     String guid = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
                     currGuids.put(guid, lineNum + 1);
                 }
+                if (line.contains("@ProvidesVersion(")) {
+                    String guid = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
+                    currVersions.put(guid, lineNum + 1);
+                }
 
                 if (line.contains("}")) {
                     classEnd = lineNum;
@@ -112,6 +117,9 @@ public class JavaClassGenerator {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
                     currGuids.get(test.getGuid()));
+            if (!currVersions.isEmpty() && currVersions.containsKey(test.getProvidesVersion())) {
+            	logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+            }
         } else {
             testsAdded++;
 
@@ -195,7 +203,7 @@ public class JavaClassGenerator {
             sb.append("     */\n");
             sb.append("    ").append(descriptorAnnotation).append("\n");
             sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
-            sb.append("    @ProvidesVersion(\"").append(test.getGuidTDWGNamespace()).append("/").append(test.getVersion()).append("\")\n");
+            sb.append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
 
