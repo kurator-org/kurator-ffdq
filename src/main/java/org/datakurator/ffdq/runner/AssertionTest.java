@@ -28,7 +28,7 @@ public class AssertionTest {
     public static final String MEASURE = "MEASURE";
     public static final String VALIDATION = "VALIDATION";
     public static final String AMENDMENT = "AMENDMENT";
-    public static final String ISSUE = "ISSUE";
+    public static final String ISSUE = "IS_ISSUE";
 
     public static final String SINGLE_RECORD = "SINGLERECORD";
     public static final String MULTI_RECORD = "MULTIRECORD";

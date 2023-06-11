@@ -179,7 +179,7 @@ public class TestUtil {
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         model.save(amendmentMethod);
                         break;
-                    case "ISSUE":
+                    case "IS_ISSUE":
                         // Define an enhancement in the context of resource type and info elements
                         Issue issue = new Issue(test.getCriterionLabel());
                         ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, resourceType);

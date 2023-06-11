@@ -166,7 +166,7 @@ public class JavaClassGenerator {
                     descriptorAnnotation.append("@Amendment(label=\"").append(test.getLabel()).append("\", description=\"");
                     descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
-                case "ISSUE":
+                case "IS_ISSUE":
                     retType = "DQResponse<IssueValue>";
                     retTypeJavaDoc = "DQResponse the response of type IssueValue";
                     descriptorAnnotation.append("@Issue(label=\"").append(test.getLabel()).append("\", description=\"");
