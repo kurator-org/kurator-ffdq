@@ -42,7 +42,7 @@ public class JavaClassGenerator {
     private Map<String, Integer> currVersions = new HashMap<>();
     private int testsAdded = 0;
 
-    private StringBuilder sb;
+    private StringBuilder outputCodeSB;
 
     public JavaClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className) {
         this.mechanismGuid = mechanismGuid;
@@ -56,18 +56,18 @@ public class JavaClassGenerator {
      * Initialize for generation of a new DQ Class
      */
     public void init() {
-        sb = new StringBuilder();
+        outputCodeSB = new StringBuilder();
 
-        sb.append("/* NOTE: requires the ffdq-api dependecy in the maven pom.xml */\n\n");
-        sb.append("package ").append(packageName).append(";\n\n");
+        outputCodeSB.append("/* NOTE: requires the ffdq-api dependecy in the maven pom.xml */\n\n");
+        outputCodeSB.append("package ").append(packageName).append(";\n\n");
 
-        sb.append("import org.datakurator.ffdq.annotations.*;\n");
-        sb.append("import org.datakurator.ffdq.api.DQResponse;\n");
-        sb.append("import org.datakurator.ffdq.model.ResultState;\n");
-        sb.append("import org.datakurator.ffdq.api.result.*;\n\n");
+        outputCodeSB.append("import org.datakurator.ffdq.annotations.*;\n");
+        outputCodeSB.append("import org.datakurator.ffdq.api.DQResponse;\n");
+        outputCodeSB.append("import org.datakurator.ffdq.model.ResultState;\n");
+        outputCodeSB.append("import org.datakurator.ffdq.api.result.*;\n\n");
 
-        sb.append("@Mechanism(value=\"").append(mechanismGuid).append("\",label=\"").append(mechanismName).append("\")\n");
-        sb.append("public class ").append(className).append(" {\n\n");
+        outputCodeSB.append("@Mechanism(value=\"").append(mechanismGuid).append("\",label=\"").append(mechanismName).append("\")\n");
+        outputCodeSB.append("public class ").append(className).append(" {\n\n");
     }
 
     /**
@@ -110,9 +110,9 @@ public class JavaClassGenerator {
             throw new RuntimeException("Unable to load Java source file", e);
         }
 
-        sb = new StringBuilder();
+        outputCodeSB = new StringBuilder();
         for (String str : lines) {
-            sb.append(str).append("\n");
+            outputCodeSB.append(str).append("\n");
         }
     }
 
@@ -134,8 +134,16 @@ public class JavaClassGenerator {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
                     currGuids.get(test.getGuid()));
-            if (!currVersions.isEmpty() && currVersions.containsKey(test.getProvidesVersion())) {
-            	logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+            if (!currVersions.isEmpty()) { 
+            	if (currVersions.containsKey(test.getProvidesVersion())) {
+            		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+            	} else {
+            		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+            		outputCodeSB.append("// TODO: Implementation of ").append(test.getLabel());
+            		outputCodeSB.append(" is not up to date with current version: ").append(test.getProvidesVersion());
+            		outputCodeSB.append(" see line: ").append( currGuids.get(test.getGuid()) );
+            		outputCodeSB.append("\n");
+            	}
             }
         } else {
             testsAdded++;
@@ -202,35 +210,35 @@ public class JavaClassGenerator {
             }
 
             // Javadoc comment first
-            sb.append("    /**\n");
-            sb.append("     * ").append(test.getDescription()).append("\n");
-            sb.append("     *\n");
-            sb.append("     * Provides: ").append(test.getLabel()).append("\n");
-            sb.append("     * Version: ").append(test.getVersion()).append("\n");
-            sb.append("     *\n");
+            outputCodeSB.append("    /**\n");
+            outputCodeSB.append("     * ").append(test.getDescription()).append("\n");
+            outputCodeSB.append("     *\n");
+            outputCodeSB.append("     * Provides: ").append(test.getLabel()).append("\n");
+            outputCodeSB.append("     * Version: ").append(test.getVersion()).append("\n");
+            outputCodeSB.append("     *\n");
 
             for (String key : params.keySet()) {
             	String param = params.get(key);
-                sb.append("     * @param ").append(param).append(" the provided ").append(key).append(" to evaluate\n");
+                outputCodeSB.append("     * @param ").append(param).append(" the provided ").append(key).append(" to evaluate\n");
             }
             
             if (retTypeJavaDoc!=null) { 
-                sb.append("     * @return ").append(retTypeJavaDoc).append(" to return\n");
+                outputCodeSB.append("     * @return ").append(retTypeJavaDoc).append(" to return\n");
             }
-            sb.append("     */\n");
-            sb.append("    ").append(descriptorAnnotation).append("\n");
-            sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
-            sb.append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
-            sb.append("    @Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
-            sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
+            outputCodeSB.append("     */\n");
+            outputCodeSB.append("    ").append(descriptorAnnotation).append("\n");
+            outputCodeSB.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
+            outputCodeSB.append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
+            outputCodeSB.append("    @Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
+            outputCodeSB.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
 
             int cnt = 0;
             for (String term : params.keySet()) {
-                sb.append("@ActedUpon(\"").append(term).append("\") String ").append(params.get(term));
+                outputCodeSB.append("@ActedUpon(\"").append(term).append("\") String ").append(params.get(term));
 
                 if (cnt < ie.size() - 1) {
-                    sb.append(", ");
+                    outputCodeSB.append(", ");
                 }
 
                 cnt++;
@@ -238,9 +246,9 @@ public class JavaClassGenerator {
 
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
             
-            sb.append(") {\n");
-            sb.append("        ").append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
-            sb.append("        //TODO:  Implement specification").append("\n");
+            outputCodeSB.append(") {\n");
+            outputCodeSB.append("        ").append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
+            outputCodeSB.append("        //TODO:  Implement specification").append("\n");
             // Split the specification into words on whitespace, then print specification in lines with
             // the last word boundary being before character 55 in the string (plus an indent and comment chars).
             Iterator<String> i = specificationWords.iterator();
@@ -248,12 +256,12 @@ public class JavaClassGenerator {
             while (i.hasNext()) { 
             	specificationLine.append(i.next()).append(" ");
             	if (specificationLine.length()>55) { 
-            	     sb.append("        // ").append(specificationLine.toString()).append("\n");
+            	     outputCodeSB.append("        // ").append(specificationLine.toString()).append("\n");
             	     specificationLine = new StringBuffer();
             	}
             }
-            sb.append("        // ").append(specificationLine.toString()).append("\n");
-            sb.append("\n");
+            outputCodeSB.append("        // ").append(specificationLine.toString()).append("\n");
+            outputCodeSB.append("\n");
             // Test Parameters change the behavior of the test.
             if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 
             	StringBuilder testParamCommentLines = new StringBuilder();
@@ -265,19 +273,19 @@ public class JavaClassGenerator {
             		}
             	}
             	if (testParamCommentLines.length()>0) { 
-            		sb.append("        //TODO: Parameters. This test is defined as parameterized.").append("\n");
-            		sb.append(testParamCommentLines);
-            		sb.append("\n");
+            		outputCodeSB.append("        //TODO: Parameters. This test is defined as parameterized.").append("\n");
+            		outputCodeSB.append(testParamCommentLines);
+            		outputCodeSB.append("\n");
             	}
             }
-            sb.append("        return result;\n");
-            sb.append("    }\n\n");
+            outputCodeSB.append("        return result;\n");
+            outputCodeSB.append("    }\n\n");
         }
     }
 
     public void writeOut(OutputStream out) throws IOException {
-        sb.append("}\n");
-        out.write(sb.toString().getBytes());
+        outputCodeSB.append("}\n");
+        out.write(outputCodeSB.toString().getBytes());
         System.out.println();
         if (testsAdded > 0) {
             logger.info("Added new stub methods for " + testsAdded + " unimplemented tests.");
