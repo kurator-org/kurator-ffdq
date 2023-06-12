@@ -221,6 +221,7 @@ public class JavaClassGenerator {
             sb.append("    ").append(descriptorAnnotation).append("\n");
             sb.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
             sb.append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
+            sb.append("    @Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
             sb.append("    public ").append(retType).append(" ").append(methodName).append("(");
 
 
