@@ -76,6 +76,7 @@ public class TestUtil {
         options.addOption("srcDir", null, true, "The Java sources root directory (e.g. src/main/java)");
         options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
         options.addOption("appendClass", null, false, "Append to an existing Java class stub methods for new tests");
+        options.addOption("checkVersion", null, false, "Report on versions in an existing Java class for each test");
 
         options.addOption("generatePython", null, false, "Generate a new Python class with stub methods for each test");
         
@@ -179,7 +180,7 @@ public class TestUtil {
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         model.save(amendmentMethod);
                         break;
-                    case "IS_ISSUE":
+                    case "ISSUE":
                         // Define an enhancement in the context of resource type and info elements
                         Issue issue = new Issue(test.getCriterionLabel());
                         ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, resourceType);
@@ -223,6 +224,24 @@ public class TestUtil {
             // Run DQ Class generation step if generateClass or appendClass options were set
             boolean generateClass = cmd.hasOption("generateClass");
             boolean appendClass = cmd.hasOption("appendClass");
+            boolean checkVersion = cmd.hasOption("checkVersion");
+            if (checkVersion) { 
+                File javaSrc = loadJavaSource(cmd.getOptionValue("srcDir"), packageName, className);
+                JavaClassGenerator generator = new JavaClassGenerator(mechanismGuid, mechanismName, packageName, className);
+
+                // Check if the source file exists, 
+                if (javaSrc.exists()) {
+                	generator.init(new FileInputStream(javaSrc), true);
+                } else {
+                	throw new RuntimeException("Specified java source file not found.  Unable to check test versions. ");
+                }
+
+                // Check all assertion tests against the class
+                for (AssertionTest test : tests) {
+                    generator.checkTest(test);
+                }
+            	
+            }
             if (generateClass || appendClass) {
                 File javaSrc = loadJavaSource(cmd.getOptionValue("srcDir"), packageName, className);
                 JavaClassGenerator generator = new JavaClassGenerator(mechanismGuid, mechanismName, packageName, className);
@@ -236,7 +255,7 @@ public class TestUtil {
                                 "the \"appendClass\" option.");
                     } else {
                         // Initialize to append to an existing DQ Class
-                        generator.init(new FileInputStream(javaSrc));
+                        generator.init(new FileInputStream(javaSrc), checkVersion);
                     }
 
                 } else {

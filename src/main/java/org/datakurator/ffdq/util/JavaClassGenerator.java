@@ -71,11 +71,11 @@ public class JavaClassGenerator {
     }
 
     /**
-     * Initialize for appending tests to an existing DQ Class
+     * Initialize for appending tests to an existing DQ Class or checking versions  
      *
-     * @param javaSrc java source file to append to
+     * @param javaSrc java source file to append to or check
      */
-    public void init(InputStream javaSrc) {
+    public void init(InputStream javaSrc, boolean logVersions) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(javaSrc));
 
         String line = "";
@@ -92,6 +92,9 @@ public class JavaClassGenerator {
                 if (line.contains("@ProvidesVersion(")) {
                     String guid = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
                     currVersions.put(guid, lineNum + 1);
+                    if (logVersions) { 
+                    	logger.info(guid);
+                    }
                 }
 
                 if (line.contains("}")) {
@@ -113,6 +116,20 @@ public class JavaClassGenerator {
         }
     }
 
+    public void checkTest(AssertionTest test) {
+        if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
+            logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " + currGuids.get(test.getGuid()));
+            if (!currVersions.isEmpty()) { 
+                if (currVersions.containsKey(test.getProvidesVersion())) {
+                	logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+                } else { 
+                	logger.info("Non-current implementation for \"" + test.getLabel() + "\" version \"" + test.getProvidesVersion() + "\" ");
+                	System.out.println("Non-current implementation for \"" + test.getLabel() + "\" current version is \"" + test.getProvidesVersion() + "\" see line: " + currGuids.get(test.getGuid()));
+                }
+            }
+        }
+    } 
+    
     public void addTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
@@ -166,7 +183,7 @@ public class JavaClassGenerator {
                     descriptorAnnotation.append("@Amendment(label=\"").append(test.getLabel()).append("\", description=\"");
                     descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
-                case "IS_ISSUE":
+                case "ISSUE":
                     retType = "DQResponse<IssueValue>";
                     retTypeJavaDoc = "DQResponse the response of type IssueValue";
                     descriptorAnnotation.append("@Issue(label=\"").append(test.getLabel()).append("\", description=\"");
