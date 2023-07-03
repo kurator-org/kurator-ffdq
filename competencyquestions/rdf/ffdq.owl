@@ -7,7 +7,7 @@
 @base <http://rs.tdwg.org/bdq/ffdq> .
 
 <http://rs.tdwg.org/bdq/ffdq> rdf:type owl:Ontology ;
-                           rdfs:comment "The classes and object properties found in this ontology are dedicated to fundamental and derived concepts from the Fitness For Use Framework described in the paper by Veiga et al available at: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178731" .
+                               rdfs:comment "The classes and object properties found in this ontology are dedicated to fundamental and derived concepts from the Fitness For Use Framework described in the paper by Veiga et al available at: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178731" .
 
 #################################################################
 #    Object Properties
@@ -300,7 +300,7 @@ This can be used to determine which measures and validations are improved upon b
 
 ###  http://rs.tdwg.org/bdq/ffdq/Assertion
 :Assertion rdf:type owl:Class ;
-           rdfs:comment """The Assertion type in FFDQ is the fundemental concept that makes up a data quality report. Assertion can be any one of three types (represented as subClasses), Measure, Validation and Amendement.
+           rdfs:comment """The Assertion type in FFDQ is the fundemental concept that makes up a data quality report. Assertion can be any one of four types (represented as subClasses), Measure, Validation, Issue, and Amendement.
 
 The assertion concept consists of a specification (the technical description of a performed test), a data resource (initial values of input data expressed in terms of some controlled vocabulary), the mechanism (external service, actor, or code that performs the test), and some form of result.""" .
 
@@ -337,7 +337,10 @@ The assertion concept consists of a specification (the technical description of 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Dimension
 :Dimension rdf:type owl:Class ;
-           rdfs:comment "Describes the data quality dimension (accuracy, precision, completeness, etc.) of a measurement test. For example \"coordinate percision of single records\"." .
+           rdfs:comment """Describes the data quality dimension (accuracy, precision, completeness, etc.) of a measurement test. For example \"coordinate percision of single records\".
+
+Measurable attributes in an Information Element (q.v.) which can be individually assessed, interpreted, and improved. Includes Completeness (q.v.), Conformance (q.v.), Consistency (q.v.), Likeliness (q.v.), Reliability (q.v.), and Resolution (q.v.)."""@en ;
+           rdfs:label "Data Quality Dimension"@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Enhancement
@@ -357,7 +360,10 @@ The assertion concept consists of a specification (the technical description of 
 
 ###  http://rs.tdwg.org/bdq/ffdq/InformationElement
 :InformationElement rdf:type owl:Class ;
-                    rdfs:comment "The information element in FFDQ can be represented as a single or composite element that consists of one or more terms from a controlled vocabulary (fields actedUpon or consulted by an assertion test)." .
+                    rdfs:comment """The information element in FFDQ can be represented as a single or composite element that consists of one or more terms from a controlled vocabulary (fields actedUpon or consulted by an assertion test).
+
+An abstraction or a concrete term that represents relevant content (e.g., coordinates; dwc.decimalLatitude, dwc:decimalLongitude)."""@en ;
+                    rdfs:label "Information Element"@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Issue
@@ -409,7 +415,10 @@ The assertion concept consists of a specification (the technical description of 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Report
 :Report rdf:type owl:Class ;
-        rdfs:comment "The FFDQ Report concept consists of a set of assertions (measures, validations and amendments) that represent the output of a workflow/actor run." .
+        rdfs:comment """The FFDQ Report concept consists of a set of assertions (measures, validations and amendments) that represent the output of a workflow/actor run.
+
+An account of the responses from a set of VALIDATIONS (q.v.), ISSUES (q.v.), MEASURES (q.v.) and AMENDMENTS (q.v.) designed to assess the fitness for use of the tested data for a particular purpose."""@en ;
+        rdfs:label "Data Quality Report"@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/ResourceType
@@ -455,6 +464,23 @@ An example of a UseCase could be \"Check for internal consistency of dates\", wi
 ###  http://rs.tdwg.org/bdq/ffdq/ValidationPolicy
 :ValidationPolicy rdf:type owl:Class ;
                   rdfs:comment "The ValidationPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedCriterion relates to a use case. This relationship defines which validations are supported by a given use case." .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://rs.tdwg.org/bdq/ffdq#MultiRecord
+:MultiRecord rdf:type owl:NamedIndividual ,
+                      :ResourceType ;
+             rdfs:label "Multi Record"@en .
+
+
+###  http://rs.tdwg.org/bdq/ffdq#SingleRecord
+:SingleRecord rdf:type owl:NamedIndividual ,
+                       :ResourceType ;
+              rdfs:comment "A record from a dataset without dependencies on any other record."@en ;
+              rdfs:label "Single Record"@en .
 
 
 ###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
