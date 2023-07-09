@@ -440,7 +440,7 @@ A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_P
 
 ###  http://rs.tdwg.org/bdq/ffdq/Specification
 :Specification rdf:type owl:Class ;
-               rdfs:comment "The specification serves as a technical desription of the assertion test implemented by some instance of the mechanism concept." .
+               rdfs:comment "A specification is a technical desription of an assertion test."@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/UseCase
@@ -470,13 +470,13 @@ An example of a UseCase could be \"Check for internal consistency of dates\", wi
 #    Individuals
 #################################################################
 
-###  http://rs.tdwg.org/bdq/ffdq#MultiRecord
+###  http://rs.tdwg.org/bdq/ffdq/MultiRecord
 :MultiRecord rdf:type owl:NamedIndividual ,
                       :ResourceType ;
              rdfs:label "Multi Record"@en .
 
 
-###  http://rs.tdwg.org/bdq/ffdq#SingleRecord
+###  http://rs.tdwg.org/bdq/ffdq/SingleRecord
 :SingleRecord rdf:type owl:NamedIndividual ,
                        :ResourceType ;
               rdfs:comment "A record from a dataset without dependencies on any other record."@en ;
