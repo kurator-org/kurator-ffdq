@@ -228,7 +228,7 @@
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/problemProperties
-:problemProperties rdf:type owl:ObjectProperty .
+:problemProperties rdf:type owl:ObjectProperty ;
                       rdfs:comment "Sub properties of this type group object properties that apply to problem concepts such as ProblemPolicy (DQ Needs), ProblemMethod (DQ Solutions) and Issue (DQ Reports)." .
 
 
