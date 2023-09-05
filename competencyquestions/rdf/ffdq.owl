@@ -69,7 +69,7 @@
                                  owl:onProperty :dimensionInContext ;
                                  owl:someValuesFrom :MeasurementPolicy
                                ] ;
-                    rdfs:comment "Describes the relationship between an ammendment concept in FFDQ (needs, solutions, reports) and a ContextualizedDimension." .
+                    rdfs:comment "Describes the relationship between an Amendment concept in FFDQ (needs, solutions, reports) and a ContextualizedDimension." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/enhancementInContext
@@ -87,7 +87,7 @@
                                    owl:onProperty :enhancementInContext ;
                                    owl:someValuesFrom :AmendmentPolicy
                                  ] ;
-                      rdfs:comment "Describes the relationship between an ammendment concept in FFDQ (needs, solutions, reports) and a ContextualizedEnhancement." .
+                      rdfs:comment "Describes the relationship between an Amendment concept in FFDQ (needs, solutions, reports) and a ContextualizedEnhancement." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/hasCriterion
@@ -146,7 +146,7 @@
           rdfs:subPropertyOf :problemProperties ;
           rdfs:domain [ rdf:type owl:Restriction ;
                         owl:onProperty :hasIssue ;
-                        owl:someValuesFrom :Issue
+                        owl:someValuesFrom :Issue_qiestionable_entity
                       ] ;
           rdfs:range [ rdf:type owl:Restriction ;
                        owl:onProperty :hasIssue ;
@@ -201,9 +201,7 @@
                          owl:onProperty :improvedBy ;
                          owl:someValuesFrom :ImprovementTarget
                        ] ;
-            rdfs:comment """Object property that describes an enhancement, as part of the ImprovementTarget, that would improve data acted upon by some set of measures or validations.
-
-This can be used to determine which measures and validations are improved upon by a given amendment.""" .
+            rdfs:comment """Object property that describes an enhancement, as part of the ImprovementTarget, that would improve data acted upon by some set of measures or validations.  This can be used to determine which measures and validations are improved upon by a given amendment.""" .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/issueInContext
@@ -231,6 +229,7 @@ This can be used to determine which measures and validations are improved upon b
 
 ###  http://rs.tdwg.org/bdq/ffdq/problemProperties
 :problemProperties rdf:type owl:ObjectProperty .
+                      rdfs:comment "Sub properties of this type group object properties that apply to problem concepts such as ProblemPolicy (DQ Needs), ProblemMethod (DQ Solutions) and Issue (DQ Reports)." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/targetedCriterion
@@ -264,7 +263,7 @@ This can be used to determine which measures and validations are improved upon b
 :targetedIssue rdf:type owl:ObjectProperty ;
                rdfs:domain [ rdf:type owl:Restriction ;
                              owl:onProperty :targetedIssue ;
-                             owl:someValuesFrom :Issue
+                             owl:someValuesFrom :Issue_qiestionable_entity
                            ] ;
                rdfs:range [ rdf:type owl:Restriction ;
                             owl:onProperty :targetedIssue ;
@@ -295,12 +294,12 @@ This can be used to determine which measures and validations are improved upon b
 
 ###  http://rs.tdwg.org/bdq/ffdq/AmendmentPolicy
 :AmendmentPolicy rdf:type owl:Class ;
-                 rdfs:comment "The AmendementPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedEnhancement relates to a use case. This relationship defines which ammendments are supported by a given use case." .
+                 rdfs:comment "The AmendmentPolicy in FFDQ is a DQ Needs level concept that describes how some contextualizedEnhancement relates to a use case. This relationship defines which Amendments are supported by a given use case." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Assertion
 :Assertion rdf:type owl:Class ;
-           rdfs:comment """The Assertion type in FFDQ is the fundemental concept that makes up a data quality report. Assertion can be any one of four types (represented as subClasses), Measure, Validation, Issue, and Amendement.
+           rdfs:comment """The Assertion type in FFDQ is the fundamental concept that makes up a data quality report. Assertion can be any one of four types (represented as subClasses), Measure, Validation, Issue, and Amendement.
 
 The assertion concept consists of a specification (the technical description of a performed test), a data resource (initial values of input data expressed in terms of some controlled vocabulary), the mechanism (external service, actor, or code that performs the test), and some form of result.""" .
 
@@ -337,7 +336,7 @@ The assertion concept consists of a specification (the technical description of 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Dimension
 :Dimension rdf:type owl:Class ;
-           rdfs:comment """Describes the data quality dimension (accuracy, precision, completeness, etc.) of a measurement test. For example \"coordinate percision of single records\".
+           rdfs:comment """Describes the aspect of data quality (accuracy, precision, completeness, etc.) that a measurement test examines. For example, \"precision\" in \"coordinate percision of single records\".  
 
 Measurable attributes in an Information Element (q.v.) which can be individually assessed, interpreted, and improved. Includes Completeness (q.v.), Conformance (q.v.), Consistency (q.v.), Likeliness (q.v.), Reliability (q.v.), and Resolution (q.v.)."""@en ;
            rdfs:label "Data Quality Dimension"@en .
@@ -355,20 +354,24 @@ Measurable attributes in an Information Element (q.v.) which can be individually
 
 ###  http://rs.tdwg.org/bdq/ffdq/ImprovementTarget
 :ImprovementTarget rdf:type owl:Class ;
-                   rdfs:comment "The ImprovementTarget concept in FFDQ describes which measures and validations are improved by some amendment. ImprovementTarget includes relationships between a contextualizedEnhancement (for an ammendment) and one or more contextualizedCriterion (link to validations) or contextualizedDimensions (link to measures)." .
+                   rdfs:comment "The ImprovementTarget concept in FFDQ describes which measures and validations are improved by some amendment. ImprovementTarget includes relationships between a contextualizedEnhancement (for an Amendment) and one or more contextualizedCriterion (link to validations) or contextualizedDimensions (link to measures)." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/InformationElement
 :InformationElement rdf:type owl:Class ;
-                    rdfs:comment """The information element in FFDQ can be represented as a single or composite element that consists of one or more terms from a controlled vocabulary (fields actedUpon or consulted by an assertion test).
-
-An abstraction or a concrete term that represents relevant content (e.g., coordinates; dwc.decimalLatitude, dwc:decimalLongitude)."""@en ;
+                    rdfs:comment """An information element identifies a portion of data to which a test pertains.  The information element in FFDQ can be represented as a single or composite element that consists of one or more terms from a controlled vocabulary (fields actedUpon or consulted by an assertion test) that identifies concepts in data relevant to a use case.  An abstraction or a concrete term that represents relevant content (e.g., coordinates; dwc.decimalLatitude, dwc:decimalLongitude)."""@en ;
                     rdfs:label "Information Element"@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Issue
 :Issue rdf:type owl:Class ;
-       rdfs:comment "Describes the Issue that a DQ Problem assertion is focused on. If the conditions described by an issue are identified by a test, the Problem assertion type will have a status of HAS_PROBLEM. Otherwise the DQ Problem will have a status of NO_PROBLEM." .
+       rdfs:subClassOf :Assertion ;
+       rdfs:comment "The DQ report concept describing a test for the negative case. If a problem was found the result has a status of HAS_PROBLEM otherwise the status is NO_PROBLEM." .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/Issue_qiestionable_entity
+:Issue_qiestionable_entity rdf:type owl:Class ;
+                           rdfs:comment "Describes the Issue that a DQ Problem assertion is focused on. If the conditions described by an issue are identified by a test, the Problem assertion type will have a status of HAS_PROBLEM. Otherwise the DQ Problem will have a status of NO_PROBLEM." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Measure
@@ -392,12 +395,6 @@ An abstraction or a concrete term that represents relevant content (e.g., coordi
            rdfs:comment "The FFDQ concept of mechanism describes the entity that performs an assertion test (code, external service, actor, etc.). Tied to a specification via the concept of an Implementation." .
 
 
-###  http://rs.tdwg.org/bdq/ffdq/Problem
-:Problem rdf:type owl:Class ;
-         rdfs:subClassOf :Assertion ;
-         rdfs:comment "The DQ report concept describing a test for the negative case. If a problem was found the result has a status of HAS_PROBLEM otherwise the status is NO_PROBLEM." .
-
-
 ###  http://rs.tdwg.org/bdq/ffdq/ProblemMethod
 :ProblemMethod rdf:type owl:Class ;
                rdfs:comment "The ProblemMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and an issue in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
@@ -415,9 +412,7 @@ An abstraction or a concrete term that represents relevant content (e.g., coordi
 
 ###  http://rs.tdwg.org/bdq/ffdq/Report
 :Report rdf:type owl:Class ;
-        rdfs:comment """The FFDQ Report concept consists of a set of assertions (measures, validations and amendments) that represent the output of a workflow/actor run.
-
-An account of the responses from a set of VALIDATIONS (q.v.), ISSUES (q.v.), MEASURES (q.v.) and AMENDMENTS (q.v.) designed to assess the fitness for use of the tested data for a particular purpose."""@en ;
+        rdfs:comment """The FFDQ Report concept consists of a set of assertions (measures, validations and amendments) that represent the output of a workflow/actor run.  These assertions form an account of the fitness for use of a tested data set for a specified use, as produced by a Mechanism."""@en ;
         rdfs:label "Data Quality Report"@en .
 
 
@@ -447,7 +442,7 @@ A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_P
 :UseCase rdf:type owl:Class ;
          rdfs:comment """The UseCase concept in FFDQ describes some data quality control use case. The Amendment, Measurement and Validation policies that make up a use case define which assertions cover a given use case.
 
-An example of a UseCase could be \"Check for internal consistency of dates\", with validation policies for checking consistency between atomic date fields and an ammendment such as \"eventDate filled in from verbatim\".""" .
+An example of a UseCase could be \"Check for internal consistency of dates\", with validation policies for checking consistency between atomic date fields and an Amendment such as \"eventDate filled in from verbatim\".""" .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Validation
