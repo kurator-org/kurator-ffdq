@@ -13,6 +13,18 @@
 #    Object Properties
 #################################################################
 
+###  http://rs.tdwg.org/bdq/ffdq#hasActedUponInformationElement
+:hasActedUponInformationElement rdf:type owl:ObjectProperty ;
+                                rdfs:subPropertyOf :hasInformationElement ;
+                                rdfs:comment "Provides a relationship between FFDQ concepts and the information elements that are ActedUpon in a test."@en .
+
+
+###  http://rs.tdwg.org/bdq/ffdq#hasConsultedInformationElemetn
+:hasConsultedInformationElemetn rdf:type owl:ObjectProperty ;
+                                rdfs:subPropertyOf :hasInformationElement ;
+                                rdfs:comment "Provides a relationship between FFDQ concepts and the information elements that are Consulted, but not ActedUpon in a test."@en .
+
+
 ###  http://rs.tdwg.org/bdq/ffdq/amendmentProperties
 :amendmentProperties rdf:type owl:ObjectProperty ;
                      rdfs:comment "Sub properties of this type group object properties that apply to amendment concepts such as AmendmentPolicy (DQ Needs), AmendmentMethod (DQ Solutions) and Amendment (DQ Reports)." .
@@ -95,7 +107,7 @@
               rdfs:subPropertyOf :validationProperties ;
               rdfs:domain [ rdf:type owl:Restriction ;
                             owl:onProperty :hasCriterion ;
-                            owl:someValuesFrom :Criterion
+                            owl:someValuesFrom :Validation
                           ] ;
               rdfs:range [ rdf:type owl:Restriction ;
                            owl:onProperty :hasCriterion ;
@@ -123,7 +135,7 @@
                 rdfs:subPropertyOf :amendmentProperties ;
                 rdfs:domain [ rdf:type owl:Restriction ;
                               owl:onProperty :hasEnhancement ;
-                              owl:someValuesFrom :Enhancement
+                              owl:someValuesFrom :Amendmenent
                             ] ;
                 rdfs:range [ rdf:type owl:Restriction ;
                              owl:onProperty :hasEnhancement ;
@@ -146,7 +158,7 @@
           rdfs:subPropertyOf :problemProperties ;
           rdfs:domain [ rdf:type owl:Restriction ;
                         owl:onProperty :hasIssue ;
-                        owl:someValuesFrom :Problem
+                        owl:someValuesFrom :Issue
                       ] ;
           rdfs:range [ rdf:type owl:Restriction ;
                        owl:onProperty :hasIssue ;
@@ -263,7 +275,7 @@
 :targetedIssue rdf:type owl:ObjectProperty ;
                rdfs:domain [ rdf:type owl:Restriction ;
                              owl:onProperty :targetedIssue ;
-                             owl:someValuesFrom :Problem
+                             owl:someValuesFrom :Issue
                            ] ;
                rdfs:range [ rdf:type owl:Restriction ;
                             owl:onProperty :targetedIssue ;
@@ -281,32 +293,39 @@
 #    Classes
 #################################################################
 
-###  http://rs.tdwg.org/bdq/ffdq#DataQualityNeed
-:DataQualityNeed rdf:type owl:Class ;
-                 rdfs:subClassOf :NeedConcept .
+###  http://rs.tdwg.org/bdq/ffdq#DataQualityMethod
+:DataQualityMethod rdf:type owl:Class ;
+                   rdfs:subClassOf :SolutionsConcept .
 
 
-###  http://rs.tdwg.org/bdq/ffdq#NeedConcept
-:NeedConcept rdf:type owl:Class .
+###  http://rs.tdwg.org/bdq/ffdq#Measure
+:Measure rdf:type owl:Class ;
+         rdfs:subClassOf :DataQualityNeed ;
+         rdfs:comment "Describes the criteria for measuring an aspect of data quality related to some data quality need.   May be criteria for determining that data are COMPLETE or NOT_COMPLETE, or may be criteria for asserting a numeric measurement.  COMPLETE or NOT_COMPLETE measures are fundamental to data quality control, as set of data are filtered to the subset of data have quality for some need if all records are COMPLETE for all pertenent Measures.  A Measure is the data quality needs concept that paralells a MeasurementMethod at the solutions level, and a MeasurementAssertion at the report level."@en .
 
 
-###  http://rs.tdwg.org/bdq/ffdq#ReportConcept
-:ReportConcept rdf:type owl:Class .
+###  http://rs.tdwg.org/bdq/ffdq/ActedUpon
+:ActedUpon rdf:type owl:Class ;
+           rdfs:subClassOf :InformationElement ;
+           rdfs:comment "An information element to which a Result applies."@en ;
+           rdfs:label "Acted Upon"@en .
 
 
-###  http://rs.tdwg.org/bdq/ffdq#SolutionsConcept
-:SolutionsConcept rdf:type owl:Class .
+###  http://rs.tdwg.org/bdq/ffdq/Amendmenent
+:Amendmenent rdf:type owl:Class ;
+             rdfs:subClassOf :DataQualityNeed ;
+             rdfs:comment "Describes a proposal for enhancement of original data, which if accepted, would improve the quality of the data for some use. For example, \"Recommends valid value for taxon name in a single record\".  Amendments may describe proposed changes to data values, or to processes for the production and manipulation of data, for example an Amendment on a SingleRecord may provide criteria for proposing that latitude and longitude are transposed in that record, or a similar Amendment on a MultiRecord may provide critera for proposing that all latitudes and longitudes from some data source have been transposed, and the mapping of data values to transport terms should be changed.  An Amendment is the data quality needs concept that paralells an AmendmentMethod at the solutions level, and an AmmendmentAssertion at the report level."@en .
 
 
-###  http://rs.tdwg.org/bdq/ffdq/Amendment
-:Amendment rdf:type owl:Class ;
-           rdfs:subClassOf :Assertion ;
-           rdfs:comment "The Amendment assertion type is a report level concept that describes a run of a test that proposes changes based on some data quality enhancement. The Amendment concept in FFDQ consists of a run result that includes a status (FILLED_IN, TRANSPOSED, etc) as well as the proposed changes to values from the original data." .
+###  http://rs.tdwg.org/bdq/ffdq/AmendmentAssertion
+:AmendmentAssertion rdf:type owl:Class ;
+                    rdfs:subClassOf :Assertion ;
+                    rdfs:comment "The Amendment assertion type is a report level concept that describes a run of a test that proposes changes based on some data quality enhancement. The Amendment concept in FFDQ consists of a run result that includes a status (FILLED_IN, TRANSPOSED, etc) as well as the proposed changes to values from the original data." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/AmendmentMethod
 :AmendmentMethod rdf:type owl:Class ;
-                 rdfs:subClassOf :SolutionsConcept ;
+                 rdfs:subClassOf :DataQualityMethod ;
                  rdfs:comment "The AmendmentMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and an enhancement in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
@@ -322,6 +341,13 @@
            rdfs:comment """The Assertion type in FFDQ is the fundamental concept that makes up a data quality report. Assertion can be any one of four types (represented as subClasses), Measure, Validation, Issue, and Amendement.
 
 The assertion concept consists of a specification (the technical description of a performed test), a data resource (initial values of input data expressed in terms of some controlled vocabulary), the mechanism (external service, actor, or code that performs the test), and some form of result.""" .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/Consulted
+:Consulted rdf:type owl:Class ;
+           rdfs:subClassOf :InformationElement ;
+           rdfs:comment "An Information Element the content of which is examined to assert a result on one or more other Information Elements"@en ;
+           rdfs:label "Consulted"@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/ContextualizedCriterion
@@ -348,10 +374,9 @@ The assertion concept consists of a specification (the technical description of 
                      rdfs:comment "Describes an instance of the issue concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
 
 
-###  http://rs.tdwg.org/bdq/ffdq/Criterion
-:Criterion rdf:type owl:Class ;
-           rdfs:subClassOf :DataQualityNeed ;
-           rdfs:comment "Describes the criterion a Validation test uses to determine compliance. For example, \"The value of basisOfRecord of single records must be in the controlled vocabulary\"." .
+###  http://rs.tdwg.org/bdq/ffdq/DataQualityNeed
+:DataQualityNeed rdf:type owl:Class ;
+                 rdfs:subClassOf :NeedConcept .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/DataResource
@@ -362,16 +387,8 @@ The assertion concept consists of a specification (the technical description of 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Dimension
 :Dimension rdf:type owl:Class ;
-           rdfs:comment """Describes the aspect of data quality (accuracy, precision, completeness, etc.) that a measurement test examines. For example, \"precision\" in \"coordinate percision of single records\".  
-
-Measurable attributes in an Information Element (q.v.) which can be individually assessed, interpreted, and improved. Includes Completeness (q.v.), Conformance (q.v.), Consistency (q.v.), Likeliness (q.v.), Reliability (q.v.), and Resolution (q.v.)."""@en ;
+           rdfs:comment "Describes the aspect of data quality (accuracy, precision, completeness, etc.) that a test examines. For example, \"precision\" in \"coordinate percision of single records\".  Includes Completeness (q.v.), Conformance (q.v.), Consistency (q.v.), Likeliness (q.v.), Reliability (q.v.), and Resolution (q.v.)."@en ;
            rdfs:label "Data Quality Dimension"@en .
-
-
-###  http://rs.tdwg.org/bdq/ffdq/Enhancement
-:Enhancement rdf:type owl:Class ;
-             rdfs:subClassOf :DataQualityNeed ;
-             rdfs:comment "Describes the enhancement to the original data performed by an Ammendment test. For example, \"Recommends valid value for taxon name in a single record\"." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/Implementation
@@ -394,19 +411,25 @@ Measurable attributes in an Information Element (q.v.) which can be individually
 
 ###  http://rs.tdwg.org/bdq/ffdq/Issue
 :Issue rdf:type owl:Class ;
-       rdfs:subClassOf :Assertion ;
-       rdfs:comment "The DQ report concept describing a test for the negative case. If a problem was found the result has a status of HAS_PROBLEM otherwise the status is NO_PROBLEM." .
+       rdfs:subClassOf :DataQualityNeed ;
+       rdfs:comment "Describes criteria by which data which lack quality for some purpose may be identified.  An issue is phrased in a negative sense, and approximantes an inverse of a Validation.  An Issue identifies data that lack or may lack quality.  An Issue may flag a POSSIBLE_PROBLEM that would need further review to determine if the data have qulity for some purpose,  If the conditions described by an issue are identified by a test, the Problem Assertion result will be either HAS_PROBLEM or POSSIBLE_PROBLEM, if no issue is found with the data the result will be NO_PROBLEM.  NO_PROBLEM, unlike COMPLIANT for a Validation, does not assert that data are fit for some purpose.    An Issue is the data quality needs concept that paralells a IssueMethod at the solutions level, and a IssieAssertion at the report level."@en .
 
 
-###  http://rs.tdwg.org/bdq/ffdq/Measure
-:Measure rdf:type owl:Class ;
-         rdfs:subClassOf :Assertion ;
-         rdfs:comment "The Measure assertion type is a report level concept that describes a run of a test that performs a measurement according to some data quality dimension. In FFDQ, the Measure concept consists of a run result of COMPLETE or NOT_COMPLETE or a value of the measurement (i.e. a measure of dwc:eventDate duration in seconds)." .
+###  http://rs.tdwg.org/bdq/ffdq/IssueAssertion
+:IssueAssertion rdf:type owl:Class ;
+                rdfs:subClassOf :Assertion ;
+                rdfs:comment "The DQ report concept describing a test for the negative case. If a problem was found the result has a status of HAS_PROBLEM otherwise the status is NO_PROBLEM." .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/MeasurementAssertion
+:MeasurementAssertion rdf:type owl:Class ;
+                      rdfs:subClassOf :Assertion ;
+                      rdfs:comment "The Measure assertion type is a report level concept that describes a run of a test that performs a measurement according to some data quality dimension. In FFDQ, the Measure concept consists of a run result of COMPLETE or NOT_COMPLETE or a value of the measurement (i.e. a measure of dwc:eventDate duration in seconds)." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/MeasurementMethod
 :MeasurementMethod rdf:type owl:Class ;
-                   rdfs:subClassOf :SolutionsConcept ;
+                   rdfs:subClassOf :DataQualityMethod ;
                    rdfs:comment "The MeasurementMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and a dimension in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
@@ -422,15 +445,13 @@ Measurable attributes in an Information Element (q.v.) which can be individually
            rdfs:comment "The FFDQ concept of mechanism describes the entity that performs an assertion test (code, external service, actor, etc.). Tied to a specification via the concept of an Implementation." .
 
 
-###  http://rs.tdwg.org/bdq/ffdq/Problem
-:Problem rdf:type owl:Class ;
-         rdfs:subClassOf :DataQualityNeed ;
-         rdfs:comment "Describes the Issue that a DQ Problem assertion is focused on. If the conditions described by an issue are identified by a test, the Problem assertion type will have a status of HAS_PROBLEM. Otherwise the DQ Problem will have a status of NO_PROBLEM." .
+###  http://rs.tdwg.org/bdq/ffdq/NeedConcept
+:NeedConcept rdf:type owl:Class .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/ProblemMethod
 :ProblemMethod rdf:type owl:Class ;
-               rdfs:subClassOf :SolutionsConcept ;
+               rdfs:subClassOf :DataQualityMethod ;
                rdfs:comment "The ProblemMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and an issue in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
@@ -453,6 +474,10 @@ Measurable attributes in an Information Element (q.v.) which can be individually
         rdfs:label "Data Quality Report"@en .
 
 
+###  http://rs.tdwg.org/bdq/ffdq/ReportConcept
+:ReportConcept rdf:type owl:Class .
+
+
 ###  http://rs.tdwg.org/bdq/ffdq/ResourceType
 :ResourceType rdf:type owl:Class ;
               rdfs:comment "In FFDQ the concept of ResourceType has instances for SingleRecord or MultiRecord" .
@@ -472,6 +497,10 @@ Measurable attributes in an Information Element (q.v.) which can be individually
 A separate concept describes the result state as values of AMBIGIOUS, INTERNAL_PREREQUISITES_NOT_MET and EXTERNAL_PREREQUISITES_NOT_MET.""" .
 
 
+###  http://rs.tdwg.org/bdq/ffdq/SolutionsConcept
+:SolutionsConcept rdf:type owl:Class .
+
+
 ###  http://rs.tdwg.org/bdq/ffdq/Specification
 :Specification rdf:type owl:Class ;
                rdfs:subClassOf :NeedConcept ;
@@ -488,13 +517,19 @@ An example of a UseCase could be \"Check for internal consistency of dates\", wi
 
 ###  http://rs.tdwg.org/bdq/ffdq/Validation
 :Validation rdf:type owl:Class ;
-            rdfs:subClassOf :Assertion ;
-            rdfs:comment "The Validation assertion type is a report level concept that describes a run of a test for validity. The Validation concept in FFDQ consists of a run result of COMPLIANT or NON_COMPLIANT and a criterion that describes the conditions for validity that result in a status of COMPLIANT." .
+            rdfs:subClassOf :DataQualityNeed ;
+            rdfs:comment "Describes the criteria for determining compliance of data to fill some data quality need.  Validations are phrased in a positive sense, they identify data which has quality for some need.  For example, \"The value of basisOfRecord of single records must be in the controlled vocabulary\".   A Validation is the data quality needs concept that paralells a ValidationMethod at the solutions level, and a ValidationAssertion at the report level.  ValidationAssertions may specify a result that is COMPLIANT, where the data has quality, or NOT_COMPLIANT, where the data lacks quality."@en .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/ValidationAssertion
+:ValidationAssertion rdf:type owl:Class ;
+                     rdfs:subClassOf :Assertion ;
+                     rdfs:comment "The Validation assertion type is a report level concept that describes a run of a test for validity. The Validation concept in FFDQ consists of a run result of COMPLIANT or NON_COMPLIANT and a criterion that describes the conditions for validity that result in a status of COMPLIANT." .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/ValidationMethod
 :ValidationMethod rdf:type owl:Class ;
-                  rdfs:subClassOf :SolutionsConcept ;
+                  rdfs:subClassOf :DataQualityMethod ;
                   rdfs:comment "The ValidationMethod in FFDQ is a DQ Solutions level concept describing the relationship between a specification (technical description of a test) and a criterion in the context of resource type (SingleRecord or MultiRecord) and associated information elements." .
 
 
