@@ -279,6 +279,7 @@ public class JavaClassGenerator {
                 if (cnt < ie.size() - 1) {
                     outputCodeSB.append(", ");
                 }
+                outputCodeSB.append("\n");
                 cnt++;
             }
             cnt = 0;
@@ -287,6 +288,7 @@ public class JavaClassGenerator {
                 if (cnt < actedUpon.size() - 1) {
                     outputCodeSB.append(", ");
                 }
+                outputCodeSB.append("\n");
                 cnt++;
             }
             cnt = 0;
@@ -301,7 +303,7 @@ public class JavaClassGenerator {
             
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
             
-            outputCodeSB.append("\n").append(indent).append(") {\n");
+            outputCodeSB.append(indent).append(") {\n");
             outputCodeSB.append(indent).append(indent).append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
             outputCodeSB.append(indent).append(indent).append("//TODO:  Implement specification").append("\n");
             // Split the specification into words on whitespace, then print specification in lines with
