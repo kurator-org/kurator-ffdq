@@ -42,6 +42,8 @@ public class TestUtil {
     private final static String CSV_HEADER_RESOURCE_TYPE;
     private final static String CSV_HEADER_DIMENSION;
     private final static String CSV_HEADER_INFO_ELEMENT;
+    private final static String CSV_HEADER_INFO_ELEMENT_ACTEDUPON;
+    private final static String CSV_HEADER_INFO_ELEMENT_CONSULTED;
     private final static String CSV_HEADER_TEST_PARMETERS;
 
     static {
@@ -58,6 +60,8 @@ public class TestUtil {
             CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
             CSV_HEADER_DIMENSION = properties.getProperty("csv.header.dimension");
             CSV_HEADER_INFO_ELEMENT = properties.getProperty("csv.header.informationElement");
+            CSV_HEADER_INFO_ELEMENT_ACTEDUPON = properties.getProperty("csv.header.actedUpon");
+            CSV_HEADER_INFO_ELEMENT_CONSULTED = properties.getProperty("csv.header.consulted");
             CSV_HEADER_TEST_PARMETERS = properties.getProperty("csv.header.testParameters");
             
         } catch (IOException e) {
@@ -129,17 +133,36 @@ public class TestUtil {
             Mechanism mechanism = new Mechanism(mechanismGuid, mechanismName);
 
             for (AssertionTest test : tests) {
+            	
+            	logger.log(Level.INFO, test.getGuid());
 
                 // Define elementary concepts first
                 Specification specification = new Specification(test.getGuid(), test.getLabel(), test.getSpecification());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
                 InformationElement informationElement = new InformationElement();
+                ActedUpon actedUpon = new ActedUpon();
+                Consulted consulted = new Consulted();
 
                 for (String str : test.getInformationElement()) {
-                    URI term = Namespace.resolvePrefixedTerm(str);
-                    informationElement.addTerm(term);
+                	if (str!=null && str.length()>0) { 
+                		URI term = Namespace.resolvePrefixedTerm(str);
+                		informationElement.addTerm(term);
+                	}
                 }
+                for (String str : test.getActedUpon()) {
+                	if (str!=null && str.length()>0) { 
+                		URI term = Namespace.resolvePrefixedTerm(str);
+                		actedUpon.addTerm(term);
+                	}
+                }
+                for (String str : test.getConsulted()) {
+                	if (str!=null && str.length()>0) { 
+                		URI term = Namespace.resolvePrefixedTerm(str);
+                		consulted.addTerm(term);
+                	}
+                }
+                
 
                 // Add the specification to an implementation for the current mechanism
                 Implementation implementation = new Implementation(specification, Collections.singletonList(mechanism));
@@ -151,7 +174,7 @@ public class TestUtil {
                         // Define a dimension in the context of resource type and info elements
                         Dimension dimension = Dimension.fromString(test.getDimension());
                         dimension.setLabel(test.getCriterionLabel());
-                        ContextualizedDimension cd = new ContextualizedDimension(dimension, informationElement, resourceType);
+                        ContextualizedDimension cd = new ContextualizedDimension(dimension, informationElement, actedUpon, consulted, resourceType);
                         cd.setLabel(test.getDescription() + " Measure of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         // Define a measurement method, a specification tied to a dimension in context
@@ -162,7 +185,7 @@ public class TestUtil {
                     case "VALIDATION":
                         // Define a criterion in the context of resource type and info elements
                         Criterion criterion = new Criterion(test.getCriterionLabel());
-                        ContextualizedCriterion cc = new ContextualizedCriterion(criterion, informationElement, resourceType);
+                        ContextualizedCriterion cc = new ContextualizedCriterion(criterion, informationElement, actedUpon, consulted, resourceType);
                         cc.setLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
                         cc.setComment(test.getDescription());
                         // Define a validation method, a specification tied to a criterion in context
@@ -173,7 +196,7 @@ public class TestUtil {
                     case "AMENDMENT":
                         // Define an enhancement in the context of resource type and info elements
                         Enhancement enhancement = new Enhancement(test.getCriterionLabel());
-                        ContextualizedEnhancement ce = new ContextualizedEnhancement(enhancement, informationElement, resourceType);
+                        ContextualizedEnhancement ce = new ContextualizedEnhancement(enhancement, informationElement, actedUpon, consulted, resourceType);
                         ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
                         ce.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
@@ -183,7 +206,7 @@ public class TestUtil {
                     case "ISSUE":
                         // Define an enhancement in the context of resource type and info elements
                         Issue issue = new Issue(test.getCriterionLabel());
-                        ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, resourceType);
+                        ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, actedUpon, consulted, resourceType);
                         ci.setLabel(test.getDescription() + " Issue for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
@@ -318,12 +341,16 @@ public class TestUtil {
                 String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
                 String dimension = record.get(CSV_HEADER_DIMENSION);
                 String informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
+                String actedUpon = record.get(CSV_HEADER_INFO_ELEMENT_ACTEDUPON);
+logger.log(Level.INFO, CSV_HEADER_INFO_ELEMENT_ACTEDUPON);                
+logger.log(Level.INFO, actedUpon);                
+                String consulted = record.get(CSV_HEADER_INFO_ELEMENT_CONSULTED);
                 String testParameters = record.get(CSV_HEADER_TEST_PARMETERS);
                 logger.log(Level.FINE, assertionType);
                 logger.log(Level.FINE, label);
-
+                
                 AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, assertionType, resourceType,
-                        dimension, parseInformationElementStr(informationElement), parseTestParametersString(testParameters));
+                        dimension, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters));
 
                 tests.add(test);
             } catch (UnsupportedTypeException e) {

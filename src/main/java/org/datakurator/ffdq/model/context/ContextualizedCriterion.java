@@ -20,6 +20,8 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.ActedUpon;
+import org.datakurator.ffdq.model.Consulted;
 import org.datakurator.ffdq.model.Criterion;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
@@ -36,6 +38,8 @@ public class ContextualizedCriterion {
 
     private Criterion criterion;
     private InformationElement ie;
+    private ActedUpon actedUpon;
+    private Consulted consulted;    
     private ResourceType rt;
     private String label;
     private String comment;
@@ -58,7 +62,43 @@ public class ContextualizedCriterion {
         this.label = label;
     }
 
-    @RDFSubject
+    public ContextualizedCriterion(Criterion criterion, InformationElement informationElement, ActedUpon actedUpon,
+			Consulted consulted, ResourceType resourceType) {
+        this.criterion = criterion;
+        if (informationElement.getComposedOf().size()==0) { 
+        	this.ie = null;
+        } else { 
+        	this.ie = informationElement;
+        }
+        if (actedUpon.getComposedOf().size()==0) { 
+        	this.actedUpon = null;
+        } else { 
+        	this.actedUpon = actedUpon;
+        }
+        if (consulted.getComposedOf().size()==0) { 
+        	this.consulted = null;
+        } else { 
+        	this.consulted = consulted;
+        }
+        this.rt = resourceType;
+        StringBuilder informationElements = new StringBuilder();
+        String separator = "";
+        if (ie!=null) { 
+        	informationElements.append(ie.toString());
+        	separator = " ";
+        }
+        if (actedUpon!=null) { 
+        	informationElements.append(separator).append(actedUpon.toString());
+        	separator = " ";
+        }
+        if (consulted!=null) { 
+        	informationElements.append(separator).append(consulted.toString());
+        	separator = " ";
+        }        
+        label = criterion.getLabel() +  " for " + informationElements.toString() + " in " + rt.getLabel();
+	}
+
+	@RDFSubject
     public String getId() {
         return id;
     }
@@ -75,6 +115,24 @@ public class ContextualizedCriterion {
     public void setInformationElements(InformationElement ie) {
         this.ie = ie;
     }
+    
+    @RDF("ffdq:hasActedUponInformationElement")
+    public InformationElement getActedUpon() {
+        return actedUpon;
+    }
+
+    public void setActedUpon(InformationElement ie) {
+        this.actedUpon = (ActedUpon) ie;
+    }   
+    
+    @RDF("ffdq:hasConsultedInformationElement")
+    public InformationElement getConsulted() {
+        return consulted;
+    }
+
+    public void setConsulted(InformationElement ie) {
+        this.consulted = (Consulted) ie;
+    }    
 
     @RDF("ffdq:hasResourceType")
     public ResourceType getResourceType() {

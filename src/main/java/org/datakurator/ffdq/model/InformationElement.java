@@ -16,6 +16,7 @@
  */
 package org.datakurator.ffdq.model;
 
+import org.apache.commons.math3.analysis.function.Log;
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
@@ -32,7 +33,7 @@ import java.util.UUID;
 @RDFBean("ffdq:InformationElement")
 public class InformationElement {
     private String id = "urn:uuid:" + UUID.randomUUID();
-    private List<URI> composedOf = new ArrayList<>();
+    protected List<URI> composedOf = new ArrayList<>();
 
     public InformationElement() { }
 

@@ -20,6 +20,8 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.ActedUpon;
+import org.datakurator.ffdq.model.Consulted;
 import org.datakurator.ffdq.model.Enhancement;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
@@ -36,6 +38,8 @@ public class ContextualizedEnhancement {
 
     private Enhancement enhancement;
     private InformationElement ie;
+    private ActedUpon actedUpon;
+    private Consulted consulted;  
     private ResourceType rt;
     private String label;
     private String comment;
@@ -50,7 +54,28 @@ public class ContextualizedEnhancement {
         this.rt = rt;
     }
 
-    @RDFSubject
+    public ContextualizedEnhancement(Enhancement enhancement, InformationElement informationElement,
+			ActedUpon actedUpon, Consulted consulted, ResourceType resourceType) {
+        this.enhancement = enhancement;
+        if (informationElement.getComposedOf().size()==0) { 
+        	this.ie = null;
+        } else { 
+        	this.ie = informationElement;
+        }
+        if (actedUpon.getComposedOf().size()==0) { 
+        	this.actedUpon = null;
+        } else { 
+        	this.actedUpon = actedUpon;
+        }
+        if (consulted.getComposedOf().size()==0) { 
+        	this.consulted = null;
+        } else { 
+        	this.consulted = consulted;
+        }
+        this.rt = resourceType;
+	}
+
+	@RDFSubject
     public String getId() {
         return id;
     }
@@ -68,6 +93,24 @@ public class ContextualizedEnhancement {
         this.ie = ie;
     }
 
+    @RDF("ffdq:hasActedUponInformationElement")
+    public InformationElement getActedUpon() {
+        return actedUpon;
+    }
+
+    public void setActedUpon(InformationElement ie) {
+        this.actedUpon = (ActedUpon) ie;
+    }   
+    
+    @RDF("ffdq:hasConsultedInformationElement")
+    public InformationElement getConsulted() {
+        return consulted;
+    }
+
+    public void setConsulted(InformationElement ie) {
+        this.consulted = (Consulted) ie;
+    }    
+    
     @RDF("ffdq:hasResourceType")
     public ResourceType getResourceType() {
         return rt;

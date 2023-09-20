@@ -37,6 +37,7 @@ public class JavaClassGenerator {
 
     private String className;
     private String packageName;
+    private String indent;
 
     private Map<String, Integer> currGuids = new HashMap<>();
     private Map<String, Integer> currVersions = new HashMap<>();
@@ -50,6 +51,16 @@ public class JavaClassGenerator {
 
         this.packageName = packageName;
         this.className = className;
+        this.indent = "    ";
+    }
+    
+    public JavaClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className, String indentWith) {
+        this.mechanismGuid = mechanismGuid;
+        this.mechanismName = mechanismName;
+
+        this.packageName = packageName;
+        this.className = className;
+        this.indent = indentWith;
     }
 
     /**
@@ -200,55 +211,93 @@ public class JavaClassGenerator {
             }
 
             // params  (these are the information elements as test inputs).
-            Map<String, String> params = new HashMap<>();
+            Map<String, String> methodIEParams = new HashMap<>();
             List<String> ie = test.getInformationElement();
             for (int i = 0; i < ie.size(); i++) {
                 String term = ie.get(i);
                 String param = term.split(":")[1];
-
-                params.put(term, param);
+                methodIEParams.put(term, param);
             }
+            Map<String, String> methodAUParams = new HashMap<>();
+            List<String> actedUpon = test.getActedUpon();
+            for (int i = 0; i < actedUpon.size(); i++) {
+                String term = actedUpon.get(i);
+                String param = term.split(":")[1];
+                methodAUParams.put(term, param);
+            }  
+            Map<String, String> methodCParams = new HashMap<>();
+            List<String> consulted = test.getConsulted();
+            for (int i = 0; i < consulted.size(); i++) {
+                String term = consulted.get(i);
+                String param = term.split(":")[1];
+                methodCParams.put(term, param);
+            }              
+           
 
             // Javadoc comment first
-            outputCodeSB.append("    /**\n");
-            outputCodeSB.append("     * ").append(test.getDescription()).append("\n");
-            outputCodeSB.append("     *\n");
-            outputCodeSB.append("     * Provides: ").append(test.getLabel()).append("\n");
-            outputCodeSB.append("     * Version: ").append(test.getVersion()).append("\n");
-            outputCodeSB.append("     *\n");
+            outputCodeSB.append(indent).append("/**\n");
+            outputCodeSB.append(indent).append("* ").append(test.getDescription()).append("\n");
+            outputCodeSB.append(indent).append("*\n");
+            outputCodeSB.append(indent).append("* Provides: ").append(test.getLabel()).append("\n");
+            outputCodeSB.append(indent).append("* Version: ").append(test.getVersion()).append("\n");
+            outputCodeSB.append(indent).append("*\n");
 
-            for (String key : params.keySet()) {
-            	String param = params.get(key);
-                outputCodeSB.append("     * @param ").append(param).append(" the provided ").append(key).append(" to evaluate\n");
+            for (String key : methodIEParams.keySet()) {
+            	String param = methodIEParams.get(key);
+                outputCodeSB.append(indent).append("* @param ").append(param).append(" the provided ").append(key).append(" to evaluate.\n");
             }
+            for (String key : methodAUParams.keySet()) {
+            	String param = methodAUParams.get(key);
+                outputCodeSB.append(indent).append("* @param ").append(param).append(" the provided ").append(key).append(" to evaluate as ActedUpon.\n");
+            } 
+            for (String key : methodCParams.keySet()) {
+            	String param = methodCParams.get(key);
+                outputCodeSB.append(indent).append("* @param ").append(param).append(" the provided ").append(key).append(" to evaluate as Consulted.\n");
+            }            
             
             if (retTypeJavaDoc!=null) { 
-                outputCodeSB.append("     * @return ").append(retTypeJavaDoc).append(" to return\n");
+                outputCodeSB.append(indent).append("* @return ").append(retTypeJavaDoc).append(" to return\n");
             }
-            outputCodeSB.append("     */\n");
-            outputCodeSB.append("    ").append(descriptorAnnotation).append("\n");
-            outputCodeSB.append("    @Provides(\"").append(test.getGuid()).append("\")\n");
-            outputCodeSB.append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
-            outputCodeSB.append("    @Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
-            outputCodeSB.append("    public ").append(retType).append(" ").append(methodName).append("(");
+            outputCodeSB.append(indent).append("*/\n");
+            outputCodeSB.append(indent).append("    ").append(descriptorAnnotation).append("\n");
+            outputCodeSB.append(indent).append("    @Provides(\"").append(test.getGuid()).append("\")\n");
+            outputCodeSB.append(indent).append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
+            outputCodeSB.append(indent).append("    @Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
+            outputCodeSB.append(indent).append("    public ").append(retType).append(" ").append(methodName).append("(\n");
 
 
             int cnt = 0;
-            for (String term : params.keySet()) {
-                outputCodeSB.append("@ActedUpon(\"").append(term).append("\") String ").append(params.get(term));
-
+            for (String term : methodIEParams.keySet()) {
+            	// Untyped InformationElements are annotated with ActedUpon
+                outputCodeSB.append(indent).append(indent).append("@ActedUpon(\"").append(term).append("\") String ").append(methodIEParams.get(term));
                 if (cnt < ie.size() - 1) {
                     outputCodeSB.append(", ");
                 }
-
                 cnt++;
             }
-
+            cnt = 0;
+            for (String term : methodAUParams.keySet()) {
+                outputCodeSB.append(indent).append(indent).append("@ActedUpon(\"").append(term).append("\") String ").append(methodAUParams.get(term));
+                if (cnt < actedUpon.size() - 1) {
+                    outputCodeSB.append(", ");
+                }
+                cnt++;
+            }
+            cnt = 0;
+            for (String term : methodCParams.keySet()) {
+                outputCodeSB.append(indent).append(indent).append("@Consulted(\"").append(term).append("\") String ").append(methodCParams.get(term));
+                if (cnt < consulted.size() - 1) {
+                    outputCodeSB.append(", ");
+                }
+                outputCodeSB.append("\n");
+                cnt++;
+            }            
+            
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
             
-            outputCodeSB.append(") {\n");
-            outputCodeSB.append("        ").append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
-            outputCodeSB.append("        //TODO:  Implement specification").append("\n");
+            outputCodeSB.append(indent).append(") {\n");
+            outputCodeSB.append(indent).append(indent).append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
+            outputCodeSB.append(indent).append(indent).append("//TODO:  Implement specification").append("\n");
             // Split the specification into words on whitespace, then print specification in lines with
             // the last word boundary being before character 55 in the string (plus an indent and comment chars).
             Iterator<String> i = specificationWords.iterator();
@@ -256,11 +305,11 @@ public class JavaClassGenerator {
             while (i.hasNext()) { 
             	specificationLine.append(i.next()).append(" ");
             	if (specificationLine.length()>55) { 
-            	     outputCodeSB.append("        // ").append(specificationLine.toString()).append("\n");
+            	     outputCodeSB.append(indent).append(indent).append("// ").append(specificationLine.toString()).append("\n");
             	     specificationLine = new StringBuffer();
             	}
             }
-            outputCodeSB.append("        // ").append(specificationLine.toString()).append("\n");
+            outputCodeSB.append(indent).append(indent).append("// ").append(specificationLine.toString()).append("\n");
             outputCodeSB.append("\n");
             // Test Parameters change the behavior of the test.
             if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 
@@ -269,17 +318,17 @@ public class JavaClassGenerator {
             	while (ipar.hasNext()) { 
             		String testParam = ipar.next();
             		if (testParam!=null && testParam.trim().length()>0) { 
-            			testParamCommentLines.append("        // ").append(testParam).append("\n");
+            			testParamCommentLines.append(indent).append(indent).append("// ").append(testParam).append("\n");
             		}
             	}
             	if (testParamCommentLines.length()>0) { 
-            		outputCodeSB.append("        //TODO: Parameters. This test is defined as parameterized.").append("\n");
+            		outputCodeSB.append(indent).append(indent).append("//TODO: Parameters. This test is defined as parameterized.").append("\n");
             		outputCodeSB.append(testParamCommentLines);
             		outputCodeSB.append("\n");
             	}
             }
-            outputCodeSB.append("        return result;\n");
-            outputCodeSB.append("    }\n\n");
+            outputCodeSB.append(indent).append(indent).append("return result;\n");
+            outputCodeSB.append(indent).append("}\n\n");
         }
     }
 

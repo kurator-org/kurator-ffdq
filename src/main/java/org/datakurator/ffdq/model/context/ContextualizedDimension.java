@@ -20,6 +20,8 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.ActedUpon;
+import org.datakurator.ffdq.model.Consulted;
 import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
@@ -36,6 +38,8 @@ public class ContextualizedDimension {
 
     private Dimension dimension;
     private InformationElement ie;
+    private ActedUpon actedUpon;
+    private Consulted consulted;
     private ResourceType rt;
     private String label;
     private String comment;
@@ -43,11 +47,39 @@ public class ContextualizedDimension {
     public ContextualizedDimension() {
 
     }
-
+    
     public ContextualizedDimension(Dimension dimension, InformationElement ie, ResourceType rt) {
         this.dimension = dimension;
         this.ie = ie;
         this.rt = rt;
+    }    
+
+    public ContextualizedDimension(Dimension dimension, ActedUpon actedUpon, Consulted consulted, ResourceType rt) {
+        this.dimension = dimension;
+        this.ie = null;
+        this.rt = rt;
+        this.actedUpon = actedUpon;
+        this.consulted = consulted;
+    }
+    
+    public ContextualizedDimension(Dimension dimension, InformationElement ie, ActedUpon actedUpon, Consulted consulted, ResourceType rt) {
+        this.dimension = dimension;
+        if (ie.getComposedOf().size()==0) {
+        	this.ie = null;
+        } else { 
+        	this.ie = ie;
+        }
+        this.rt = rt;
+        if (actedUpon.getComposedOf().size()==0) { 
+        	this.actedUpon = null;
+        } else { 
+        	this.actedUpon = actedUpon;
+        }
+        if (consulted.getComposedOf().size()==0) { 
+        	this.consulted = null;
+        } else { 
+        	this.consulted = consulted;
+        }
     }
 
     @RDFSubject
@@ -67,6 +99,24 @@ public class ContextualizedDimension {
     public void setInformationElements(InformationElement ie) {
         this.ie = ie;
     }
+    
+    @RDF("ffdq:hasActedUponInformationElement")
+    public InformationElement getActedUpon() {
+        return actedUpon;
+    }
+
+    public void setActedUpon(InformationElement ie) {
+        this.actedUpon = (ActedUpon) ie;
+    }   
+    
+    @RDF("ffdq:hasConsultedInformationElement")
+    public InformationElement getConsulted() {
+        return consulted;
+    }
+
+    public void setConsulted(InformationElement ie) {
+        this.consulted = (Consulted) ie;
+    }       
 
     @RDF("ffdq:hasResourceType")
     public ResourceType getResourceType() {

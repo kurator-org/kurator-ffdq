@@ -13,18 +13,6 @@
 #    Object Properties
 #################################################################
 
-###  http://rs.tdwg.org/bdq/ffdq#hasActedUponInformationElement
-:hasActedUponInformationElement rdf:type owl:ObjectProperty ;
-                                rdfs:subPropertyOf :hasInformationElement ;
-                                rdfs:comment "Provides a relationship between FFDQ concepts and the information elements that are ActedUpon in a test."@en .
-
-
-###  http://rs.tdwg.org/bdq/ffdq#hasConsultedInformationElemetn
-:hasConsultedInformationElemetn rdf:type owl:ObjectProperty ;
-                                rdfs:subPropertyOf :hasInformationElement ;
-                                rdfs:comment "Provides a relationship between FFDQ concepts and the information elements that are Consulted, but not ActedUpon in a test."@en .
-
-
 ###  http://rs.tdwg.org/bdq/ffdq/amendmentProperties
 :amendmentProperties rdf:type owl:ObjectProperty ;
                      rdfs:comment "Sub properties of this type group object properties that apply to amendment concepts such as AmendmentPolicy (DQ Needs), AmendmentMethod (DQ Solutions) and Amendment (DQ Reports)." .
@@ -100,6 +88,18 @@
                                    owl:someValuesFrom :AmendmentPolicy
                                  ] ;
                       rdfs:comment "Describes the relationship between an Amendment concept in FFDQ (needs, solutions, reports) and a ContextualizedEnhancement." .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/hasActedUponInformationElement
+:hasActedUponInformationElement rdf:type owl:ObjectProperty ;
+                                rdfs:subPropertyOf :hasInformationElement ;
+                                rdfs:comment "Provides a relationship between FFDQ concepts and the information elements that are ActedUpon in a test."@en .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/hasConsultedInformationElement
+:hasConsultedInformationElement rdf:type owl:ObjectProperty ;
+                                rdfs:subPropertyOf :hasInformationElement ;
+                                rdfs:comment "Provides a relationship between FFDQ concepts and the information elements that are Consulted, but not ActedUpon in a test."@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/hasCriterion
@@ -293,17 +293,6 @@
 #    Classes
 #################################################################
 
-###  http://rs.tdwg.org/bdq/ffdq#DataQualityMethod
-:DataQualityMethod rdf:type owl:Class ;
-                   rdfs:subClassOf :SolutionsConcept .
-
-
-###  http://rs.tdwg.org/bdq/ffdq#Measure
-:Measure rdf:type owl:Class ;
-         rdfs:subClassOf :DataQualityNeed ;
-         rdfs:comment "Describes the criteria for measuring an aspect of data quality related to some data quality need.   May be criteria for determining that data are COMPLETE or NOT_COMPLETE, or may be criteria for asserting a numeric measurement.  COMPLETE or NOT_COMPLETE measures are fundamental to data quality control, as set of data are filtered to the subset of data have quality for some need if all records are COMPLETE for all pertenent Measures.  A Measure is the data quality needs concept that paralells a MeasurementMethod at the solutions level, and a MeasurementAssertion at the report level."@en .
-
-
 ###  http://rs.tdwg.org/bdq/ffdq/ActedUpon
 :ActedUpon rdf:type owl:Class ;
            rdfs:subClassOf :InformationElement ;
@@ -374,6 +363,11 @@ The assertion concept consists of a specification (the technical description of 
                      rdfs:comment "Describes an instance of the issue concept in terms of the associated information elements from some controlled vocabulary (fields actedUpon or consulted), and a resource type of SingleRecord or MultiRecord." .
 
 
+###  http://rs.tdwg.org/bdq/ffdq/DataQualityMethod
+:DataQualityMethod rdf:type owl:Class ;
+                   rdfs:subClassOf :SolutionsConcept .
+
+
 ###  http://rs.tdwg.org/bdq/ffdq/DataQualityNeed
 :DataQualityNeed rdf:type owl:Class ;
                  rdfs:subClassOf :NeedConcept .
@@ -419,6 +413,12 @@ The assertion concept consists of a specification (the technical description of 
 :IssueAssertion rdf:type owl:Class ;
                 rdfs:subClassOf :Assertion ;
                 rdfs:comment "The DQ report concept describing a test for the negative case. If a problem was found the result has a status of HAS_PROBLEM otherwise the status is NO_PROBLEM." .
+
+
+###  http://rs.tdwg.org/bdq/ffdq/Measure
+:Measure rdf:type owl:Class ;
+         rdfs:subClassOf :DataQualityNeed ;
+         rdfs:comment "Describes the criteria for measuring an aspect of data quality related to some data quality need.   May be criteria for determining that data are COMPLETE or NOT_COMPLETE, or may be criteria for asserting a numeric measurement.  COMPLETE or NOT_COMPLETE measures are fundamental to data quality control, as set of data are filtered to the subset of data have quality for some need if all records are COMPLETE for all pertenent Measures.  A Measure is the data quality needs concept that paralells a MeasurementMethod at the solutions level, and a MeasurementAssertion at the report level."@en .
 
 
 ###  http://rs.tdwg.org/bdq/ffdq/MeasurementAssertion

@@ -42,7 +42,9 @@ public class AssertionTest {
     private String assertionType;
     private String resourceType;
     private String dimension;
-    private List<String> informationElement;  // will be java class parameters
+    private List<String> informationElement;  // will be java class parameters, treated as ActedUpon
+    private List<String> actedUpon;  // will be java class parameters
+    private List<String> consulted;  // will be java class parameters
     private List<String> testParameters;      // parameters specified in the test to change its behavior.
 
     private Class cls;
@@ -54,7 +56,7 @@ public class AssertionTest {
     }
 
     public AssertionTest(String guid, String label, String version, String description, String criterionLabel, String specification, String assertionType,
-                         String resourceType, String dimension, List<String> informationElement, List<String> testParameters) throws UnsupportedTypeException {
+                         String resourceType, String dimension, List<String> informationElement, List<String> actedUpon, List<String> consulted, List<String> testParameters) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
@@ -66,6 +68,8 @@ public class AssertionTest {
         this.resourceType = resourceType;
         this.dimension = dimension;
         this.informationElement = informationElement;
+        this.actedUpon = actedUpon;
+        this.consulted = consulted;
         this.testParameters = testParameters;
         
 
@@ -215,7 +219,36 @@ public class AssertionTest {
     public void setInformationElement(List<String> informationElement) {
         this.informationElement = informationElement;
     }
+    
+    public List<String> getActedUpon() {
+        return actedUpon;
+    }
 
+    public void setActedUpon(List<String> actedUpon) {
+        this.actedUpon = actedUpon;
+    }    
+    
+    public List<String> getConsulted() {
+        return consulted;
+    }
+
+    public void setConsulted(List<String> consulted) {
+        this.consulted = consulted;
+    }
+
+    /**
+     * Obtain a list of all information elements, acted upon, consulted, and not specified.
+     * 
+     * @return a list of informationElement plus actedUpon plus consulted.
+     */
+    public List<String> getAllInformationElements() { 
+    	ArrayList<String> retval = new ArrayList<String>();
+    	retval.addAll(informationElement);
+    	retval.addAll(actedUpon);
+    	retval.addAll(consulted);
+    	return retval;
+    }
+    
     /**
 	 * @return the testParameters that alter the behavior of the test.
 	 */
@@ -272,6 +305,8 @@ public class AssertionTest {
                 ", resourceType='" + resourceType + '\'' +
                 ", dimension='" + dimension + '\'' +
                 ", informationElement=" + informationElement.toString() +
+                ", actedUpon=" + actedUpon.toString() +
+                ", consulted=" + consulted.toString() +
                 ", testParameters=" + testParameters.toString() + 
                 ", cls=" + cls +
                 ", method=" + method +

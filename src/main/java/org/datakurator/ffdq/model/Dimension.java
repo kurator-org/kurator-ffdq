@@ -84,6 +84,6 @@ public class Dimension {
         else if (value.equalsIgnoreCase(PRECISION.getLabel())) return PRECISION;
         else if (value.equalsIgnoreCase(UNIQUENESS.getLabel())) return UNIQUENESS;
         else if (value.equalsIgnoreCase(RELIABILITY.getLabel())) return RELIABILITY;
-        else throw new UnsupportedOperationException("Unable to find an ffdq:Dimension for value: " + value);
+        else throw new UnsupportedOperationException("Unable to find an ffdq:Dimension for value: [" + value + "]");
     }
 }
