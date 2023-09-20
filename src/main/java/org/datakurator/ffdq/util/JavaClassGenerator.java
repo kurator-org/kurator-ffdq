@@ -215,22 +215,28 @@ public class JavaClassGenerator {
             List<String> ie = test.getInformationElement();
             for (int i = 0; i < ie.size(); i++) {
                 String term = ie.get(i);
-                String param = term.split(":")[1];
-                methodIEParams.put(term, param);
+                if (term!=null && term.contains(":")) { 
+                	String param = term.split(":")[1];
+                	methodIEParams.put(term, param);
+                }
             }
             Map<String, String> methodAUParams = new HashMap<>();
             List<String> actedUpon = test.getActedUpon();
             for (int i = 0; i < actedUpon.size(); i++) {
                 String term = actedUpon.get(i);
-                String param = term.split(":")[1];
-                methodAUParams.put(term, param);
+                if (term!=null && term.contains(":")) { 
+                	String param = term.split(":")[1];
+                	methodAUParams.put(term, param);
+                }
             }  
             Map<String, String> methodCParams = new HashMap<>();
             List<String> consulted = test.getConsulted();
             for (int i = 0; i < consulted.size(); i++) {
                 String term = consulted.get(i);
-                String param = term.split(":")[1];
-                methodCParams.put(term, param);
+                if (term!=null && term.contains(":")) { 
+                	String param = term.split(":")[1];
+                	methodCParams.put(term, param);
+                }
             }              
            
 
@@ -259,11 +265,11 @@ public class JavaClassGenerator {
                 outputCodeSB.append(indent).append("* @return ").append(retTypeJavaDoc).append(" to return\n");
             }
             outputCodeSB.append(indent).append("*/\n");
-            outputCodeSB.append(indent).append("    ").append(descriptorAnnotation).append("\n");
-            outputCodeSB.append(indent).append("    @Provides(\"").append(test.getGuid()).append("\")\n");
-            outputCodeSB.append(indent).append("    @ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
-            outputCodeSB.append(indent).append("    @Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
-            outputCodeSB.append(indent).append("    public ").append(retType).append(" ").append(methodName).append("(\n");
+            outputCodeSB.append(indent).append("").append(descriptorAnnotation).append("\n");
+            outputCodeSB.append(indent).append("@Provides(\"").append(test.getGuid()).append("\")\n");
+            outputCodeSB.append(indent).append("@ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
+            outputCodeSB.append(indent).append("@Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
+            outputCodeSB.append(indent).append("public ").append(retType).append(" ").append(methodName).append("(\n");
 
 
             int cnt = 0;
@@ -295,7 +301,7 @@ public class JavaClassGenerator {
             
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
             
-            outputCodeSB.append(indent).append(") {\n");
+            outputCodeSB.append("\n").append(indent).append(") {\n");
             outputCodeSB.append(indent).append(indent).append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
             outputCodeSB.append(indent).append(indent).append("//TODO:  Implement specification").append("\n");
             // Split the specification into words on whitespace, then print specification in lines with
