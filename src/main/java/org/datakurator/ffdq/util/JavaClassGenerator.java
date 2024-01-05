@@ -273,10 +273,12 @@ public class JavaClassGenerator {
 
 
             int cnt = 0;
+            int auCount = methodAUParams.size();
+            int cCount = methodCParams.size();
             for (String term : methodIEParams.keySet()) {
             	// Untyped InformationElements are annotated with ActedUpon
                 outputCodeSB.append(indent).append(indent).append("@ActedUpon(\"").append(term).append("\") String ").append(methodIEParams.get(term));
-                if (cnt < ie.size() - 1) {
+                if ((cnt < ie.size() - 1) || auCount > 0 || cCount > 0) {
                     outputCodeSB.append(", ");
                 }
                 outputCodeSB.append("\n");
@@ -285,7 +287,7 @@ public class JavaClassGenerator {
             cnt = 0;
             for (String term : methodAUParams.keySet()) {
                 outputCodeSB.append(indent).append(indent).append("@ActedUpon(\"").append(term).append("\") String ").append(methodAUParams.get(term));
-                if (cnt < actedUpon.size() - 1) {
+                if ((cnt < actedUpon.size() - 1) || cCount > 0) {
                     outputCodeSB.append(", ");
                 }
                 outputCodeSB.append("\n");
