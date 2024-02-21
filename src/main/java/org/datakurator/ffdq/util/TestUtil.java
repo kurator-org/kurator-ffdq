@@ -340,7 +340,10 @@ public class TestUtil {
                 String assertionType = record.get(CSV_HEADER_ASSERTION);
                 String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
                 String dimension = record.get(CSV_HEADER_DIMENSION);
-                String informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
+                String informationElement = "";
+                if (record.isMapped(CSV_HEADER_INFO_ELEMENT)) { 
+                	informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
+                }
                 String actedUpon = record.get(CSV_HEADER_INFO_ELEMENT_ACTEDUPON);
 logger.log(Level.INFO, CSV_HEADER_INFO_ELEMENT_ACTEDUPON);                
 logger.log(Level.INFO, actedUpon);                
