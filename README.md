@@ -84,6 +84,10 @@ To run the utility use the `test-util.sh` shell script with the following requir
 * **in \<arg\>** - Input CSV file containing list of tests
 * **out \<arg\>** - Output file for the rdf representation of the tests
 
+Optionally, UseCase-relationships can be included and loaded from a file:
+
+* **useCaseFile \<arg\>** - Input CSV file containing one UseCase per line, with a pipe delimited list of test labels for that use case.
+
 The default format is turtle but this can be changed via the following option:
 
 * **format \<arg\>** - Output format (RDFXML, TURTLE, JSON-LD)

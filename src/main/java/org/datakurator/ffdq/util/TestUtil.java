@@ -2,13 +2,21 @@
 package org.datakurator.ffdq.util;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 import org.datakurator.ffdq.model.context.ContextualizedIssue;
+import org.datakurator.ffdq.model.needs.AmendmentPolicy;
+import org.datakurator.ffdq.model.needs.MeasurementPolicy;
+import org.datakurator.ffdq.model.needs.ProblemPolicy;
+import org.datakurator.ffdq.model.needs.UseCase;
+import org.datakurator.ffdq.model.needs.ValidationPolicy;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.Implementation;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
@@ -25,7 +33,10 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,7 +85,9 @@ public class TestUtil {
         options.addRequiredOption("config", null, true, "Properties file defining the mechanism to use");
         options.addRequiredOption("in", null, true, "Input CSV file containing list of tests");
         options.addRequiredOption("out", null, true, "Output file for the rdf representation of the tests");
-
+        
+        options.addOption("useCaseFile", null, true, "Input file containing UseCase-Test relationships");
+        
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
 
         options.addOption("srcDir", null, true, "The Java sources root directory (e.g. src/main/java)");
@@ -96,7 +109,13 @@ public class TestUtil {
 
             // Default output format is turtle
             RDFFormat format = RDFFormat.TURTLE;
-
+            
+            // allow linking to UseCases
+            boolean includeUseCases = false;
+            String useCaseFilename = null;
+            if (cmd.hasOption("useCaseFile")) {
+            	useCaseFilename = cmd.getOptionValue("useCaseFile");
+            }
             if (cmd.hasOption("format")) {
                 String value = cmd.getOptionValue("format");
 
@@ -123,6 +142,43 @@ public class TestUtil {
 
             String packageName = props.getProperty("ffdq.mechanism.javaPackage");
             String className = props.getProperty("ffdq.mechanism.javaClass");
+
+            MultiValuedMap<String, String> useCaseTestMap = new HashSetValuedHashMap<>();
+            Map<String,UseCase> useCaseMap = new HashMap<String,UseCase>();
+            if (useCaseFilename != null && useCaseFilename.length()>0) {
+            	logger.info(useCaseFilename);
+            	File useCaseFile = new File(useCaseFilename);
+            	logger.info(Boolean.toString(useCaseFile.canRead()));
+            	if (useCaseFile.canRead()) { 
+            		try { 
+            			FileReader reader = new FileReader(useCaseFile);
+            			CSVParser csvParser = new CSVParser(reader,CSVFormat.DEFAULT.withFirstRecordAsHeader());
+            			List<CSVRecord> useCaseList = csvParser.getRecords();
+            			Iterator<CSVRecord> i = useCaseList.iterator();
+            			while (i.hasNext()) { 
+            				CSVRecord useCaseRecord = i.next();
+            				String useCaseLabel = useCaseRecord.get("UseCase").trim();
+            				if (!useCaseMap.containsKey(useCaseLabel)) { 
+            					UseCase useCaseInstance = new UseCase();
+            					useCaseInstance.setLabel(useCaseLabel);
+            					useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdq/terms/"));
+            					useCaseMap.put(useCaseLabel, useCaseInstance);
+            				}
+            				String includedTests = useCaseRecord.get("LabelsOfTestsIncluded");
+            				String[] bits = includedTests.split("[|]");
+            				for (String bit: bits) {
+            					String testLabel = bit.trim();
+            					if (testLabel.length()>0) {
+            						useCaseTestMap.put(testLabel, useCaseLabel);
+            					}
+            				}
+            			}
+            			includeUseCases = true;
+            		} catch (IOException e) { 
+            			logger.warning(e.getMessage());
+            		}
+            	}
+            }
 
             // Populate an ffdq model with metadata for each test from the csv
             FFDQModel model = new FFDQModel();
@@ -179,6 +235,18 @@ public class TestUtil {
                         cd.setComment(test.getDescription());
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
+                        if (includeUseCases) {
+                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
+                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
+                        		while (iuc.hasNext()) { 
+                        			String useCaseName = iuc.next();
+                        			MeasurementPolicy pol = new MeasurementPolicy();
+                        			pol.setDimensionInContext(cd);
+                        			pol.setUseCase(useCaseMap.get(useCaseName));
+                        			model.save(pol);
+                        		}
+                        	}
+                        }
                         model.save(measurementMethod);
                         break;
 
@@ -190,6 +258,18 @@ public class TestUtil {
                         cc.setComment(test.getDescription());
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
+                        if (includeUseCases) {
+                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
+                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
+                        		while (iuc.hasNext()) { 
+                        			String useCaseName = iuc.next();
+                        			ValidationPolicy vp = new ValidationPolicy();
+                        			vp.setCriterionInContext(cc);
+                        			vp.setUseCase(useCaseMap.get(useCaseName));
+                        			model.save(vp);
+                        		}
+                        	}
+                        }
                         model.save(validationMethod);
                         break;
 
@@ -201,6 +281,18 @@ public class TestUtil {
                         ce.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
+                        if (includeUseCases) {
+                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
+                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
+                        		while (iuc.hasNext()) { 
+                        			String useCaseName = iuc.next();
+                        			AmendmentPolicy pol = new AmendmentPolicy();
+                        			pol.setEnhancementInContext(ce);
+                        			pol.setUseCase(useCaseMap.get(useCaseName));
+                        			model.save(pol);
+                        		}
+                        	}
+                        }
                         model.save(amendmentMethod);
                         break;
                     case "ISSUE":
@@ -211,6 +303,18 @@ public class TestUtil {
                         ci.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
                         ProblemMethod problemMethod = new ProblemMethod(specification, ci);
+                        if (includeUseCases) {
+                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
+                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
+                        		while (iuc.hasNext()) { 
+                        			String useCaseName = iuc.next();
+                        			ProblemPolicy pol = new ProblemPolicy();
+                        			pol.setIssueInContext(ci);
+                        			pol.setUseCase(useCaseMap.get(useCaseName));
+                        			model.save(pol);
+                        		}
+                        	}
+                        }
                         model.save(problemMethod);
                         break;
                 }
@@ -354,7 +458,7 @@ logger.log(Level.INFO, actedUpon);
                 
                 AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, assertionType, resourceType,
                         dimension, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters));
-
+                
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.

@@ -30,6 +30,7 @@ import java.util.UUID;
 @RDFBean("ffdq:UseCase")
 public class UseCase {
     private UUID uuid;
+    private String subject;
     private String label;
     private String description;
 
@@ -37,7 +38,12 @@ public class UseCase {
         this.uuid = UUID.randomUUID();
     }
 
-    @RDFSubject()
+    public UseCase(String subject, String label) {
+        this.uuid = UUID.randomUUID();
+        this.subject = subject;
+        this.label = label;
+    }
+    
     public String getId() {
         return "urn:uuid:" + uuid.toString();
     }
@@ -63,4 +69,19 @@ public class UseCase {
     public void setDescription(String description) {
         this.description = description;
     }
+
+	/**
+	 * @return the subject
+	 */
+    @RDFSubject()
+	public String getSubject() {
+		return subject;
+	}
+
+	/**
+	 * @param subject the subject to set
+	 */
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
 }
