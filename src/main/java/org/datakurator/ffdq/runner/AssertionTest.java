@@ -46,6 +46,7 @@ public class AssertionTest {
     private List<String> actedUpon;  // will be java class parameters
     private List<String> consulted;  // will be java class parameters
     private List<String> testParameters;      // parameters specified in the test to change its behavior.
+    private List<String> useCases; // labels for UseCases related to test.
 
     private Class cls;
     private Method method;
@@ -56,7 +57,7 @@ public class AssertionTest {
     }
 
     public AssertionTest(String guid, String label, String version, String description, String criterionLabel, String specification, String assertionType,
-                         String resourceType, String dimension, List<String> informationElement, List<String> actedUpon, List<String> consulted, List<String> testParameters) throws UnsupportedTypeException {
+                         String resourceType, String dimension, List<String> informationElement, List<String> actedUpon, List<String> consulted, List<String> testParameters, List<String> useCases) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
@@ -71,7 +72,7 @@ public class AssertionTest {
         this.actedUpon = actedUpon;
         this.consulted = consulted;
         this.testParameters = testParameters;
-        
+        this.setUseCases(useCases);
 
         // Validate
         if (!Arrays.asList(SINGLE_RECORD, MULTI_RECORD).contains(resourceType.toUpperCase())) {
@@ -308,9 +309,24 @@ public class AssertionTest {
                 ", actedUpon=" + actedUpon.toString() +
                 ", consulted=" + consulted.toString() +
                 ", testParameters=" + testParameters.toString() + 
+                ", useCases=" + useCases.toString() + 
                 ", cls=" + cls +
                 ", method=" + method +
                 ", parameters=" + parameters +
                 '}';
     }
+
+	/**
+	 * @return the useCases related to this test.
+	 */
+	public List<String> getUseCases() {
+		return useCases;
+	}
+
+	/**
+	 * @param useCases the useCases to set
+	 */
+	public void setUseCases(List<String> useCases) {
+		this.useCases = useCases;
+	}
 }

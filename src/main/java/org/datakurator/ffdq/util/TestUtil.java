@@ -56,6 +56,7 @@ public class TestUtil {
     private final static String CSV_HEADER_INFO_ELEMENT_ACTEDUPON;
     private final static String CSV_HEADER_INFO_ELEMENT_CONSULTED;
     private final static String CSV_HEADER_TEST_PARMETERS;
+    private final static String CSV_HEADER_USECASES;
 
     static {
         Properties properties = new Properties();
@@ -74,6 +75,7 @@ public class TestUtil {
             CSV_HEADER_INFO_ELEMENT_ACTEDUPON = properties.getProperty("csv.header.actedUpon");
             CSV_HEADER_INFO_ELEMENT_CONSULTED = properties.getProperty("csv.header.consulted");
             CSV_HEADER_TEST_PARMETERS = properties.getProperty("csv.header.testParameters");
+            CSV_HEADER_USECASES = properties.getProperty("csv.header.useCases");
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -86,7 +88,7 @@ public class TestUtil {
         options.addRequiredOption("in", null, true, "Input CSV file containing list of tests");
         options.addRequiredOption("out", null, true, "Output file for the rdf representation of the tests");
         
-        options.addOption("useCaseFile", null, true, "Input file containing UseCase-Test relationships");
+        options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships, if not specfied, UseCases column in InputFile will be used, if specified, will override InputFile.");
         
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
 
@@ -111,7 +113,7 @@ public class TestUtil {
             RDFFormat format = RDFFormat.TURTLE;
             
             // allow linking to UseCases
-            boolean includeUseCases = false;
+            boolean includeUseCasesFromFile = false;
             String useCaseFilename = null;
             if (cmd.hasOption("useCaseFile")) {
             	useCaseFilename = cmd.getOptionValue("useCaseFile");
@@ -173,7 +175,7 @@ public class TestUtil {
             					}
             				}
             			}
-            			includeUseCases = true;
+            			includeUseCasesFromFile = true;
             		} catch (IOException e) { 
             			logger.warning(e.getMessage());
             		}
@@ -218,12 +220,30 @@ public class TestUtil {
                 		consulted.addTerm(term);
                 	}
                 }
-                
 
                 // Add the specification to an implementation for the current mechanism
                 Implementation implementation = new Implementation(specification, Collections.singletonList(mechanism));
                 model.save(implementation);
 
+                // Load usecases from selected source (input csv for tests, or specified usecase-test file.
+                Iterator<String> iuc = null;
+                if (includeUseCasesFromFile) {
+                	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
+                		iuc = useCaseTestMap.get(test.getLabel()).iterator();
+                	}
+                } else { 
+                	iuc = test.getUseCases().iterator();
+                	while (iuc.hasNext()) { 
+                		String useCaseLabel = iuc.next();	
+                		if (!useCaseMap.containsKey(useCaseLabel)) { 
+                			UseCase useCaseInstance = new UseCase();
+                			useCaseInstance.setLabel(useCaseLabel);
+                			useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdq/terms/"));
+                			useCaseMap.put(useCaseLabel, useCaseInstance);
+                		}
+                	}
+                	iuc = test.getUseCases().iterator();
+                }
                 // Define measure, validation, and amendment methods
                 switch(test.getAssertionType().toUpperCase()) {
                     case "MEASURE":
@@ -235,16 +255,13 @@ public class TestUtil {
                         cd.setComment(test.getDescription());
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
-                        if (includeUseCases) {
-                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
-                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
-                        		while (iuc.hasNext()) { 
-                        			String useCaseName = iuc.next();
-                        			MeasurementPolicy pol = new MeasurementPolicy();
-                        			pol.setDimensionInContext(cd);
-                        			pol.setUseCase(useCaseMap.get(useCaseName));
-                        			model.save(pol);
-                        		}
+                        if (iuc!=null) { 
+                        	while (iuc.hasNext()) { 
+                        		String useCaseName = iuc.next();
+                        		MeasurementPolicy pol = new MeasurementPolicy();
+                        		pol.setDimensionInContext(cd);
+                        		pol.setUseCase(useCaseMap.get(useCaseName));
+                        		model.save(pol);
                         	}
                         }
                         model.save(measurementMethod);
@@ -258,16 +275,13 @@ public class TestUtil {
                         cc.setComment(test.getDescription());
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
-                        if (includeUseCases) {
-                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
-                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
-                        		while (iuc.hasNext()) { 
-                        			String useCaseName = iuc.next();
-                        			ValidationPolicy vp = new ValidationPolicy();
-                        			vp.setCriterionInContext(cc);
-                        			vp.setUseCase(useCaseMap.get(useCaseName));
-                        			model.save(vp);
-                        		}
+                        if (iuc!=null) { 
+                        	while (iuc.hasNext()) { 
+                        		String useCaseName = iuc.next();
+                        		ValidationPolicy vp = new ValidationPolicy();
+                        		vp.setCriterionInContext(cc);
+                        		vp.setUseCase(useCaseMap.get(useCaseName));
+                        		model.save(vp);
                         	}
                         }
                         model.save(validationMethod);
@@ -281,17 +295,14 @@ public class TestUtil {
                         ce.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
-                        if (includeUseCases) {
-                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
-                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
-                        		while (iuc.hasNext()) { 
-                        			String useCaseName = iuc.next();
-                        			AmendmentPolicy pol = new AmendmentPolicy();
-                        			pol.setEnhancementInContext(ce);
-                        			pol.setUseCase(useCaseMap.get(useCaseName));
-                        			model.save(pol);
-                        		}
-                        	}
+                        if (iuc!=null) { 
+                       		while (iuc.hasNext()) { 
+                       			String useCaseName = iuc.next();
+                       			AmendmentPolicy pol = new AmendmentPolicy();
+                       			pol.setEnhancementInContext(ce);
+                       			pol.setUseCase(useCaseMap.get(useCaseName));
+                       			model.save(pol);
+                       		}
                         }
                         model.save(amendmentMethod);
                         break;
@@ -303,17 +314,14 @@ public class TestUtil {
                         ci.setComment(test.getDescription());
                         // Define an amendment method, a specification tied to a criterion in context
                         ProblemMethod problemMethod = new ProblemMethod(specification, ci);
-                        if (includeUseCases) {
-                        	if (useCaseTestMap.get(test.getLabel()).size()>0) { 
-                        		Iterator<String> iuc = useCaseTestMap.get(test.getLabel()).iterator();
-                        		while (iuc.hasNext()) { 
-                        			String useCaseName = iuc.next();
-                        			ProblemPolicy pol = new ProblemPolicy();
-                        			pol.setIssueInContext(ci);
-                        			pol.setUseCase(useCaseMap.get(useCaseName));
-                        			model.save(pol);
-                        		}
-                        	}
+                        if (iuc!=null) { 
+                       		while (iuc.hasNext()) { 
+                       			String useCaseName = iuc.next();
+                       			ProblemPolicy pol = new ProblemPolicy();
+                       			pol.setIssueInContext(ci);
+                       			pol.setUseCase(useCaseMap.get(useCaseName));
+                       			model.save(pol);
+                       		}
                         }
                         model.save(problemMethod);
                         break;
@@ -445,6 +453,7 @@ public class TestUtil {
                 String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
                 String dimension = record.get(CSV_HEADER_DIMENSION);
                 String informationElement = "";
+                String useCasesForTestString = record.get(CSV_HEADER_USECASES);
                 if (record.isMapped(CSV_HEADER_INFO_ELEMENT)) { 
                 	informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
                 }
@@ -456,8 +465,13 @@ logger.log(Level.INFO, actedUpon);
                 logger.log(Level.FINE, assertionType);
                 logger.log(Level.FINE, label);
                 
+                List<String> useCaseNames = new ArrayList<String>();
+                if (useCasesForTestString!=null && useCasesForTestString.length()>0) { 
+                	useCaseNames = parseUseCaseString(useCasesForTestString);
+                }
+                
                 AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, assertionType, resourceType,
-                        dimension, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters));
+                        dimension, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames);
                 
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
@@ -532,5 +546,27 @@ logger.log(Level.INFO, actedUpon);
         }
 
         return infoElems;
+    }
+    
+    /**
+     * UseCases are expected to be a comma delmited list.
+     * 
+     * @param str the input string containing use case names
+     * @return input elements as a list of strings, each element containing one use case name.
+     */
+    private static List<String> parseUseCaseString(String str) {
+        List<String> useCases = new ArrayList<>();
+
+        if (str!=null && str.length()>0) { 
+        	if (str.contains(",")) {
+        		for (String ie : str.split(",")) {
+        			useCases.add(ie.trim());
+        		}
+        	} else {
+        		useCases.add(str.trim());
+        	}
+        }
+
+        return useCases;
     }
 }
