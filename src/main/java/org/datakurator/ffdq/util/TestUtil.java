@@ -89,6 +89,7 @@ public class TestUtil {
         options.addRequiredOption("out", null, true, "Output file for the rdf representation of the tests");
         
         options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships, if not specfied, UseCases column in InputFile will be used, if specified, will override InputFile.");
+        options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
         
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
 
@@ -118,6 +119,14 @@ public class TestUtil {
             if (cmd.hasOption("useCaseFile")) {
             	useCaseFilename = cmd.getOptionValue("useCaseFile");
             }
+            
+            boolean guidsProvided = false;
+            String additionalGuidFilename = null;
+            if (cmd.hasOption("guidFile")) { 
+            	additionalGuidFilename = cmd.getOptionValue("guidFile");
+            	guidsProvided = true;
+            }
+            
             if (cmd.hasOption("format")) {
                 String value = cmd.getOptionValue("format");
 
@@ -186,6 +195,10 @@ public class TestUtil {
             FFDQModel model = new FFDQModel();
 
             List<AssertionTest> tests = parseCSV(csvIn);
+            
+            if (guidsProvided) { 
+            	tests = addAdditionalGuidsFromFile(additionalGuidFilename, tests);
+            }
 
             // Define a mechanism for the tests
             Mechanism mechanism = new Mechanism(mechanismGuid, mechanismName);
@@ -251,16 +264,25 @@ public class TestUtil {
                         Dimension dimension = Dimension.fromString(test.getDimension());
                         dimension.setLabel(test.getCriterionLabel());
                         ContextualizedDimension cd = new ContextualizedDimension(dimension, informationElement, actedUpon, consulted, resourceType);
+                        if (test.getContextualizedGuid()!=null) { 
+                        	cd.setId(test.getContextualizedGuid());
+                        }
                         cd.setLabel(test.getDescription() + " Measure of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
+                        if (test.getMethodGuid()!=null) { 
+                        	measurementMethod.setId(test.getMethodGuid());
+                        }
                         if (iuc!=null) { 
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
                         		MeasurementPolicy pol = new MeasurementPolicy();
                         		pol.setDimensionInContext(cd);
                         		pol.setUseCase(useCaseMap.get(useCaseName));
+                        		if (test.getPolicyGuid()!=null) { 
+                        			pol.setId(test.getPolicyGuid());
+                        		}
                         		model.save(pol);
                         	}
                         }
@@ -273,15 +295,24 @@ public class TestUtil {
                         ContextualizedCriterion cc = new ContextualizedCriterion(criterion, informationElement, actedUpon, consulted, resourceType);
                         cc.setLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
                         cc.setComment(test.getDescription());
+                        if (test.getContextualizedGuid()!=null) { 
+                        	cc.setId(test.getContextualizedGuid());
+                        }
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
+                        if (test.getMethodGuid()!=null) { 
+                        	validationMethod.setId(test.getMethodGuid());
+                        }
                         if (iuc!=null) { 
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
                         		ValidationPolicy vp = new ValidationPolicy();
                         		vp.setCriterionInContext(cc);
                         		vp.setUseCase(useCaseMap.get(useCaseName));
-                        		model.save(vp);
+                        		if (test.getPolicyGuid()!=null) { 
+                        			vp.setId(test.getPolicyGuid());
+                        		}
+                         		model.save(vp);
                         	}
                         }
                         model.save(validationMethod);
@@ -293,14 +324,23 @@ public class TestUtil {
                         ContextualizedEnhancement ce = new ContextualizedEnhancement(enhancement, informationElement, actedUpon, consulted, resourceType);
                         ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
                         ce.setComment(test.getDescription());
+                        if (test.getContextualizedGuid()!=null) { 
+                        	ce.setId(test.getContextualizedGuid());
+                        }
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
+                        if (test.getMethodGuid()!=null) {
+                        	amendmentMethod.setId(test.getMethodGuid());
+                        }
                         if (iuc!=null) { 
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
                        			AmendmentPolicy pol = new AmendmentPolicy();
                        			pol.setEnhancementInContext(ce);
                        			pol.setUseCase(useCaseMap.get(useCaseName));
+                       			if (test.getPolicyGuid()!=null) { 
+                       				pol.setId(test.getPolicyGuid());
+                       			}
                        			model.save(pol);
                        		}
                         }
@@ -312,14 +352,23 @@ public class TestUtil {
                         ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, actedUpon, consulted, resourceType);
                         ci.setLabel(test.getDescription() + " Issue for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
+                        if (test.getContextualizedGuid()!=null) { 
+                        	ci.setId(test.getContextualizedGuid());
+                        }
                         // Define an amendment method, a specification tied to a criterion in context
                         ProblemMethod problemMethod = new ProblemMethod(specification, ci);
+                        if (test.getMethodGuid()!=null) { 
+                        	problemMethod.setId(test.getMethodGuid());
+                        }
                         if (iuc!=null) { 
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
                        			ProblemPolicy pol = new ProblemPolicy();
                        			pol.setIssueInContext(ci);
                        			pol.setUseCase(useCaseMap.get(useCaseName));
+                       			if (test.getPolicyGuid()!=null) { 
+                       				pol.setId(test.getPolicyGuid());
+                       			}
                        			model.save(pol);
                        		}
                         }
@@ -423,7 +472,59 @@ public class TestUtil {
 
     }
 
-    private static List<AssertionTest> parseCSV(String filename) throws IOException {
+    /**
+     * Given a file containing additional guids and a list of tests, add the relevant guids to each test.
+     * 
+     * @param additionalGuidFilename file containing guids for method, contexturalized, and policy concepts for each test.
+     * @param tests a list of AssertionTests to which to add additional guids
+     * @return the provided list of tests, with guids added.
+     */
+    private static List<AssertionTest> addAdditionalGuidsFromFile(String additionalGuidFilename, List<AssertionTest> tests) {
+
+        Map<String,String> methodMap = new HashMap<String,String>();
+        Map<String,String> contextualizedMap = new HashMap<String,String>();
+        Map<String,String> policyMap = new HashMap<String,String>();
+        if (additionalGuidFilename != null && additionalGuidFilename.length()>0) {
+        	logger.info(additionalGuidFilename);
+        	File guidFile = new File(additionalGuidFilename);
+        	logger.info(Boolean.toString(guidFile.canRead()));
+        	if (guidFile.canRead()) { 
+        		try { 
+        			FileReader reader = new FileReader(guidFile);
+        			CSVParser csvParser = new CSVParser(reader,CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        			List<CSVRecord> guidList = csvParser.getRecords();
+        			Iterator<CSVRecord> i = guidList.iterator();
+        			while (i.hasNext()) { 
+        				CSVRecord guidRecord = i.next();
+        				String testGuid = guidRecord.get("GUID").trim();
+        				String method = guidRecord.get("Method").trim();
+        				methodMap.put(testGuid, method);
+        				String contextualized = guidRecord.get("Contextualized").trim();
+        				contextualizedMap.put(testGuid, contextualized);
+        				String poliicy = guidRecord.get("Policy").trim();
+        				policyMap.put(testGuid, poliicy);
+        			}
+        			for (AssertionTest test : tests) {
+        				if (methodMap.containsKey(test.getGuid())) { 
+        					test.setMethodGuid(methodMap.get(test.getGuid()));
+        				}
+        				if (contextualizedMap.containsKey(test.getGuid())) { 
+        					test.setContextualizedGuid(contextualizedMap.get(test.getGuid()));
+        				}
+        				if (policyMap.containsKey(test.getGuid())) { 
+        					test.setPolicyGuid(policyMap.get(test.getGuid()));
+        				}
+        			}
+        		} catch (IOException e) { 
+        			logger.warning(e.getMessage());
+        		}
+        	}
+        }
+    	
+    	return tests;
+    }
+
+	private static List<AssertionTest> parseCSV(String filename) throws IOException {
         File csvFile = new File(filename);
 
         if (!csvFile.exists()) {

@@ -48,6 +48,15 @@ public class AssertionTest {
     private List<String> testParameters;      // parameters specified in the test to change its behavior.
     private List<String> useCases; // labels for UseCases related to test.
 
+    // additional strings for classes holding more of the framework structure of the test
+    // can be loaded from a file for consistent generation of RDF.
+    // guid for Amendment/Measurement/Problem/Validation Method
+    private String methodGuid;
+    // guid for Contexturalized Enhancement/Dimension/Issue/Criterion
+    private String contextualizedGuid;
+    // guid Amendment/Measurement/Problem/Validation Policy, 
+    private String policyGuid;
+    
     private Class cls;
     private Method method;
     private List<TestParam> parameters;
@@ -328,5 +337,47 @@ public class AssertionTest {
 	 */
 	public void setUseCases(List<String> useCases) {
 		this.useCases = useCases;
+	}
+
+	/**
+	 * @return the methodGuid
+	 */
+	public String getMethodGuid() {
+		return methodGuid;
+	}
+
+	/**
+	 * @param methodGuid the methodGuid to set
+	 */
+	public void setMethodGuid(String methodGuid) {
+		this.methodGuid = methodGuid;
+	}
+
+	/**
+	 * @return the contextualizedGuid
+	 */
+	public String getContextualizedGuid() {
+		return contextualizedGuid;
+	}
+
+	/**
+	 * @param contextualizedGuid the contextualizedGuid to set
+	 */
+	public void setContextualizedGuid(String contextualizedGuid) {
+		this.contextualizedGuid = contextualizedGuid;
+	}
+
+	/**
+	 * @return the policyGuid
+	 */
+	public String getPolicyGuid() {
+		return policyGuid;
+	}
+
+	/**
+	 * @param policyGuid the policyGuid to set
+	 */
+	public void setPolicyGuid(String policyGuid) {
+		this.policyGuid = policyGuid;
 	}
 }
