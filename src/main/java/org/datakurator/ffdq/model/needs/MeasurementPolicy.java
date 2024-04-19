@@ -25,7 +25,8 @@ import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:MeasurementPolicy")
 public class MeasurementPolicy {
@@ -67,4 +68,16 @@ public class MeasurementPolicy {
     public void setDimensionInContext(ContextualizedDimension cd) {
         this.cd = cd;
     }
+    
+	/**
+	 * @return a generated label
+	 */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		StringBuilder labelBuilder = new StringBuilder();
+		labelBuilder.append("MeasurementPolicy: ");
+		labelBuilder.append(cd.getLabel()).append(" in UseCase ");
+		labelBuilder.append(useCase.getLabel());
+		return labelBuilder.toString();
+	}
 }

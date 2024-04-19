@@ -28,12 +28,15 @@ import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:InformationElement")
 public class InformationElement {
     private String id = "urn:uuid:" + UUID.randomUUID();
     protected List<URI> composedOf = new ArrayList<>();
+    protected String label;
+    
 
     public InformationElement() { }
 
@@ -66,4 +69,19 @@ public class InformationElement {
     public void addTerm(URI uri) {
         composedOf.add(uri);
     }
+
+	/**
+	 * @return the label
+	 */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		return label;
+	}
+
+	/**
+	 * @param label the label to set
+	 */
+	public void setLabel(String label) {
+		this.label = label;
+	}
 }

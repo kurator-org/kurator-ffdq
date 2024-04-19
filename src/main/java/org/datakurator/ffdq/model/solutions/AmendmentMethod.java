@@ -23,7 +23,8 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:AmendmentMethod")
 public class AmendmentMethod extends AssertionMethod {
@@ -44,4 +45,16 @@ public class AmendmentMethod extends AssertionMethod {
     public void setContextualizedEnhancement(ContextualizedEnhancement ce) {
         this.ce = ce;
     }
+    
+	/**
+	 * @return a generated label
+	 */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		StringBuilder labelBuilder = new StringBuilder();
+		labelBuilder.append(this.getClass().getSimpleName()).append(": ");
+		labelBuilder.append(ce.getLabel()).append(" with Specification ");
+		labelBuilder.append(specification.getLabel());
+		return labelBuilder.toString();
+	}
 }

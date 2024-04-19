@@ -25,7 +25,8 @@ import org.datakurator.ffdq.model.context.ContextualizedIssue;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:ProblemPolicy")
 public class ProblemPolicy {
@@ -67,4 +68,16 @@ public class ProblemPolicy {
     public void setIssueInContext(ContextualizedIssue ci) {
         this.ci = ci;
     }
+    
+	/**
+	 * @return a generated label
+	 */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		StringBuilder labelBuilder = new StringBuilder();
+		labelBuilder.append("ProblemPolicy: ");
+		labelBuilder.append(ci.getLabel()).append(" in UseCase ");
+		labelBuilder.append(useCase.getLabel());
+		return labelBuilder.toString();
+	}
 }

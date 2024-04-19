@@ -215,29 +215,53 @@ public class TestUtil {
                 ActedUpon actedUpon = new ActedUpon();
                 Consulted consulted = new Consulted();
 
+               	StringBuilder label = new StringBuilder("Information Element  ");
+               	String separator = "";
                 for (String str : test.getInformationElement()) {
                 	if (str!=null && str.length()>0) { 
                 		URI term = Namespace.resolvePrefixedTerm(str);
                 		informationElement.addTerm(term);
+                		label.append(separator).append(str);
+                		separator = ", ";
                 	}
                 }
+                if (test.getInformationElement().size()>0) { 
+                	informationElement.setLabel(label.toString());
+                }
+               	label = new StringBuilder("Information Element ActedUpon ");
+               	separator = "";
                 for (String str : test.getActedUpon()) {
                 	if (str!=null && str.length()>0) { 
                 		URI term = Namespace.resolvePrefixedTerm(str);
                 		actedUpon.addTerm(term);
+                		label.append(separator).append(str);
+                		separator = ", ";
                 	}
                 }
+                if (test.getActedUpon().size()>0) { 
+                	actedUpon.setLabel(label.toString());
+                }
+               	label = new StringBuilder("Information Element Consulted ");
+               	separator = "";
                 for (String str : test.getConsulted()) {
                 	if (str!=null && str.length()>0) { 
                 		URI term = Namespace.resolvePrefixedTerm(str);
                 		consulted.addTerm(term);
+                		label.append(separator).append(str);
+                		separator = ", ";
                 	}
+                }
+                if (test.getConsulted().size()>0) { 
+                	consulted.setLabel(label.toString());
                 }
 
                 // Add the specification to an implementation for the current mechanism
                 Implementation implementation = new Implementation(specification, Collections.singletonList(mechanism));
-                model.save(implementation);
-
+                // TODO: Provide means to add implementations, cardinality may be wrong, list specification for one mechanism.
+                if (0==1) { 
+                	model.save(implementation);
+                }
+                
                 // Load usecases from selected source (input csv for tests, or specified usecase-test file.
                 Iterator<String> iuc = null;
                 if (includeUseCasesFromFile) {

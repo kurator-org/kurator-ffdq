@@ -26,7 +26,8 @@ import org.datakurator.ffdq.model.context.ContextualizedIssue;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:ProblemMethod")
 public class ProblemMethod {
@@ -72,4 +73,16 @@ public class ProblemMethod {
     public void setContextualizedIssue(ContextualizedIssue ci) {
         this.ci = ci;
     }
+    
+	/**
+	 * @return a generated label
+	 */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		StringBuilder labelBuilder = new StringBuilder();
+		labelBuilder.append(this.getClass().getSimpleName()).append(": ");
+		labelBuilder.append(ci.getLabel()).append(" with Specification ");
+		labelBuilder.append(specification.getLabel());
+		return labelBuilder.toString();
+	}
 }

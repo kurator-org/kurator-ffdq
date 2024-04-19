@@ -23,7 +23,8 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("ffdq:MeasurementMethod")
 public class MeasurementMethod extends AssertionMethod {
@@ -44,4 +45,16 @@ public class MeasurementMethod extends AssertionMethod {
     public void setContextualizedDimension(ContextualizedDimension cd) {
         this.cd = cd;
     }
+    
+	/**
+	 * @return a generated label
+	 */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		StringBuilder labelBuilder = new StringBuilder();
+		labelBuilder.append(this.getClass().getSimpleName()).append(": ");
+		labelBuilder.append(cd.getLabel()).append(" with Specification ");
+		labelBuilder.append(specification.getLabel());
+		return labelBuilder.toString();
+	}
 }
