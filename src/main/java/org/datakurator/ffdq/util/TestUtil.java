@@ -285,8 +285,7 @@ public class TestUtil {
                 switch(test.getAssertionType().toUpperCase()) {
                     case "MEASURE":
                         // Define a dimension in the context of resource type and info elements
-                        Dimension dimension = Dimension.fromString(test.getDimension());
-                        dimension.setLabel(test.getCriterionLabel());
+                        Dimension dimension = new Dimension(test.getCriterionLabel());
                         ContextualizedDimension cd = new ContextualizedDimension(dimension, informationElement, actedUpon, consulted, resourceType);
                         if (test.getContextualizedGuid()!=null) { 
                         	cd.setId(test.getContextualizedGuid());
