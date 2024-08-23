@@ -25,9 +25,9 @@ import org.datakurator.ffdq.model.Specification;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
 })
-@RDFBean("ffdq:AssertionMethod")
+@RDFBean("bdqffdq:AssertionMethod")
 public class AssertionMethod {
     protected String id = "urn:uuid:" + UUID.randomUUID();
     protected Specification specification;
@@ -48,7 +48,7 @@ public class AssertionMethod {
     	}
     }
 
-    @RDF("ffdq:hasSpecification")
+    @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
         return specification;
     }

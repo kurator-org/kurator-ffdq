@@ -1,6 +1,6 @@
 # Given a use case find the mechanisms used
 
-PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/>
+PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -11,25 +11,25 @@ WHERE {
     # Find criterion in context from the validation
     # policy for a given use case
 
-    ?policy a ffdq:ValidationPolicy .
-    ?policy ffdq:coversUseCase ?uc .
-    ?policy ffdq:criterionInContext ?cc .
+    ?policy a bdqffdq:ValidationPolicy .
+    ?policy bdqffdq:coversUseCase ?uc .
+    ?policy bdqffdq:criterionInContext ?cc .
     ?uc rdfs:label ?useCase .
 
     # Find the specification from the validation method
     # referencing the criterion in context
 
-    ?vm a ffdq:ValidationMethod .
-    ?vm ffdq:hasContextualizedCriterion ?cc .
-    ?vm ffdq:hasSpecification ?s .
+    ?vm a bdqffdq:ValidationMethod .
+    ?vm bdqffdq:hasContextualizedCriterion ?cc .
+    ?vm bdqffdq:hasSpecification ?s .
     ?s rdfs:label ?specification .
 
     # Find the mechanism from the implementation
     # for the specification
 
-    ?i a ffdq:Implementation .
-    ?i ffdq:hasSpecification ?s .
-    ?i ffdq:implementedBy ?m .
+    ?i a bdqffdq:Implementation .
+    ?i bdqffdq:hasSpecification ?s .
+    ?i bdqffdq:implementedBy ?m .
     ?m rdfs:label ?mechanism .
 
     # Filter by a specific use case

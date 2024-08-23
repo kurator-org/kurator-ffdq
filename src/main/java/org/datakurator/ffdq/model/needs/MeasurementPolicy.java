@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:MeasurementPolicy")
+@RDFBean("bdqffdq:MeasurementPolicy")
 public class MeasurementPolicy {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -51,7 +51,7 @@ public class MeasurementPolicy {
     	}
     }
 
-    @RDF("ffdq:hasUseCase")
+    @RDF("bdqffdq:hasUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -60,7 +60,7 @@ public class MeasurementPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("ffdq:dimensionInContext")
+    @RDF("bdqffdq:dimensionInContext")
     public ContextualizedDimension getDimensionInContext() {
         return cd;
     }

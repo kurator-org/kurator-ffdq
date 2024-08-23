@@ -29,10 +29,10 @@ import org.datakurator.ffdq.model.ResourceType;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+		"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:ContextualizedEnhancement")
+@RDFBean("bdqffdq:ContextualizedEnhancement")
 public class ContextualizedEnhancement {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -91,7 +91,7 @@ public class ContextualizedEnhancement {
     	}
     }
 
-    @RDF("ffdq:hasInformationElement")
+    @RDF("bdqffdq:hasInformationElement")
     public InformationElement getInformationElements() {
         return ie;
     }
@@ -100,7 +100,7 @@ public class ContextualizedEnhancement {
         this.ie = ie;
     }
 
-    @RDF("ffdq:hasActedUponInformationElement")
+    @RDF("bdqffdq:hasActedUponInformationElement")
     public InformationElement getActedUpon() {
         return actedUpon;
     }
@@ -109,7 +109,7 @@ public class ContextualizedEnhancement {
         this.actedUpon = (ActedUpon) ie;
     }   
     
-    @RDF("ffdq:hasConsultedInformationElement")
+    @RDF("bdqffdq:hasConsultedInformationElement")
     public InformationElement getConsulted() {
         return consulted;
     }
@@ -118,7 +118,7 @@ public class ContextualizedEnhancement {
         this.consulted = (Consulted) ie;
     }    
     
-    @RDF("ffdq:hasResourceType")
+    @RDF("bdqffdq:hasResourceType")
     public ResourceType getResourceType() {
         return rt;
     }
@@ -127,7 +127,7 @@ public class ContextualizedEnhancement {
         this.rt = rt;
     }
 
-    @RDF("ffdq:hasEnhancement")
+    @RDF("bdqffdq:hasEnhancement")
     public Enhancement getEnhancement() {
         return enhancement;
     }

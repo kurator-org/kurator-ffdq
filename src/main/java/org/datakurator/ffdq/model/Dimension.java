@@ -24,12 +24,12 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
-        "bdq = http://rs.tdwg.org/bdq/",
-        "d = http://rs.tdwg.org/bdq/ffdq/dimension/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "bdq = https://rs.tdwg.org/bdq/terms/",
+        "d = https://rs.tdwg.org/bdqdim/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:Dimension")
+@RDFBean("bdqffdq:Dimension")
 public class Dimension {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;

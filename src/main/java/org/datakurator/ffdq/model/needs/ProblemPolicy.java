@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedIssue;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:ProblemPolicy")
+@RDFBean("bdqffdq:ProblemPolicy")
 public class ProblemPolicy {
 	private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -51,7 +51,7 @@ public class ProblemPolicy {
     	}
     }
     
-    @RDF("ffdq:hasUseCase")
+    @RDF("bdqffdq:hasUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -60,7 +60,7 @@ public class ProblemPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("ffdq:issueInContext")
+    @RDF("bdqffdq:issueInContext")
     public ContextualizedIssue getIssueInContext() {
         return ci;
     }

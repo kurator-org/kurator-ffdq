@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
 })
-@RDFBean("ffdq:Implementation")
+@RDFBean("bdqffdq:Implementation")
 public class Implementation {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -54,7 +54,7 @@ public class Implementation {
         this.id = id;
     }
 
-    @RDF("ffdq:hasSpecification")
+    @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
         return specification;
     }
@@ -63,7 +63,7 @@ public class Implementation {
         this.specification = specification;
     }
 
-    @RDF("ffdq:implementedBy")
+    @RDF("bdqffdq:implementedBy")
     public List<Mechanism> getImplementedBy() {
         return implementedBy;
     }

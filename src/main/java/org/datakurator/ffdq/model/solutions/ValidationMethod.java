@@ -23,10 +23,10 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:ValidationMethod")
+@RDFBean("bdqffdq:ValidationMethod")
 public class ValidationMethod extends AssertionMethod {
     private ContextualizedCriterion cc;
 
@@ -37,7 +37,7 @@ public class ValidationMethod extends AssertionMethod {
         this.cc = contextualizedCriterion;
     }
 
-    @RDF("ffdq:criterionInContext")
+    @RDF("bdqffdq:criterionInContext")
     public ContextualizedCriterion getContextualizedCriterion() {
         return cc;
     }

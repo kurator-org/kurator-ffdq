@@ -26,10 +26,10 @@ import org.datakurator.ffdq.model.context.ContextualizedIssue;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:ProblemMethod")
+@RDFBean("bdqffdq:ProblemMethod")
 public class ProblemMethod {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -56,7 +56,7 @@ public class ProblemMethod {
         this.id = id;
     }
 
-    @RDF("ffdq:hasSpecification")
+    @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
         return specification;
     }
@@ -65,7 +65,7 @@ public class ProblemMethod {
         this.specification = specification;
     }
 
-    @RDF("ffdq:issueInContext")
+    @RDF("bdqffdq:issueInContext")
     public ContextualizedIssue getContextualizedIssue() {
         return ci;
     }

@@ -23,10 +23,10 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedDimension;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:MeasurementMethod")
+@RDFBean("bdqffdq:MeasurementMethod")
 public class MeasurementMethod extends AssertionMethod {
     private ContextualizedDimension cd;
 
@@ -37,7 +37,7 @@ public class MeasurementMethod extends AssertionMethod {
         this.cd = contextualizedDimension;
     }
 
-    @RDF("ffdq:dimensionInContext")
+    @RDF("bdqffdq:dimensionInContext")
     public ContextualizedDimension getContextualizedDimension() {
         return cd;
     }

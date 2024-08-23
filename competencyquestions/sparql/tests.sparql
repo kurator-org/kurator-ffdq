@@ -1,7 +1,7 @@
 # Given a use case find the validation result status and valuable
 # information elements
 
-PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/>
+PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -14,24 +14,24 @@ WHERE {
     # Find criterion in context from the validation
     # policy for a given use case
 
-    ?policy a ffdq:ValidationPolicy .
-    ?policy ffdq:coversUseCase ?uc .
-    ?policy ffdq:criterionInContext ?cc .
+    ?policy a bdqffdq:ValidationPolicy .
+    ?policy bdqffdq:coversUseCase ?uc .
+    ?policy bdqffdq:criterionInContext ?cc .
     ?uc rdfs:label ?useCase .
 
     # Find the specification from the validation method
     # referencing the criterion in context
 
-    ?vm a ffdq:ValidationMethod .
-    ?vm ffdq:hasContextualizedCriterion ?cc .
-    ?vm ffdq:hasSpecification ?test .
+    ?vm a bdqffdq:ValidationMethod .
+    ?vm bdqffdq:hasContextualizedCriterion ?cc .
+    ?vm bdqffdq:hasSpecification ?test .
     ?test rdfs:label ?specification .
 
     # Find the validations from the criterion
     # in context and the specification
 
-    ?v a ffdq:Validation .
-    ?v ffdq:criterionInContext ?cc .
+    ?v a bdqffdq:Validation .
+    ?v bdqffdq:criterionInContext ?cc .
     ?v prov:hadPlan ?s .
 
     # Get the record id from the data resource
@@ -42,7 +42,7 @@ WHERE {
     # from the validations
 
     ?validation prov:generated ?r .
-    ?r ffdq:hasStatus ?rs .
+    ?r bdqffdq:hasStatus ?rs .
     ?rs rdfs:label ?status .
     ?r rdfs:comment ?comment .
 

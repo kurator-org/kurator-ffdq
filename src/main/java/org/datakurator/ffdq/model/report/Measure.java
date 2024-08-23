@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedDimension;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("ffdq:Measure")
+@RDFBean("bdqffdq:Measure")
 public class Measure extends Assertion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -44,7 +44,7 @@ public class Measure extends Assertion {
         this.id = id;
     }
 
-    @RDF("ffdq:dimensionInContext")
+    @RDF("bdqffdq:dimensionInContext")
     public ContextualizedDimension getDimension() {
         return dimension;
     }

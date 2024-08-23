@@ -9,7 +9,7 @@
 # "fieldsActedUpon" and "fieldsConsulted" via
 # annotated method parameters
 
-PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/>
+PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -21,30 +21,30 @@ WHERE {
     # Find criterion in context from the validation
     # policy for a given use case
 
-    ?policy a ffdq:ValidationPolicy .
-    ?policy ffdq:coversUseCase ?uc .
-    ?policy ffdq:criterionInContext ?cc .
+    ?policy a bdqffdq:ValidationPolicy .
+    ?policy bdqffdq:coversUseCase ?uc .
+    ?policy bdqffdq:criterionInContext ?cc .
     ?uc rdfs:label ?useCase .
 
     # Find the valuable information element
     # terms from the criterion in context
 
-    ?cc ffdq:hasInformationElement ?vie .
-    ?vie ffdq:composedOf ?term .
+    ?cc bdqffdq:hasInformationElement ?vie .
+    ?vie bdqffdq:composedOf ?term .
 
     # Find the specification from the validation method
     # referencing the criterion in context
 
-    ?vm a ffdq:ValidationMethod .
-    ?vm ffdq:hasContextualizedCriterion ?cc .
-    ?vm ffdq:hasSpecification ?specification .
+    ?vm a bdqffdq:ValidationMethod .
+    ?vm bdqffdq:hasContextualizedCriterion ?cc .
+    ?vm bdqffdq:hasSpecification ?specification .
 
     # Find the mechanism from the implementation of
     # the specification
 
-    ?implementation a ffdq:Implementation .
-    ?implementation ffdq:hasSpecification ?specification .
-    ?implementation ffdq:implementedBy ?mechanism .
+    ?implementation a bdqffdq:Implementation .
+    ?implementation bdqffdq:hasSpecification ?specification .
+    ?implementation bdqffdq:implementedBy ?mechanism .
 
     # Filter by a specific use case
 

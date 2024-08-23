@@ -26,8 +26,9 @@ public class Namespace {
     public static final String DCTERMS = "http://purl.org/dc/terms/";
     public static final String DWCIRI = "http://rs.tdwg.org/dwc/iri/";
     public static final String DC = "http://purl.org/dc/elements/1.1/";
-    public static final String BDQ = "http://rs.tdwg.org/bdq/terms/";   
-    public static final String FFDQ = "http://rs.tdwg.org/bdq/ffdq/";   
+    public static final String BDQ = "https://rs.tdwg.org/bdq/terms/";   // other bdq terms
+    public static final String BDQDIM = "https://rs.tdwg.org/bdqdim/terms/";  // dimensions   
+    public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms";   // tests
 
     public static final String NONE = "http://datakurator.org/none/";
 

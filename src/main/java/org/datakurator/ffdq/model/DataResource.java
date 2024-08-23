@@ -47,7 +47,7 @@ import java.util.*;
 public class DataResource {
     private Vocabulary vocab;
 
-    private ModelBuilder builder = new ModelBuilder().setNamespace("ffdq", "http://rs.tdwg.org/bdq/ffdq/");
+    private ModelBuilder builder = new ModelBuilder().setNamespace("bdqffdq", "https://rs.tdwg.org/bdqffdq/terms/");
     private ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
     private Model model;
@@ -59,7 +59,7 @@ public class DataResource {
 
         // Set an rdf type of ffdq:DataResource
         subject = valueFactory.createIRI(uuid);
-        builder.defaultGraph().add(subject, RDF.TYPE, "ffdq:DataResource");
+        builder.defaultGraph().add(subject, RDF.TYPE, "bdqffdq:DataResource");
 
         this.vocab = vocab;
     }
@@ -97,7 +97,7 @@ public class DataResource {
 
         // Set an rdf type of ffdq:DataResource
         subject = valueFactory.createIRI(uuid);
-        builder.defaultGraph().add(subject, RDF.TYPE, "ffdq:DataResource");
+        builder.defaultGraph().add(subject, RDF.TYPE, "bdqffdq:DataResource");
 
         // Add triples from the key value pairs in the map
         for (String term : record.keySet()) {

@@ -26,11 +26,11 @@ import org.datakurator.ffdq.model.ResultState;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:Result")
+@RDFBean("bdqffdq:Result")
 public class Result {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -49,7 +49,7 @@ public class Result {
         this.id = id;
     }
 
-    @RDF("ffdq:hasAmbiguity")
+    @RDF("bdqffdq:hasAmbiguity")
     public Boolean isAmbiguous() {
         return isAmbiguous;
     }
@@ -58,7 +58,7 @@ public class Result {
         isAmbiguous = ambiguous;
     }
 
-    @RDF("ffdq:hasState")
+    @RDF("bdqffdq:hasState")
     public ResultState getState() {
         return state;
     }
@@ -67,7 +67,7 @@ public class Result {
         this.state = state;
     }
 
-    @RDF("ffdq:hasValue")
+    @RDF("bdqffdq:hasValue")
     public Entity getEntity() {
         return this.value;
     }

@@ -24,10 +24,10 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:Issue")
+@RDFBean("bdqffdq:Issue")
 public class Issue {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;

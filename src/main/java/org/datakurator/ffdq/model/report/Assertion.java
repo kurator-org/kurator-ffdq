@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.Specification;
 import java.net.URI;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("ffdq:Assertion")
+@RDFBean("bdqffdq:Assertion")
 public abstract class Assertion {
     private Specification specification;
     private Mechanism mechanism;

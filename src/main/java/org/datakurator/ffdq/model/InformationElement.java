@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:InformationElement")
+@RDFBean("bdqffdq:InformationElement")
 public class InformationElement {
     private String id = "urn:uuid:" + UUID.randomUUID();
     protected List<URI> composedOf = new ArrayList<>();
@@ -57,7 +57,7 @@ public class InformationElement {
         this.id = id;
     }
 
-    @RDF("ffdq:composedOf")
+    @RDF("bdqffdq:composedOf")
     public List<URI> getComposedOf() {
         return composedOf;
     }

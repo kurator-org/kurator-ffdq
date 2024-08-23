@@ -16,5 +16,6 @@
  */
 package org.datakurator.ffdq.model.report;
 
+@Deprecated
 public class Assessment {
 }

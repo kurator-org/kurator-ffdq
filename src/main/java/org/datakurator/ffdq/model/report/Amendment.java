@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("ffdq:Amendment")
+@RDFBean("bdqffdq:Amendment")
 public class Amendment extends Assertion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -43,7 +43,7 @@ public class Amendment extends Assertion {
         this.id = id;
     }
 
-    @RDF("ffdq:enhancementInContext")
+    @RDF("bdqffdq:enhancementInContext")
     public ContextualizedEnhancement getEnhancement() {
         return enhancement;
     }

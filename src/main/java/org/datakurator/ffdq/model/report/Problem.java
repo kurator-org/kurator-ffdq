@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedIssue;
 import java.util.UUID;
 
 @RDFNamespaces({
-       "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+       "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
        "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("ffdq:Problem")
+@RDFBean("bdqffdq:Problem")
 public class Problem extends Assertion {
    private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -44,7 +44,7 @@ public class Problem extends Assertion {
        this.id = id;
    }
 
-   @RDF("ffdq:hasIssue")
+   @RDF("bdqffdq:hasIssue")
    public ContextualizedIssue getIssueInContext() {
        return issueInContext;
    }

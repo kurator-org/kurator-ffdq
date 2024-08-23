@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("ffdq:Validation")
+@RDFBean("bdqffdq:Validation")
 public class Validation extends Assertion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -44,7 +44,7 @@ public class Validation extends Assertion {
         this.id = id;
     }
 
-    @RDF("ffdq:criterionInContext")
+    @RDF("bdqffdq:criterionInContext")
     public ContextualizedCriterion getCriterion() {
         return criterion;
     }

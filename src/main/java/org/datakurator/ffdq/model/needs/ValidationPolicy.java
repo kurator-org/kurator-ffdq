@@ -25,10 +25,10 @@ import org.datakurator.ffdq.model.context.ContextualizedCriterion;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:ValidationPolicy")
+@RDFBean("bdqffdq:ValidationPolicy")
 public class ValidationPolicy {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -51,7 +51,7 @@ public class ValidationPolicy {
     	}
     }
 
-    @RDF("ffdq:coversUseCase")
+    @RDF("bdqffdq:coversUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -60,7 +60,7 @@ public class ValidationPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("ffdq:criterionInContext")
+    @RDF("bdqffdq:criterionInContext")
     public ContextualizedCriterion getCriterionInContext() {
         return cc;
     }

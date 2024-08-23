@@ -23,10 +23,10 @@ import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:AmendmentMethod")
+@RDFBean("bdqffdq:AmendmentMethod")
 public class AmendmentMethod extends AssertionMethod {
     private ContextualizedEnhancement ce;
 
@@ -37,7 +37,7 @@ public class AmendmentMethod extends AssertionMethod {
         this.ce = contextualizedEnhancement;
     }
 
-    @RDF("ffdq:enhancementInContext")
+    @RDF("bdqffdq:enhancementInContext")
     public ContextualizedEnhancement getContextualizedEnhancement() {
         return ce;
     }

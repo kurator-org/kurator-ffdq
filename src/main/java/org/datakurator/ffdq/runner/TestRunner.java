@@ -83,7 +83,7 @@ public class TestRunner {
                     mechanism.setLabel(mechanismLabel);
                 }
 
-                // Query the FFDQ model for test specifications implemented by the mechanism tied to the DQClass
+                // Query the BDQFFDQ model for test specifications implemented by the mechanism tied to the DQClass
                 Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
 
                 // Process method level annotations and check that test methods in the DQClass are consistent
@@ -164,7 +164,7 @@ public class TestRunner {
         Set<String> definedGuids = new HashSet<>(definedTests.keySet());
         Set<String> implementedGuids = new HashSet<>(implementedTests.keySet());
 
-        // Check that all tests defined for the current mechanism in the FFDQ rdf correspond to a DQClass method
+        // Check that all tests defined for the current mechanism in the BDQFFDQ rdf correspond to a DQClass method
         // that implements the test
         if (!implementedGuids.containsAll(definedGuids)) {
             logger.warning("Java class missing implementation for tests defined in RDF!");
@@ -181,7 +181,7 @@ public class TestRunner {
         }
 
         // Check that all test method in the DQClass have associated metadata in the form of Measurement, Validation,
-        // and Amendment Methods in the FFDQ rdf
+        // and Amendment Methods in the BDQFFDQ rdf
         if (!definedGuids.containsAll(implementedGuids)) {
             logger.warning("Tests declared in Java class via @DQProvides missing corresponding definitions " +
                     "in the RDF!");

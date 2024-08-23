@@ -24,11 +24,10 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "rt = http://rs.tdwg.org/bdq/ffdq/rt/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#",
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
 })
-@RDFBean("ffdq:ResourceType")
+@RDFBean("bdqffdq:ResourceType")
 public class ResourceType {
     public static final ResourceType SINGLE_RECORD = new ResourceType("SingleRecord");
     public static final ResourceType MULTI_RECORD = new ResourceType("MultiRecord");
@@ -36,7 +35,7 @@ public class ResourceType {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    @RDFSubject(prefix = "rt:")
+    @RDFSubject(prefix = "bdqffdq:")
     public String getId() {
         return label;
     }

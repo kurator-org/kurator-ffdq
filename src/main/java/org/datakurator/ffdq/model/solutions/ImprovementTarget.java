@@ -30,9 +30,9 @@ import java.util.Set;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
 })
-@RDFBean("ffdq:ImprovementTarget")
+@RDFBean("bdqffdq:ImprovementTarget")
 public class ImprovementTarget {
     private Set<ContextualizedCriterion> targetedCriterion = new HashSet<>();
     private Set<ContextualizedIssue> targetedIssues = new HashSet<>();
@@ -51,22 +51,22 @@ public class ImprovementTarget {
         this.id = id;
     }
 
-    @RDF("ffdq:targetedDimension")
+    @RDF("bdqffdq:targetedDimension")
     public Set<ContextualizedDimension> getTargetedDimensions() {
         return targetedDimensions;
     }
 
-    @RDF("ffdq:targetedCriterion")
+    @RDF("bdqffdq:targetedCriterion")
     public Set<ContextualizedCriterion> getContextualizedCriterion() {
         return targetedCriterion;
     }
 
-    @RDF("ffdq:targetedIssue")
+    @RDF("bdqffdq:targetedIssue")
     public Set<ContextualizedIssue> getContextualizedIssue() {
         return targetedIssues;
     }
 
-    @RDF("ffdq:improvedBy")
+    @RDF("bdqffdq:improvedBy")
     public ContextualizedEnhancement getImprovedBy() {
         return improvedBy;
     }

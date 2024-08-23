@@ -29,10 +29,10 @@ import org.datakurator.ffdq.model.ResourceType;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+		"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:ContextualizedDimension")
+@RDFBean("bdqffdq:ContextualizedDimension")
 public class ContextualizedDimension {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -98,7 +98,7 @@ public class ContextualizedDimension {
     	}
     }
 
-    @RDF("ffdq:hasInformationElement")
+    @RDF("bdqffdq:hasInformationElement")
     public InformationElement getInformationElements() {
         return ie;
     }
@@ -107,7 +107,7 @@ public class ContextualizedDimension {
         this.ie = ie;
     }
     
-    @RDF("ffdq:hasActedUponInformationElement")
+    @RDF("bdqffdq:hasActedUponInformationElement")
     public InformationElement getActedUpon() {
         return actedUpon;
     }
@@ -116,7 +116,7 @@ public class ContextualizedDimension {
         this.actedUpon = (ActedUpon) ie;
     }   
     
-    @RDF("ffdq:hasConsultedInformationElement")
+    @RDF("bdqffdq:hasConsultedInformationElement")
     public InformationElement getConsulted() {
         return consulted;
     }
@@ -125,7 +125,7 @@ public class ContextualizedDimension {
         this.consulted = (Consulted) ie;
     }       
 
-    @RDF("ffdq:hasResourceType")
+    @RDF("bdqffdq:hasResourceType")
     public ResourceType getResourceType() {
         return rt;
     }
@@ -134,7 +134,7 @@ public class ContextualizedDimension {
         this.rt = rt;
     }
 
-    @RDF("ffdq:hasDimension")
+    @RDF("bdqffdq:hasDimension")
     public Dimension getDimension() {
         return dimension;
     }

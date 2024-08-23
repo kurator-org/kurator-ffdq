@@ -1,6 +1,6 @@
 # Report on all standardized tests defined as assertion methods
 
-PREFIX ffdq: <http://rs.tdwg.org/bdq/ffdq/>
+PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/>
 PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -9,6 +9,6 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 SELECT DISTINCT ?guid ?specification
 
 WHERE {
-    ?guid a ffdq:Specification .
+    ?guid a bdqffdq:Specification .
     ?guid rdfs:label ?specification
 }

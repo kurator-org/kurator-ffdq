@@ -11,76 +11,76 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix fn: <http://www.w3.org/2005/xpath-functions#> .
 @prefix dwc: <http://rs.tdwg.org/dwc/terms/> .
-@prefix ffdq: <http://rs.tdwg.org/bdq/ffdq/> .
+@prefix bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 
 # Example UseCase for validating internal consistency of dates
-<urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> a ffdq:UseCase ;
+<urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> a bdqffdq:UseCase ;
     rdfs:label "Check for internal consistency of dates" .
 
 # The ValidationPolicy ties a UseCase to some Criterion by referencing an instance of ContextualizedCriterion
-<#validation-policy> a ffdq:ValidationPolicy ;
-    ffdq:coversUseCase <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> ;
-    ffdq:criterionInContext <#contextualized-criterion> .
+<#validation-policy> a bdqffdq:ValidationPolicy ;
+    bdqffdq:coversUseCase <urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0> ;
+    bdqffdq:criterionInContext <#contextualized-criterion> .
 
 # The Criterion for a validation test
-<#criterion> a <ffdq:Criterion> ;
+<#criterion> a <bdqffdq:Criterion> ;
     rdfs:label "Check if a value for day is consistent with a provided month and year." .
 
 # ContextualizedCriterion describes Criterion in the context of a resource type (SingleRecord) and information elements (year, month, day)
-<#contextualized-criterion> a ffdq:ContextualizedCriterion ;
-    ffdq:hasCriterion <#criterion> ;
-    ffdq:hasInformationElement <#year> , <#month> , <#day> ;
-    ffdq:hasResourceType <#single-record> .
+<#contextualized-criterion> a bdqffdq:ContextualizedCriterion ;
+    bdqffdq:hasCriterion <#criterion> ;
+    bdqffdq:hasInformationElement <#year> , <#month> , <#day> ;
+    bdqffdq:hasResourceType <#single-record> .
 
 # ResourceType can be single or multi record
 <#single-record> a <http://rs.tdwg.org/rt/SingleRecord> .
 
 # The InformationElements describe how terms from a controlled vocabulary (darwin core) relate to fields acted upon by the test
-<#year> a ffdq:InformationElement ;
-    ffdq:composedOf <dwc:year> .
+<#year> a bdqffdq:InformationElement ;
+    bdqffdq:composedOf <dwc:year> .
 
-<#month> a ffdq:InformationElement ;
-    ffdq:composedOf <dwc:month> .
+<#month> a bdqffdq:InformationElement ;
+    bdqffdq:composedOf <dwc:month> .
 
-<#day> a ffdq:InformationElement;
-    ffdq:composedOf <dwc:day> .
+<#day> a bdqffdq:InformationElement;
+    bdqffdq:composedOf <dwc:day> .
 
 # ValidationMethod ties ContextualizedCriterion to a Specification for a test
-<#validation-method> a ffdq:ValidationMethod ;
-    ffdq:hasContextualizedCriterion <#contextualized-criterion> ;
-    ffdq:hasSpecification <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> .
+<#validation-method> a bdqffdq:ValidationMethod ;
+    bdqffdq:hasContextualizedCriterion <#contextualized-criterion> ;
+    bdqffdq:hasSpecification <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> .
 
 # Implementation describes the relationship between specification and mechanism (can be used to identify Java method and class)
-<#implementation> a ffdq:Implementation ;
-    ffdq:hasSpecification <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
-    ffdq:implementedBy <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> .
+<#implementation> a bdqffdq:Implementation ;
+    bdqffdq:hasSpecification <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
+    bdqffdq:implementedBy <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> .
 
 # The specification for the DAY_POSSIBLE_FOR_MONTH_YEAR test (guid can be mapped to Java method DwCEventDQ.isDayPossibleForMonthYear)
-<urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> a ffdq:Specification ;
+<urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> a bdqffdq:Specification ;
     rdfs:label "Check that the value of dwc:eventDate is consistent with the values for dwc:month and dwc:year. Requires valid values for month and year." .
 
 # Date validator mechanism (guid can be mapped to DwCEventDQ Java class from the event_date_qc project)
-<urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> a ffdq:Mechanism ;
+<urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> a bdqffdq:Mechanism ;
     rdfs:label "org.filteredpush.qc.date.DwCEventDQ" .
 
 # DQ validation report instance: "generated" references the Result, "hadPlan" references the specification, "used" references the
 # original DataResource, "wasAttributedTo" references the Mechanism that ran the test
-<#validation> a ffdq:Validation ;
-    ffdq:criterionInContext <#contextualized-criterion> ;
+<#validation> a bdqffdq:Validation ;
+    bdqffdq:criterionInContext <#contextualized-criterion> ;
     prov:used <#data-resource> ;
     prov:generated <#validation-result> ;
     prov:hadPlan <urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f> ;
     prov:wasAttributedTo <urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84> .
 
 # ResultStatus for the Validation
-<#status-compliant> a ffdq:ResultStatus ;
+<#status-compliant> a bdqffdq:ResultStatus ;
     rdfs:label "COMPLIANT" .
 
 # The Result of running the validation contains a comment and ResultStatus (COMPLIANT)
-<#validation-result> a ffdq:Result ;
-    ffdq:hasStatus <#status-compliant> ;
+<#validation-result> a bdqffdq:Result ;
+    bdqffdq:hasStatus <#status-compliant> ;
     rdfs:comment "Provided value for year-month-day 1974-2-12 parses to a valid day." .
 
 # DataResource for a single occurrence record contains original values from the input file

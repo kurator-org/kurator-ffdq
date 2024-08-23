@@ -17,7 +17,12 @@
 package org.datakurator.ffdq.model.report;
 
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 
-@RDFBean("ffdq:Report")
+@RDFNamespaces({
+       "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
+})
+
+@RDFBean("bdqffdq:Report")
 public class Report {
 }

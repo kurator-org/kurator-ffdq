@@ -20,8 +20,8 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 
 @RDFNamespaces({
-        "ffdq = http://rs.tdwg.org/bdq/ffdq/"
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
 })
-@RDFBean("ffdq:Profile")
+@RDFBean("bdqffdq:Profile")
 public class Profile {
 }

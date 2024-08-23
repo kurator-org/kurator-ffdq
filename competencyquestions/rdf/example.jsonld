@@ -2,11 +2,11 @@
   "@graph": [
     {
       "@id": "urn:uuid:02a041e3-2d8d-41ba-86ed-1036b8da599f",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/Implementation",
-      "http://rs.tdwg.org/bdq/ffdq/hasSpecification": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/Implementation",
+      "https://rs.tdwg.org/bdqffdq/terms/hasSpecification": {
         "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"
       },
-      "http://rs.tdwg.org/bdq/ffdq/implementedBy": {
+      "https://rs.tdwg.org/bdqffdq/terms/implementedBy": {
         "@id": "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84"
       }
     },
@@ -81,71 +81,71 @@
     },
     {
       "@id": "urn:uuid:4def6d47-1626-4fd0-b70c-c0ef9932c519",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/InformationElement",
-      "http://rs.tdwg.org/bdq/ffdq/composedOf": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/InformationElement",
+      "https://rs.tdwg.org/bdqffdq/terms/composedOf": {
         "@id": "http://rs.tdwg.org/dwc/terms/month"
       }
     },
     {
       "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/Specification",
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/Specification",
       "http://www.w3.org/2000/01/rdf-schema#label": "Check that the value of dwc:eventDate is consistent with the values for dwc:month and dwc:year. Requires valid values for month and year."
     },
     {
       "@id": "urn:uuid:5694279a-3103-4413-986d-127f2141795f",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/ValidationPolicy",
-      "http://rs.tdwg.org/bdq/ffdq/coversUseCase": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/ValidationPolicy",
+      "https://rs.tdwg.org/bdqffdq/terms/coversUseCase": {
         "@id": "urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0"
       },
-      "http://rs.tdwg.org/bdq/ffdq/criterionInContext": {
+      "https://rs.tdwg.org/bdqffdq/terms/criterionInContext": {
         "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a"
       }
     },
     {
       "@id": "urn:uuid:677e067a-66dc-4f4e-bb76-890d2f8f91ef",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/Result",
-      "http://rs.tdwg.org/bdq/ffdq/hasStatus": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/Result",
+      "https://rs.tdwg.org/bdqffdq/terms/hasStatus": {
         "@id": "urn:uuid:c2b301b3-39c9-4a1a-8cd8-448469a9ca18"
       },
       "http://www.w3.org/2000/01/rdf-schema#comment": "Provided value for year-month-day 1974-2-12 parses to a valid day."
     },
     {
       "@id": "urn:uuid:75d64099-b62d-4b4f-8d6b-b3cae74b7400",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/Criterion",
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/Criterion",
       "http://www.w3.org/2000/01/rdf-schema#label": "Check if a value for day is consistent with a provided month and year."
     },
     {
       "@id": "urn:uuid:7e00b597-658f-41cd-913d-f9f06d348f30",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/ValidationMethod",
-      "http://rs.tdwg.org/bdq/ffdq/hasContextualizedCriterion": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/ValidationMethod",
+      "https://rs.tdwg.org/bdqffdq/terms/hasContextualizedCriterion": {
         "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a"
       },
-      "http://rs.tdwg.org/bdq/ffdq/hasSpecification": {
+      "https://rs.tdwg.org/bdqffdq/terms/hasSpecification": {
         "@id": "urn:uuid:5618f083-d55a-4ac2-92b5-b9fb227b832f"
       }
     },
     {
       "@id": "urn:uuid:b396dd5c-60e5-4ec8-b8eb-57fdcc28a00c",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/InformationElement",
-      "http://rs.tdwg.org/bdq/ffdq/composedOf": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/InformationElement",
+      "https://rs.tdwg.org/bdqffdq/terms/composedOf": {
         "@id": "http://rs.tdwg.org/dwc/terms/day"
       }
     },
     {
       "@id": "urn:uuid:b79dc547-786b-48c5-bba8-d2a436a3239b",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/InformationElement",
-      "http://rs.tdwg.org/bdq/ffdq/composedOf": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/InformationElement",
+      "https://rs.tdwg.org/bdqffdq/terms/composedOf": {
         "@id": "http://rs.tdwg.org/dwc/terms/year"
       }
     },
     {
       "@id": "urn:uuid:b844059f-87cf-4c31-b4d7-9a52003eef84",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/Mechanism",
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/Mechanism",
       "http://www.w3.org/2000/01/rdf-schema#label": "org.filteredpush.qc.date.DwCEventDQ"
     },
     {
       "@id": "urn:uuid:c2b301b3-39c9-4a1a-8cd8-448469a9ca18",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/ResultStatus",
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/ResultStatus",
       "http://www.w3.org/2000/01/rdf-schema#label": "COMPLIANT"
     },
     {
@@ -154,11 +154,11 @@
     },
     {
       "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/ContextualizedCriterion",
-      "http://rs.tdwg.org/bdq/ffdq/hasCriterion": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/ContextualizedCriterion",
+      "https://rs.tdwg.org/bdqffdq/terms/hasCriterion": {
         "@id": "urn:uuid:75d64099-b62d-4b4f-8d6b-b3cae74b7400"
       },
-      "http://rs.tdwg.org/bdq/ffdq/hasInformationElement": [
+      "https://rs.tdwg.org/bdqffdq/terms/hasInformationElement": [
         {
           "@id": "urn:uuid:4def6d47-1626-4fd0-b70c-c0ef9932c519"
         },
@@ -169,14 +169,14 @@
           "@id": "urn:uuid:b79dc547-786b-48c5-bba8-d2a436a3239b"
         }
       ],
-      "http://rs.tdwg.org/bdq/ffdq/hasResourceType": {
+      "https://rs.tdwg.org/bdqffdq/terms/hasResourceType": {
         "@id": "urn:uuid:c2fea4e6-4c40-495d-8f3e-4938c9414712"
       }
     },
     {
       "@id": "urn:uuid:dc698a99-eced-4330-94f9-e59ba303101e",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/Validation",
-      "http://rs.tdwg.org/bdq/ffdq/criterionInContext": {
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/Validation",
+      "https://rs.tdwg.org/bdqffdq/terms/criterionInContext": {
         "@id": "urn:uuid:d2852db3-ea41-4b51-aa99-897e67cfbe7a"
       },
       "http://www.w3.org/ns/prov#generated": {
@@ -194,7 +194,7 @@
     },
     {
       "@id": "urn:uuid:dd78b90c-640f-4b9c-bece-564e525a43e0",
-      "@type": "http://rs.tdwg.org/bdq/ffdq/UseCase",
+      "@type": "https://rs.tdwg.org/bdqffdq/terms/UseCase",
       "http://www.w3.org/2000/01/rdf-schema#label": "Check for internal consistency of dates"
     }
   ]

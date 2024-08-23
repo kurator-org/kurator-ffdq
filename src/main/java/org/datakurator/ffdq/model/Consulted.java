@@ -18,10 +18,10 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
  *
  */
 @RDFNamespaces({
-    "ffdq = http://rs.tdwg.org/bdq/ffdq/",
+    "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
     "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("ffdq:Consulted")
+@RDFBean("bdqffdq:Consulted")
 public class Consulted extends InformationElement {
 
     private String id = "urn:uuid:" + UUID.randomUUID();
@@ -31,7 +31,7 @@ public class Consulted extends InformationElement {
         return id;
     }
 
-    @RDF("ffdq:composedOf")
+    @RDF("bdqffdq:composedOf")
     public List<URI> getComposedOf() {
         return composedOf;
     }
