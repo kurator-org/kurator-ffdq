@@ -1,4 +1,4 @@
-/**  Issue.java
+/**  MeasureAssertion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,29 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model;
+package org.datakurator.ffdq.model.report;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.context.Measure;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+        "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:Issue")
-public class Issue {
+@RDFBean("bdqffdq:MeasureAssertion")
+public class MeasureAssertion extends Assertion {
     private String id = "urn:uuid:" + UUID.randomUUID();
-    private String label;
 
-    public Issue() { }
-
-    public Issue(String label) {
-        this.label = label;
-    }
+    private Measure dimension;
+    private AmendmentAssertion informedBy;
 
     @RDFSubject
     public String getId() {
@@ -47,13 +44,21 @@ public class Issue {
         this.id = id;
     }
 
-    @RDF("rdfs:label")
-    public String getLabel() {
-        return label;
+    @RDF("bdqffdq:dimensionInContext")
+    public Measure getDimension() {
+        return dimension;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setDimension(Measure dimension) {
+        this.dimension = dimension;
     }
 
+    @RDF("prov:wasInformedBy")
+    public AmendmentAssertion getInformedBy() {
+        return informedBy;
+    }
+
+    public void setInformedBy(AmendmentAssertion informedBy) {
+        this.informedBy = informedBy;
+    }
 }

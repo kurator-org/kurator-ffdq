@@ -1,4 +1,4 @@
-/**  Amendment.java
+/**  InvertedCriterion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -14,25 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datakurator.ffdq.model.report;
+package org.datakurator.ffdq.model;
 
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "prov = http://www.w3.org/ns/prov#"
+        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:Amendment")
-public class Amendment extends Assertion {
+@RDFBean("bdqffdq:InvertedCriterion")
+public class InvertedCriterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
+    private String label;
 
-    private ContextualizedEnhancement enhancement;
+    public InvertedCriterion() { }
+
+    public InvertedCriterion(String label) {
+        this.label = label;
+    }
 
     @RDFSubject
     public String getId() {
@@ -43,12 +47,13 @@ public class Amendment extends Assertion {
         this.id = id;
     }
 
-    @RDF("bdqffdq:enhancementInContext")
-    public ContextualizedEnhancement getEnhancement() {
-        return enhancement;
+    @RDF("rdfs:label")
+    public String getLabel() {
+        return label;
     }
 
-    public void setEnhancement(ContextualizedEnhancement enhancement) {
-        this.enhancement = enhancement;
+    public void setLabel(String label) {
+        this.label = label;
     }
+
 }

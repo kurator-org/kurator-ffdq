@@ -26,6 +26,7 @@ public class Namespace {
     public static final String DCTERMS = "http://purl.org/dc/terms/";
     public static final String DWCIRI = "http://rs.tdwg.org/dwc/iri/";
     public static final String DC = "http://purl.org/dc/elements/1.1/";
+    public static final String SKOS = "http://www.w3.org/2004/02/skos/core#";
     public static final String BDQ = "https://rs.tdwg.org/bdq/terms/";   // other bdq terms
     public static final String BDQDIM = "https://rs.tdwg.org/bdqdim/terms/";  // dimensions   
     public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms";   // tests
@@ -43,6 +44,8 @@ public class Namespace {
         nsPrefixes.put("dc", DC);
         
         nsPrefixes.put("bdq", BDQ);
+        nsPrefixes.put("bdqdim", BDQDIM);
+        nsPrefixes.put("skos", SKOS);
 
         nsPrefixes.put("dwcloud", NONE);
         nsPrefixes.put("none", NONE);

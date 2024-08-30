@@ -44,7 +44,7 @@ public class FFDQModel extends BaseModel {
     public Map<String, Specification> findSpecificationsForMechanism(String mechanismGuid) {
         Set<String> guids = new HashSet<>();
 
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdffdq/terms/> " +
+        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
                 "SELECT ?specification " +
                 "WHERE { ?implementation ffdq:implementedBy <" + mechanismGuid + "> . " +
                 "?implementation ffdq:hasSpecification ?specification }";

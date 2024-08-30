@@ -20,29 +20,30 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.datakurator.ffdq.model.Specification;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.context.Amendment;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:AmendmentMethod")
 public class AmendmentMethod extends AssertionMethod {
-    private ContextualizedEnhancement ce;
+    private Amendment ce;
 
     public AmendmentMethod() { }
 
-    public AmendmentMethod(Specification specification, ContextualizedEnhancement contextualizedEnhancement) {
+    public AmendmentMethod(Specification specification, Amendment contextualizedEnhancement) {
         this.specification = specification;
         this.ce = contextualizedEnhancement;
     }
 
     @RDF("bdqffdq:enhancementInContext")
-    public ContextualizedEnhancement getContextualizedEnhancement() {
+    public Amendment getContextualizedEnhancement() {
         return ce;
     }
 
-    public void setContextualizedEnhancement(ContextualizedEnhancement ce) {
+    public void setContextualizedEnhancement(Amendment ce) {
         this.ce = ce;
     }
     
@@ -57,4 +58,14 @@ public class AmendmentMethod extends AssertionMethod {
 		labelBuilder.append(specification.getLabel());
 		return labelBuilder.toString();
 	}
+    
+    /**
+     * Get the preferred label, currently, same as the rdfs;label.
+     * 
+     * @return a skos:prefLabel
+     */
+    @RDF("skos:prefLabel") 
+    public String getPrefLabel() { 
+    	return getLabel();
+    }
 }

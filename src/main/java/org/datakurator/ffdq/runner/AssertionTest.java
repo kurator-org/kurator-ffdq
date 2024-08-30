@@ -50,11 +50,11 @@ public class AssertionTest {
 
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
-    // guid for Amendment/Measurement/Problem/Validation Method
+    // guid for AmendmentAssertion/Measurement/IssueAssertion/ValidationAssertion Method
     private String methodGuid;
-    // guid for Contexturalized Enhancement/Dimension/Issue/Criterion
-    private String contextualizedGuid;
-    // guid Amendment/Measurement/Problem/Validation Policy, 
+    // guid for Contexturalized Enhancement/Dimension/InvertedCriterion/Criterion
+    private String specificationGuid;
+    // guid AmendmentAssertion/Measurement/IssueAssertion/ValidationAssertion Policy, 
     private String policyGuid;
     
     private Class cls;
@@ -149,7 +149,7 @@ public class AssertionTest {
     	if (guid==null) { 
     		return guid;
     	} else { 
-    		return "https://rs.tdwg.org/bdq/terms/" + guid.replace("urn:uuid:","");
+    		return "https://rs.tdwg.org/bdqcore/terms/" + guid.replace("urn:uuid:","");
     	}
     }
 
@@ -354,17 +354,17 @@ public class AssertionTest {
 	}
 
 	/**
-	 * @return the contextualizedGuid
+	 * @return the specificationGuid
 	 */
-	public String getContextualizedGuid() {
-		return contextualizedGuid;
+	public String getSpecificationGuid() {
+		return specificationGuid;
 	}
 
 	/**
-	 * @param contextualizedGuid the contextualizedGuid to set
+	 * @param specificaitonGuid the specificationGuid to set
 	 */
-	public void setContextualizedGuid(String contextualizedGuid) {
-		this.contextualizedGuid = contextualizedGuid;
+	public void setSpecificationGuid(String specificaitonGuid) {
+		this.specificationGuid = specificaitonGuid;
 	}
 
 	/**

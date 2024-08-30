@@ -1,4 +1,4 @@
-/**  Validation.java
+/**  AmendmentAssertion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -20,7 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
+import org.datakurator.ffdq.model.context.Amendment;
 
 import java.util.UUID;
 
@@ -28,12 +28,11 @@ import java.util.UUID;
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:Validation")
-public class Validation extends Assertion {
+@RDFBean("bdqffdq:AmendmentAssertion")
+public class AmendmentAssertion extends Assertion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private ContextualizedCriterion criterion;
-    private Amendment informedBy;
+    private Amendment enhancement;
 
     @RDFSubject
     public String getId() {
@@ -44,21 +43,12 @@ public class Validation extends Assertion {
         this.id = id;
     }
 
-    @RDF("bdqffdq:criterionInContext")
-    public ContextualizedCriterion getCriterion() {
-        return criterion;
+    @RDF("bdqffdq:enhancementInContext")
+    public Amendment getEnhancement() {
+        return enhancement;
     }
 
-    public void setCriterion(ContextualizedCriterion criterion) {
-        this.criterion = criterion;
-    }
-
-    @RDF("prov:wasInformedBy")
-    public Amendment getInformedBy() {
-        return informedBy;
-    }
-
-    public void setInformedBy(Amendment informedBy) {
-        this.informedBy = informedBy;
+    public void setEnhancement(Amendment enhancement) {
+        this.enhancement = enhancement;
     }
 }

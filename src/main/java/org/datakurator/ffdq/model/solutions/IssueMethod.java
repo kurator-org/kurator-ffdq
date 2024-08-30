@@ -1,4 +1,4 @@
-/** ProblemMethod.java
+/** IssueMethod.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -21,29 +21,30 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.Specification;
-import org.datakurator.ffdq.model.context.ContextualizedIssue;
+import org.datakurator.ffdq.model.context.Issue;
 
 import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:ProblemMethod")
-public class ProblemMethod {
+@RDFBean("bdqffdq:IssueMethod")
+public class IssueMethod {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Specification specification;
-    private ContextualizedIssue ci;
+    private Issue ci;
 
-    public ProblemMethod() { }
+    public IssueMethod() { }
     
-    public ProblemMethod(Specification specification, ContextualizedIssue ci) { 
+    public IssueMethod(Specification specification, Issue ci) { 
     	this.specification = specification;
     	this.ci = ci;
     }
 
-    public ProblemMethod(String id) {
+    public IssueMethod(String id) {
         this.id = id;
     }
 
@@ -66,11 +67,11 @@ public class ProblemMethod {
     }
 
     @RDF("bdqffdq:issueInContext")
-    public ContextualizedIssue getContextualizedIssue() {
+    public Issue getContextualizedIssue() {
         return ci;
     }
 
-    public void setContextualizedIssue(ContextualizedIssue ci) {
+    public void setContextualizedIssue(Issue ci) {
         this.ci = ci;
     }
     
@@ -85,4 +86,14 @@ public class ProblemMethod {
 		labelBuilder.append(specification.getLabel());
 		return labelBuilder.toString();
 	}
+    
+    /**
+     * Get the preferred label, currently, same as the rdfs;label.
+     * 
+     * @return a skos:prefLabel
+     */
+    @RDF("skos:prefLabel") 
+    public String getPrefLabel() { 
+    	return getLabel();
+    }
 }

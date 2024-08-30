@@ -185,7 +185,7 @@ public class JavaClassGenerator {
                         retType = "DQResponse<NumericalValue>";
                         retTypeJavaDoc = "DQResponse the response of type NumericalValue ";
                     }
-                    descriptorAnnotation.append("@Measure(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append("@MeasureAssertion(label=\"").append(test.getLabel()).append("\", description=\"");
                     descriptorAnnotation.append(test.getDescription()).append("\"");
                     descriptorAnnotation.append(", dimension= Dimension." + test.getDimension().toUpperCase());
                     descriptorAnnotation.append(")");
@@ -193,19 +193,19 @@ public class JavaClassGenerator {
                 case "VALIDATION":
                     retType = "DQResponse<ComplianceValue>";
                     retTypeJavaDoc = "DQResponse the response of type ComplianceValue ";
-                    descriptorAnnotation.append("@Validation(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append("@ValidationAssertion(label=\"").append(test.getLabel()).append("\", description=\"");
                     descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
                 case "AMENDMENT":
                     retType = "DQResponse<AmendmentValue>";
                     retTypeJavaDoc = "DQResponse the response of type AmendmentValue";
-                    descriptorAnnotation.append("@Amendment(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append("@AmendmentAssertion(label=\"").append(test.getLabel()).append("\", description=\"");
                     descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
                 case "ISSUE":
                     retType = "DQResponse<IssueValue>";
                     retTypeJavaDoc = "DQResponse the response of type IssueValue";
-                    descriptorAnnotation.append("@Issue(label=\"").append(test.getLabel()).append("\", description=\"");
+                    descriptorAnnotation.append("@InvertedCriterion(label=\"").append(test.getLabel()).append("\", description=\"");
                     descriptorAnnotation.append(test.getDescription()).append("\")");
                     break;
             }

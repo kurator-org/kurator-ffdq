@@ -26,9 +26,9 @@ import org.datakurator.ffdq.api.DQResponse;
 import org.datakurator.ffdq.api.ResultValue;
 import org.datakurator.ffdq.api.result.AmendmentValue;
 import org.datakurator.ffdq.model.*;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.context.Validation;
+import org.datakurator.ffdq.model.context.Measure;
+import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
@@ -87,7 +87,7 @@ public class TestRunner {
                 Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
 
                 // Process method level annotations and check that test methods in the DQClass are consistent
-                // with Measurement, Validation and Amendment Methods defined in the RDF
+                // with Measurement, ValidationAssertion and AmendmentAssertion Methods defined in the RDF
                 processMethods(cls, definedTests);
 
             }
@@ -180,8 +180,8 @@ public class TestRunner {
             }
         }
 
-        // Check that all test method in the DQClass have associated metadata in the form of Measurement, Validation,
-        // and Amendment Methods in the BDQFFDQ rdf
+        // Check that all test method in the DQClass have associated metadata in the form of Measurement, ValidationAssertion,
+        // and AmendmentAssertion Methods in the BDQFFDQ rdf
         if (!definedGuids.containsAll(implementedGuids)) {
             logger.warning("Tests declared in Java class via @DQProvides missing corresponding definitions " +
                     "in the RDF!");
@@ -223,7 +223,7 @@ public class TestRunner {
                 test.setAssertionType(AssertionTest.VALIDATION);
                 validations.add(validationMethod);
 
-                ContextualizedCriterion cc = validationMethod.getContextualizedCriterion();
+                Validation cc = validationMethod.getValidation();
                 if (test.getDescription() == null) {
                     test.setDescription(cc.getCriterion().getLabel());
                 }
@@ -238,7 +238,7 @@ public class TestRunner {
                 test.setAssertionType(AssertionTest.MEASURE);
                 measures.add(measurementMethod);
 
-                ContextualizedDimension cd = measurementMethod.getContextualizedDimension();
+                Measure cd = measurementMethod.getContextualizedDimension();
                 if (test.getDimension() == null) {
                     test.setDimension(cd.getDimension().getLabel());
                 }
@@ -252,7 +252,7 @@ public class TestRunner {
                 test.setAssertionType(AssertionTest.AMENDMENT);
                 amendments.add(amendmentMethod);
 
-                ContextualizedEnhancement ce = amendmentMethod.getContextualizedEnhancement();
+                Amendment ce = amendmentMethod.getContextualizedEnhancement();
                 if (test.getDescription() == null) {
                     test.setDescription(ce.getEnhancement().getLabel());
                 }
@@ -451,13 +451,13 @@ public class TestRunner {
             // create a dq report object
             for (MeasurementMethod measurementMethod : measures) {
                 Specification specification = measurementMethod.getSpecification();
-                ContextualizedDimension dimension = measurementMethod.getContextualizedDimension();
+                Measure dimension = measurementMethod.getContextualizedDimension();
 
                 AssertionTest test = tests.get(specification.getId());
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                Measure measure = new Measure();
+                MeasureAssertion measure = new MeasureAssertion();
 
                 measure.setDimension(dimension);
                 measure.setDataResource(dataResource.getURI());
@@ -470,13 +470,13 @@ public class TestRunner {
 
             for (ValidationMethod validationMethod : validations) {
                 Specification specification = validationMethod.getSpecification();
-                ContextualizedCriterion criterion = validationMethod.getContextualizedCriterion();
+                Validation criterion = validationMethod.getValidation();
 
                 AssertionTest test = tests.get(specification.getId());
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                Validation validation = new Validation();
+                ValidationAssertion validation = new ValidationAssertion();
 
                 validation.setCriterion(criterion);
                 validation.setDataResource(dataResource.getURI());
@@ -489,13 +489,13 @@ public class TestRunner {
 
             for (AmendmentMethod amendmentMethod : amendments) {
                 Specification specification = amendmentMethod.getSpecification();
-                ContextualizedEnhancement enhancement = amendmentMethod.getContextualizedEnhancement();
+                Amendment enhancement = amendmentMethod.getContextualizedEnhancement();
 
                 AssertionTest test = tests.get(specification.getId());
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                Amendment amendment = new Amendment();
+                AmendmentAssertion amendment = new AmendmentAssertion();
 
                 amendment.setEnhancement(enhancement);
                 amendment.setDataResource(dataResource.getURI());

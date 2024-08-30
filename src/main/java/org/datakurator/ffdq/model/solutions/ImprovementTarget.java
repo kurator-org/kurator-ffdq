@@ -20,10 +20,10 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
-import org.datakurator.ffdq.model.context.ContextualizedIssue;
+import org.datakurator.ffdq.model.context.Validation;
+import org.datakurator.ffdq.model.context.Measure;
+import org.datakurator.ffdq.model.context.Amendment;
+import org.datakurator.ffdq.model.context.Issue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,11 +34,11 @@ import java.util.UUID;
 })
 @RDFBean("bdqffdq:ImprovementTarget")
 public class ImprovementTarget {
-    private Set<ContextualizedCriterion> targetedCriterion = new HashSet<>();
-    private Set<ContextualizedIssue> targetedIssues = new HashSet<>();
-    private Set<ContextualizedDimension> targetedDimensions = new HashSet<>();
+    private Set<Validation> targetedCriterion = new HashSet<>();
+    private Set<Issue> targetedIssues = new HashSet<>();
+    private Set<Measure> targetedDimensions = new HashSet<>();
 
-    private ContextualizedEnhancement improvedBy;
+    private Amendment improvedBy;
 
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -52,47 +52,47 @@ public class ImprovementTarget {
     }
 
     @RDF("bdqffdq:targetedDimension")
-    public Set<ContextualizedDimension> getTargetedDimensions() {
+    public Set<Measure> getTargetedDimensions() {
         return targetedDimensions;
     }
 
     @RDF("bdqffdq:targetedCriterion")
-    public Set<ContextualizedCriterion> getContextualizedCriterion() {
+    public Set<Validation> getContextualizedCriterion() {
         return targetedCriterion;
     }
 
     @RDF("bdqffdq:targetedIssue")
-    public Set<ContextualizedIssue> getContextualizedIssue() {
+    public Set<Issue> getContextualizedIssue() {
         return targetedIssues;
     }
 
     @RDF("bdqffdq:improvedBy")
-    public ContextualizedEnhancement getImprovedBy() {
+    public Amendment getImprovedBy() {
         return improvedBy;
     }
 
-    public void setTargetedDimensions(Set<ContextualizedDimension> dimensions) {
+    public void setTargetedDimensions(Set<Measure> dimensions) {
         targetedDimensions = dimensions;
     }
 
-    public void setContextualizedCriterion(Set<ContextualizedCriterion> criteria) {
+    public void setContextualizedCriterion(Set<Validation> criteria) {
         targetedCriterion = criteria;
     }
 
-    public void setContextualizedIssue(Set<ContextualizedIssue> issues) {
+    public void setContextualizedIssue(Set<Issue> issues) {
         targetedIssues = issues;
     }
 
-    public void setImprovedBy(ContextualizedEnhancement ce) {
+    public void setImprovedBy(Amendment ce) {
         improvedBy = ce;
     }
 
     // Convenience methods for adding to Set
-    public void addContextualizedDimension(ContextualizedDimension cd) {
+    public void addContextualizedDimension(Measure cd) {
         targetedDimensions.add(cd);
     }
 
-    public void addContextualizedCriterion(ContextualizedCriterion cc) {
+    public void addContextualizedCriterion(Validation cc) {
         targetedCriterion.add(cc);
     }
 

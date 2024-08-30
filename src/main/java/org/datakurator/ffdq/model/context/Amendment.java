@@ -1,4 +1,4 @@
-/** ContextualizedCriterion.java
+/** Amendment.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -22,49 +22,43 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.Consulted;
-import org.datakurator.ffdq.model.Criterion;
+import org.datakurator.ffdq.model.Enhancement;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
 
 import java.util.UUID;
 
 @RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+		"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:ContextualizedCriterion")
-public class ContextualizedCriterion {
+@RDFBean("bdqffdq:Amendment")
+public class Amendment {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Criterion criterion;
+    private Enhancement enhancement;
     private InformationElement ie;
     private ActedUpon actedUpon;
-    private Consulted consulted;    
+    private Consulted consulted;  
     private ResourceType rt;
     private String label;
+    private String prefLabel;
     private String comment;
 
-    public ContextualizedCriterion() {
+    public Amendment() {
 
     }
 
-    public ContextualizedCriterion(Criterion criterion, InformationElement ie, ResourceType rt) {
-        this.criterion = criterion;
+    public Amendment(Enhancement enhancement, InformationElement ie, ResourceType rt) {
+        this.enhancement = enhancement;
         this.ie = ie;
         this.rt = rt;
-        label = criterion.getLabel() +  " for " + ie.toString() + " in " + rt.getLabel();
-    }
-    
-    public ContextualizedCriterion(Criterion criterion, InformationElement ie, ResourceType rt, String label) {
-        this.criterion = criterion;
-        this.ie = ie;
-        this.rt = rt;
-        this.label = label;
     }
 
-    public ContextualizedCriterion(Criterion criterion, InformationElement informationElement, ActedUpon actedUpon,
-			Consulted consulted, ResourceType resourceType) {
-        this.criterion = criterion;
+    public Amendment(Enhancement enhancement, InformationElement informationElement,
+			ActedUpon actedUpon, Consulted consulted, ResourceType resourceType) {
+        this.enhancement = enhancement;
         if (informationElement.getComposedOf().size()==0) { 
         	this.ie = null;
         } else { 
@@ -81,21 +75,6 @@ public class ContextualizedCriterion {
         	this.consulted = consulted;
         }
         this.rt = resourceType;
-        StringBuilder informationElements = new StringBuilder();
-        String separator = "";
-        if (ie!=null) { 
-        	informationElements.append(ie.toString());
-        	separator = " ";
-        }
-        if (actedUpon!=null) { 
-        	informationElements.append(separator).append(actedUpon.toString());
-        	separator = " ";
-        }
-        if (consulted!=null) { 
-        	informationElements.append(separator).append(consulted.toString());
-        	separator = " ";
-        }        
-        label = criterion.getLabel() +  " for " + informationElements.toString() + " in " + rt.getLabel();
 	}
 
 	@RDFSubject
@@ -122,7 +101,7 @@ public class ContextualizedCriterion {
     public void setInformationElements(InformationElement ie) {
         this.ie = ie;
     }
-    
+
     @RDF("bdqffdq:hasActedUponInformationElement")
     public InformationElement getActedUpon() {
         return actedUpon;
@@ -140,7 +119,7 @@ public class ContextualizedCriterion {
     public void setConsulted(InformationElement ie) {
         this.consulted = (Consulted) ie;
     }    
-
+    
     @RDF("bdqffdq:hasResourceType")
     public ResourceType getResourceType() {
         return rt;
@@ -150,24 +129,24 @@ public class ContextualizedCriterion {
         this.rt = rt;
     }
 
-    @RDF("bdqffdq:hasCriterion")
-    public Criterion getCriterion() {
-        return criterion;
+    @RDF("bdqffdq:hasEnhancement")
+    public Enhancement getEnhancement() {
+        return enhancement;
     }
 
-    public void setCriterion(Criterion criterion) {
-        this.criterion = criterion;
+    public void setEnhancement(Enhancement enhancement) {
+        this.enhancement = enhancement;
     }
-    
+
     @RDF("rdfs:label")
-    public String getLabel() {
-        return label;
-    }
+	public String getLabel() {
+		return label;
+	}
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-    
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	
     @RDF("rdfs:comment")
 	public String getComment() {
 		return comment;
@@ -175,5 +154,20 @@ public class ContextualizedCriterion {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	
+	/**
+	 * @return the prefLabel
+	 */
+	@RDF("skos:prefLabel")
+	public String getPrefLabel() {
+		return prefLabel;
+	}
+
+	/**
+	 * @param prefLabel the skos:prefLabel to set
+	 */
+	public void setPrefLabel(String prefLabel) {
+		this.prefLabel = prefLabel;
 	}
 }

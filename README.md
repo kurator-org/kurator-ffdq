@@ -217,3 +217,10 @@ FFDQ is a sort of acronym for a conceptual Framework For Data Quality assessment
  
 
 An example is: https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/java/org/datakurator/data/ffdq/model/report/DataResource.java
+
+
+# Updated test generation command with parameters:
+
+./test-util.sh -config data/tg2_tests.properties -format RDFXML -out ../bdq/tg2/core/TG2_tests.ttl -in  data/TG2_tests.csv -guidFile ../bdq/tg2/core/TG2_tests_additional_guids.csv -useCaseFile ../bdq/tg2/core/usecase_test_list.csv
+
+

@@ -1,4 +1,4 @@
-/** ContextualizedIssue.java
+/** Measure.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -22,42 +22,56 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.Consulted;
+import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
-import org.datakurator.ffdq.model.Issue;
 import org.datakurator.ffdq.model.ResourceType;
 
 import java.util.UUID;
 
 @RDFNamespaces({
 		"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:ContextualizedIssue")
-public class ContextualizedIssue {
+@RDFBean("bdqffdq:Measure")
+public class Measure {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Issue issue;
+    private Dimension dimension;
     private InformationElement ie;
     private ActedUpon actedUpon;
-    private Consulted consulted; 
+    private Consulted consulted;
     private ResourceType rt;
     private String label;
+    private String prefLabel;
     private String comment;
-    
-    public ContextualizedIssue(Issue issue, InformationElement ie, ResourceType rt) {
-    	this.issue = issue;
-    	this.ie = ie;
-    	this.rt = rt;
-    }
 
-    public ContextualizedIssue(Issue issue, InformationElement informationElement, ActedUpon actedUpon,
-			Consulted consulted, ResourceType resourceType) {
-    	this.issue = issue;
-        if (informationElement.getComposedOf().size()==0) { 
+    public Measure() {
+
+    }
+    
+    public Measure(Dimension dimension, InformationElement ie, ResourceType rt) {
+        this.dimension = dimension;
+        this.ie = ie;
+        this.rt = rt;
+    }    
+
+    public Measure(Dimension dimension, ActedUpon actedUpon, Consulted consulted, ResourceType rt) {
+        this.dimension = dimension;
+        this.ie = null;
+        this.rt = rt;
+        this.actedUpon = actedUpon;
+        this.consulted = consulted;
+    }
+    
+    public Measure(Dimension dimension, InformationElement ie, ActedUpon actedUpon, Consulted consulted, ResourceType rt) {
+        this.dimension = dimension;
+        if (ie.getComposedOf().size()==0) {
         	this.ie = null;
         } else { 
-        	this.ie = informationElement;
+        	this.ie = ie;
         }
+        this.rt = rt;
         if (actedUpon.getComposedOf().size()==0) { 
         	this.actedUpon = null;
         } else { 
@@ -68,10 +82,9 @@ public class ContextualizedIssue {
         } else { 
         	this.consulted = consulted;
         }
-    	this.rt = resourceType;
-	}
+    }
 
-	@RDFSubject
+    @RDFSubject
     public String getId() {
         return id;
     }
@@ -112,7 +125,7 @@ public class ContextualizedIssue {
 
     public void setConsulted(InformationElement ie) {
         this.consulted = (Consulted) ie;
-    }     
+    }       
 
     @RDF("bdqffdq:hasResourceType")
     public ResourceType getResourceType() {
@@ -123,13 +136,13 @@ public class ContextualizedIssue {
         this.rt = rt;
     }
 
-    @RDF("bdqffdq:hasIssue")
-    public Issue getIssue() {
-        return issue;
+    @RDF("bdqffdq:hasDimension")
+    public Dimension getDimension() {
+        return dimension;
     }
 
-    public void setIssue(Issue issue) {
-        this.issue = issue;
+    public void setDimension(Dimension dimension) {
+        this.dimension = dimension;
     }
 
     @RDF("rdfs:label")
@@ -140,7 +153,7 @@ public class ContextualizedIssue {
 	public void setLabel(String label) {
 		this.label = label;
 	}
-
+	
     @RDF("rdfs:comment")
 	public String getComment() {
 		return comment;
@@ -148,5 +161,20 @@ public class ContextualizedIssue {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	/**
+	 * @return the prefLabel
+	 */
+	@RDF("skos:prefLabel")
+	public String getPrefLabel() {
+		return prefLabel;
+	}
+
+	/**
+	 * @param prefLabel the skos:prefLabel to set
+	 */
+	public void setPrefLabel(String prefLabel) {
+		this.prefLabel = prefLabel;
 	}
 }

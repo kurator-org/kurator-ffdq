@@ -1,4 +1,4 @@
-/** ContextualizedDimension.java
+/** Issue.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -22,54 +22,44 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.Consulted;
-import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
+import org.datakurator.ffdq.model.InvertedCriterion;
 import org.datakurator.ffdq.model.ResourceType;
 
 import java.util.UUID;
 
 @RDFNamespaces({
 		"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:ContextualizedDimension")
-public class ContextualizedDimension {
+@RDFBean("bdqffdq:Issue")
+public class Issue {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Dimension dimension;
+    private InvertedCriterion issue;
     private InformationElement ie;
     private ActedUpon actedUpon;
-    private Consulted consulted;
+    private Consulted consulted; 
     private ResourceType rt;
     private String label;
+    private String prefLabel;
     private String comment;
-
-    public ContextualizedDimension() {
-
-    }
     
-    public ContextualizedDimension(Dimension dimension, InformationElement ie, ResourceType rt) {
-        this.dimension = dimension;
-        this.ie = ie;
-        this.rt = rt;
-    }    
-
-    public ContextualizedDimension(Dimension dimension, ActedUpon actedUpon, Consulted consulted, ResourceType rt) {
-        this.dimension = dimension;
-        this.ie = null;
-        this.rt = rt;
-        this.actedUpon = actedUpon;
-        this.consulted = consulted;
+    public Issue(InvertedCriterion issue, InformationElement ie, ResourceType rt) {
+    	this.issue = issue;
+    	this.ie = ie;
+    	this.rt = rt;
     }
-    
-    public ContextualizedDimension(Dimension dimension, InformationElement ie, ActedUpon actedUpon, Consulted consulted, ResourceType rt) {
-        this.dimension = dimension;
-        if (ie.getComposedOf().size()==0) {
+
+    public Issue(InvertedCriterion issue, InformationElement informationElement, ActedUpon actedUpon,
+			Consulted consulted, ResourceType resourceType) {
+    	this.issue = issue;
+        if (informationElement.getComposedOf().size()==0) { 
         	this.ie = null;
         } else { 
-        	this.ie = ie;
+        	this.ie = informationElement;
         }
-        this.rt = rt;
         if (actedUpon.getComposedOf().size()==0) { 
         	this.actedUpon = null;
         } else { 
@@ -80,9 +70,10 @@ public class ContextualizedDimension {
         } else { 
         	this.consulted = consulted;
         }
-    }
+    	this.rt = resourceType;
+	}
 
-    @RDFSubject
+	@RDFSubject
     public String getId() {
         return id;
     }
@@ -123,7 +114,7 @@ public class ContextualizedDimension {
 
     public void setConsulted(InformationElement ie) {
         this.consulted = (Consulted) ie;
-    }       
+    }     
 
     @RDF("bdqffdq:hasResourceType")
     public ResourceType getResourceType() {
@@ -134,13 +125,13 @@ public class ContextualizedDimension {
         this.rt = rt;
     }
 
-    @RDF("bdqffdq:hasDimension")
-    public Dimension getDimension() {
-        return dimension;
+    @RDF("bdqffdq:hasIssue")
+    public InvertedCriterion getIssue() {
+        return issue;
     }
 
-    public void setDimension(Dimension dimension) {
-        this.dimension = dimension;
+    public void setIssue(InvertedCriterion issue) {
+        this.issue = issue;
     }
 
     @RDF("rdfs:label")
@@ -151,7 +142,7 @@ public class ContextualizedDimension {
 	public void setLabel(String label) {
 		this.label = label;
 	}
-	
+
     @RDF("rdfs:comment")
 	public String getComment() {
 		return comment;
@@ -159,5 +150,20 @@ public class ContextualizedDimension {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	
+	/**
+	 * @return the prefLabel
+	 */
+	@RDF("skos:prefLabel")
+	public String getPrefLabel() {
+		return prefLabel;
+	}
+
+	/**
+	 * @param prefLabel the skos:prefLabel to set
+	 */
+	public void setPrefLabel(String prefLabel) {
+		this.prefLabel = prefLabel;
 	}
 }

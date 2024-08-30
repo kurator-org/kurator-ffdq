@@ -20,29 +20,30 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.datakurator.ffdq.model.Specification;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
+import org.datakurator.ffdq.model.context.Measure;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:MeasurementMethod")
 public class MeasurementMethod extends AssertionMethod {
-    private ContextualizedDimension cd;
+    private Measure cd;
 
     public MeasurementMethod() { }
 
-    public MeasurementMethod(Specification specification, ContextualizedDimension contextualizedDimension) {
+    public MeasurementMethod(Specification specification, Measure contextualizedDimension) {
         this.specification = specification;
         this.cd = contextualizedDimension;
     }
 
     @RDF("bdqffdq:dimensionInContext")
-    public ContextualizedDimension getContextualizedDimension() {
+    public Measure getContextualizedDimension() {
         return cd;
     }
 
-    public void setContextualizedDimension(ContextualizedDimension cd) {
+    public void setContextualizedDimension(Measure cd) {
         this.cd = cd;
     }
     
@@ -57,4 +58,14 @@ public class MeasurementMethod extends AssertionMethod {
 		labelBuilder.append(specification.getLabel());
 		return labelBuilder.toString();
 	}
+    
+    /**
+     * Get the preferred label, currently, same as the rdfs;label.
+     * 
+     * @return a skos:prefLabel
+     */
+    @RDF("skos:prefLabel") 
+    public String getPrefLabel() { 
+    	return getLabel();
+    }
 }

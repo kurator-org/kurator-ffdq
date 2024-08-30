@@ -20,7 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.context.Amendment;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public class AmendmentPolicy {
 	private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private ContextualizedEnhancement ce;
+    private Amendment ce;
 
     @RDFSubject
     public String getId() {
@@ -61,11 +61,11 @@ public class AmendmentPolicy {
     }
 
     @RDF("bdqffdq:enhancementInContext")
-    public ContextualizedEnhancement getEnhancementInContext() {
+    public Amendment getEnhancementInContext() {
         return ce;
     }
 
-    public void setEnhancementInContext(ContextualizedEnhancement ce) {
+    public void setEnhancementInContext(Amendment ce) {
         this.ce = ce;
     }
 

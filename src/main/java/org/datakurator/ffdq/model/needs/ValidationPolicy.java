@@ -20,12 +20,16 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
+import org.datakurator.ffdq.model.context.Validation;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:ValidationPolicy")
@@ -33,8 +37,27 @@ public class ValidationPolicy {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private ContextualizedCriterion cc;
+    private List<Validation> validations;
+    
+    
+    public ValidationPolicy() { 
+    	init();
+    }
+    
+    public ValidationPolicy(String id, UseCase useCase) { 
+    	init();
+    	this.setId(id);
+    	this.setUseCase(useCase);
+    }
+    
+    
+    private void init()  {
+    	validations = new ArrayList<Validation>();
+    }
 
+    public void addValidationx(Validation aValidation) { 
+    }
+    
     @RDFSubject
     public String getId() {
         return id;
@@ -59,14 +82,17 @@ public class ValidationPolicy {
     public void setUseCase(UseCase useCase) {
         this.useCase = useCase;
     }
-
-    @RDF("bdqffdq:criterionInContext")
-    public ContextualizedCriterion getCriterionInContext() {
-        return cc;
+    
+    /*
+     * Add a validation to the list of validations for this policy.
+     */
+    @RDF("bdqffdq:hasValidation")
+    public List<Validation> getValidations() {
+        return validations;
     }
 
-    public void setCriterionInContext(ContextualizedCriterion cc) {
-        this.cc = cc;
+    public void addValidation(Validation aValidation) {
+    	validations.add(aValidation);
     }
     
 	/**
@@ -76,8 +102,24 @@ public class ValidationPolicy {
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
 		labelBuilder.append("ValidationPolicy: ");
-		labelBuilder.append(cc.getLabel()).append(" in UseCase ");
+		Iterator<Validation> i = validations.iterator();
+		String separator = "";
+		while (i.hasNext()) { 
+			labelBuilder.append(separator).append(i.next().getLabel());
+			separator = ", ";
+		}
+		labelBuilder.append(" in UseCase ");
 		labelBuilder.append(useCase.getLabel());
 		return labelBuilder.toString();
 	}
+    
+    /**
+     * Get the preferred label, currently, same as the rdfs;label.
+     * 
+     * @return a skos:prefLabel
+     */
+    @RDF("skos:prefLabel") 
+    public String getPrefLabel() { 
+    	return getLabel();
+    }
 }

@@ -20,7 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedIssue;
+import org.datakurator.ffdq.model.context.Issue;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public class ProblemPolicy {
 	private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private ContextualizedIssue ci;
+    private Issue ci;
 
     @RDFSubject
     public String getId() {
@@ -61,11 +61,11 @@ public class ProblemPolicy {
     }
 
     @RDF("bdqffdq:issueInContext")
-    public ContextualizedIssue getIssueInContext() {
+    public Issue getIssueInContext() {
         return ci;
     }
 
-    public void setIssueInContext(ContextualizedIssue ci) {
+    public void setIssueInContext(Issue ci) {
         this.ci = ci;
     }
     

@@ -20,7 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
+import org.datakurator.ffdq.model.context.Measure;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public class MeasurementPolicy {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private ContextualizedDimension cd;
+    private Measure cd;
 
     @RDFSubject
     public String getId() {
@@ -61,11 +61,11 @@ public class MeasurementPolicy {
     }
 
     @RDF("bdqffdq:dimensionInContext")
-    public ContextualizedDimension getDimensionInContext() {
+    public Measure getDimensionInContext() {
         return cd;
     }
 
-    public void setDimensionInContext(ContextualizedDimension cd) {
+    public void setDimensionInContext(Measure cd) {
         this.cd = cd;
     }
     

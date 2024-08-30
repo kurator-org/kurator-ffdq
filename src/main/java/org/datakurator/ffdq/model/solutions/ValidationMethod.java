@@ -20,29 +20,30 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.datakurator.ffdq.model.Specification;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
+import org.datakurator.ffdq.model.context.Validation;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "skos = http://www.w3.org/2004/02/skos/core#",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:ValidationMethod")
 public class ValidationMethod extends AssertionMethod {
-    private ContextualizedCriterion cc;
+    private Validation cc;
 
     public ValidationMethod() { }
 
-    public ValidationMethod(Specification specification, ContextualizedCriterion contextualizedCriterion) {
+    public ValidationMethod(Specification specification, Validation contextualizedCriterion) {
         this.specification = specification;
         this.cc = contextualizedCriterion;
     }
 
     @RDF("bdqffdq:criterionInContext")
-    public ContextualizedCriterion getContextualizedCriterion() {
+    public Validation getValidation() {
         return cc;
     }
 
-    public void setContextualizedCriterion(ContextualizedCriterion cc) {
+    public void setContextualizedCriterion(Validation cc) {
         this.cc = cc;
     }
     
@@ -53,8 +54,19 @@ public class ValidationMethod extends AssertionMethod {
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
 		labelBuilder.append(this.getClass().getSimpleName()).append(": ");
-		labelBuilder.append(cc.getLabel()).append(" with Specification ");
+		labelBuilder.append(cc.getLabel()).append(" with ");
 		labelBuilder.append(specification.getLabel());
 		return labelBuilder.toString();
 	}
+    
+    /**
+     * Get the preferred label, currently, same as the rdfs;label.
+     * 
+     * @return a skos:prefLabel
+     */
+    @RDF("skos:prefLabel") 
+    public String getPrefLabel() { 
+    	return getLabel();
+    }
+    
 }

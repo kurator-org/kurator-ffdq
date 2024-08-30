@@ -8,10 +8,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.datakurator.ffdq.model.*;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
-import org.datakurator.ffdq.model.context.ContextualizedIssue;
+import org.datakurator.ffdq.model.context.Validation;
+import org.datakurator.ffdq.model.context.Measure;
+import org.datakurator.ffdq.model.context.Amendment;
+import org.datakurator.ffdq.model.context.Issue;
 import org.datakurator.ffdq.model.needs.AmendmentPolicy;
 import org.datakurator.ffdq.model.needs.MeasurementPolicy;
 import org.datakurator.ffdq.model.needs.ProblemPolicy;
@@ -20,13 +20,15 @@ import org.datakurator.ffdq.model.needs.ValidationPolicy;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.Implementation;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
-import org.datakurator.ffdq.model.solutions.ProblemMethod;
+import org.datakurator.ffdq.model.solutions.IssueMethod;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
 import org.datakurator.ffdq.runner.AssertionTest;
 import org.datakurator.ffdq.runner.UnsupportedTypeException;
 import org.eclipse.rdf4j.rio.RDFFormat;
+
+import jdk.jfr.internal.LogLevel;
 
 import java.io.*;
 import java.net.URI;
@@ -45,10 +47,13 @@ public class TestUtil {
     private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
     private final static String CSV_HEADER_LABEL;
+    private final static String CSV_HEADER_GUID;
+    private final static String CSV_HEADER_PREFLABEL;
     private final static String CSV_HEADER_VERSION;
     private final static String CSV_HEADER_DESCRIPTION;
     private final static String CSV_HEADER_CRITERION_LABEL;
     private final static String CSV_HEADER_SPECIFICATION;
+    private final static String CSV_HEADER_AUTHORITIESDEFAULTS;
     private final static String CSV_HEADER_ASSERTION;
     private final static String CSV_HEADER_RESOURCE_TYPE;
     private final static String CSV_HEADER_DIMENSION;
@@ -64,10 +69,13 @@ public class TestUtil {
             properties.load(TestUtil.class.getResourceAsStream("/config.properties"));
 
             CSV_HEADER_LABEL = properties.getProperty("csv.header.label");
+            CSV_HEADER_GUID= properties.getProperty("csv.header.guid");
+            CSV_HEADER_PREFLABEL = properties.getProperty("csv.header.prefLabel");
             CSV_HEADER_VERSION = properties.getProperty("csv.header.version");
             CSV_HEADER_DESCRIPTION = properties.getProperty("csv.header.description");
             CSV_HEADER_CRITERION_LABEL = properties.getProperty("csv.header.criterionLabel");
             CSV_HEADER_SPECIFICATION = properties.getProperty("csv.header.specification");
+            CSV_HEADER_AUTHORITIESDEFAULTS = properties.getProperty("csv.header.authoritiesDefaults");
             CSV_HEADER_ASSERTION = properties.getProperty("csv.header.assertion");
             CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
             CSV_HEADER_DIMENSION = properties.getProperty("csv.header.dimension");
@@ -172,7 +180,7 @@ public class TestUtil {
             				if (!useCaseMap.containsKey(useCaseLabel)) { 
             					UseCase useCaseInstance = new UseCase();
             					useCaseInstance.setLabel(useCaseLabel);
-            					useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdq/terms/"));
+            					useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdqffdq/terms/"));
             					useCaseMap.put(useCaseLabel, useCaseInstance);
             				}
             				String includedTests = useCaseRecord.get("LabelsOfTestsIncluded");
@@ -208,7 +216,9 @@ public class TestUtil {
             	logger.log(Level.INFO, test.getGuid());
 
                 // Define elementary concepts first
-                Specification specification = new Specification(test.getGuid(), test.getLabel(), test.getSpecification());
+            	String specificationLabel = "Specification for: " + test.getLabel();
+                Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, test.getSpecification());
+                logger.log(Level.INFO, test.getSpecificationGuid());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
                 InformationElement informationElement = new InformationElement();
@@ -286,11 +296,13 @@ public class TestUtil {
                     case "MEASURE":
                         // Define a dimension in the context of resource type and info elements
                         Dimension dimension = new Dimension(test.getCriterionLabel());
-                        ContextualizedDimension cd = new ContextualizedDimension(dimension, informationElement, actedUpon, consulted, resourceType);
-                        if (test.getContextualizedGuid()!=null) { 
-                        	cd.setId(test.getContextualizedGuid());
+                        Measure cd = new Measure(dimension, informationElement, actedUpon, consulted, resourceType);
+                        cd.setId(test.getGuidTDWGNamespace());
+                        cd.setPrefLabel(test.getLabel());
+                        if (test.getSpecificationGuid()!=null) { 
+                        	cd.setId(test.getSpecificationGuid());
                         }
-                        cd.setLabel(test.getDescription() + " Measure of " + test.getDimension() +  " for " + resourceType.getLabel());
+                        cd.setLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
@@ -314,13 +326,15 @@ public class TestUtil {
 
                     case "VALIDATION":
                         // Define a criterion in the context of resource type and info elements
-                        Criterion criterion = new Criterion(test.getCriterionLabel());
-                        ContextualizedCriterion cc = new ContextualizedCriterion(criterion, informationElement, actedUpon, consulted, resourceType);
+                        Criterion validation = new Criterion(test.getCriterionLabel());
+                        Validation cc = new Validation(validation, informationElement, actedUpon, consulted, resourceType);
+                        cc.setPrefLabel(test.getLabel());
                         cc.setLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
                         cc.setComment(test.getDescription());
-                        if (test.getContextualizedGuid()!=null) { 
-                        	cc.setId(test.getContextualizedGuid());
-                        }
+                        //if (test.getContextualizedGuid()!=null) { 
+                        //	cc.setId(test.getContextualizedGuid());
+                        //}
+                        cc.setId(test.getGuidTDWGNamespace());
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
                         if (test.getMethodGuid()!=null) { 
@@ -330,7 +344,8 @@ public class TestUtil {
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
                         		ValidationPolicy vp = new ValidationPolicy();
-                        		vp.setCriterionInContext(cc);
+                        		// TOODO: Support a one use case to many validations case.
+                        		vp.addValidation(cc);
                         		vp.setUseCase(useCaseMap.get(useCaseName));
                         		if (test.getPolicyGuid()!=null) { 
                         			vp.setId(test.getPolicyGuid());
@@ -344,11 +359,13 @@ public class TestUtil {
                     case "AMENDMENT":
                         // Define an enhancement in the context of resource type and info elements
                         Enhancement enhancement = new Enhancement(test.getCriterionLabel());
-                        ContextualizedEnhancement ce = new ContextualizedEnhancement(enhancement, informationElement, actedUpon, consulted, resourceType);
+                        Amendment ce = new Amendment(enhancement, informationElement, actedUpon, consulted, resourceType);
+                        ce.setId(test.getGuidTDWGNamespace());
+                        ce.setPrefLabel(test.getLabel());
                         ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
                         ce.setComment(test.getDescription());
-                        if (test.getContextualizedGuid()!=null) { 
-                        	ce.setId(test.getContextualizedGuid());
+                        if (test.getSpecificationGuid()!=null) { 
+                        	ce.setId(test.getSpecificationGuid());
                         }
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
@@ -371,15 +388,17 @@ public class TestUtil {
                         break;
                     case "ISSUE":
                         // Define an enhancement in the context of resource type and info elements
-                        Issue issue = new Issue(test.getCriterionLabel());
-                        ContextualizedIssue ci = new ContextualizedIssue(issue, informationElement, actedUpon, consulted, resourceType);
-                        ci.setLabel(test.getDescription() + " Issue for " + resourceType.getLabel());
+                        InvertedCriterion issue = new InvertedCriterion(test.getCriterionLabel());
+                        Issue ci = new Issue(issue, informationElement, actedUpon, consulted, resourceType);
+                        ci.setId(test.getGuidTDWGNamespace());
+                        ci.setPrefLabel(test.getLabel());
+                        ci.setLabel(test.getDescription() + " InvertedCriterion for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
-                        if (test.getContextualizedGuid()!=null) { 
-                        	ci.setId(test.getContextualizedGuid());
+                        if (test.getSpecificationGuid()!=null) { 
+                        	ci.setId(test.getSpecificationGuid());
                         }
                         // Define an amendment method, a specification tied to a criterion in context
-                        ProblemMethod problemMethod = new ProblemMethod(specification, ci);
+                        IssueMethod problemMethod = new IssueMethod(specification, ci);
                         if (test.getMethodGuid()!=null) { 
                         	problemMethod.setId(test.getMethodGuid());
                         }
@@ -505,7 +524,7 @@ public class TestUtil {
     private static List<AssertionTest> addAdditionalGuidsFromFile(String additionalGuidFilename, List<AssertionTest> tests) {
 
         Map<String,String> methodMap = new HashMap<String,String>();
-        Map<String,String> contextualizedMap = new HashMap<String,String>();
+        Map<String,String> specificationGuidMap = new HashMap<String,String>();
         Map<String,String> policyMap = new HashMap<String,String>();
         if (additionalGuidFilename != null && additionalGuidFilename.length()>0) {
         	logger.info(additionalGuidFilename);
@@ -522,8 +541,8 @@ public class TestUtil {
         				String testGuid = guidRecord.get("GUID").trim();
         				String method = guidRecord.get("Method").trim();
         				methodMap.put(testGuid, method);
-        				String contextualized = guidRecord.get("Contextualized").trim();
-        				contextualizedMap.put(testGuid, contextualized);
+        				String specificationGuid = guidRecord.get("Specification").trim();
+        				specificationGuidMap.put(testGuid, specificationGuid);
         				String poliicy = guidRecord.get("Policy").trim();
         				policyMap.put(testGuid, poliicy);
         			}
@@ -531,8 +550,8 @@ public class TestUtil {
         				if (methodMap.containsKey(test.getGuid())) { 
         					test.setMethodGuid(methodMap.get(test.getGuid()));
         				}
-        				if (contextualizedMap.containsKey(test.getGuid())) { 
-        					test.setContextualizedGuid(contextualizedMap.get(test.getGuid()));
+        				if (specificationGuidMap.containsKey(test.getGuid())) { 
+        					test.setSpecificationGuid(specificationGuidMap.get(test.getGuid()));
         				}
         				if (policyMap.containsKey(test.getGuid())) { 
         					test.setPolicyGuid(policyMap.get(test.getGuid()));

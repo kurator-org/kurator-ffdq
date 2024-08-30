@@ -24,7 +24,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "bdqffdq = http://rs.tdwg.org/bdqffdq/terms/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Specification")
@@ -36,7 +36,11 @@ public class Specification {
     public Specification() { }
 
     public Specification(String id, String label, String description) {
-        this.id = "urn:uuid:" + id;
+    	if (id!=null && (id.startsWith("urn:uuid") || id.startsWith("http"))) {
+    		this.id = id;
+    	} else { 
+    		this.id = "urn:uuid:" + id;
+    	}
         this.label = label;
         this.description = description;
     }

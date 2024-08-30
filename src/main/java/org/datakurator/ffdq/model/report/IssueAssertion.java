@@ -1,4 +1,4 @@
-/**  Problem.java
+/**  IssueAssertion.java
 *
 * Copyright 2022 President and Fellows of Harvard College
 *
@@ -20,7 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedIssue;
+import org.datakurator.ffdq.model.context.Issue;
 
 import java.util.UUID;
 
@@ -28,12 +28,12 @@ import java.util.UUID;
        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
        "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:Problem")
-public class Problem extends Assertion {
+@RDFBean("bdqffdq:IssueAssertion")
+public class IssueAssertion extends Assertion {
    private String id = "urn:uuid:" + UUID.randomUUID();
 
-   private ContextualizedIssue issueInContext;
-   private Amendment informedBy;
+   private Issue issueInContext;
+   private AmendmentAssertion informedBy;
 
    @RDFSubject
    public String getId() {
@@ -45,20 +45,20 @@ public class Problem extends Assertion {
    }
 
    @RDF("bdqffdq:hasIssue")
-   public ContextualizedIssue getIssueInContext() {
+   public Issue getIssueInContext() {
        return issueInContext;
    }
 
-   public void setIssueInContext(ContextualizedIssue issueInContext) {
+   public void setIssueInContext(Issue issueInContext) {
        this.issueInContext = issueInContext;
    }
 
    @RDF("prov:wasInformedBy")
-   public Amendment getInformedBy() {
+   public AmendmentAssertion getInformedBy() {
        return informedBy;
    }
 
-   public void setInformedBy(Amendment informedBy) {
+   public void setInformedBy(AmendmentAssertion informedBy) {
        this.informedBy = informedBy;
    }
 }

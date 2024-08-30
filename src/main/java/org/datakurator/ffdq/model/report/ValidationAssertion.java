@@ -1,4 +1,4 @@
-/**  Measure.java
+/**  ValidationAssertion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -20,7 +20,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
+import org.datakurator.ffdq.model.context.Validation;
 
 import java.util.UUID;
 
@@ -28,12 +28,12 @@ import java.util.UUID;
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:Measure")
-public class Measure extends Assertion {
+@RDFBean("bdqffdq:ValidationAssertion")
+public class ValidationAssertion extends Assertion {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private ContextualizedDimension dimension;
-    private Amendment informedBy;
+    private Validation criterion;
+    private AmendmentAssertion informedBy;
 
     @RDFSubject
     public String getId() {
@@ -44,21 +44,21 @@ public class Measure extends Assertion {
         this.id = id;
     }
 
-    @RDF("bdqffdq:dimensionInContext")
-    public ContextualizedDimension getDimension() {
-        return dimension;
+    @RDF("bdqffdq:criterionInContext")
+    public Validation getCriterion() {
+        return criterion;
     }
 
-    public void setDimension(ContextualizedDimension dimension) {
-        this.dimension = dimension;
+    public void setCriterion(Validation criterion) {
+        this.criterion = criterion;
     }
 
     @RDF("prov:wasInformedBy")
-    public Amendment getInformedBy() {
+    public AmendmentAssertion getInformedBy() {
         return informedBy;
     }
 
-    public void setInformedBy(Amendment informedBy) {
+    public void setInformedBy(AmendmentAssertion informedBy) {
         this.informedBy = informedBy;
     }
 }

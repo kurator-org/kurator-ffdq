@@ -26,9 +26,9 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.datakurator.ffdq.api.result.AmendmentValue;
 import org.datakurator.ffdq.api.result.CompletenessValue;
 import org.datakurator.ffdq.model.*;
-import org.datakurator.ffdq.model.context.ContextualizedCriterion;
-import org.datakurator.ffdq.model.context.ContextualizedDimension;
-import org.datakurator.ffdq.model.context.ContextualizedEnhancement;
+import org.datakurator.ffdq.model.context.Validation;
+import org.datakurator.ffdq.model.context.Measure;
+import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.datakurator.ffdq.rdf.Namespace;
@@ -156,9 +156,9 @@ public class XLSXPostProcessor {
 
         for (DataResource dataResource : dataResources) {
             // Get the assertions for each data resource
-            List<Assertion> measures = model.findAssertionsForDataResource(dataResource, Measure.class);
-            List<Assertion> validations = model.findAssertionsForDataResource(dataResource, Validation.class);
-            List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, Amendment.class);
+            List<Assertion> measures = model.findAssertionsForDataResource(dataResource, MeasureAssertion.class);
+            List<Assertion> validations = model.findAssertionsForDataResource(dataResource, ValidationAssertion.class);
+            List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, AmendmentAssertion.class);
 
             // TODO: add support to postprocessor for issues
 
@@ -249,10 +249,10 @@ public class XLSXPostProcessor {
 
     private void initMeasuresSheet(Sheet measuresSheet, List<Assertion> measures, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        //List<String> fields = model.findFieldsByAssertionType(Measure.class);
+        //List<String> fields = model.findFieldsByAssertionType(MeasureAssertion.class);
 
         for (Assertion assertion : measures) {
-            Measure measure = (Measure) assertion;
+            MeasureAssertion measure = (MeasureAssertion) assertion;
             String recordId = dataResource.getRecordId();
 
             // Measurement assertion row
@@ -330,7 +330,7 @@ public class XLSXPostProcessor {
 
     private void initValidationsSheet(Sheet validationsSheet, Sheet initialValuesSheet, List<Assertion> validations, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        //List<String> fields = model.findFieldsByAssertionType(Validation.class);
+        //List<String> fields = model.findFieldsByAssertionType(ValidationAssertion.class);
 
         List<Map<String, ValidationState>> allInitialValues = new ArrayList<>();
 
@@ -340,17 +340,17 @@ public class XLSXPostProcessor {
             // Initialize the validation states for initial and final values
             Map<String, ValidationState> initialValues = new HashMap<>();
 
-            Validation validation = (Validation) assertion;
+            ValidationAssertion validation = (ValidationAssertion) assertion;
             String recordId = dataResource.getRecordId();
 
-            // Validation assertion row
+            // ValidationAssertion assertion row
             Row validationsRow = validationsSheet.createRow(validationsSheetRowNum++);
 
             // Get the test name from the specification
             Specification specification = validation.getSpecification();
             String test = specification.getLabel();
 
-            // Validation result
+            // ValidationAssertion result
             Result result = validation.getResult();
 
             // Determine row status from state and value
@@ -518,17 +518,17 @@ public class XLSXPostProcessor {
         List<String> allFlags = new ArrayList<>();
 
         for (Assertion assertion : amendments) {
-            Amendment amendment = (Amendment) assertion;
+            AmendmentAssertion amendment = (AmendmentAssertion) assertion;
             String recordId = dataResource.getRecordId();
 
-            // Amendment assertion row
+            // AmendmentAssertion assertion row
             Row amendmentsRow = amendmentsSheet.createRow(amendmentsSheetRowNum++);
 
             // Get the test name from the specification
             Specification specification = amendment.getSpecification();
             String test = specification.getLabel();
 
-            // Validation result
+            // ValidationAssertion result
             Result result = amendment.getResult();
 
             // Determine row status from state and value
@@ -610,7 +610,7 @@ public class XLSXPostProcessor {
         amendmentsSheetRowNum++;
     }
 
-    private List<String> fieldsFromMeasureContext(ContextualizedDimension context) {
+    private List<String> fieldsFromMeasureContext(Measure context) {
         List<String> fields = new ArrayList<>();
 
         List<URI> ie = context.getInformationElements().getComposedOf();
@@ -624,7 +624,7 @@ public class XLSXPostProcessor {
         return fields;
     }
 
-    private List<String> fieldsFromValidationContext(ContextualizedCriterion context) {
+    private List<String> fieldsFromValidationContext(Validation context) {
         List<String> fields = new ArrayList<>();
 
         List<URI> ie = context.getInformationElements().getComposedOf();
@@ -638,7 +638,7 @@ public class XLSXPostProcessor {
         return fields;
     }
 
-    private List<String> fieldsFromAmendmentContext(ContextualizedEnhancement context) {
+    private List<String> fieldsFromAmendmentContext(Amendment context) {
         List<String> fields = new ArrayList<>();
 
         List<URI> ie = context.getInformationElements().getComposedOf();
