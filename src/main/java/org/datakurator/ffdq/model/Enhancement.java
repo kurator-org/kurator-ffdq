@@ -25,6 +25,7 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = http://rs.tdwg.org/bdqffdq/terms/",
+        "bdqenh = http://rs.tdwg.org/bdqenh/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Enhancement")
@@ -32,6 +33,8 @@ public class Enhancement {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
+    // TODO: Support enhancement classes
+    
     public Enhancement() { }
 
     public Enhancement(String label) {

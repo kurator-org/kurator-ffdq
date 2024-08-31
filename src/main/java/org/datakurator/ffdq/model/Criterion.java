@@ -25,6 +25,7 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "bdqcrit = https://rs.tdwg.org/bdqcrit/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Criterion")
@@ -32,6 +33,8 @@ public class Criterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
+    // TODO: Support Criterion classes in bdqcrit
+    
     public Criterion() { }
 
     public Criterion(String label) {

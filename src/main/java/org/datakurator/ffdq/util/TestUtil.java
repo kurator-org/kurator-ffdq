@@ -296,6 +296,7 @@ public class TestUtil {
                     case "MEASURE":
                         // Define a dimension in the context of resource type and info elements
                         Dimension dimension = new Dimension(test.getCriterionLabel());
+                        dimension.setId(test.getDimension());
                         Measure cd = new Measure(dimension, informationElement, actedUpon, consulted, resourceType);
                         cd.setId(test.getGuidTDWGNamespace());
                         cd.setPrefLabel(test.getLabel());
