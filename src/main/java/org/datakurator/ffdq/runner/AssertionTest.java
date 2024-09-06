@@ -42,7 +42,9 @@ public class AssertionTest {
     private String authoritiesDefaults;  // source authorities and default values for parameters.
     private String assertionType;
     private String resourceType;
-    private String dimension;
+    private String dimension;  // bdqdim: terms
+    private String criterion;  // bdqcrit: terms
+    private String enhancement; // bdqenh: terms
     private List<String> informationElement;  // will be java class parameters, treated as ActedUpon
     private List<String> actedUpon;  // will be java class parameters
     private List<String> consulted;  // will be java class parameters
@@ -69,6 +71,7 @@ public class AssertionTest {
     public AssertionTest(String guid, String label, String version, String description, 
     		String criterionLabel, String specification, String authoritiesDefaults,
     		String assertionType, String resourceType, String dimension, 
+    		String criterion, String enhancement,
             List<String> informationElement, List<String> actedUpon, 
             List<String> consulted, List<String> testParameters, List<String> useCases) throws UnsupportedTypeException {
 
@@ -82,6 +85,8 @@ public class AssertionTest {
         this.assertionType = assertionType;
         this.resourceType = resourceType;
         this.dimension = dimension;
+        this.setCriterion(criterion);
+        this.setEnhancement(enhancement);
         this.informationElement = informationElement;
         this.actedUpon = actedUpon;
         this.consulted = consulted;
@@ -241,7 +246,35 @@ public class AssertionTest {
         this.dimension = dimension;
     }
 
-    public List<String> getInformationElement() {
+    /**
+	 * @return the criterion
+	 */
+	public String getCriterion() {
+		return criterion;
+	}
+
+	/**
+	 * @param criterion the criterion to set
+	 */
+	public void setCriterion(String criterion) {
+		this.criterion = criterion;
+	}
+
+	/**
+	 * @return the enhancement
+	 */
+	public String getEnhancement() {
+		return enhancement;
+	}
+
+	/**
+	 * @param enhancement the enhancement to set
+	 */
+	public void setEnhancement(String enhancement) {
+		this.enhancement = enhancement;
+	}
+
+	public List<String> getInformationElement() {
         return informationElement;
     }
 

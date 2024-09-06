@@ -33,15 +33,18 @@ public class Criterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    // TODO: Support Criterion classes in bdqcrit
-    
     public Criterion() { }
 
     public Criterion(String label) {
         this.label = label;
     }
+    
+    public Criterion(String label, String id) {
+        this.label = label;
+        this.id = id;
+    }
 
-    @RDFSubject
+    @RDFSubject(prefix = "bdqcrit:")
     public String getId() {
         return id;
     }
@@ -57,6 +60,27 @@ public class Criterion {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+    
+    public static Criterion COMPLETE = new Criterion("Complete","https://rs.tdwg.org/bdqcrit/terms/Complete");
+    public static Criterion CONSISTENT = new Criterion("Consistent","https://rs.tdwg.org/bdqcrit/terms/Consistent");
+    public static Criterion FOUND = new Criterion("Found","https://rs.tdwg.org/bdqcrit/terms/Found");
+    public static Criterion INRANGE = new Criterion("InRange","https://rs.tdwg.org/bdqcrit/terms/InRange");
+    public static Criterion LIKELY = new Criterion("Likely","https://rs.tdwg.org/bdqcrit/terms/Likely");
+    public static Criterion NOTEMPTY = new Criterion("NotEmpty","https://rs.tdwg.org/bdqcrit/terms/NotEmpty");
+    public static Criterion STANDARD = new Criterion("Standard","https://rs.tdwg.org/bdqcrit/terms/Standard");
+    public static Criterion UNAMBIGUOUS = new Criterion("Unambiguous","https://rs.tdwg.org/bdqcrit/terms/Unambiguous");
+
+    public static Criterion fromString(String value) {
+        if (value.equalsIgnoreCase(COMPLETE.getLabel())) return COMPLETE;
+        else if (value.equalsIgnoreCase(CONSISTENT.getLabel())) return CONSISTENT;
+        else if (value.equalsIgnoreCase(FOUND.getLabel())) return FOUND;
+        else if (value.equalsIgnoreCase(INRANGE.getLabel())) return INRANGE;
+        else if (value.equalsIgnoreCase(LIKELY.getLabel())) return LIKELY;
+        else if (value.equalsIgnoreCase(NOTEMPTY.getLabel())) return NOTEMPTY;
+        else if (value.equalsIgnoreCase(STANDARD.getLabel())) return STANDARD;
+        else if (value.equalsIgnoreCase(UNAMBIGUOUS.getLabel())) return UNAMBIGUOUS;
+        else throw new UnsupportedOperationException("Unable to find an bdqcrit: term for bdqffdq:Criterion for value: [" + value + "]");
     }
 
 }

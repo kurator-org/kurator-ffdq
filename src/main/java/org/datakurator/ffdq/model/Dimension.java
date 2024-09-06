@@ -26,7 +26,7 @@ import java.util.UUID;
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "bdq = https://rs.tdwg.org/bdq/terms/",
-        "d = https://rs.tdwg.org/bdqdim/terms/",
+        "bdqdim = https://rs.tdwg.org/bdqdim/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Dimension")
@@ -44,7 +44,7 @@ public class Dimension {
 
     @RDFSubject(prefix = "bdqdim:")
     public String getId() {
-        return label.toLowerCase();
+        return label;
     }
 
     public void setId(String id) {
@@ -64,7 +64,7 @@ public class Dimension {
     public static Dimension CONFORMANCE = new Dimension("Conformance");
     public static Dimension RESOLUTION = new Dimension("Resolution");
     public static Dimension CONSISTENCY = new Dimension("Consistency");
-    public static Dimension LIKELYHOOD = new Dimension("Likelyhood");
+    public static Dimension LIKELYNESS = new Dimension("Likeliness");
     public static Dimension VOCAB_MATCH = new Dimension("Vocab Match");
     public static Dimension COMPLETENESS = new Dimension("Completeness");
     public static Dimension ACCURACY = new Dimension("Accuracy");
@@ -78,7 +78,7 @@ public class Dimension {
         else if (value.equalsIgnoreCase(CONFORMANCE.getLabel())) return CONFORMANCE;
         else if (value.equalsIgnoreCase(CONSISTENCY.getLabel())) return CONSISTENCY;
         else if (value.equalsIgnoreCase(RESOLUTION.getLabel())) return RESOLUTION;
-        else if (value.equalsIgnoreCase(LIKELYHOOD.getLabel())) return LIKELYHOOD;
+        else if (value.equalsIgnoreCase(LIKELYNESS.getLabel())) return LIKELYNESS;
         else if (value.equalsIgnoreCase(COMPLETENESS.getLabel())) return COMPLETENESS;
         else if (value.equalsIgnoreCase(ACCURACY.getLabel())) return ACCURACY;
         else if (value.equalsIgnoreCase(PRECISION.getLabel())) return PRECISION;

@@ -23,6 +23,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.Consulted;
 import org.datakurator.ffdq.model.Criterion;
+import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
 
@@ -38,6 +39,7 @@ public class Validation {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Criterion criterion;
+    private Dimension dimension;
     private InformationElement ie;
     private ActedUpon actedUpon;
     private Consulted consulted;    
@@ -152,7 +154,22 @@ public class Validation {
         this.rt = rt;
     }
 
-    @RDF("bdqffdq:hasCriterion")
+    /**
+	 * @return the dimension
+	 */
+    @RDF("bdqffdq:hasDataQualityDimension")
+	public Dimension getDimension() {
+		return dimension;
+	}
+
+	/**
+	 * @param dimension the dimension to set
+	 */
+	public void setDimension(Dimension dimension) {
+		this.dimension = dimension;
+	}
+
+	@RDF("bdqffdq:hasCriterion")
     public Criterion getCriterion() {
         return criterion;
     }

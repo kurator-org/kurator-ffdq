@@ -58,6 +58,8 @@ public class TestUtil {
     private final static String CSV_HEADER_ASSERTION;
     private final static String CSV_HEADER_RESOURCE_TYPE;
     private final static String CSV_HEADER_DIMENSION;
+    private final static String CSV_HEADER_CRITERION;
+    private final static String CSV_HEADER_ENHANCEMENT;
     private final static String CSV_HEADER_INFO_ELEMENT;
     private final static String CSV_HEADER_INFO_ELEMENT_ACTEDUPON;
     private final static String CSV_HEADER_INFO_ELEMENT_CONSULTED;
@@ -80,6 +82,8 @@ public class TestUtil {
             CSV_HEADER_ASSERTION = properties.getProperty("csv.header.assertion");
             CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
             CSV_HEADER_DIMENSION = properties.getProperty("csv.header.dimension");
+            CSV_HEADER_CRITERION = properties.getProperty("csv.header.criterion");
+            CSV_HEADER_ENHANCEMENT = properties.getProperty("csv.header.enhancement");
             CSV_HEADER_INFO_ELEMENT = properties.getProperty("csv.header.informationElement");
             CSV_HEADER_INFO_ELEMENT_ACTEDUPON = properties.getProperty("csv.header.actedUpon");
             CSV_HEADER_INFO_ELEMENT_CONSULTED = properties.getProperty("csv.header.consulted");
@@ -302,8 +306,7 @@ public class TestUtil {
                 switch(test.getAssertionType().toUpperCase()) {
                     case "MEASURE":
                         // Define a dimension in the context of resource type and info elements
-                        Dimension dimension = new Dimension(test.getCriterionLabel());
-                        dimension.setId(test.getDimension());
+                        Dimension dimension = Dimension.fromString(test.getDimension());
                         Measure cd = new Measure(dimension, informationElement, actedUpon, consulted, resourceType);
                         cd.setId(test.getGuidTDWGNamespace());
                         cd.setPrefLabel(test.getLabel());
@@ -341,8 +344,10 @@ public class TestUtil {
 
                     case "VALIDATION":
                         // Define a criterion in the context of resource type and info elements
-                        Criterion validation = new Criterion(test.getCriterionLabel());
-                        Validation cc = new Validation(validation, informationElement, actedUpon, consulted, resourceType);
+                        Criterion criterion = Criterion.fromString(test.getCriterion());
+                        Validation cc = new Validation(criterion, informationElement, actedUpon, consulted, resourceType);
+                        dimension = new Dimension(test.getDimension());
+                        cc.setDimension(dimension);
                         cc.setPrefLabel(test.getLabel());
                         cc.setLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
                         cc.setComment(test.getDescription());
@@ -674,6 +679,8 @@ public class TestUtil {
                 String version = record.get(CSV_HEADER_VERSION);
                 String description = record.get(CSV_HEADER_DESCRIPTION);
                 String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
+                String criterion = record.get(CSV_HEADER_CRITERION);
+                String enhancement = record.get(CSV_HEADER_ENHANCEMENT);
                 String specification = record.get(CSV_HEADER_SPECIFICATION);
                 String authoritiesDefaults = record.get(CSV_HEADER_AUTHORITIESDEFAULTS);
                 String assertionType = record.get(CSV_HEADER_ASSERTION);
@@ -698,7 +705,7 @@ public class TestUtil {
                 }
                 
                 AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, authoritiesDefaults, assertionType, resourceType,
-                        dimension, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames);
+                        dimension, criterion, enhancement, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames);
                 
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
