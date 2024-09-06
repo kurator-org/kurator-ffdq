@@ -39,6 +39,7 @@ public class AssertionTest {
     private String description;
     private String criterionLabel;
     private String specification;
+    private String authoritiesDefaults;  // source authorities and default values for parameters.
     private String assertionType;
     private String resourceType;
     private String dimension;
@@ -65,8 +66,11 @@ public class AssertionTest {
         // default constructor for test runner
     }
 
-    public AssertionTest(String guid, String label, String version, String description, String criterionLabel, String specification, String assertionType,
-                         String resourceType, String dimension, List<String> informationElement, List<String> actedUpon, List<String> consulted, List<String> testParameters, List<String> useCases) throws UnsupportedTypeException {
+    public AssertionTest(String guid, String label, String version, String description, 
+    		String criterionLabel, String specification, String authoritiesDefaults,
+    		String assertionType, String resourceType, String dimension, 
+            List<String> informationElement, List<String> actedUpon, 
+            List<String> consulted, List<String> testParameters, List<String> useCases) throws UnsupportedTypeException {
 
         this.guid = guid;
         this.label = label;
@@ -74,6 +78,7 @@ public class AssertionTest {
         this.description = description;
         this.setCriterionLabel(criterionLabel);
         this.specification = specification;
+        this.authoritiesDefaults = authoritiesDefaults;
         this.assertionType = assertionType;
         this.resourceType = resourceType;
         this.dimension = dimension;
@@ -198,7 +203,21 @@ public class AssertionTest {
         this.specification = specification;
     }
 
-    public String getAssertionType() {
+    /**
+	 * @return the authoritiesDefaults
+	 */
+	public String getAuthoritiesDefaults() {
+		return authoritiesDefaults;
+	}
+
+	/**
+	 * @param authoritiesDefaults the authoritiesDefaults to set
+	 */
+	public void setAuthoritiesDefaults(String authoritiesDefaults) {
+		this.authoritiesDefaults = authoritiesDefaults;
+	}
+
+	public String getAssertionType() {
         return assertionType;
     }
 

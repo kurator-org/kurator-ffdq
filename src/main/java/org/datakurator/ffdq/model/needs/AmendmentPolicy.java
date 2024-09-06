@@ -21,7 +21,10 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.context.Amendment;
+import org.datakurator.ffdq.model.context.Measure;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
@@ -33,7 +36,21 @@ public class AmendmentPolicy {
 	private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private Amendment ce;
+    private List<Amendment> amendments;
+
+    public AmendmentPolicy() { 
+    	init();
+    }
+    
+    public AmendmentPolicy(String id, UseCase useCase) { 
+    	init();
+    	this.setId(id);
+    	this.setUseCase(useCase);
+    }
+    
+    private void init()  {
+    	amendments = new ArrayList<Amendment>();
+    }
 
     @RDFSubject
     public String getId() {
@@ -60,13 +77,13 @@ public class AmendmentPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("bdqffdq:enhancementInContext")
-    public Amendment getEnhancementInContext() {
-        return ce;
+    @RDF("bdqffdq:includesInPolicy")
+    public List<Amendment> getEnhancementInContext() {
+        return amendments;
     }
 
-    public void setEnhancementInContext(Amendment ce) {
-        this.ce = ce;
+    public void addAmendment(Amendment ce) {
+        this.amendments.add(ce);
     }
 
 	/**
@@ -75,8 +92,9 @@ public class AmendmentPolicy {
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
-		labelBuilder.append("AmendmentPolicy: ");
-		labelBuilder.append(ce.getLabel()).append(" in UseCase ");
+		labelBuilder.append("AmendmentPolicy: (");
+		labelBuilder.append(amendments.size()).append(") amendments ");
+		labelBuilder.append(" in UseCase ");
 		labelBuilder.append(useCase.getLabel());
 		return labelBuilder.toString();
 	}

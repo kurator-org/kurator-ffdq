@@ -38,7 +38,7 @@ public class ValidationMethod extends AssertionMethod {
         this.cc = contextualizedCriterion;
     }
 
-    @RDF("bdqffdq:criterionInContext")
+    @RDF("bdqffdq:forValidation")
     public Validation getValidation() {
         return cc;
     }

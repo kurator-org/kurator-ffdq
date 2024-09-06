@@ -238,7 +238,7 @@ public class TestRunner {
                 test.setAssertionType(AssertionTest.MEASURE);
                 measures.add(measurementMethod);
 
-                Measure cd = measurementMethod.getContextualizedDimension();
+                Measure cd = measurementMethod.getMeasure();
                 if (test.getDimension() == null) {
                     test.setDimension(cd.getDimension().getLabel());
                 }
@@ -451,7 +451,7 @@ public class TestRunner {
             // create a dq report object
             for (MeasurementMethod measurementMethod : measures) {
                 Specification specification = measurementMethod.getSpecification();
-                Measure dimension = measurementMethod.getContextualizedDimension();
+                Measure dimension = measurementMethod.getMeasure();
 
                 AssertionTest test = tests.get(specification.getId());
 

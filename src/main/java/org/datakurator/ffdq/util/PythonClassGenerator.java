@@ -251,6 +251,7 @@ class DwCTG2DQ:
             sb.append("\t").append("\t").append("result = ").append(retType).append("()").append("\n\n");
 
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
+            List<String> defaultsWords = java.util.Arrays.asList(test.getAuthoritiesDefaults().split("\\s+"));
             sb.append("\t").append("\t").append("#TODO:  Implement specification").append("\n");
             // Split the specification into words on whitespace, then print specification in lines with
             // the last word boundary being before character 55 in the string (plus an indent and comment chars).
@@ -264,6 +265,16 @@ class DwCTG2DQ:
             	}
             }
             sb.append("\t").append("\t").append("#").append(specificationLine.toString()).append("\n");
+            Iterator<String> iw = defaultsWords.iterator();
+            StringBuffer defaultsLine = new StringBuffer();
+            while (i.hasNext()) { 
+            	defaultsLine.append(i.next()).append(" ");
+            	if (defaultsLine.length()>55) { 
+            	     sb.append("\t").append("\t").append("# ").append(defaultsLine.toString()).append("\n");
+            	     defaultsLine = new StringBuffer();
+            	}
+            }
+            sb.append("\t").append("\t").append("#").append(defaultsLine.toString()).append("\n");
             sb.append("\n");
             // Test Parameters change the behavior of the test.
             if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 

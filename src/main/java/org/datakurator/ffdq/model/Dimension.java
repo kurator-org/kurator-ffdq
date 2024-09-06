@@ -42,7 +42,7 @@ public class Dimension {
 
     }
 
-    @RDFSubject(prefix = "d:")
+    @RDFSubject(prefix = "bdqdim:")
     public String getId() {
         return label.toLowerCase();
     }

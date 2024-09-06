@@ -21,7 +21,11 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.context.Measure;
+import org.datakurator.ffdq.model.context.Validation;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
@@ -33,8 +37,22 @@ public class MeasurementPolicy {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private Measure cd;
+    private List<Measure> measures;
 
+    public MeasurementPolicy() { 
+    	init();
+    }
+    
+    public MeasurementPolicy(String id, UseCase useCase) { 
+    	init();
+    	this.setId(id);
+    	this.setUseCase(useCase);
+    }
+    
+    private void init()  {
+    	measures = new ArrayList<Measure>();
+    }
+    
     @RDFSubject
     public String getId() {
         return id;
@@ -60,13 +78,13 @@ public class MeasurementPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("bdqffdq:dimensionInContext")
-    public Measure getDimensionInContext() {
-        return cd;
+    @RDF("bdqffdq:includesInPolicy")
+    public List<Measure> getMeasures() {
+        return measures;
     }
 
-    public void setDimensionInContext(Measure cd) {
-        this.cd = cd;
+    public void addMeasure(Measure aMeasure) {
+        this.measures.add(aMeasure);
     }
     
 	/**
@@ -75,8 +93,15 @@ public class MeasurementPolicy {
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
-		labelBuilder.append("MeasurementPolicy: ");
-		labelBuilder.append(cd.getLabel()).append(" in UseCase ");
+		labelBuilder.append("MeasurementPolicy: (");
+		labelBuilder.append(measures.size()).append(") measures ");
+//		Iterator<Measure> i = measures.iterator();
+//		String separator = "";
+//		while (i.hasNext()) { 
+//			labelBuilder.append(separator).append(i.next().getLabel());
+//			separator = ", ";
+//		}
+		labelBuilder.append(" in UseCase ");
 		labelBuilder.append(useCase.getLabel());
 		return labelBuilder.toString();
 	}

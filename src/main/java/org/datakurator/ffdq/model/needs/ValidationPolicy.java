@@ -74,7 +74,7 @@ public class ValidationPolicy {
     	}
     }
 
-    @RDF("bdqffdq:coversUseCase")
+    @RDF("bdqffdq:hasUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -86,7 +86,7 @@ public class ValidationPolicy {
     /*
      * Add a validation to the list of validations for this policy.
      */
-    @RDF("bdqffdq:hasValidation")
+    @RDF("bdqffdq:includesInPolicy")
     public List<Validation> getValidations() {
         return validations;
     }
@@ -101,13 +101,14 @@ public class ValidationPolicy {
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
-		labelBuilder.append("ValidationPolicy: ");
-		Iterator<Validation> i = validations.iterator();
-		String separator = "";
-		while (i.hasNext()) { 
-			labelBuilder.append(separator).append(i.next().getLabel());
-			separator = ", ";
-		}
+		labelBuilder.append("ValidationPolicy: (");
+		labelBuilder.append(validations.size()).append(") validations ");
+//		Iterator<Validation> i = validations.iterator();
+//		String separator = "";
+//		while (i.hasNext()) { 
+//			labelBuilder.append(separator).append(i.next().getLabel());
+//			separator = ", ";
+//		}
 		labelBuilder.append(" in UseCase ");
 		labelBuilder.append(useCase.getLabel());
 		return labelBuilder.toString();

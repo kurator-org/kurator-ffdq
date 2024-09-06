@@ -38,8 +38,8 @@ public class MeasurementMethod extends AssertionMethod {
         this.cd = contextualizedDimension;
     }
 
-    @RDF("bdqffdq:dimensionInContext")
-    public Measure getContextualizedDimension() {
+    @RDF("bdqffdq:forMeasurement")
+    public Measure getMeasure() {
         return cd;
     }
 

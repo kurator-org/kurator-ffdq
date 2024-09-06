@@ -36,7 +36,7 @@ public abstract class Assertion {
     private Result result;
     private URI dataResource;
 
-    @RDF("prov:used")
+    @RDF("bdqffdq:appliesTo")
     public URI getDataResource() {
         return dataResource;
     }

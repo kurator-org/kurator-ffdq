@@ -14,7 +14,7 @@ import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.Issue;
 import org.datakurator.ffdq.model.needs.AmendmentPolicy;
 import org.datakurator.ffdq.model.needs.MeasurementPolicy;
-import org.datakurator.ffdq.model.needs.ProblemPolicy;
+import org.datakurator.ffdq.model.needs.IssuePolicy;
 import org.datakurator.ffdq.model.needs.UseCase;
 import org.datakurator.ffdq.model.needs.ValidationPolicy;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -211,13 +212,19 @@ public class TestUtil {
             // Define a mechanism for the tests
             Mechanism mechanism = new Mechanism(mechanismGuid, mechanismName);
 
+            Map<UseCase,MeasurementPolicy> useCaseMeasurementPolicyMap = new HashMap<UseCase,MeasurementPolicy>(); 
+            Map<UseCase,ValidationPolicy> useCaseValidationPolicyMap = new HashMap<UseCase,ValidationPolicy>(); 
+            Map<UseCase,AmendmentPolicy> useCaseAmendmentPolicyMap = new HashMap<UseCase,AmendmentPolicy>(); 
+            Map<UseCase,IssuePolicy> useCaseIssuePolicyMap = new HashMap<UseCase,IssuePolicy>(); 
+            
             for (AssertionTest test : tests) {
             	
             	logger.log(Level.INFO, test.getGuid());
 
                 // Define elementary concepts first
             	String specificationLabel = "Specification for: " + test.getLabel();
-                Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, test.getSpecification());
+            	String specificationDescription = test.getSpecification() + " " + test.getAuthoritiesDefaults();
+                Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, specificationDescription.trim(), test.getSpecification(), test.getAuthoritiesDefaults());
                 logger.log(Level.INFO, test.getSpecificationGuid());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
@@ -313,13 +320,20 @@ public class TestUtil {
                         if (iuc!=null) { 
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
-                        		MeasurementPolicy pol = new MeasurementPolicy();
-                        		pol.setDimensionInContext(cd);
-                        		pol.setUseCase(useCaseMap.get(useCaseName));
-                        		if (test.getPolicyGuid()!=null) { 
-                        			pol.setId(test.getPolicyGuid());
+                        		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
+                        		MeasurementPolicy pol = null;
+                        		if (!useCaseMeasurementPolicyMap.containsKey(useCase)) {
+                        			List<MeasurementPolicy> measPolList = new ArrayList<MeasurementPolicy>();
+                        			pol = new MeasurementPolicy();
+                        			pol.setUseCase(useCase);
+                        			if (test.getPolicyGuid()!=null) { 
+                        				pol.setId(test.getPolicyGuid());
+                        			}
+                        		} else { 
+                        			pol = useCaseMeasurementPolicyMap.get(useCase);
                         		}
-                        		model.save(pol);
+                        		pol.addMeasure(cd);
+                        		useCaseMeasurementPolicyMap.put(useCase, pol);
                         	}
                         }
                         model.save(measurementMethod);
@@ -344,19 +358,26 @@ public class TestUtil {
                         if (iuc!=null) { 
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
-                        		ValidationPolicy vp = new ValidationPolicy();
-                        		// TOODO: Support a one use case to many validations case.
-                        		vp.addValidation(cc);
-                        		vp.setUseCase(useCaseMap.get(useCaseName));
-                        		if (test.getPolicyGuid()!=null) { 
-                        			vp.setId(test.getPolicyGuid());
+                        		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
+                        		ValidationPolicy pol = null;
+                        		if (!useCaseValidationPolicyMap.containsKey(useCase)) {
+                        			pol = new ValidationPolicy();
+                        			pol.setUseCase(useCase);
+                        			if (test.getPolicyGuid()!=null) { 
+                        				pol.setId(test.getPolicyGuid());
+                        			}
+                        		} else { 
+                        			pol = useCaseValidationPolicyMap.get(useCase);
                         		}
-                         		model.save(vp);
+                        		pol.addValidation(cc);
+                        		useCaseValidationPolicyMap.put(useCase, pol);
                         	}
                         }
                         model.save(validationMethod);
                         break;
 
+
+                        
                     case "AMENDMENT":
                         // Define an enhancement in the context of resource type and info elements
                         Enhancement enhancement = new Enhancement(test.getCriterionLabel());
@@ -376,13 +397,20 @@ public class TestUtil {
                         if (iuc!=null) { 
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
-                       			AmendmentPolicy pol = new AmendmentPolicy();
-                       			pol.setEnhancementInContext(ce);
-                       			pol.setUseCase(useCaseMap.get(useCaseName));
-                       			if (test.getPolicyGuid()!=null) { 
-                       				pol.setId(test.getPolicyGuid());
-                       			}
-                       			model.save(pol);
+                        		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
+                       			AmendmentPolicy pol = null;
+                        		if (!useCaseAmendmentPolicyMap.containsKey(useCase)) {
+                        			List<AmendmentPolicy> measPolList = new ArrayList<AmendmentPolicy>();
+                        			pol = new AmendmentPolicy();
+                        			pol.setUseCase(useCase);
+                        			if (test.getPolicyGuid()!=null) { 
+                        				pol.setId(test.getPolicyGuid());
+                        			}
+                        		} else { 
+                        			pol = useCaseAmendmentPolicyMap.get(useCase);
+                        		}
+                        		pol.addAmendment(ce);
+                        		useCaseAmendmentPolicyMap.put(useCase, pol);
                        		}
                         }
                         model.save(amendmentMethod);
@@ -406,20 +434,74 @@ public class TestUtil {
                         if (iuc!=null) { 
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
-                       			ProblemPolicy pol = new ProblemPolicy();
-                       			pol.setIssueInContext(ci);
-                       			pol.setUseCase(useCaseMap.get(useCaseName));
-                       			if (test.getPolicyGuid()!=null) { 
-                       				pol.setId(test.getPolicyGuid());
-                       			}
-                       			model.save(pol);
+                        		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
+                       			IssuePolicy pol = null;
+                        		if (!useCaseIssuePolicyMap.containsKey(useCase)) {
+                        			List<IssuePolicy> measPolList = new ArrayList<IssuePolicy>();
+                        			pol = new IssuePolicy();
+                        			pol.setUseCase(useCase);
+                        			if (test.getPolicyGuid()!=null) { 
+                        				pol.setId(test.getPolicyGuid());
+                        			}
+                        		} else { 
+                        			pol = useCaseIssuePolicyMap.get(useCase);
+                        		}
+                        		pol.addIssue(ci);
+                        		useCaseIssuePolicyMap.put(useCase, pol);
                        		}
                         }
                         model.save(problemMethod);
                         break;
                 }
-
             }
+
+            Set<UseCase> keys = useCaseMeasurementPolicyMap.keySet();
+            Iterator<UseCase> i = keys.iterator();
+            while (i.hasNext()) { 
+            	UseCase key = i.next();
+            	if (useCaseMeasurementPolicyMap.containsKey(key)) { 
+            		MeasurementPolicy measurementPolicy = useCaseMeasurementPolicyMap.get(key);
+            		if (measurementPolicy!=null) { 
+            			model.save(measurementPolicy);
+            		}
+            	}
+            }   
+            
+            keys = useCaseValidationPolicyMap.keySet();
+            i = keys.iterator();
+            while (i.hasNext()) { 
+            	UseCase key = i.next();
+            	if (useCaseValidationPolicyMap.containsKey(key)) { 
+            		ValidationPolicy validationPolicy = useCaseValidationPolicyMap.get(key);
+            		if (validationPolicy!=null) { 
+            			model.save(validationPolicy);
+            		}
+            	}
+            }      
+            
+            keys = useCaseAmendmentPolicyMap.keySet();
+            i = keys.iterator();
+            while (i.hasNext()) { 
+            	UseCase key = i.next();
+            	if (useCaseAmendmentPolicyMap.containsKey(key)) { 
+            		AmendmentPolicy policy = useCaseAmendmentPolicyMap.get(key);
+            		if (policy!=null) { 
+            			model.save(policy);
+            		}
+            	}
+            } 
+            
+            keys = useCaseIssuePolicyMap.keySet();
+            i = keys.iterator();
+            while (i.hasNext()) { 
+            	UseCase key = i.next();
+            	if (useCaseIssuePolicyMap.containsKey(key)) { 
+            		IssuePolicy policy = useCaseIssuePolicyMap.get(key);
+            		if (policy!=null) { 
+            			model.save(policy);
+            		}
+            	}
+            } 
 
             // Write rdf to file
             FileOutputStream out = new FileOutputStream(rdfOut);
@@ -593,6 +675,7 @@ public class TestUtil {
                 String description = record.get(CSV_HEADER_DESCRIPTION);
                 String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
                 String specification = record.get(CSV_HEADER_SPECIFICATION);
+                String authoritiesDefaults = record.get(CSV_HEADER_AUTHORITIESDEFAULTS);
                 String assertionType = record.get(CSV_HEADER_ASSERTION);
                 String resourceType = record.get(CSV_HEADER_RESOURCE_TYPE);
                 String dimension = record.get(CSV_HEADER_DIMENSION);
@@ -602,8 +685,8 @@ public class TestUtil {
                 	informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
                 }
                 String actedUpon = record.get(CSV_HEADER_INFO_ELEMENT_ACTEDUPON);
-logger.log(Level.INFO, CSV_HEADER_INFO_ELEMENT_ACTEDUPON);                
-logger.log(Level.INFO, actedUpon);                
+                logger.log(Level.INFO, CSV_HEADER_INFO_ELEMENT_ACTEDUPON);                
+                logger.log(Level.INFO, actedUpon);                
                 String consulted = record.get(CSV_HEADER_INFO_ELEMENT_CONSULTED);
                 String testParameters = record.get(CSV_HEADER_TEST_PARMETERS);
                 logger.log(Level.FINE, assertionType);
@@ -614,7 +697,7 @@ logger.log(Level.INFO, actedUpon);
                 	useCaseNames = parseUseCaseString(useCasesForTestString);
                 }
                 
-                AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, assertionType, resourceType,
+                AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, authoritiesDefaults, assertionType, resourceType,
                         dimension, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames);
                 
                 tests.add(test);

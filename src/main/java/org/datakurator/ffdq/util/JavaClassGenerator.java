@@ -304,6 +304,7 @@ public class JavaClassGenerator {
             }            
             
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
+            List<String> defaultsWords = java.util.Arrays.asList(test.getAuthoritiesDefaults().split("\\s+"));
             
             outputCodeSB.append(indent).append(") {\n");
             outputCodeSB.append(indent).append(indent).append(retType).append(" result = ").append("new ").append(retType).append("();\n\n");
@@ -320,7 +321,19 @@ public class JavaClassGenerator {
             	}
             }
             outputCodeSB.append(indent).append(indent).append("// ").append(specificationLine.toString()).append("\n");
+            // similarly for authorities and default values
+            Iterator<String> iw = defaultsWords.iterator();
+            StringBuffer defaultsLine = new StringBuffer();
+            while (iw.hasNext()) { 
+            	defaultsLine.append(iw.next()).append(" ");
+            	if (defaultsLine.length()>55) { 
+            	     outputCodeSB.append(indent).append(indent).append("// ").append(defaultsLine.toString()).append("\n");
+            	     defaultsLine = new StringBuffer();
+            	}
+            }
+            outputCodeSB.append(indent).append(indent).append("// ").append(defaultsLine.toString()).append("\n");
             outputCodeSB.append("\n");
+            // Test Parameters change the behavior of the test.
             // Test Parameters change the behavior of the test.
             if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 
             	StringBuilder testParamCommentLines = new StringBuilder();

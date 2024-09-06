@@ -1,4 +1,4 @@
-/**  ProblemPolicy.java
+/**  IssuePolicy.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -20,20 +20,38 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.Issue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:ProblemPolicy")
-public class ProblemPolicy {
+@RDFBean("bdqffdq:IssuePolicy")
+public class IssuePolicy {
 	private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
-    private Issue ci;
+    private List<Issue> issues;
+
+    public IssuePolicy() { 
+    	init();
+    }
+    
+    public IssuePolicy(String id, UseCase useCase) { 
+    	init();
+    	this.setId(id);
+    	this.setUseCase(useCase);
+    }
+    
+    private void init()  {
+    	issues = new ArrayList<Issue>();
+    }
+    
 
     @RDFSubject
     public String getId() {
@@ -60,13 +78,13 @@ public class ProblemPolicy {
         this.useCase = useCase;
     }
 
-    @RDF("bdqffdq:issueInContext")
-    public Issue getIssueInContext() {
-        return ci;
+    @RDF("bdqffdq:includesInPolicy")
+    public List<Issue> getIssues() {
+        return issues;
     }
 
-    public void setIssueInContext(Issue ci) {
-        this.ci = ci;
+    public void addIssue(Issue ci) {
+        this.issues.add(ci);
     }
     
 	/**
@@ -75,8 +93,9 @@ public class ProblemPolicy {
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
-		labelBuilder.append("ProblemPolicy: ");
-		labelBuilder.append(ci.getLabel()).append(" in UseCase ");
+		labelBuilder.append("IssuePolicy: (");
+		labelBuilder.append(issues.size()).append(") issues ");
+		labelBuilder.append(" in UseCase ");
 		labelBuilder.append(useCase.getLabel());
 		return labelBuilder.toString();
 	}

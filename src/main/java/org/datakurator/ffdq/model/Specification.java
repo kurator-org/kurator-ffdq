@@ -32,10 +32,12 @@ public class Specification {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
     private String description;
+    private String expectedResponse;
+    private String authoritiesDefaults;
 
     public Specification() { }
 
-    public Specification(String id, String label, String description) {
+    public Specification(String id, String label, String description, String expectedResponse, String authoritiesDefaults) {
     	if (id!=null && (id.startsWith("urn:uuid") || id.startsWith("http"))) {
     		this.id = id;
     	} else { 
@@ -43,6 +45,8 @@ public class Specification {
     	}
         this.label = label;
         this.description = description;
+        this.authoritiesDefaults = authoritiesDefaults;
+        this.expectedResponse = expectedResponse;
     }
 
     @RDFSubject
@@ -71,4 +75,34 @@ public class Specification {
     public void setDescription(String description) {
         this.description = description;
     }
+
+	/**
+	 * @return the expectedResponse
+	 */
+    @RDF("bdqffdq:hasExpectedResponse")
+	public String getExpectedResponse() {
+		return expectedResponse;
+	}
+
+	/**
+	 * @param expectedResponse the expectedResponse to set
+	 */
+	public void setExpectedResponse(String expectedResponse) {
+		this.expectedResponse = expectedResponse;
+	}
+
+	/**
+	 * @return the authoritiesDefaults
+	 */
+    @RDF("bdqffdq:hasAuthoritiesDefaults")
+	public String getAuthoritiesDefaults() {
+		return authoritiesDefaults;
+	}
+
+	/**
+	 * @param authoritiesDefaults the authoritiesDefaults to set
+	 */
+	public void setAuthoritiesDefaults(String authoritiesDefaults) {
+		this.authoritiesDefaults = authoritiesDefaults;
+	}
 }
