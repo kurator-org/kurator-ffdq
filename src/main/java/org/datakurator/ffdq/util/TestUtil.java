@@ -315,6 +315,7 @@ public class TestUtil {
                         }
                         cd.setLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
+                        model.save(cd);
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
                         if (test.getMethodGuid()!=null) { 
@@ -355,6 +356,7 @@ public class TestUtil {
                         //	cc.setId(test.getContextualizedGuid());
                         //}
                         cc.setId(test.getGuidTDWGNamespace());
+                        model.save(cc);
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
                         if (test.getMethodGuid()!=null) { 
@@ -394,6 +396,7 @@ public class TestUtil {
                         if (test.getSpecificationGuid()!=null) { 
                         	ce.setId(test.getSpecificationGuid());
                         }
+                        model.save(ce);
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         if (test.getMethodGuid()!=null) {
@@ -431,6 +434,7 @@ public class TestUtil {
                         if (test.getSpecificationGuid()!=null) { 
                         	ci.setId(test.getSpecificationGuid());
                         }
+                        model.save(ci);
                         // Define an amendment method, a specification tied to a criterion in context
                         IssueMethod problemMethod = new IssueMethod(specification, ci);
                         if (test.getMethodGuid()!=null) { 

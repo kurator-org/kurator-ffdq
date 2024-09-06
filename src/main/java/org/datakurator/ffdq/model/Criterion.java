@@ -46,7 +46,11 @@ public class Criterion {
 
     @RDFSubject(prefix = "bdqcrit:")
     public String getId() {
-        return id;
+    	if (id.startsWith("https://rs.tdwg.org/bdqcrit/terms/")) { 
+    		return id.replace("https://rs.tdwg.org/bdqcrit/terms/", "");
+    	} else { 
+    		return id;
+    	}
     }
 
     public void setId(String id) {
