@@ -69,7 +69,7 @@ public class Namespace {
         while (i.hasNext()) { 
         	String key = i.next();
         	if (!key.equalsIgnoreCase("none")) { 
-        		namespaces.append("PREFIX ").append(key).append(" ").append("<").append(nsPrefixes.get(key)).append("> ");
+        		namespaces.append("PREFIX ").append(key).append(": ").append("<").append(nsPrefixes.get(key)).append("> ");
         	}
         }
         

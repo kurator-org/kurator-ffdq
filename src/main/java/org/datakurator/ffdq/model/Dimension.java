@@ -28,6 +28,9 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
 import java.util.UUID;
 
+/**
+ * Class for data quality Dimensions.
+ */
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "bdq = https://rs.tdwg.org/bdq/terms/",
