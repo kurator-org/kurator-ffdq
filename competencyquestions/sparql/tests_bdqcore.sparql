@@ -9,7 +9,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 #SELECT DISTINCT ?useCase ?test ?specification ?id ?status ?comment
-SELECT DISTINCT ?useCase ?test ?spec
+SELECT DISTINCT ?useCase ?test ?specification
 
 WHERE {
 
@@ -29,8 +29,7 @@ WHERE {
     ?vm a bdqffdq:ValidationMethod .
     ?vm bdqffdq:forValidation ?cc .
     ?vm bdqffdq:hasSpecification ?testSpec .
-    ?testSpec rdfs:comment ?spec
-#    ?testSpec rdfs:hasExpectedResponse ?specification .
+    ?testSpec bdqffdq:hasExpectedResponse ?specification .
 
 #
 #    # Find the validations from the criterion

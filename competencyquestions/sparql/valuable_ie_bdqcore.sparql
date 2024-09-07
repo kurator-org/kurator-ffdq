@@ -1,0 +1,39 @@
+# Given a use case find the valuable
+# information elements
+
+PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/>
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT ?useCase ?ie ?criterion
+
+WHERE {
+
+   # Find Validations from the ValidationPolicy
+   # for a given use case
+
+   ?policy a bdqffdq:ValidationPolicy .
+   ?policy bdqffdq:hasUseCase ?uc .
+   ?policy bdqffdq:includesInPolicy ?cc .
+   ?uc rdfs:label ?useCase .
+
+   ?cc bdqffdq:hasCriterion ?criterion .
+
+   # Find Information Elements 
+   # for a the Validation
+ 
+   ?cc bdqffdq:hasActedUponInformationElement ?ieClass .
+
+   ?ieClass bdqffdq:composedOf ?ie
+
+   # Filter by a specific use case
+
+   FILTER( ?uc = <https://rs.tdwg.org/bdqffdq/terms/Spatial-Temporal_Patterns> )
+
+}
+
+ORDER BY ?ie
+
