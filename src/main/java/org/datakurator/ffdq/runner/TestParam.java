@@ -23,6 +23,9 @@ import java.net.URI;
 
 /**
  * Created by lowery on 8/21/17.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 public class TestParam {
     private final String value;
@@ -32,6 +35,13 @@ public class TestParam {
     private Parameter parameter;
     private int index;
 
+    /**
+     * <p>Constructor for TestParam.</p>
+     *
+     * @param value a {@link java.lang.String} object.
+     * @param index a int.
+     * @param parameter a {@link java.lang.reflect.Parameter} object.
+     */
     public TestParam(String value, int index, Parameter parameter) {
         this.parameter = parameter;
         this.index = index;
@@ -49,22 +59,43 @@ public class TestParam {
         }
     }
 
+    /**
+     * <p>getURI.</p>
+     *
+     * @return a {@link java.net.URI} object.
+     */
     public URI getURI() {
         return namespace.resolve(term);
     }
 
+    /**
+     * <p>Getter for the field <code>term</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getTerm() {
         return term;
     }
 
+    /**
+     * <p>getName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getName() {
         return parameter.getName();
     }
 
+    /**
+     * <p>Getter for the field <code>index</code>.</p>
+     *
+     * @return a int.
+     */
     public int getIndex() {
         return index;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return term;

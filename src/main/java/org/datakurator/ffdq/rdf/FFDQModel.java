@@ -31,16 +31,28 @@ import java.util.*;
 
 /**
  * Created by lowery on 11/14/17.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 public class FFDQModel extends BaseModel {
     private final Vocabulary vocab;
 
+    /**
+     * <p>Constructor for FFDQModel.</p>
+     */
     public FFDQModel() {
         super();
 
         this.vocab = Vocabulary.defaultInstance();
     }
 
+    /**
+     * <p>findSpecificationsForMechanism.</p>
+     *
+     * @param mechanismGuid a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, Specification> findSpecificationsForMechanism(String mechanismGuid) {
         Set<String> guids = new HashSet<>();
 
@@ -52,6 +64,12 @@ public class FFDQModel extends BaseModel {
         return (Map<String, Specification>) findAll(Specification.class, sparql, "specification");
     }
 
+    /**
+     * <p>findMethodForSpecification.</p>
+     *
+     * @param testGuid a {@link java.lang.String} object.
+     * @return a {@link org.datakurator.ffdq.model.solutions.AssertionMethod} object.
+     */
     public AssertionMethod findMethodForSpecification(String testGuid) {
         String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "SELECT ?method WHERE { " +
@@ -63,6 +81,11 @@ public class FFDQModel extends BaseModel {
         return (AssertionMethod) findOne(AssertionMethod.class, sparql, "method");
     }
 
+    /**
+     * <p>findDataResources.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<DataResource> findDataResources() {
         List<DataResource> dataResources = new ArrayList<>();
 
@@ -86,6 +109,12 @@ public class FFDQModel extends BaseModel {
         return dataResources;
     }
 
+    /**
+     * <p>findFieldsByAssertionType.</p>
+     *
+     * @param cls a {@link java.lang.Class} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<String> findFieldsByAssertionType(Class<? extends Assertion> cls) {
         List<String> fields = new ArrayList<>();
 
@@ -112,6 +141,11 @@ public class FFDQModel extends BaseModel {
         return fields;
     }
 
+    /**
+     * <p>listDataResourcesByURI.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<URI> listDataResourcesByURI() {
         List<URI> dataResources = new ArrayList<>();
 
@@ -137,6 +171,13 @@ public class FFDQModel extends BaseModel {
         return dataResources;
     }
 
+    /**
+     * <p>findAssertionsForDataResource.</p>
+     *
+     * @param dataResource a {@link org.datakurator.ffdq.model.DataResource} object.
+     * @param cls a {@link java.lang.Class} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<Assertion> findAssertionsForDataResource(DataResource dataResource, Class<? extends Assertion> cls) {
         String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
@@ -151,6 +192,12 @@ public class FFDQModel extends BaseModel {
         return new ArrayList<>(assertions.values());
     }
 
+    /**
+     * <p>findDataResource.</p>
+     *
+     * @param uri a {@link java.net.URI} object.
+     * @return a {@link org.datakurator.ffdq.model.DataResource} object.
+     */
     public DataResource findDataResource(URI uri) {
         Model model = getResource(uri.toString());
 
@@ -163,6 +210,11 @@ public class FFDQModel extends BaseModel {
         return dataResource;
     }
 
+    /**
+     * <p>Getter for the field <code>vocab</code>.</p>
+     *
+     * @return a {@link org.datakurator.dwcloud.Vocabulary} object.
+     */
     public Vocabulary getVocab() {
         return vocab;
     }

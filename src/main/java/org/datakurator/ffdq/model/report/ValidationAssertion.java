@@ -1,4 +1,6 @@
-/**  ValidationAssertion.java
+
+/**
+ *  ValidationAssertion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.report;
 
@@ -35,29 +40,59 @@ public class ValidationAssertion extends Assertion {
     private Validation criterion;
     private AmendmentAssertion informedBy;
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>criterion</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Validation} object.
+     */
     @RDF("bdqffdq:criterionInContext")
     public Validation getCriterion() {
         return criterion;
     }
 
+    /**
+     * <p>Setter for the field <code>criterion</code>.</p>
+     *
+     * @param criterion a {@link org.datakurator.ffdq.model.context.Validation} object.
+     */
     public void setCriterion(Validation criterion) {
         this.criterion = criterion;
     }
 
+    /**
+     * <p>Getter for the field <code>informedBy</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.report.AmendmentAssertion} object.
+     */
     @RDF("prov:wasInformedBy")
     public AmendmentAssertion getInformedBy() {
         return informedBy;
     }
 
+    /**
+     * <p>Setter for the field <code>informedBy</code>.</p>
+     *
+     * @param informedBy a {@link org.datakurator.ffdq.model.report.AmendmentAssertion} object.
+     */
     public void setInformedBy(AmendmentAssertion informedBy) {
         this.informedBy = informedBy;
     }

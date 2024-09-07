@@ -1,4 +1,6 @@
-/** AssertionTest.java
+
+/**
+ * AssertionTest.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.runner;
 
@@ -23,14 +28,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 public class AssertionTest {
+    /** Constant <code>MEASURE="MEASURE"</code> */
     public static final String MEASURE = "MEASURE";
+    /** Constant <code>VALIDATION="VALIDATION"</code> */
     public static final String VALIDATION = "VALIDATION";
+    /** Constant <code>AMENDMENT="AMENDMENT"</code> */
     public static final String AMENDMENT = "AMENDMENT";
+    /** Constant <code>ISSUE="ISSUE"</code> */
     public static final String ISSUE = "ISSUE";
 
+    /** Constant <code>SINGLE_RECORD="SINGLERECORD"</code> */
     public static final String SINGLE_RECORD = "SINGLERECORD";
+    /** Constant <code>MULTI_RECORD="MULTIRECORD"</code> */
     public static final String MULTI_RECORD = "MULTIRECORD";
 
     private String guid;
@@ -64,10 +74,35 @@ public class AssertionTest {
     private Method method;
     private List<TestParam> parameters;
 
+    /**
+     * <p>Constructor for AssertionTest.</p>
+     */
     public AssertionTest() {
         // default constructor for test runner
     }
 
+    /**
+     * <p>Constructor for AssertionTest.</p>
+     *
+     * @param guid a {@link java.lang.String} object.
+     * @param label a {@link java.lang.String} object.
+     * @param version a {@link java.lang.String} object.
+     * @param description a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param specification a {@link java.lang.String} object.
+     * @param authoritiesDefaults a {@link java.lang.String} object.
+     * @param assertionType a {@link java.lang.String} object.
+     * @param resourceType a {@link java.lang.String} object.
+     * @param dimension a {@link java.lang.String} object.
+     * @param criterion a {@link java.lang.String} object.
+     * @param enhancement a {@link java.lang.String} object.
+     * @param informationElement a {@link java.util.List} object.
+     * @param actedUpon a {@link java.util.List} object.
+     * @param consulted a {@link java.util.List} object.
+     * @param testParameters a {@link java.util.List} object.
+     * @param useCases a {@link java.util.List} object.
+     * @throws org.datakurator.ffdq.runner.UnsupportedTypeException if any.
+     */
     public AssertionTest(String guid, String label, String version, String description, 
     		String criterionLabel, String specification, String authoritiesDefaults,
     		String assertionType, String resourceType, String dimension, 
@@ -112,12 +147,27 @@ public class AssertionTest {
         }
     }
 
+    /**
+     * <p>Constructor for AssertionTest.</p>
+     *
+     * @param guid a {@link java.lang.String} object.
+     * @param cls a {@link java.lang.Class} object.
+     * @param method a {@link java.lang.reflect.Method} object.
+     */
     public AssertionTest(String guid, Class cls, Method method) {
         this.guid = guid;
         this.cls = cls;
         this.method = method;
     }
 
+    /**
+     * <p>invoke.</p>
+     *
+     * @param instance a {@link java.lang.Object} object.
+     * @param record a {@link java.util.Map} object.
+     * @return a {@link java.lang.Object} object.
+     * @throws java.lang.reflect.InvocationTargetException if any.
+     */
     public Object invoke(Object instance, Map<String, String> record) throws InvocationTargetException {
         Set<String> keys = record.keySet();
 
@@ -147,14 +197,29 @@ public class AssertionTest {
         }
     }
 
+    /**
+     * <p>Setter for the field <code>guid</code>.</p>
+     *
+     * @param guid a {@link java.lang.String} object.
+     */
     public void setGuid(String guid) {
         this.guid = guid;
     }
 
+    /**
+     * <p>Getter for the field <code>guid</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getGuid() {
         return guid;
     }
     
+    /**
+     * <p>getGuidTDWGNamespace.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getGuidTDWGNamespace()  {
     	if (guid==null) { 
     		return guid;
@@ -163,52 +228,109 @@ public class AssertionTest {
     	}
     }
 
+    /**
+     * <p>Getter for the field <code>label</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * <p>Setter for the field <code>label</code>.</p>
+     *
+     * @param label a {@link java.lang.String} object.
+     */
     public void setLabel(String label) {
         this.label = label;
     }
 
+    /**
+     * <p>Getter for the field <code>version</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * <p>Setter for the field <code>version</code>.</p>
+     *
+     * @param version a {@link java.lang.String} object.
+     */
     public void setVersion(String version) {
         this.version = version;
     }    
     
+    /**
+     * <p>getProvidesVersion.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getProvidesVersion() { 
     	StringBuilder retval = new StringBuilder();
     	return retval.append(this.getGuidTDWGNamespace()).append("/").append(this.version).toString();
     }
     
+    /**
+     * <p>Getter for the field <code>description</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * <p>Setter for the field <code>description</code>.</p>
+     *
+     * @param description a {@link java.lang.String} object.
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * <p>Getter for the field <code>criterionLabel</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getCriterionLabel() {
 		return criterionLabel;
 	}
 
+	/**
+	 * <p>Setter for the field <code>criterionLabel</code>.</p>
+	 *
+	 * @param criterionLabel a {@link java.lang.String} object.
+	 */
 	public void setCriterionLabel(String criterionLabel) {
 		this.criterionLabel = criterionLabel;
 	}
 
+	/**
+	 * <p>Getter for the field <code>specification</code>.</p>
+	 *
+	 * @return a {@link java.lang.String} object.
+	 */
 	public String getSpecification() {
         return specification;
     }
 
+    /**
+     * <p>Setter for the field <code>specification</code>.</p>
+     *
+     * @param specification a {@link java.lang.String} object.
+     */
     public void setSpecification(String specification) {
         this.specification = specification;
     }
 
-    /**
+	/**
+	 * <p>Getter for the field <code>authoritiesDefaults</code>.</p>
+	 *
 	 * @return the authoritiesDefaults
 	 */
 	public String getAuthoritiesDefaults() {
@@ -216,37 +338,71 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>authoritiesDefaults</code>.</p>
+	 *
 	 * @param authoritiesDefaults the authoritiesDefaults to set
 	 */
 	public void setAuthoritiesDefaults(String authoritiesDefaults) {
 		this.authoritiesDefaults = authoritiesDefaults;
 	}
 
+	/**
+	 * <p>Getter for the field <code>assertionType</code>.</p>
+	 *
+	 * @return a {@link java.lang.String} object.
+	 */
 	public String getAssertionType() {
         return assertionType;
     }
 
+    /**
+     * <p>Setter for the field <code>assertionType</code>.</p>
+     *
+     * @param assertionType a {@link java.lang.String} object.
+     */
     public void setAssertionType(String assertionType) {
         this.assertionType = assertionType;
     }
 
+    /**
+     * <p>Getter for the field <code>resourceType</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getResourceType() {
         return resourceType;
     }
 
+    /**
+     * <p>Setter for the field <code>resourceType</code>.</p>
+     *
+     * @param resourceType a {@link java.lang.String} object.
+     */
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
     }
 
+    /**
+     * <p>Getter for the field <code>dimension</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getDimension() {
         return dimension;
     }
 
+    /**
+     * <p>Setter for the field <code>dimension</code>.</p>
+     *
+     * @param dimension a {@link java.lang.String} object.
+     */
     public void setDimension(String dimension) {
         this.dimension = dimension;
     }
 
-    /**
+	/**
+	 * <p>Getter for the field <code>criterion</code>.</p>
+	 *
 	 * @return the criterion
 	 */
 	public String getCriterion() {
@@ -254,6 +410,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>criterion</code>.</p>
+	 *
 	 * @param criterion the criterion to set
 	 */
 	public void setCriterion(String criterion) {
@@ -261,6 +419,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Getter for the field <code>enhancement</code>.</p>
+	 *
 	 * @return the enhancement
 	 */
 	public String getEnhancement() {
@@ -268,39 +428,71 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>enhancement</code>.</p>
+	 *
 	 * @param enhancement the enhancement to set
 	 */
 	public void setEnhancement(String enhancement) {
 		this.enhancement = enhancement;
 	}
 
+	/**
+	 * <p>Getter for the field <code>informationElement</code>.</p>
+	 *
+	 * @return a {@link java.util.List} object.
+	 */
 	public List<String> getInformationElement() {
         return informationElement;
     }
 
+    /**
+     * <p>Setter for the field <code>informationElement</code>.</p>
+     *
+     * @param informationElement a {@link java.util.List} object.
+     */
     public void setInformationElement(List<String> informationElement) {
         this.informationElement = informationElement;
     }
     
+    /**
+     * <p>Getter for the field <code>actedUpon</code>.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getActedUpon() {
         return actedUpon;
     }
 
+    /**
+     * <p>Setter for the field <code>actedUpon</code>.</p>
+     *
+     * @param actedUpon a {@link java.util.List} object.
+     */
     public void setActedUpon(List<String> actedUpon) {
         this.actedUpon = actedUpon;
     }    
     
+    /**
+     * <p>Getter for the field <code>consulted</code>.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getConsulted() {
         return consulted;
     }
 
+    /**
+     * <p>Setter for the field <code>consulted</code>.</p>
+     *
+     * @param consulted a {@link java.util.List} object.
+     */
     public void setConsulted(List<String> consulted) {
         this.consulted = consulted;
     }
 
     /**
      * Obtain a list of all information elements, acted upon, consulted, and not specified.
-     * 
+     *
      * @return a list of informationElement plus actedUpon plus consulted.
      */
     public List<String> getAllInformationElements() { 
@@ -311,7 +503,9 @@ public class AssertionTest {
     	return retval;
     }
     
-    /**
+	/**
+	 * <p>Getter for the field <code>testParameters</code>.</p>
+	 *
 	 * @return the testParameters that alter the behavior of the test.
 	 */
 	public List<String> getTestParameters() {
@@ -319,6 +513,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>testParameters</code>.</p>
+	 *
 	 * @param testParameters the testParameters to set to alter the behavior of the test.
 	 */
 	public void setTestParameters(List<String> testParameters) {
@@ -329,32 +525,61 @@ public class AssertionTest {
 		}
 	}
 
+	/**
+	 * <p>Getter for the field <code>cls</code>.</p>
+	 *
+	 * @return a {@link java.lang.Class} object.
+	 */
 	public Class getCls() {
         return cls;
     }
 
+    /**
+     * <p>Setter for the field <code>cls</code>.</p>
+     *
+     * @param cls a {@link java.lang.Class} object.
+     */
     public void setCls(Class cls) {
         this.cls = cls;
     }
 
+    /**
+     * <p>Getter for the field <code>method</code>.</p>
+     *
+     * @return a {@link java.lang.reflect.Method} object.
+     */
     public Method getMethod() {
         return method;
     }
 
+    /**
+     * <p>Setter for the field <code>method</code>.</p>
+     *
+     * @param method a {@link java.lang.reflect.Method} object.
+     */
     public void setMethod(Method method) {
         this.method = method;
     }
 
-    /** the information elements as inputs to the test **/
+    /**
+     * the information elements as inputs to the test *
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<TestParam> getParameters() {
         return parameters;
     }
 
-    /** These are the information elements as inputs **/
+    /**
+     * These are the information elements as inputs *
+     *
+     * @param parameters a {@link java.util.List} object.
+     */
     public void setParameters(List<TestParam> parameters) {
         this.parameters = parameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "AssertionTest{" +
@@ -378,6 +603,8 @@ public class AssertionTest {
     }
 
 	/**
+	 * <p>Getter for the field <code>useCases</code>.</p>
+	 *
 	 * @return the useCases related to this test.
 	 */
 	public List<String> getUseCases() {
@@ -385,6 +612,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>useCases</code>.</p>
+	 *
 	 * @param useCases the useCases to set
 	 */
 	public void setUseCases(List<String> useCases) {
@@ -392,6 +621,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Getter for the field <code>methodGuid</code>.</p>
+	 *
 	 * @return the methodGuid
 	 */
 	public String getMethodGuid() {
@@ -399,6 +630,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>methodGuid</code>.</p>
+	 *
 	 * @param methodGuid the methodGuid to set
 	 */
 	public void setMethodGuid(String methodGuid) {
@@ -406,6 +639,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Getter for the field <code>specificationGuid</code>.</p>
+	 *
 	 * @return the specificationGuid
 	 */
 	public String getSpecificationGuid() {
@@ -413,6 +648,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>specificationGuid</code>.</p>
+	 *
 	 * @param specificaitonGuid the specificationGuid to set
 	 */
 	public void setSpecificationGuid(String specificaitonGuid) {
@@ -420,6 +657,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Getter for the field <code>policyGuid</code>.</p>
+	 *
 	 * @return the policyGuid
 	 */
 	public String getPolicyGuid() {
@@ -427,6 +666,8 @@ public class AssertionTest {
 	}
 
 	/**
+	 * <p>Setter for the field <code>policyGuid</code>.</p>
+	 *
 	 * @param policyGuid the policyGuid to set
 	 */
 	public void setPolicyGuid(String policyGuid) {

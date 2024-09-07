@@ -24,26 +24,43 @@ import java.util.Map;
 
 /**
  * Namespaces used with the FFDQModel
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 public class Namespace {
+    /** Constant <code>DWC="http://rs.tdwg.org/dwc/terms/"</code> */
     public static final String DWC = "http://rs.tdwg.org/dwc/terms/";
+    /** Constant <code>DCTERMS="http://purl.org/dc/terms/"</code> */
     public static final String DCTERMS = "http://purl.org/dc/terms/";
+    /** Constant <code>DWCIRI="http://rs.tdwg.org/dwc/iri/"</code> */
     public static final String DWCIRI = "http://rs.tdwg.org/dwc/iri/";
+    /** Constant <code>DC="http://purl.org/dc/elements/1.1/"</code> */
     public static final String DC = "http://purl.org/dc/elements/1.1/";
+    /** Constant <code>SKOS="http://www.w3.org/2004/02/skos/core#"</code> */
     public static final String SKOS = "http://www.w3.org/2004/02/skos/core#";
+    /** Constant <code>BDQ="https://rs.tdwg.org/bdq/terms/"</code> */
     public static final String BDQ = "https://rs.tdwg.org/bdq/terms/";   // other bdq terms
+    /** Constant <code>BDQDIM="https://rs.tdwg.org/bdqdim/terms/"</code> */
     public static final String BDQDIM = "https://rs.tdwg.org/bdqdim/terms/";  // dimensions   
+    /** Constant <code>BDQENH="https://rs.tdwg.org/bdqenh/terms/"</code> */
     public static final String BDQENH = "https://rs.tdwg.org/bdqenh/terms/";  // enhancements   
+    /** Constant <code>BDQCRIT="https://rs.tdwg.org/bdqcrit/terms/"</code> */
     public static final String BDQCRIT = "https://rs.tdwg.org/bdqcrit/terms/";  // criteria   
+    /** Constant <code>BDQFFDQ="https://rs.tdwg.org/bdqffdq/terms"</code> */
     public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms";   // ontology
+    /** Constant <code>BDQCORE="https://rs.tdwg.org/bdqcore/terms"</code> */
     public static final String BDQCORE = "https://rs.tdwg.org/bdqcore/terms";   // tests
 
+    /** Constant <code>NONE="http://datakurator.org/none/"</code> */
     public static final String NONE = "http://datakurator.org/none/";
 
+    /** Constant <code>nsPrefixes</code> */
     public static final Map<String, String> nsPrefixes;
 
-    /** Get a list of the prefixes in a form suitable for inclusion in SPARQL (PREFIX ns: <namespace>)
-     * 
+    /**
+     * Get a list of the prefixes in a form suitable for inclusion in SPARQL (PREFIX ns: <namespace>)
+     *
      * @return a string list of prefixes used with the FFDQ model.
      */
     public static String getNamespacePrefixes() { 
@@ -78,6 +95,12 @@ public class Namespace {
         nsPrefixes.put("none", NONE);
     }
 
+    /**
+     * <p>set.</p>
+     *
+     * @param prefix a {@link java.lang.String} object.
+     * @param uri a {@link java.lang.String} object.
+     */
     public static void set(String prefix, String uri) {
         try {
             nsPrefixes.put(prefix, new URI(uri).toString());
@@ -87,6 +110,12 @@ public class Namespace {
     }
 
 
+    /**
+     * <p>resolvePrefixedTerm.</p>
+     *
+     * @param value a {@link java.lang.String} object.
+     * @return a {@link java.net.URI} object.
+     */
     public static URI resolvePrefixedTerm(String value) {
         if (value.indexOf(':') != -1) {
             // Split string into namespace prefix and term name

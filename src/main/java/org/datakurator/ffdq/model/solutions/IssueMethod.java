@@ -1,4 +1,6 @@
-/** IssueMethod.java
+
+/**
+ * IssueMethod.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.solutions;
 
@@ -37,47 +42,93 @@ public class IssueMethod {
     private Specification specification;
     private Issue ci;
 
+    /**
+     * <p>Constructor for IssueMethod.</p>
+     */
     public IssueMethod() { }
     
+    /**
+     * <p>Constructor for IssueMethod.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     * @param ci a {@link org.datakurator.ffdq.model.context.Issue} object.
+     */
     public IssueMethod(Specification specification, Issue ci) { 
     	this.specification = specification;
     	this.ci = ci;
     }
 
+    /**
+     * <p>Constructor for IssueMethod.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public IssueMethod(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>specification</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.Specification} object.
+     */
     @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
         return specification;
     }
 
+    /**
+     * <p>Setter for the field <code>specification</code>.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     */
     public void setSpecification(Specification specification) {
         this.specification = specification;
     }
 
+    /**
+     * <p>getContextualizedIssue.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Issue} object.
+     */
     @RDF("bdqffdq:issueInContext")
     public Issue getContextualizedIssue() {
         return ci;
     }
 
+    /**
+     * <p>setContextualizedIssue.</p>
+     *
+     * @param ci a {@link org.datakurator.ffdq.model.context.Issue} object.
+     */
     public void setContextualizedIssue(Issue ci) {
         this.ci = ci;
     }
     
-	/**
-	 * @return a generated label
-	 */
+    /**
+     * <p>getLabel.</p>
+     *
+     * @return a generated label
+     */
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
@@ -89,7 +140,7 @@ public class IssueMethod {
     
     /**
      * Get the preferred label, currently, same as the rdfs;label.
-     * 
+     *
      * @return a skos:prefLabel
      */
     @RDF("skos:prefLabel") 

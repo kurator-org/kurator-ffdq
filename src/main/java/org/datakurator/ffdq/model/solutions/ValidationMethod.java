@@ -1,4 +1,6 @@
-/** ValidationMethod.java
+
+/**
+ * ValidationMethod.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.solutions;
 
@@ -31,25 +36,46 @@ import org.datakurator.ffdq.model.context.Validation;
 public class ValidationMethod extends AssertionMethod {
     private Validation cc;
 
+    /**
+     * <p>Constructor for ValidationMethod.</p>
+     */
     public ValidationMethod() { }
 
+    /**
+     * <p>Constructor for ValidationMethod.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     * @param contextualizedCriterion a {@link org.datakurator.ffdq.model.context.Validation} object.
+     */
     public ValidationMethod(Specification specification, Validation contextualizedCriterion) {
         this.specification = specification;
         this.cc = contextualizedCriterion;
     }
 
+    /**
+     * <p>getValidation.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Validation} object.
+     */
     @RDF("bdqffdq:forValidation")
     public Validation getValidation() {
         return cc;
     }
 
+    /**
+     * <p>setContextualizedCriterion.</p>
+     *
+     * @param cc a {@link org.datakurator.ffdq.model.context.Validation} object.
+     */
     public void setContextualizedCriterion(Validation cc) {
         this.cc = cc;
     }
     
-	/**
-	 * @return a generated label
-	 */
+    /**
+     * <p>getLabel.</p>
+     *
+     * @return a generated label
+     */
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
@@ -61,7 +87,7 @@ public class ValidationMethod extends AssertionMethod {
     
     /**
      * Get the preferred label, currently, same as the rdfs;label.
-     * 
+     *
      * @return a skos:prefLabel
      */
     @RDF("skos:prefLabel") 

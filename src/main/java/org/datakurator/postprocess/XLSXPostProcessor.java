@@ -45,6 +45,9 @@ import java.util.*;
 
 /**
  * Created by lowery on 2/17/2017.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 public class XLSXPostProcessor {
     private FFDQModel model;
@@ -61,10 +64,20 @@ public class XLSXPostProcessor {
     private int initialValuesSheetRowNum = 1;
     private int finalValuesSheetRowNum = 1;
 
+    /**
+     * <p>Constructor for XLSXPostProcessor.</p>
+     *
+     * @param model a {@link org.datakurator.ffdq.rdf.FFDQModel} object.
+     */
     public XLSXPostProcessor(FFDQModel model) {
         this.model = model;
     }
 
+    /**
+     * <p>initStyles.</p>
+     *
+     * @param wb a {@link org.apache.poi.xssf.streaming.SXSSFWorkbook} object.
+     */
     public void initStyles(SXSSFWorkbook wb) {
         // White font
         Font font = wb.createFont();
@@ -108,6 +121,11 @@ public class XLSXPostProcessor {
         styles.put("EXTERNAL_PREREQUISITES_NOT_MET", style);
     }
 
+    /**
+     * <p>postprocess.</p>
+     *
+     * @param out a {@link java.io.OutputStream} object.
+     */
     public void postprocess(OutputStream out) {
         int windowSize = 100; // keep 100 rows in memory, exceeding rows will be flushed to disk
 
@@ -681,6 +699,12 @@ public class XLSXPostProcessor {
     }
 
 
+    /**
+     * <p>main.</p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.io.IOException if any.
+     */
     public static void main(String[] args) throws IOException {
         FFDQModel model = new FFDQModel();
         model.load(new FileInputStream("/home/lowery/Downloads/dq_report.rdf"), RDFFormat.TURTLE);

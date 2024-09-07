@@ -25,9 +25,19 @@ import java.io.*;
 
 /**
  * Execute sparql queries on the ffdq rdf model
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 public class QueryUtil {
 
+    /**
+     * <p>main.</p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws org.apache.commons.cli.ParseException if any.
+     * @throws java.io.IOException if any.
+     */
     public static void main(String[] args) throws ParseException, IOException {
         Options options = new Options();
 

@@ -44,6 +44,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * <p>TestUtil class.</p>
+ *
+ * @author mole
+ * @version $Id: $Id
+ */
 public class TestUtil {
     private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
@@ -95,6 +101,12 @@ public class TestUtil {
         }
     }
 
+    /**
+     * <p>main.</p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.io.IOException if any.
+     */
     public static void main(String[] args) throws IOException {
         Options options = new Options();
         options.addRequiredOption("config", null, true, "Properties file defining the mechanism to use");

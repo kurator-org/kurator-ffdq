@@ -42,7 +42,8 @@ import java.util.*;
  * assessment and management of biodiversity data. PLoS ONE 12(6): e0178731.
  *
  * @see <a href="https://doi.org/10.1371/journal.pone.0178731">https://doi.org/10.1371/journal.pone.0178731</a>
- *
+ * @author mole
+ * @version $Id: $Id
  */
 public class DataResource {
     private Vocabulary vocab;
@@ -53,6 +54,11 @@ public class DataResource {
     private Model model;
     private IRI subject;
 
+    /**
+     * <p>Constructor for DataResource.</p>
+     *
+     * @param vocab a {@link org.datakurator.dwcloud.Vocabulary} object.
+     */
     public DataResource(Vocabulary vocab) {
         // Create data resource subject iri from generated uuid
         String uuid = "urn:uuid:" + UUID.randomUUID().toString();
@@ -64,6 +70,12 @@ public class DataResource {
         this.vocab = vocab;
     }
 
+    /**
+     * <p>Constructor for DataResource.</p>
+     *
+     * @param vocab a {@link org.datakurator.dwcloud.Vocabulary} object.
+     * @param model a {@link org.eclipse.rdf4j.model.Model} object.
+     */
     public DataResource(Vocabulary vocab, Model model) {
         List<Resource> resources = new ArrayList<>();
         for (Object obj : model.subjects().toArray()) {
@@ -85,10 +97,23 @@ public class DataResource {
         this.model = model;
     }
 
+    /**
+     * <p>Constructor for DataResource.</p>
+     *
+     * @param vocab a {@link org.datakurator.dwcloud.Vocabulary} object.
+     * @param record a {@link java.util.Map} object.
+     */
     public DataResource(Vocabulary vocab, Map<String, String> record) {
         this(null, vocab, record);
     }
 
+    /**
+     * <p>Constructor for DataResource.</p>
+     *
+     * @param uuid a {@link java.lang.String} object.
+     * @param vocab a {@link org.datakurator.dwcloud.Vocabulary} object.
+     * @param record a {@link java.util.Map} object.
+     */
     public DataResource(String uuid, Vocabulary vocab, Map<String, String> record) {
         if (uuid == null) {
             // Create data resource subject iri from generated uuid
@@ -115,6 +140,12 @@ public class DataResource {
         this.model = builder.build();
     }
 
+    /**
+     * <p>get.</p>
+     *
+     * @param term a {@link java.net.URI} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String get(URI term) {
         // Resolve term and create predicate iri
         IRI predicate = valueFactory.createIRI(term.toString());
@@ -126,6 +157,12 @@ public class DataResource {
         return value;
     }
 
+    /**
+     * <p>get.</p>
+     *
+     * @param term a {@link java.lang.String} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String get(String term) {
         // Resolve term and create predicate iri
         URI uri = vocab.getURI(term);
@@ -138,6 +175,11 @@ public class DataResource {
         return value;
     }
 
+    /**
+     * <p>getURI.</p>
+     *
+     * @return a {@link java.net.URI} object.
+     */
     public URI getURI() {
         try {
             return new URI(subject.stringValue());
@@ -146,11 +188,21 @@ public class DataResource {
         }
     }
 
+    /**
+     * <p>getRecordId.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getRecordId() {
         // Use the id term set in vocab to find the id
         return get(vocab.getIdTerm());
     }
 
+    /**
+     * <p>asMap.</p>
+     *
+     * @return a {@link java.util.Map} object.
+     */
     public Map<String, String> asMap() {
         Map<String, String> record = new HashMap<>();
 
@@ -167,6 +219,11 @@ public class DataResource {
         return record;
     }
 
+    /**
+     * <p>asModel.</p>
+     *
+     * @return a {@link org.eclipse.rdf4j.model.Model} object.
+     */
     public Model asModel() {
         return model;
     }

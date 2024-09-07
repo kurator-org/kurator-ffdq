@@ -18,12 +18,18 @@ package org.datakurator.ffdq.runner;
 
 /**
  * Exception intended to flag types asserted in input CSV that are not supported
- * by the org.datakurator.ffdq.model 
- * 
+ * by the org.datakurator.ffdq.model
+ *
  * @author Paul J. Morris
+ * @version $Id: $Id
  */
 public class UnsupportedTypeException extends Exception {
 
+	/**
+	 * <p>Constructor for UnsupportedTypeException.</p>
+	 *
+	 * @param message a {@link java.lang.String} object.
+	 */
 	public UnsupportedTypeException(String message) {
 		super(message);
 	}

@@ -1,4 +1,6 @@
-/** MeasurementMethod.java
+
+/**
+ * MeasurementMethod.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.solutions;
 
@@ -31,25 +36,46 @@ import org.datakurator.ffdq.model.context.Measure;
 public class MeasurementMethod extends AssertionMethod {
     private Measure cd;
 
+    /**
+     * <p>Constructor for MeasurementMethod.</p>
+     */
     public MeasurementMethod() { }
 
+    /**
+     * <p>Constructor for MeasurementMethod.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     * @param contextualizedDimension a {@link org.datakurator.ffdq.model.context.Measure} object.
+     */
     public MeasurementMethod(Specification specification, Measure contextualizedDimension) {
         this.specification = specification;
         this.cd = contextualizedDimension;
     }
 
+    /**
+     * <p>getMeasure.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Measure} object.
+     */
     @RDF("bdqffdq:forMeasurement")
     public Measure getMeasure() {
         return cd;
     }
 
+    /**
+     * <p>setContextualizedDimension.</p>
+     *
+     * @param cd a {@link org.datakurator.ffdq.model.context.Measure} object.
+     */
     public void setContextualizedDimension(Measure cd) {
         this.cd = cd;
     }
     
-	/**
-	 * @return a generated label
-	 */
+    /**
+     * <p>getLabel.</p>
+     *
+     * @return a generated label
+     */
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
@@ -61,7 +87,7 @@ public class MeasurementMethod extends AssertionMethod {
     
     /**
      * Get the preferred label, currently, same as the rdfs;label.
-     * 
+     *
      * @return a skos:prefLabel
      */
     @RDF("skos:prefLabel") 

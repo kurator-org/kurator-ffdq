@@ -1,4 +1,6 @@
-/** Vocabulary.java
+
+/**
+ * Vocabulary.java
  *
  * Copyright 2018 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.dwcloud;
 
@@ -27,7 +32,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 public class Vocabulary {
     private static final String VOCAB_PROPERTY = "org.datakurator.dwcloud.vocab";
     private static final String ID_TERM_PROPERTY = "org.datakurator.dwcloud.idTerm";
@@ -37,6 +41,12 @@ public class Vocabulary {
     private String idTerm;
     private Map<String, URI> mapping = new HashMap<>();
 
+    /**
+     * <p>Constructor for Vocabulary.</p>
+     *
+     * @param vocabUrl a {@link java.lang.String} object.
+     * @param idTerm a {@link java.lang.String} object.
+     */
     public Vocabulary(String vocabUrl, String idTerm) {
         this.idTerm = idTerm;
 
@@ -101,10 +111,21 @@ public class Vocabulary {
         }
     }
 
+    /**
+     * <p>Constructor for Vocabulary.</p>
+     *
+     * @param vocabFile a {@link java.io.File} object.
+     * @param idTerm a {@link java.lang.String} object.
+     */
     public Vocabulary(File vocabFile, String idTerm) {
         this(vocabFile.toURI().toString(), idTerm);
     }
 
+    /**
+     * <p>defaultInstance.</p>
+     *
+     * @return a {@link org.datakurator.dwcloud.Vocabulary} object.
+     */
     public static Vocabulary defaultInstance() {
         try {
             Properties properties = new Properties();
@@ -120,6 +141,12 @@ public class Vocabulary {
         }
     }
 
+    /**
+     * <p>getURI.</p>
+     *
+     * @param term a {@link java.lang.String} object.
+     * @return a {@link java.net.URI} object.
+     */
     public URI getURI(String term) {
         URI uri;
 
@@ -138,6 +165,11 @@ public class Vocabulary {
         }
     }
 
+    /**
+     * <p>Getter for the field <code>idTerm</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getIdTerm() {
         return idTerm.split(":")[1];
     }

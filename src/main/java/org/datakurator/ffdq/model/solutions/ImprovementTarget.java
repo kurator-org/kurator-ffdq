@@ -1,4 +1,6 @@
-/** ImprovementTarget.java
+
+/**
+ * ImprovementTarget.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.solutions;
 
@@ -42,56 +47,116 @@ public class ImprovementTarget {
 
     private String id = "urn:uuid:" + UUID.randomUUID();
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>targetedDimensions</code>.</p>
+     *
+     * @return a {@link java.util.Set} object.
+     */
     @RDF("bdqffdq:targetedDimension")
     public Set<Measure> getTargetedDimensions() {
         return targetedDimensions;
     }
 
+    /**
+     * <p>getContextualizedCriterion.</p>
+     *
+     * @return a {@link java.util.Set} object.
+     */
     @RDF("bdqffdq:targetedCriterion")
     public Set<Validation> getContextualizedCriterion() {
         return targetedCriterion;
     }
 
+    /**
+     * <p>getContextualizedIssue.</p>
+     *
+     * @return a {@link java.util.Set} object.
+     */
     @RDF("bdqffdq:targetedIssue")
     public Set<Issue> getContextualizedIssue() {
         return targetedIssues;
     }
 
+    /**
+     * <p>Getter for the field <code>improvedBy</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     @RDF("bdqffdq:improvedBy")
     public Amendment getImprovedBy() {
         return improvedBy;
     }
 
+    /**
+     * <p>Setter for the field <code>targetedDimensions</code>.</p>
+     *
+     * @param dimensions a {@link java.util.Set} object.
+     */
     public void setTargetedDimensions(Set<Measure> dimensions) {
         targetedDimensions = dimensions;
     }
 
+    /**
+     * <p>setContextualizedCriterion.</p>
+     *
+     * @param criteria a {@link java.util.Set} object.
+     */
     public void setContextualizedCriterion(Set<Validation> criteria) {
         targetedCriterion = criteria;
     }
 
+    /**
+     * <p>setContextualizedIssue.</p>
+     *
+     * @param issues a {@link java.util.Set} object.
+     */
     public void setContextualizedIssue(Set<Issue> issues) {
         targetedIssues = issues;
     }
 
+    /**
+     * <p>Setter for the field <code>improvedBy</code>.</p>
+     *
+     * @param ce a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     public void setImprovedBy(Amendment ce) {
         improvedBy = ce;
     }
 
     // Convenience methods for adding to Set
+    /**
+     * <p>addContextualizedDimension.</p>
+     *
+     * @param cd a {@link org.datakurator.ffdq.model.context.Measure} object.
+     */
     public void addContextualizedDimension(Measure cd) {
         targetedDimensions.add(cd);
     }
 
+    /**
+     * <p>addContextualizedCriterion.</p>
+     *
+     * @param cc a {@link org.datakurator.ffdq.model.context.Validation} object.
+     */
     public void addContextualizedCriterion(Validation cc) {
         targetedCriterion.add(cc);
     }

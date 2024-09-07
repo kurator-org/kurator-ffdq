@@ -1,4 +1,6 @@
-/** TestRunner.java
+
+/**
+ * TestRunner.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.runner;
 
@@ -46,7 +51,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Logger;
-
 public class TestRunner {
     private final static Logger logger = Logger.getLogger(TestRunner.class.getName());
 
@@ -61,10 +65,23 @@ public class TestRunner {
     private List<MeasurementMethod> measures = new ArrayList<>();
     private List<AmendmentMethod> amendments = new ArrayList<>();
 
+    /**
+     * <p>Constructor for TestRunner.</p>
+     *
+     * @param cls a {@link java.lang.Class} object.
+     * @param model a {@link org.datakurator.ffdq.rdf.FFDQModel} object.
+     */
     public TestRunner(Class cls, FFDQModel model) {
         this(cls, model, new HashMap<>());
     }
 
+    /**
+     * <p>Constructor for TestRunner.</p>
+     *
+     * @param cls a {@link java.lang.Class} object.
+     * @param model a {@link org.datakurator.ffdq.rdf.FFDQModel} object.
+     * @param params a {@link java.util.Map} object.
+     */
     public TestRunner(Class cls, FFDQModel model, Map<String, Object> params) {
         this.cls = cls;
         this.model = model;
@@ -350,6 +367,13 @@ public class TestRunner {
         return params;
     }
 
+    /**
+     * <p>main.</p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.io.IOException if any.
+     * @throws java.net.URISyntaxException if any.
+     */
     public static void main(String[] args) throws IOException, URISyntaxException {
         Options options = new Options();
         options.addRequiredOption("in", null, true, "Input occurrence tsv data file");
@@ -440,6 +464,11 @@ public class TestRunner {
         }
     }
 
+    /**
+     * <p>run.</p>
+     *
+     * @param record a {@link java.util.Map} object.
+     */
     public void run(Map<String, String> record) {
         // Create a new data resource from the record and load triples via model
         DataResource dataResource = new DataResource(model.getVocab(), record);

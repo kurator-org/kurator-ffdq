@@ -1,4 +1,6 @@
-/** Implementation.java
+
+/**
+ * Implementation.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.solutions;
 
@@ -36,38 +41,77 @@ public class Implementation {
     private List<Mechanism> implementedBy;
     private Specification specification;
 
+    /**
+     * <p>Constructor for Implementation.</p>
+     */
     public Implementation() {
 
     }
 
+    /**
+     * <p>Constructor for Implementation.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     * @param implementedBy a {@link java.util.List} object.
+     */
     public Implementation(Specification specification, List<Mechanism> implementedBy) {
         this.specification = specification;
         this.implementedBy = implementedBy;
     }
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>specification</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.Specification} object.
+     */
     @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
         return specification;
     }
 
+    /**
+     * <p>Setter for the field <code>specification</code>.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     */
     public void setSpecification(Specification specification) {
         this.specification = specification;
     }
 
+    /**
+     * <p>Getter for the field <code>implementedBy</code>.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     @RDF("bdqffdq:implementedBy")
     public List<Mechanism> getImplementedBy() {
         return implementedBy;
     }
 
+    /**
+     * <p>Setter for the field <code>implementedBy</code>.</p>
+     *
+     * @param implementedBy a {@link java.util.List} object.
+     */
     public void setImplementedBy(List<Mechanism> implementedBy) {
         this.implementedBy = implementedBy;
     }

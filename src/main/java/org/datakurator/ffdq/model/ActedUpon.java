@@ -13,9 +13,10 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
 /**
- * 
- * @author mole
+ * <p>ActedUpon class.</p>
  *
+ * @author mole
+ * @version $Id: $Id
  */
 @RDFNamespaces({
     "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
@@ -26,10 +27,20 @@ public class ActedUpon extends InformationElement {
 
     private String id = "urn:uuid:" + UUID.randomUUID();
 	
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject()
     public String getId() {
         return id;
     }
+    /**
+     * <p>getComposedOf.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     @RDF("bdqffdq:composedOf")
     public List<URI> getComposedOf() {
         return composedOf;

@@ -1,4 +1,6 @@
-/** ClassGenerator.java
+
+/**
+ * ClassGenerator.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,9 +15,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @author David Lowery
  * @author Paul J. Morris
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.util;
 
@@ -28,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 public class JavaClassGenerator {
     private final static Logger logger = Logger.getLogger(JavaClassGenerator.class.getName());
 
@@ -45,6 +47,14 @@ public class JavaClassGenerator {
 
     private StringBuilder outputCodeSB;
 
+    /**
+     * <p>Constructor for JavaClassGenerator.</p>
+     *
+     * @param mechanismGuid a {@link java.lang.String} object.
+     * @param mechanismName a {@link java.lang.String} object.
+     * @param packageName a {@link java.lang.String} object.
+     * @param className a {@link java.lang.String} object.
+     */
     public JavaClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className) {
         this.mechanismGuid = mechanismGuid;
         this.mechanismName = mechanismName;
@@ -54,6 +64,15 @@ public class JavaClassGenerator {
         this.indent = "    ";
     }
     
+    /**
+     * <p>Constructor for JavaClassGenerator.</p>
+     *
+     * @param mechanismGuid a {@link java.lang.String} object.
+     * @param mechanismName a {@link java.lang.String} object.
+     * @param packageName a {@link java.lang.String} object.
+     * @param className a {@link java.lang.String} object.
+     * @param indentWith a {@link java.lang.String} object.
+     */
     public JavaClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className, String indentWith) {
         this.mechanismGuid = mechanismGuid;
         this.mechanismName = mechanismName;
@@ -82,9 +101,10 @@ public class JavaClassGenerator {
     }
 
     /**
-     * Initialize for appending tests to an existing DQ Class or checking versions  
+     * Initialize for appending tests to an existing DQ Class or checking versions
      *
      * @param javaSrc java source file to append to or check
+     * @param logVersions a boolean.
      */
     public void init(InputStream javaSrc, boolean logVersions) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(javaSrc));
@@ -127,6 +147,11 @@ public class JavaClassGenerator {
         }
     }
 
+    /**
+     * <p>checkTest.</p>
+     *
+     * @param test a {@link org.datakurator.ffdq.runner.AssertionTest} object.
+     */
     public void checkTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " + currGuids.get(test.getGuid()));
@@ -141,6 +166,11 @@ public class JavaClassGenerator {
         }
     } 
     
+    /**
+     * <p>addTest.</p>
+     *
+     * @param test a {@link org.datakurator.ffdq.runner.AssertionTest} object.
+     */
     public void addTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
@@ -355,6 +385,12 @@ public class JavaClassGenerator {
         }
     }
 
+    /**
+     * <p>writeOut.</p>
+     *
+     * @param out a {@link java.io.OutputStream} object.
+     * @throws java.io.IOException if any.
+     */
     public void writeOut(OutputStream out) throws IOException {
         outputCodeSB.append("}\n");
         out.write(outputCodeSB.toString().getBytes());

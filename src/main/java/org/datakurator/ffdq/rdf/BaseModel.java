@@ -1,4 +1,6 @@
-/** BaseModel.java
+
+/**
+ * BaseModel.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.rdf;
 
@@ -40,12 +45,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 public class BaseModel {
     private Repository repo;
     private RepositoryConnection conn;
     private RDFBeanManager manager;
 
+    /**
+     * <p>Constructor for BaseModel.</p>
+     */
     public BaseModel() {
         // Initialize an in-memory store and the rdf bean manager
         repo = new SailRepository(new MemoryStore());
@@ -55,16 +62,33 @@ public class BaseModel {
         manager = new RDFBeanManager(conn);
     }
 
+    /**
+     * <p>load.</p>
+     *
+     * @param input a {@link java.io.InputStream} object.
+     * @param format a {@link org.eclipse.rdf4j.rio.RDFFormat} object.
+     * @throws java.io.IOException if any.
+     */
     public void load(InputStream input, RDFFormat format) throws IOException {
         // Load RDF data from file
         Model model = Rio.parse(input, "", format);
         conn.add(model);
     }
 
+    /**
+     * <p>load.</p>
+     *
+     * @param model a {@link org.eclipse.rdf4j.model.Model} object.
+     */
     public void load(Model model) {
         conn.add(model);
     }
 
+    /**
+     * <p>save.</p>
+     *
+     * @param obj a {@link java.lang.Object} object.
+     */
     public void save(Object obj) {
         try {
             manager.add(obj);
@@ -73,6 +97,13 @@ public class BaseModel {
         }
     }
 
+    /**
+     * <p>findOne.</p>
+     *
+     * @param guid a {@link java.lang.String} object.
+     * @param cls a {@link java.lang.Class} object.
+     * @return a {@link java.lang.Object} object.
+     */
     public Object findOne(String guid, Class cls) {
         try {
             Resource r = manager.getResource(guid, cls);
@@ -82,6 +113,14 @@ public class BaseModel {
         }
     }
 
+    /**
+     * <p>findOne.</p>
+     *
+     * @param cls a {@link java.lang.Class} object.
+     * @param sparql a {@link java.lang.String} object.
+     * @param field a {@link java.lang.String} object.
+     * @return a {@link java.lang.Object} object.
+     */
     public Object findOne(Class cls, String sparql, String field) {
         try {
             TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
@@ -96,6 +135,14 @@ public class BaseModel {
         }
     }
 
+    /**
+     * <p>findAll.</p>
+     *
+     * @param cls a {@link java.lang.Class} object.
+     * @param sparql a {@link java.lang.String} object.
+     * @param field a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map findAll(Class cls, String sparql, String field) {
         Map rdfBeans = new HashMap();
 
@@ -114,7 +161,7 @@ public class BaseModel {
 
     /**
      * Serialize the model to an output.
-     * 
+     *
      * @param format RDFFormat too write out
      * @param out OutputStream to write to
      * @param includeBindingClass if true, include rdfbeans:bindingClass assertions
@@ -134,6 +181,12 @@ public class BaseModel {
         }
     }
 
+    /**
+     * <p>executeQuery.</p>
+     *
+     * @param sparql a {@link java.lang.String} object.
+     * @param out a {@link java.io.OutputStream} object.
+     */
     public void executeQuery(String sparql, OutputStream out) {
         if (sparql.contains("CONSTRUCT")) {
 
@@ -150,10 +203,22 @@ public class BaseModel {
         }
     }
 
+    /**
+     * <p>executeQuery.</p>
+     *
+     * @param sparql a {@link java.lang.String} object.
+     * @return a {@link org.eclipse.rdf4j.query.TupleQueryResult} object.
+     */
     public TupleQueryResult executeQuery(String sparql) {
          return conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
     }
 
+    /**
+     * <p>getResource.</p>
+     *
+     * @param subject a {@link java.lang.String} object.
+     * @return a {@link org.eclipse.rdf4j.model.Model} object.
+     */
     public Model getResource(String subject) {
         Model model = new LinkedHashModel();
 

@@ -28,14 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/** Generate experimental stub methods in python using analogs for java annotations that
- * could potentially be used to with python implementations in a manner similar to the 
+/**
+ * Generate experimental stub methods in python using analogs for java annotations that
+ * could potentially be used to with python implementations in a manner similar to the
  * java kurator-ffdq and ffdq-api packages to associate metadata with tests and test
- * results. 
- * 
+ * results.
+ *
  * @author David Lowery
  * @author Paul J. Morris
- *
+ * @version $Id: $Id
  */
 public class PythonClassGenerator {
 
@@ -85,6 +86,14 @@ class DwCTG2DQ:
 
     private StringBuilder sb;
 
+    /**
+     * <p>Constructor for PythonClassGenerator.</p>
+     *
+     * @param mechanismGuid a {@link java.lang.String} object.
+     * @param mechanismName a {@link java.lang.String} object.
+     * @param packageName a {@link java.lang.String} object.
+     * @param className a {@link java.lang.String} object.
+     */
     public PythonClassGenerator(String mechanismGuid, String mechanismName, String packageName, String className) {
         this.mechanismGuid = mechanismGuid;
         this.mechanismName = mechanismName;
@@ -148,6 +157,11 @@ class DwCTG2DQ:
         */
     }
 
+    /**
+     * <p>addTest.</p>
+     *
+     * @param test a {@link org.datakurator.ffdq.runner.AssertionTest} object.
+     */
     public void addTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
@@ -297,6 +311,12 @@ class DwCTG2DQ:
         }
     }
 
+    /**
+     * <p>writeOut.</p>
+     *
+     * @param out a {@link java.io.OutputStream} object.
+     * @throws java.io.IOException if any.
+     */
     public void writeOut(OutputStream out) throws IOException {
         sb.append("\n");
         out.write(sb.toString().getBytes());

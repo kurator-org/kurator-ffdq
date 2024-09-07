@@ -1,4 +1,6 @@
-/** AmendmentMethod.java
+
+/**
+ * AmendmentMethod.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.solutions;
 
@@ -31,25 +36,46 @@ import org.datakurator.ffdq.model.context.Amendment;
 public class AmendmentMethod extends AssertionMethod {
     private Amendment ce;
 
+    /**
+     * <p>Constructor for AmendmentMethod.</p>
+     */
     public AmendmentMethod() { }
 
+    /**
+     * <p>Constructor for AmendmentMethod.</p>
+     *
+     * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
+     * @param contextualizedEnhancement a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     public AmendmentMethod(Specification specification, Amendment contextualizedEnhancement) {
         this.specification = specification;
         this.ce = contextualizedEnhancement;
     }
 
+    /**
+     * <p>getContextualizedEnhancement.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     @RDF("bdqffdq:enhancementInContext")
     public Amendment getContextualizedEnhancement() {
         return ce;
     }
 
+    /**
+     * <p>setContextualizedEnhancement.</p>
+     *
+     * @param ce a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     public void setContextualizedEnhancement(Amendment ce) {
         this.ce = ce;
     }
     
-	/**
-	 * @return a generated label
-	 */
+    /**
+     * <p>getLabel.</p>
+     *
+     * @return a generated label
+     */
     @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
@@ -61,7 +87,7 @@ public class AmendmentMethod extends AssertionMethod {
     
     /**
      * Get the preferred label, currently, same as the rdfs;label.
-     * 
+     *
      * @return a skos:prefLabel
      */
     @RDF("skos:prefLabel") 

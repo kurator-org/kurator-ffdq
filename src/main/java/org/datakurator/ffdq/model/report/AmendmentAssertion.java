@@ -1,4 +1,6 @@
-/**  AmendmentAssertion.java
+
+/**
+ *  AmendmentAssertion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model.report;
 
@@ -34,20 +39,40 @@ public class AmendmentAssertion extends Assertion {
 
     private Amendment enhancement;
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>enhancement</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     @RDF("bdqffdq:enhancementInContext")
     public Amendment getEnhancement() {
         return enhancement;
     }
 
+    /**
+     * <p>Setter for the field <code>enhancement</code>.</p>
+     *
+     * @param enhancement a {@link org.datakurator.ffdq.model.context.Amendment} object.
+     */
     public void setEnhancement(Amendment enhancement) {
         this.enhancement = enhancement;
     }

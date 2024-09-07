@@ -1,4 +1,6 @@
-/**  InvertedCriterion.java
+
+/**
+ *  InvertedCriterion.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model;
 
@@ -33,26 +38,54 @@ public class InvertedCriterion {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
+    /**
+     * <p>Constructor for InvertedCriterion.</p>
+     */
     public InvertedCriterion() { }
 
+    /**
+     * <p>Constructor for InvertedCriterion.</p>
+     *
+     * @param label a {@link java.lang.String} object.
+     */
     public InvertedCriterion(String label) {
         this.label = label;
     }
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>label</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
 
+    /**
+     * <p>Setter for the field <code>label</code>.</p>
+     *
+     * @param label a {@link java.lang.String} object.
+     */
     public void setLabel(String label) {
         this.label = label;
     }

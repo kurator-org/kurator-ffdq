@@ -1,4 +1,6 @@
-/**  Specification.java
+
+/**
+ *  Specification.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -13,6 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 package org.datakurator.ffdq.model;
 
@@ -35,8 +40,20 @@ public class Specification {
     private String expectedResponse;
     private String authoritiesDefaults;
 
+    /**
+     * <p>Constructor for Specification.</p>
+     */
     public Specification() { }
 
+    /**
+     * <p>Constructor for Specification.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     * @param label a {@link java.lang.String} object.
+     * @param description a {@link java.lang.String} object.
+     * @param expectedResponse a {@link java.lang.String} object.
+     * @param authoritiesDefaults a {@link java.lang.String} object.
+     */
     public Specification(String id, String label, String description, String expectedResponse, String authoritiesDefaults) {
     	if (id!=null && (id.startsWith("urn:uuid") || id.startsWith("http"))) {
     		this.id = id;
@@ -49,57 +66,95 @@ public class Specification {
         this.expectedResponse = expectedResponse;
     }
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDFSubject
     public String getId() {
         return id;
     }
 
+    /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * <p>Getter for the field <code>label</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
 
+    /**
+     * <p>Setter for the field <code>label</code>.</p>
+     *
+     * @param label a {@link java.lang.String} object.
+     */
     public void setLabel(String label) {
         this.label = label;
     }
 
+    /**
+     * <p>Getter for the field <code>description</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     @RDF("rdfs:comment")
     public String getDescription() {
         return description;
     }
 
+    /**
+     * <p>Setter for the field <code>description</code>.</p>
+     *
+     * @param description a {@link java.lang.String} object.
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-	/**
-	 * @return the expectedResponse
-	 */
+    /**
+     * <p>Getter for the field <code>expectedResponse</code>.</p>
+     *
+     * @return the expectedResponse
+     */
     @RDF("bdqffdq:hasExpectedResponse")
 	public String getExpectedResponse() {
 		return expectedResponse;
 	}
 
 	/**
+	 * <p>Setter for the field <code>expectedResponse</code>.</p>
+	 *
 	 * @param expectedResponse the expectedResponse to set
 	 */
 	public void setExpectedResponse(String expectedResponse) {
 		this.expectedResponse = expectedResponse;
 	}
 
-	/**
-	 * @return the authoritiesDefaults
-	 */
+    /**
+     * <p>Getter for the field <code>authoritiesDefaults</code>.</p>
+     *
+     * @return the authoritiesDefaults
+     */
     @RDF("bdqffdq:hasAuthoritiesDefaults")
 	public String getAuthoritiesDefaults() {
 		return authoritiesDefaults;
 	}
 
 	/**
+	 * <p>Setter for the field <code>authoritiesDefaults</code>.</p>
+	 *
 	 * @param authoritiesDefaults the authoritiesDefaults to set
 	 */
 	public void setAuthoritiesDefaults(String authoritiesDefaults) {
