@@ -89,11 +89,52 @@ public class AssertionTest {
      * @param version a {@link java.lang.String} object.
      * @param description a {@link java.lang.String} object.
      * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
      * @param specification a {@link java.lang.String} object.
      * @param authoritiesDefaults a {@link java.lang.String} object.
      * @param assertionType a {@link java.lang.String} object.
      * @param resourceType a {@link java.lang.String} object.
      * @param dimension a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
+     * @param criterionLabel a {@link java.lang.String} object.
      * @param criterion a {@link java.lang.String} object.
      * @param enhancement a {@link java.lang.String} object.
      * @param informationElement a {@link java.util.List} object.
