@@ -29,7 +29,7 @@ import java.util.UUID;
         "bdqdim = https://rs.tdwg.org/bdqdim/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:Dimension")
+@RDFBean("bdqffdq:DataQualityDimension")
 public class Dimension {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;

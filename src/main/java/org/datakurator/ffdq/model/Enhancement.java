@@ -30,20 +30,28 @@ import java.util.UUID;
 })
 @RDFBean("bdqffdq:Enhancement")
 public class Enhancement {
+	
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
-    // TODO: Support enhancement classes
-    
     public Enhancement() { }
 
     public Enhancement(String label) {
         this.label = label;
     }
+    
+    public Enhancement(String label, String id) { 
+    	this.label= label;
+    	this.id = id;
+    }
 
-    @RDFSubject
+    @RDFSubject(prefix = "bdqenh:")
     public String getId() {
-        return id;
+    	if (id.startsWith("https://rs.tdwg.org/bdqenh/terms/")) { 
+    		return id.replace("https://rs.tdwg.org/bdqenh/terms/", "");
+    	} else { 
+    		return id;
+    	}
     }
 
     public void setId(String id) {
@@ -58,5 +66,21 @@ public class Enhancement {
     public void setLabel(String label) {
         this.label = label;
     }
+    
+    public static Enhancement ASSUMEDDEFAULT = new Enhancement("AssumedDefault","https://rs.tdwg.org/bdqenh/terms/AssumedDefault");
+    public static Enhancement CONVERTED = new Enhancement("Converted","https://rs.tdwg.org/bdqenh/terms/Converted");
+    public static Enhancement FILLINFROM = new Enhancement("FillInFrom","https://rs.tdwg.org/bdqenh/terms/FillInFrom");
+    public static Enhancement STANDARDIZED = new Enhancement("Standardized","https://rs.tdwg.org/bdqenh/terms/Standardized");
+    public static Enhancement TRANSPOSED = new Enhancement("Transposed","https://rs.tdwg.org/bdqenh/terms/Transposed");
+
+    public static Enhancement fromString(String value) {
+        if (value.equalsIgnoreCase(ASSUMEDDEFAULT.getLabel())) return ASSUMEDDEFAULT;
+        else if (value.equalsIgnoreCase(CONVERTED.getLabel())) return CONVERTED;
+        else if (value.equalsIgnoreCase(FILLINFROM.getLabel())) return FILLINFROM;
+        else if (value.equalsIgnoreCase(TRANSPOSED.getLabel())) return TRANSPOSED;
+        else if (value.equalsIgnoreCase(STANDARDIZED.getLabel())) return STANDARDIZED;
+        else throw new UnsupportedOperationException("Unable to find an bdqenh: term for bdqffdq:Criterion for value: [" + value + "]");
+    }
+    
 
 }

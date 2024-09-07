@@ -112,16 +112,25 @@ public class BaseModel {
         return rdfBeans;
     }
 
-    public void write(RDFFormat format, OutputStream out) {
+    /**
+     * Serialize the model to an output.
+     * 
+     * @param format RDFFormat too write out
+     * @param out OutputStream to write to
+     * @param includeBindingClass if true, include rdfbeans:bindingClass assertions
+     */
+    public void write(RDFFormat format, OutputStream out, boolean includeBindingClass) {
         RDFWriter writer = Rio.createWriter(format, out);
         try (RepositoryConnection conn = repo.getConnection()) {
-            conn.prepareGraphQuery(QueryLanguage.SPARQL,
-                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " +
+        	if (includeBindingClass) { 
+        		conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " + Namespace.getNamespacePrefixes() + 
                             "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o } ").evaluate(writer);
-
-            // conn.prepareGraphQuery(QueryLanguage.SPARQL,
-            //         "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " +
-            //            "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
+        	} else { 
+        		conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                     "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " + Namespace.getNamespacePrefixes() + 
+                        "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
+        	} 
         }
     }
 

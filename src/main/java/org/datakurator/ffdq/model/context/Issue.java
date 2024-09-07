@@ -22,6 +22,8 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.Consulted;
+import org.datakurator.ffdq.model.Criterion;
+import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.InvertedCriterion;
 import org.datakurator.ffdq.model.ResourceType;
@@ -37,7 +39,8 @@ import java.util.UUID;
 public class Issue {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private InvertedCriterion issue;
+    private Criterion criterion;
+    private Dimension dimension;
     private InformationElement ie;
     private ActedUpon actedUpon;
     private Consulted consulted; 
@@ -46,15 +49,15 @@ public class Issue {
     private String prefLabel;
     private String comment;
     
-    public Issue(InvertedCriterion issue, InformationElement ie, ResourceType rt) {
-    	this.issue = issue;
+    public Issue(Criterion issue, InformationElement ie, ResourceType rt) {
+    	this.criterion = issue;
     	this.ie = ie;
     	this.rt = rt;
     }
 
-    public Issue(InvertedCriterion issue, InformationElement informationElement, ActedUpon actedUpon,
+    public Issue(Criterion issue, InformationElement informationElement, ActedUpon actedUpon,
 			Consulted consulted, ResourceType resourceType) {
-    	this.issue = issue;
+    	this.criterion = issue;
         if (informationElement.getComposedOf().size()==0) { 
         	this.ie = null;
         } else { 
@@ -125,16 +128,31 @@ public class Issue {
         this.rt = rt;
     }
 
-    @RDF("bdqffdq:hasIssue")
-    public InvertedCriterion getIssue() {
-        return issue;
+    @RDF("bdqffdq:hasCriterion")
+    public Criterion getCriterion() {
+        return criterion;
     }
 
-    public void setIssue(InvertedCriterion issue) {
-        this.issue = issue;
+    public void setCriterion(Criterion issue) {
+        this.criterion = issue;
     }
 
-    @RDF("rdfs:label")
+    /**
+	 * @return the dimension
+	 */
+    @RDF("bdqffdq:hasDataQualityDimension")
+	public Dimension getDimension() {
+		return dimension;
+	}
+
+	/**
+	 * @param dimension the dimension to set
+	 */
+	public void setDimension(Dimension dimension) {
+		this.dimension = dimension;
+	}
+
+	@RDF("rdfs:label")
 	public String getLabel() {
 		return label;
 	}

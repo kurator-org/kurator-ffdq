@@ -22,6 +22,7 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.Consulted;
+import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.Enhancement;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
@@ -38,6 +39,7 @@ public class Amendment {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Enhancement enhancement;
+    private Dimension dimension;
     private InformationElement ie;
     private ActedUpon actedUpon;
     private Consulted consulted;  
@@ -138,7 +140,22 @@ public class Amendment {
         this.enhancement = enhancement;
     }
 
-    @RDF("rdfs:label")
+    /**
+	 * @return the dimension
+	 */
+    @RDF("bdqffdq:hasDataQualityDimension")
+	public Dimension getDimension() {
+		return dimension;
+	}
+
+	/**
+	 * @param dimension the dimension to set
+	 */
+	public void setDimension(Dimension dimension) {
+		this.dimension = dimension;
+	}
+
+	@RDF("rdfs:label")
 	public String getLabel() {
 		return label;
 	}

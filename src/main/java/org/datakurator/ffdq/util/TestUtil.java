@@ -229,6 +229,9 @@ public class TestUtil {
             	String specificationLabel = "Specification for: " + test.getLabel();
             	String specificationDescription = test.getSpecification() + " " + test.getAuthoritiesDefaults();
                 Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, specificationDescription.trim(), test.getSpecification(), test.getAuthoritiesDefaults());
+                if (test.getSpecificationGuid()==null) { 
+                	logger.log(Level.WARNING, "Missing Specification GUID for " + test.getLabel());
+                }
                 logger.log(Level.INFO, test.getSpecificationGuid());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
@@ -387,8 +390,10 @@ public class TestUtil {
                         
                     case "AMENDMENT":
                         // Define an enhancement in the context of resource type and info elements
-                        Enhancement enhancement = new Enhancement(test.getCriterionLabel());
+                        Enhancement enhancement = Enhancement.fromString(test.getEnhancement());
                         Amendment ce = new Amendment(enhancement, informationElement, actedUpon, consulted, resourceType);
+                        dimension = new Dimension(test.getDimension());
+                        ce.setDimension(dimension);
                         ce.setId(test.getGuidTDWGNamespace());
                         ce.setPrefLabel(test.getLabel());
                         ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
@@ -424,12 +429,14 @@ public class TestUtil {
                         model.save(amendmentMethod);
                         break;
                     case "ISSUE":
-                        // Define an enhancement in the context of resource type and info elements
-                        InvertedCriterion issue = new InvertedCriterion(test.getCriterionLabel());
-                        Issue ci = new Issue(issue, informationElement, actedUpon, consulted, resourceType);
+                        // Define an issue in the context of resource type and information elements
+                        criterion = Criterion.fromString(test.getCriterion());
+                        Issue ci = new Issue(criterion, informationElement, actedUpon, consulted, resourceType);
+                        dimension = new Dimension(test.getDimension());
+                        ci.setDimension(dimension);
                         ci.setId(test.getGuidTDWGNamespace());
                         ci.setPrefLabel(test.getLabel());
-                        ci.setLabel(test.getDescription() + " InvertedCriterion for " + resourceType.getLabel());
+                        ci.setLabel(test.getDescription() + " Criterion for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
                         if (test.getSpecificationGuid()!=null) { 
                         	ci.setId(test.getSpecificationGuid());
@@ -514,7 +521,8 @@ public class TestUtil {
 
             // Write rdf to file
             FileOutputStream out = new FileOutputStream(rdfOut);
-            model.write(format, out);
+            boolean includeBindingClass = false;
+            model.write(format, out, includeBindingClass);
             logger.info("Wrote rdf for tests to: " + new File(rdfOut).getAbsolutePath());
 
             // Generate python if requested.

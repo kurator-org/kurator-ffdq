@@ -27,6 +27,7 @@ import java.util.UUID;
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
+@Deprecated
 @RDFBean("bdqffdq:InvertedCriterion")
 public class InvertedCriterion {
     private String id = "urn:uuid:" + UUID.randomUUID();

@@ -19,8 +19,12 @@ package org.datakurator.ffdq.rdf;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Namespaces used with the FFDQModel
+ */
 public class Namespace {
     public static final String DWC = "http://rs.tdwg.org/dwc/terms/";
     public static final String DCTERMS = "http://purl.org/dc/terms/";
@@ -29,12 +33,32 @@ public class Namespace {
     public static final String SKOS = "http://www.w3.org/2004/02/skos/core#";
     public static final String BDQ = "https://rs.tdwg.org/bdq/terms/";   // other bdq terms
     public static final String BDQDIM = "https://rs.tdwg.org/bdqdim/terms/";  // dimensions   
-    public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms";   // tests
+    public static final String BDQENH = "https://rs.tdwg.org/bdqenh/terms/";  // enhancements   
+    public static final String BDQCRIT = "https://rs.tdwg.org/bdqcrit/terms/";  // criteria   
+    public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms";   // ontology
+    public static final String BDQCORE = "https://rs.tdwg.org/bdqcore/terms";   // tests
 
     public static final String NONE = "http://datakurator.org/none/";
 
     public static final Map<String, String> nsPrefixes;
 
+    /** Get a list of the prefixes in a form suitable for inclusion in SPARQL (PREFIX ns: <namespace>)
+     * 
+     * @return a string list of prefixes used with the FFDQ model.
+     */
+    public static String getNamespacePrefixes() { 
+        StringBuilder namespaces = new StringBuilder();
+        Iterator<String> i = nsPrefixes.keySet().iterator();
+        while (i.hasNext()) { 
+        	String key = i.next();
+        	if (!key.equalsIgnoreCase("none")) { 
+        		namespaces.append("PREFIX ").append(key).append(" ").append("<").append(nsPrefixes.get(key)).append("> ");
+        	}
+        }
+        
+        return namespaces.toString();
+    }
+    
     static {
         nsPrefixes = new HashMap<>();
 
@@ -45,6 +69,9 @@ public class Namespace {
         
         nsPrefixes.put("bdq", BDQ);
         nsPrefixes.put("bdqdim", BDQDIM);
+        nsPrefixes.put("bdqcrit", BDQCRIT);
+        nsPrefixes.put("bdqenh", BDQENH);
+        nsPrefixes.put("bdqcore", BDQCORE);
         nsPrefixes.put("skos", SKOS);
 
         nsPrefixes.put("dwcloud", NONE);
