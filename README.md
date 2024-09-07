@@ -46,6 +46,10 @@ For example:
 
 `./query-util.sh -t competencyquestions/rdf/example.jsonld -q competencyquestions/sparql/results.sparql -o results.tsv`
 
+Example working with the BDQ Core tests (assuming checkout of tdwg/bdq in a directory next to kurator-ffdq):
+
+./query-util.sh -t ../bdq/tg2/core/TG2_tests.ttl -q competencyquestions/sparql/tests_bdqcore.sparql -o results.tsv
+
 # Test spreadsheet utility
 
 This utility provides authors of actors a way to convert the spreadsheet of standardized tests into FFDQ RDF and/or Java classes containing stub methods for implementing tests.

@@ -6,49 +6,56 @@ PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 #SELECT DISTINCT ?useCase ?test ?specification ?id ?status ?comment
-SELECT DISTINCT ?useCase ?test ?specification
+SELECT DISTINCT ?useCase ?test ?spec
 
 WHERE {
 
-    # Find criterion in context from the validation
-    # policy for a given use case
+    # Find Validations from the ValidationPolicy
+    # for a given use case
 
     ?policy a bdqffdq:ValidationPolicy .
-    ?policy bdqffdq:coversUseCase ?uc .
+    ?policy bdqffdq:hasUseCase ?uc .
     ?policy bdqffdq:includesInPolicy ?cc .
     ?uc rdfs:label ?useCase .
 
     # Find the specification from the validation method
-    # referencing the criterion in context
+    # referencing the Validation
+
+    ?cc skos:prefLabel ?test .
 
     ?vm a bdqffdq:ValidationMethod .
-    ?vm bdqffdq:hasContextualizedCriterion ?cc .
-    ?vm bdqffdq:hasSpecification ?test .
-    ?test rdfs:label ?specification .
+    ?vm bdqffdq:forValidation ?cc .
+    ?vm bdqffdq:hasSpecification ?testSpec .
+    ?testSpec rdfs:comment ?spec
+#    ?testSpec rdfs:hasExpectedResponse ?specification .
 
-    # Find the validations from the criterion
-    # in context and the specification
+#
+#    # Find the validations from the criterion
+#    # in context and the specification
+#
+##    ?v a bdqffdq:Validation .
+##    ?v bdqffdq:criterionInContext ?cc .
+##    ?v prov:hadPlan ?s .
+#
+##    # Get the record id from the data resource
+##    ?v prov:used ?dr .
+##    ?dr dcterms:identifier ?id .
+#
+#    # Find the result status.sparql and comment
+#    # from the validations
+#
+##    ?validation prov:generated ?r .
+##    ?r bdqffdq:hasStatus ?rs .
+##    ?rs rdfs:label ?status .
+##    ?r rdfs:comment ?comment .
+#
 
-#    ?v a bdqffdq:Validation .
-#    ?v bdqffdq:criterionInContext ?cc .
-#    ?v prov:hadPlan ?s .
+  # Filter by a specific use case
 
-#    # Get the record id from the data resource
-#    ?v prov:used ?dr .
-#    ?dr dcterms:identifier ?id .
+  FILTER( ?uc = <https://rs.tdwg.org/bdqffdq/terms/Taxon-Management> )
 
-    # Find the result status.sparql and comment
-    # from the validations
-
-#    ?validation prov:generated ?r .
-#    ?r bdqffdq:hasStatus ?rs .
-#    ?rs rdfs:label ?status .
-#    ?r rdfs:comment ?comment .
-
-    # Filter by a specific use case
-
-    FILTER( ?uc = <https://rs.tdwg.org/bdqffdq/terms/Taxon-Management> )
 
 }
