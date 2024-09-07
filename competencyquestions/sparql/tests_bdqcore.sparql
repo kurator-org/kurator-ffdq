@@ -1,0 +1,54 @@
+# Given a use case find the validation result status and valuable
+# information elements
+
+PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/>
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+#SELECT DISTINCT ?useCase ?test ?specification ?id ?status ?comment
+SELECT DISTINCT ?useCase ?test ?specification
+
+WHERE {
+
+    # Find criterion in context from the validation
+    # policy for a given use case
+
+    ?policy a bdqffdq:ValidationPolicy .
+    ?policy bdqffdq:coversUseCase ?uc .
+    ?policy bdqffdq:includesInPolicy ?cc .
+    ?uc rdfs:label ?useCase .
+
+    # Find the specification from the validation method
+    # referencing the criterion in context
+
+    ?vm a bdqffdq:ValidationMethod .
+    ?vm bdqffdq:hasContextualizedCriterion ?cc .
+    ?vm bdqffdq:hasSpecification ?test .
+    ?test rdfs:label ?specification .
+
+    # Find the validations from the criterion
+    # in context and the specification
+
+#    ?v a bdqffdq:Validation .
+#    ?v bdqffdq:criterionInContext ?cc .
+#    ?v prov:hadPlan ?s .
+
+#    # Get the record id from the data resource
+#    ?v prov:used ?dr .
+#    ?dr dcterms:identifier ?id .
+
+    # Find the result status.sparql and comment
+    # from the validations
+
+#    ?validation prov:generated ?r .
+#    ?r bdqffdq:hasStatus ?rs .
+#    ?rs rdfs:label ?status .
+#    ?r rdfs:comment ?comment .
+
+    # Filter by a specific use case
+
+    FILTER( ?uc = <https://rs.tdwg.org/bdqffdq/terms/Taxon-Management> )
+
+}

@@ -193,7 +193,7 @@ public class TestUtil {
             			Iterator<CSVRecord> i = useCaseList.iterator();
             			while (i.hasNext()) { 
             				CSVRecord useCaseRecord = i.next();
-            				String useCaseLabel = useCaseRecord.get("UseCase").trim();
+            				String useCaseLabel = useCaseRecord.get("UseCase").trim().replace(" ","_");
             				if (!useCaseMap.containsKey(useCaseLabel)) { 
             					UseCase useCaseInstance = new UseCase();
             					useCaseInstance.setLabel(useCaseLabel);
