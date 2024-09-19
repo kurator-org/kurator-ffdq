@@ -26,6 +26,8 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Data Resource is an instance of data and the target to the DQ assessment and management.
@@ -53,6 +55,8 @@ public class DataResource {
 
     private Model model;
     private IRI subject;
+    
+    private final static Logger logger = Logger.getLogger(DataResource.class.getName());
 
     /**
      * <p>Constructor for DataResource.</p>
@@ -127,6 +131,7 @@ public class DataResource {
         // Add triples from the key value pairs in the map
         for (String term : record.keySet()) {
 
+        	try { 
             URI uri = vocab.getURI(term);  // Lookup the term uri via dwcloud vocab
 
             IRI predicate = valueFactory.createIRI(uri.toString());
@@ -134,6 +139,9 @@ public class DataResource {
 
             builder.defaultGraph().add(subject, predicate, object);
 
+        	} catch (Exception e) {
+        		logger.log(Level.SEVERE, e.getMessage());
+        	}
         }
 
         this.vocab = vocab;

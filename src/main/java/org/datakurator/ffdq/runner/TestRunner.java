@@ -34,6 +34,7 @@ import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.model.context.Measure;
 import org.datakurator.ffdq.model.context.Amendment;
+import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
@@ -50,6 +51,7 @@ import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 public class TestRunner {
     private final static Logger logger = Logger.getLogger(TestRunner.class.getName());
@@ -91,7 +93,11 @@ public class TestRunner {
             // Find the class level annotation and get the value for mechanism guid
             if (annotation instanceof org.datakurator.ffdq.annotations.Mechanism) {
 
+            	logger.log(Level.INFO, annotation.toString());
+                       	
                 String mechanismGuid = ((org.datakurator.ffdq.annotations.Mechanism) annotation).value();
+                
+                try { 
                 mechanism = (Mechanism) model.findOne(mechanismGuid, Mechanism.class);
 
                 // check to see if the annotation has a label value and override value from rdf if present
@@ -99,9 +105,17 @@ public class TestRunner {
                 if (mechanismLabel != null) {
                     mechanism.setLabel(mechanismLabel);
                 }
+                } catch (Exception e) { 
+                	logger.log(Level.SEVERE, e.getMessage());
+                }
 
                 // Query the BDQFFDQ model for test specifications implemented by the mechanism tied to the DQClass
                 Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
+                
+                // TODO: Implmement handling of tests as DataQualityNeed subclasses, rather than specifications
+                // Map<String, DataQualityNeed> definedTests = model.findTestsForMechanism(mechanismGuid);
+                
+                logger.log(Level.INFO, "Specifications found for Mechanism in RDF: " + definedTests.size());
 
                 // Process method level annotations and check that test methods in the DQClass are consistent
                 // with Measurement, ValidationAssertion and AmendmentAssertion Methods defined in the RDF
@@ -125,7 +139,15 @@ public class TestRunner {
 
                 if (annotation instanceof Provides) {
                     String guid = ((Provides) annotation).value();
+                    
+                    if (guid.startsWith("urn:uuid:")){ 
+                    	guid = guid.replace("urn:uuid:", "");
+                    }
+                    if (!guid.startsWith("https://rs.tdwg.org/bdqcore/terms/")) { 
+                    	guid = "https://rs.tdwg.org/bdqcore/terms/" + guid;
+                    }
 
+                    logger.log(Level.INFO, guid);
                     test.setGuid(guid);
                     implementedTests.put(guid, test);
                 } else if (annotation instanceof org.datakurator.ffdq.annotations.Measure) {
@@ -209,7 +231,7 @@ public class TestRunner {
             for (String guid : missingGuids) {
                 logger.warning("Missing definition in RDF for Java method \"" +
                         implementedTests.get(guid).getLabel() + "\" in " + cls + ": " +
-                        guid.substring(guid.lastIndexOf(":")+1));
+                        guid);
 
                 implementedTests.remove(guid);
             }

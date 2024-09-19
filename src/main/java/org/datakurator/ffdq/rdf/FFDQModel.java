@@ -19,6 +19,7 @@ package org.datakurator.ffdq.rdf;
 import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.datakurator.ffdq.model.report.Assertion;
 import org.datakurator.ffdq.model.solutions.AssertionMethod;
 import org.eclipse.rdf4j.model.Model;
@@ -81,6 +82,39 @@ public class FFDQModel extends BaseModel {
         return (AssertionMethod) findOne(AssertionMethod.class, sparql, "method");
     }
 
+    /**
+     * findNeedsForMechanism, given a mechanism, find DataQualityNeeds (Amenement, 
+     * Validation, Measurement, Issue that have known implementations and mechanisms
+     * associating them with a specified mechanism.
+     *
+     * @param mechanismGuid a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
+    public Map<String, DataQualityNeed> findTestsForMechanism(String mechanismGuid) {
+        Set<String> guids = new HashSet<>();
+
+        String sparql = "PREFIX bdqffffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+                "SELECT ?test " +
+                "WHERE "
+                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
+                "?implementation bdqffdq:hasSpecification ?specification "
+                + "?specification bdqffdq:forValidation ?test "
+                + "} UNION " 
+                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
+                "?implementation bdqffdq:hasSpecification ?specification "
+                + "?specification bdqffdq:forAmendment ?test "
+                + "} UNION " 
+                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
+                "?implementation bdqffdq:hasSpecification ?specification "
+                + "?specification bdqffdq:forMeasure ?test "
+                + "} UNION " 
+                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
+                "?implementation bdqffdq:hasSpecification ?specification "
+                + "?specification bdqffdq:forIssue ?test "
+                + "}";
+        return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
+    }
+    
     /**
      * <p>findDataResources.</p>
      *

@@ -45,10 +45,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class BaseModel {
     private Repository repo;
     private RepositoryConnection conn;
     private RDFBeanManager manager;
+    
+    private final static Logger logger = Logger.getLogger(BaseModel.class.getName());
 
     /**
      * <p>Constructor for BaseModel.</p>
@@ -107,6 +112,9 @@ public class BaseModel {
     public Object findOne(String guid, Class cls) {
         try {
             Resource r = manager.getResource(guid, cls);
+            if (r == null) { 
+            	logger.log(Level.SEVERE, "Class: " + cls + " Guid: " + guid );
+            }
             return manager.get(r);
         } catch (RDFBeanException e) {
             throw new RuntimeException("Could not fetch the rdf bean instance.", e);
@@ -126,6 +134,8 @@ public class BaseModel {
             TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
 
             BindingSet solution = result.next();
+            logger.log(Level.INFO, field);
+            logger.log(Level.INFO, sparql);
             String id = solution.getValue(field).stringValue();
 
             Resource r = manager.getResource(id, cls);
@@ -147,10 +157,14 @@ public class BaseModel {
         Map rdfBeans = new HashMap();
 
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+        logger.log(Level.INFO, field);
+        logger.log(Level.INFO, sparql);
 
         while (result.hasNext()) {
             BindingSet solution = result.next();
             String id = solution.getValue(field).stringValue();
+            
+            logger.log(Level.INFO, "Looking for bean for: " + id);
 
             Object rdfBean = findOne(id, cls);
             rdfBeans.put(id, rdfBean);

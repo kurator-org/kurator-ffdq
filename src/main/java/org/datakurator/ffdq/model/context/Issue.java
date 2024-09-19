@@ -41,7 +41,7 @@ import java.util.UUID;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Issue")
-public class Issue {
+public class Issue extends DataQualityNeed  {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Criterion criterion;

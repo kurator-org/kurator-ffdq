@@ -39,7 +39,7 @@ import java.util.UUID;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Measure")
-public class Measure {
+public class Measure  extends DataQualityNeed  {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Dimension dimension;
