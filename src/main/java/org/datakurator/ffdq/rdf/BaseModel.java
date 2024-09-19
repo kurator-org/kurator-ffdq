@@ -47,7 +47,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 public class BaseModel {
     private Repository repo;
     private RepositoryConnection conn;

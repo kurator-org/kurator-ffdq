@@ -30,6 +30,9 @@ import java.util.UUID;
 
 /**
  * Class for data quality Dimensions.
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",

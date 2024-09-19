@@ -83,7 +83,7 @@ public class FFDQModel extends BaseModel {
     }
 
     /**
-     * findNeedsForMechanism, given a mechanism, find DataQualityNeeds (Amenement, 
+     * findNeedsForMechanism, given a mechanism, find DataQualityNeeds (Amenement,
      * Validation, Measurement, Issue that have known implementations and mechanisms
      * associating them with a specified mechanism.
      *

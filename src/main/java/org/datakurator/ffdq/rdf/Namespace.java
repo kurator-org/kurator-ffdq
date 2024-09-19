@@ -59,7 +59,7 @@ public class Namespace {
     public static final Map<String, String> nsPrefixes;
 
     /**
-     * Get a list of the prefixes in a form suitable for inclusion in SPARQL (PREFIX ns: <namespace>)
+     * Get a list of the prefixes in a form suitable for inclusion in SPARQL (PREFIX ns: namespace)
      *
      * @return a string list of prefixes used with the FFDQ model.
      */

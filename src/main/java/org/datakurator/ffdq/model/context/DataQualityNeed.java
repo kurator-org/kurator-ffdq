@@ -8,7 +8,10 @@ import org.apache.commons.logging.LogFactory;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 
 /**
- *  Superclass for "tests" 
+ *  Superclass for "tests"
+ *
+ * @author mole
+ * @version $Id: $Id
  */
 @RDFBean("bdqffdq:DataQualityNeed")
 public class DataQualityNeed {
