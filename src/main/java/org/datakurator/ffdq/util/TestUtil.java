@@ -293,7 +293,6 @@ public class TestUtil {
                 	// Set GUID if provided in list
                 	if (ieGuidsProvided) { 
                 		if (ieGuidMap.containsKey(label.toString())) { 
-                			System.out.println(label.toString() + " " + ieGuidMap.get(label.toString()));
                 			actedUpon.setId(ieGuidMap.get(label.toString()));
                 		}
                 	}
