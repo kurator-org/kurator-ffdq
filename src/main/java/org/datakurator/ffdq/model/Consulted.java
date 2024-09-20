@@ -38,6 +38,15 @@ public class Consulted extends InformationElement {
     }
 
     /**
+     * <p>Setter for the field <code>id</code>.</p>
+     *
+     * @param id a {@link java.lang.String} object.
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    /**
      * <p>getComposedOf.</p>
      *
      * @return a {@link java.util.List} object.

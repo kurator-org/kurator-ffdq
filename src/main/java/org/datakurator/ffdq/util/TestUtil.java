@@ -101,6 +101,9 @@ public class TestUtil {
         }
     }
 
+    private static Map<String,InformationElement> ieMap;
+    private static Map<String,String> ieGuidMap;
+    
     /**
      * <p>main.</p>
      *
@@ -115,6 +118,8 @@ public class TestUtil {
         
         options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships, if not specfied, UseCases column in InputFile will be used, if specified, will override InputFile.");
         options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
+        options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
+        options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels.");
         
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
 
@@ -151,6 +156,15 @@ public class TestUtil {
             	additionalGuidFilename = cmd.getOptionValue("guidFile");
             	guidsProvided = true;
             }
+            
+            boolean ieGuidsProvided = false;
+            String ieGuidFilename = null;
+            if (cmd.hasOption("ieGuidFile")) {
+            	ieGuidFilename = cmd.getOptionValue("ieGuidFile");
+            	ieGuidMap = addIEGuidsFromFile(ieGuidFilename);
+            	ieGuidsProvided = true;
+            }
+            ieMap = new HashMap<String,InformationElement>();
             
             if (cmd.hasOption("format")) {
                 String value = cmd.getOptionValue("format");
@@ -276,7 +290,21 @@ public class TestUtil {
                 }
                 if (test.getActedUpon().size()>0) { 
                 	actedUpon.setLabel(label.toString());
+                	// Set GUID if provided in list
+                	if (ieGuidsProvided) { 
+                		if (ieGuidMap.containsKey(label.toString())) { 
+                			System.out.println(label.toString() + " " + ieGuidMap.get(label.toString()));
+                			actedUpon.setId(ieGuidMap.get(label.toString()));
+                		}
+                	}
+                	// Reuse existing instance
+                	if (ieMap.containsKey(label.toString())) { 
+                		actedUpon = (ActedUpon) ieMap.get(label.toString());
+                	} else { 
+                		ieMap.put(label.toString(), actedUpon);
+                	}
                 }
+                
                	label = new StringBuilder("Information Element Consulted ");
                	separator = "";
                 for (String str : test.getConsulted()) {
@@ -289,6 +317,18 @@ public class TestUtil {
                 }
                 if (test.getConsulted().size()>0) { 
                 	consulted.setLabel(label.toString());
+                	// Set GUID if provided in list
+                	if (ieGuidsProvided) { 
+                		if (ieGuidMap.containsKey(label.toString())) { 
+                			consulted.setId(ieGuidMap.get(label.toString()));
+                		}
+                	}
+                	// Reuse existing instance
+                	if (ieMap.containsKey(label.toString())) { 
+                		consulted = (Consulted) ieMap.get(label.toString());
+                	} else { 
+                		ieMap.put(label.toString(), consulted);
+                	}
                 }
 
                 // Add the specification to an implementation for the current mechanism
@@ -827,4 +867,41 @@ public class TestUtil {
 
         return useCases;
     }
+    
+    /**
+     *  Given a file containing guids information element labels, return a map of these values.
+     * 
+     * @param ieGuidFilename file containing guids and IE labels
+     * @return map of label, guid, with label as they key.
+     */
+    private static Map<String,String> addIEGuidsFromFile(String ieGuidFilename) {
+
+        Map<String,String> ieGuidMapLoad = new HashMap<String,String>();
+        if (ieGuidFilename != null && ieGuidFilename.length()>0) {
+        	logger.info(ieGuidFilename);
+        	File guidFile = new File(ieGuidFilename);
+        	logger.info(Boolean.toString(guidFile.canRead()));
+        	if (guidFile.canRead()) { 
+        		try { 
+        			FileReader reader = new FileReader(guidFile);
+        			CSVParser csvParser = new CSVParser(reader,CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        			List<CSVRecord> guidList = csvParser.getRecords();
+        			Iterator<CSVRecord> i = guidList.iterator();
+        			while (i.hasNext()) { 
+        				CSVRecord guidRecord = i.next();
+        				String ieGuid = guidRecord.get("guid").trim();
+        				String label = guidRecord.get("label").trim();
+        				if (!ieGuidMapLoad.containsKey(label)) { 
+        					ieGuidMapLoad.put(label, ieGuid);
+        				} 
+        			}
+        		} catch (IOException e) { 
+        			logger.warning(e.getMessage());
+        		}
+        	}
+        }
+    	
+    	return ieGuidMapLoad;
+    }
+    
 }
