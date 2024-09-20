@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -118,7 +119,6 @@ public class TestUtil {
         
         options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships, if not specfied, UseCases column in InputFile will be used, if specified, will override InputFile.");
         options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
-        options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
         options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels.");
         
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
@@ -127,6 +127,7 @@ public class TestUtil {
         options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
         options.addOption("appendClass", null, false, "Append to an existing Java class stub methods for new tests");
         options.addOption("checkVersion", null, false, "Report on versions in an existing Java class for each test");
+        options.addOption("makeGuidList", null, false, "If guidFile is specified and specificationGuid is missing, include new additional guids lists in output.");
 
         options.addOption("generatePython", null, false, "Generate a new Python class with stub methods for each test");
         
@@ -150,11 +151,13 @@ public class TestUtil {
             	useCaseFilename = cmd.getOptionValue("useCaseFile");
             }
             
+            boolean doOutputMissingGuidList = false;
             boolean guidsProvided = false;
             String additionalGuidFilename = null;
             if (cmd.hasOption("guidFile")) { 
             	additionalGuidFilename = cmd.getOptionValue("guidFile");
             	guidsProvided = true;
+            	doOutputMissingGuidList = cmd.hasOption("makeGuidList");
             }
             
             boolean ieGuidsProvided = false;
@@ -257,6 +260,19 @@ public class TestUtil {
                 Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, specificationDescription.trim(), test.getSpecification(), test.getAuthoritiesDefaults());
                 if (test.getSpecificationGuid()==null) { 
                 	logger.log(Level.WARNING, "Missing Specification GUID for " + test.getLabel());
+                	if (doOutputMissingGuidList) {
+                		// produce lines suitable for addition to guid file to output
+                		Specification tempS = new Specification();
+                		String tempMG = test.getMethodGuid();
+                		if (tempMG==null) { 
+                			tempMG = "urn:uuid:" + UUID.randomUUID();
+                		}
+                		String tempPG = test.getMethodGuid();
+                		if (tempPG==null) { 
+                			tempPG = "urn:uuid:" + UUID.randomUUID();
+                		}
+                		System.out.println('"' + test.getGuid() + "\",\"" + test.getLabel() + "\",\"" +  tempMG + "\",\"" + tempS.getId() + "\",\"" + tempPG + '"');
+                	}
                 }
                 logger.log(Level.INFO, test.getSpecificationGuid());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
