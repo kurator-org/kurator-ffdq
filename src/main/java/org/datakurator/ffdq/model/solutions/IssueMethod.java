@@ -110,7 +110,7 @@ public class IssueMethod {
      *
      * @return a {@link org.datakurator.ffdq.model.context.Issue} object.
      */
-    @RDF("bdqffdq:issueInContext")
+    @RDF("bdqffdq:forIssue")
     public Issue getContextualizedIssue() {
         return ci;
     }

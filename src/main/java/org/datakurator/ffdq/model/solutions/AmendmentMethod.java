@@ -57,7 +57,7 @@ public class AmendmentMethod extends AssertionMethod {
      *
      * @return a {@link org.datakurator.ffdq.model.context.Amendment} object.
      */
-    @RDF("bdqffdq:enhancementInContext")
+    @RDF("bdqffdq:forAmendment")
     public Amendment getContextualizedEnhancement() {
         return ce;
     }
