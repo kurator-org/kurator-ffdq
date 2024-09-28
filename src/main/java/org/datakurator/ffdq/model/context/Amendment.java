@@ -294,4 +294,13 @@ public class Amendment extends DataQualityNeed {
 	public void setPrefLabel(String prefLabel) {
 		this.prefLabel = prefLabel;
 	}
+	
+	/**
+	 * @return the historyNote
+	 */
+	@RDF("skos:historyNote")
+	public String getHistoryNote() {
+		return super.historyNote;
+	}
+
 }

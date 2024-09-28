@@ -72,6 +72,8 @@ public class TestUtil {
     private final static String CSV_HEADER_INFO_ELEMENT_CONSULTED;
     private final static String CSV_HEADER_TEST_PARMETERS;
     private final static String CSV_HEADER_USECASES;
+    private final static String CSV_HEADER_EXAMPLES;
+    private final static String CSV_HISTORY_NUMBER;
 
     static {
         Properties properties = new Properties();
@@ -96,6 +98,8 @@ public class TestUtil {
             CSV_HEADER_INFO_ELEMENT_CONSULTED = properties.getProperty("csv.header.consulted");
             CSV_HEADER_TEST_PARMETERS = properties.getProperty("csv.header.testParameters");
             CSV_HEADER_USECASES = properties.getProperty("csv.header.useCases");
+            CSV_HEADER_EXAMPLES = properties.getProperty("csv.header.examples");
+            CSV_HISTORY_NUMBER = properties.getProperty("csv.header.historyNumber"); 
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -258,6 +262,7 @@ public class TestUtil {
             	String specificationLabel = "Specification for: " + test.getLabel();
             	String specificationDescription = test.getSpecification() + " " + test.getAuthoritiesDefaults();
                 Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, specificationDescription.trim(), test.getSpecification(), test.getAuthoritiesDefaults());
+                specification.addExamples(test.getExamples());
                 if (test.getSpecificationGuid()==null) { 
                 	logger.log(Level.WARNING, "Missing Specification GUID for " + test.getLabel());
                 	if (doOutputMissingGuidList) {
@@ -417,6 +422,7 @@ public class TestUtil {
                         // Define a criterion in the context of resource type and info elements
                         Criterion criterion = Criterion.fromString(test.getCriterion());
                         Validation cc = new Validation(criterion, informationElement, actedUpon, consulted, resourceType);
+                        cc.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
                         dimension = new Dimension(test.getDimension());
                         cc.setDimension(dimension);
                         cc.setPrefLabel(test.getLabel());
@@ -459,6 +465,7 @@ public class TestUtil {
                         // Define an enhancement in the context of resource type and info elements
                         Enhancement enhancement = Enhancement.fromString(test.getEnhancement());
                         Amendment ce = new Amendment(enhancement, informationElement, actedUpon, consulted, resourceType);
+                        ce.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
                         dimension = new Dimension(test.getDimension());
                         ce.setDimension(dimension);
                         ce.setId(test.getGuidTDWGNamespace());
@@ -499,6 +506,7 @@ public class TestUtil {
                         // Define an issue in the context of resource type and information elements
                         criterion = Criterion.fromString(test.getCriterion());
                         Issue ci = new Issue(criterion, informationElement, actedUpon, consulted, resourceType);
+                        ci.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
                         dimension = new Dimension(test.getDimension());
                         ci.setDimension(dimension);
                         ci.setId(test.getGuidTDWGNamespace());
@@ -748,13 +756,14 @@ public class TestUtil {
         for (CSVRecord record : records) {
             try {
                 // Parse and validate csv records
-                String guid = record.get("GUID");
+                String guid = record.get(CSV_HEADER_GUID);
 
                 if (guid.isEmpty() || guid == null) {
                     throw new IllegalArgumentException("Missing required GUID for test #" + record.getRecordNumber());
                 }
 
                 String label = record.get(CSV_HEADER_LABEL);
+                String historyNumber = record.get(CSV_HISTORY_NUMBER);
                 String version = record.get(CSV_HEADER_VERSION);
                 String description = record.get(CSV_HEADER_DESCRIPTION);
                 String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
@@ -767,6 +776,7 @@ public class TestUtil {
                 String dimension = record.get(CSV_HEADER_DIMENSION);
                 String informationElement = "";
                 String useCasesForTestString = record.get(CSV_HEADER_USECASES);
+                String examples = record.get(CSV_HEADER_EXAMPLES);
                 if (record.isMapped(CSV_HEADER_INFO_ELEMENT)) { 
                 	informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
                 }
@@ -784,8 +794,9 @@ public class TestUtil {
                 }
                 
                 AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, authoritiesDefaults, assertionType, resourceType,
-                        dimension, criterion, enhancement, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames);
-                
+                        dimension, criterion, enhancement, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), 
+                        parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames, examples);
+                test.setHistoryNumber(historyNumber);
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.

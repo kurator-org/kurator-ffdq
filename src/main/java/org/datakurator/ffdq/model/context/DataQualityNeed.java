@@ -17,5 +17,16 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 public class DataQualityNeed {
 
 	private static final Log logger = LogFactory.getLog(DataQualityNeed.class);
+	
+	protected String historyNote;
+
+	/**
+	 * @param historyNote the historyNote to set
+	 */
+	public void setHistoryNote(String historyNote) {
+		this.historyNote = historyNote;
+	}
+	
+	
 
 }
