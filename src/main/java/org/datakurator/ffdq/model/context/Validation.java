@@ -37,6 +37,7 @@ import java.util.UUID;
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "skos = http://www.w3.org/2004/02/skos/core#",
+        "dcterms = http://purl.org/dc/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Validation")
@@ -332,5 +333,21 @@ public class Validation extends DataQualityNeed  {
 	@RDF("skos:historyNote")
 	public String getHistoryNote() {
 		return super.historyNote;
+	}
+	
+	/**
+	 * @return the references as a string
+	 */
+	@RDF("dcterms:bibliographicCitation")
+	public String getReferences() {
+		return references;
+	}
+	
+	/**
+	 * @return the note
+	 */
+	@RDF("skos:note")
+	public String getNote() {
+		return note;
 	}
 }

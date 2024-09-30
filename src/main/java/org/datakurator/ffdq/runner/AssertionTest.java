@@ -62,6 +62,8 @@ public class AssertionTest {
     private List<String> testParameters;      // parameters specified in the test to change its behavior.
     private List<String> useCases; // labels for UseCases related to test.
     private String examples;  // list of examples
+    private String references;   // dcterms:bibliographicCitation, string.  (dcterms:references for resource iri)
+    private String note;    // skos:note
 
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
@@ -700,4 +702,34 @@ public class AssertionTest {
 	public void setHistoryNumber(String historyNumber) {
 		this.historyNumber = historyNumber;
 	}
+
+	/**
+	 * @return the references
+	 */
+	public String getReferences() {
+		return references;
+	}
+
+	/**
+	 * @param references the references to set
+	 */
+	public void setReferences(String references) {
+		// TODO: Parse into list
+		this.references = references.replace("<ul><li>", "").replace("</li></ul>", "").replaceAll("</li><li>","; ");
+	}
+
+	/**
+	 * @return the note
+	 */
+	public String getNote() {
+		return note;
+	}
+
+	/**
+	 * @param note the note to set
+	 */
+	public void setNote(String note) {
+		this.note = note;
+	}
+
 }

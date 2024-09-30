@@ -19,12 +19,28 @@ public class DataQualityNeed {
 	private static final Log logger = LogFactory.getLog(DataQualityNeed.class);
 	
 	protected String historyNote;
+	protected String references;
+	protected String note;
 
 	/**
 	 * @param historyNote the historyNote to set
 	 */
 	public void setHistoryNote(String historyNote) {
 		this.historyNote = historyNote;
+	}
+
+	/**
+	 * @param references the references to set
+	 */
+	public void setReferences(String references) {
+		this.references = references;
+	}
+
+	/**
+	 * @param note the note to set
+	 */
+	public void setNote(String note) {
+		this.note = note;
 	}
 	
 	

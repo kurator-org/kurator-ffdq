@@ -74,6 +74,8 @@ public class TestUtil {
     private final static String CSV_HEADER_USECASES;
     private final static String CSV_HEADER_EXAMPLES;
     private final static String CSV_HISTORY_NUMBER;
+    private final static String CSV_HEADER_REFERENCES;
+    private final static String CSV_HEADER_NOTE;
 
     static {
         Properties properties = new Properties();
@@ -100,6 +102,8 @@ public class TestUtil {
             CSV_HEADER_USECASES = properties.getProperty("csv.header.useCases");
             CSV_HEADER_EXAMPLES = properties.getProperty("csv.header.examples");
             CSV_HISTORY_NUMBER = properties.getProperty("csv.header.historyNumber"); 
+            CSV_HEADER_REFERENCES = properties.getProperty("csv.header.references");
+            CSV_HEADER_NOTE = properties.getProperty("csv.header.note");
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -383,6 +387,9 @@ public class TestUtil {
                         // Define a dimension in the context of resource type and info elements
                         Dimension dimension = Dimension.fromString(test.getDimension());
                         Measure cd = new Measure(dimension, informationElement, actedUpon, consulted, resourceType);
+                        cd.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
+                        cd.setReferences(test.getReferences());
+                        cd.setNote(test.getNote());
                         cd.setId(test.getGuidTDWGNamespace());
                         cd.setPrefLabel(test.getLabel());
                         if (test.getSpecificationGuid()!=null) { 
@@ -423,6 +430,8 @@ public class TestUtil {
                         Criterion criterion = Criterion.fromString(test.getCriterion());
                         Validation cc = new Validation(criterion, informationElement, actedUpon, consulted, resourceType);
                         cc.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
+                        cc.setReferences(test.getReferences());
+                        cc.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         cc.setDimension(dimension);
                         cc.setPrefLabel(test.getLabel());
@@ -466,6 +475,8 @@ public class TestUtil {
                         Enhancement enhancement = Enhancement.fromString(test.getEnhancement());
                         Amendment ce = new Amendment(enhancement, informationElement, actedUpon, consulted, resourceType);
                         ce.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
+                        ce.setReferences(test.getReferences());
+                        ce.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         ce.setDimension(dimension);
                         ce.setId(test.getGuidTDWGNamespace());
@@ -507,6 +518,8 @@ public class TestUtil {
                         criterion = Criterion.fromString(test.getCriterion());
                         Issue ci = new Issue(criterion, informationElement, actedUpon, consulted, resourceType);
                         ci.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
+                        ci.setReferences(test.getReferences());
+                        ci.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         ci.setDimension(dimension);
                         ci.setId(test.getGuidTDWGNamespace());
@@ -787,6 +800,8 @@ public class TestUtil {
                 String testParameters = record.get(CSV_HEADER_TEST_PARMETERS);
                 logger.log(Level.FINE, assertionType);
                 logger.log(Level.FINE, label);
+                String references =  record.get(CSV_HEADER_REFERENCES);
+                String note = record.get(CSV_HEADER_NOTE);
                 
                 List<String> useCaseNames = new ArrayList<String>();
                 if (useCasesForTestString!=null && useCasesForTestString.length()>0) { 
@@ -797,6 +812,8 @@ public class TestUtil {
                         dimension, criterion, enhancement, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), 
                         parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames, examples);
                 test.setHistoryNumber(historyNumber);
+                test.setReferences(references);
+                test.setNote(note);
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.
