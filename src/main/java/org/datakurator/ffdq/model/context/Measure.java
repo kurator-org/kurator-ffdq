@@ -219,7 +219,7 @@ public class Measure  extends DataQualityNeed  {
      *
      * @return a {@link org.datakurator.ffdq.model.Dimension} object.
      */
-    @RDF("bdqffdq:hasDimension")
+    @RDF("bdqffdq:hasDataQualityDimension")
     public Dimension getDimension() {
         return dimension;
     }
