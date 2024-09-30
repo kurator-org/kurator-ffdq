@@ -392,9 +392,9 @@ public class TestUtil {
                         cd.setNote(test.getNote());
                         cd.setId(test.getGuidTDWGNamespace());
                         cd.setPrefLabel(test.getLabel());
-                        if (test.getSpecificationGuid()!=null) { 
-                        	cd.setId(test.getSpecificationGuid());
-                        }
+                        //if (test.getSpecificationGuid()!=null) { 
+                        //	cd.setId(test.getSpecificationGuid());
+                        //}
                         cd.setLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         model.save(cd);
@@ -483,9 +483,9 @@ public class TestUtil {
                         ce.setPrefLabel(test.getLabel());
                         ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
                         ce.setComment(test.getDescription());
-                        if (test.getSpecificationGuid()!=null) { 
-                        	ce.setId(test.getSpecificationGuid());
-                        }
+                        //if (test.getSpecificationGuid()!=null) { 
+                        //	ce.setId(test.getSpecificationGuid());
+                        //}
                         model.save(ce);
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
@@ -526,9 +526,9 @@ public class TestUtil {
                         ci.setPrefLabel(test.getLabel());
                         ci.setLabel(test.getDescription() + " Criterion for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
-                        if (test.getSpecificationGuid()!=null) { 
-                        	ci.setId(test.getSpecificationGuid());
-                        }
+                        //if (test.getSpecificationGuid()!=null) { 
+                        //	ci.setId(test.getSpecificationGuid());
+                        //}
                         model.save(ci);
                         // Define an amendment method, a specification tied to a criterion in context
                         IssueMethod problemMethod = new IssueMethod(specification, ci);

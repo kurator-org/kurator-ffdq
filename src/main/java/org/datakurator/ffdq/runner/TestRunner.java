@@ -146,7 +146,6 @@ public class TestRunner {
                     if (!guid.startsWith("https://rs.tdwg.org/bdqcore/terms/")) { 
                     	guid = "https://rs.tdwg.org/bdqcore/terms/" + guid;
                     }
-
                     logger.log(Level.INFO, guid);
                     test.setGuid(guid);
                     implementedTests.put(guid, test);
