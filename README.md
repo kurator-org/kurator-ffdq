@@ -69,7 +69,7 @@ The properties file must contain a guid that uniquely identifies and a human rea
 
 The csv file containing the test metadata defines the following metadata :
 
-* **GUID** - The test guid
+* **term_localName** (was **GUID**) - The test guid
 * **Label** - Human readable name of the test
 * **Description** - Describes the test conditions (pass/fail). This value is used to define the Criterion for a Validation or the Enhancement for an Amendment. 
 * **Specification** - Technical description of expected behavior when running the test
@@ -225,6 +225,6 @@ An example is: https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/
 
 # Updated test generation command with parameters:
 
-./test-util.sh -config data/tg2_tests.properties -format RDFXML -out ../bdq/tg2/core/TG2_tests.ttl -in  data/TG2_tests.csv -guidFile ../bdq/tg2/core/TG2_tests_additional_guids.csv -useCaseFile ../bdq/tg2/core/usecase_test_list.csv -ieGuidFile ../bdq/tg2/core/information_element_guids.csv
+./test-util.sh -config data/tg2_tests.properties -format RDFXML -out ../bdq/tg2/core/TG2_tests.xml -in  data/TG2_tests.csv -guidFile ../bdq/tg2/core/TG2_tests_additional_guids.csv -useCaseFile ../bdq/tg2/core/usecase_test_list.csv -ieGuidFile ../bdq/tg2/core/information_element_guids.csv
 
 
