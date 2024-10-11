@@ -375,7 +375,7 @@ public class TestRunner {
             missingParams.removeAll(definedParams);
 
             for (URI uri : missingParams) {
-                // Parameter variable name
+                // Argument variable name
                 TestParam param = testParams.get(uri);
 
                 logger.warning("Missing information element in rdf \"" + uri + "\" for arg " + param.getIndex() +

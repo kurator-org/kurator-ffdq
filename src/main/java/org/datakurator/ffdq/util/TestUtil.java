@@ -44,6 +44,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>TestUtil class.</p>
@@ -281,6 +283,53 @@ public class TestUtil {
                 			tempPG = "urn:uuid:" + UUID.randomUUID();
                 		}
                 		System.out.println('"' + test.getGuid() + "\",\"" + test.getLabel() + "\",\"" +  tempMG + "\",\"" + tempS.getId() + "\",\"" + tempPG + '"');
+                	}
+                }
+                List<String> params = test.getTestParameters();
+                if (params!=null) { 
+                	Iterator<String> ip = params.iterator();
+                	if (ip.hasNext()) { 
+                		// TODO: Stable guids for arguments
+                		Argument argument = null;
+                		String paramString = ip.next();
+                		if (paramString.contains(",")) { 
+                			String[] bits = paramString.split(",");
+                			for (int bi=0; bi<bits.length; bi++) {
+                				String paramStringBit = bits[bi].trim();
+                				if (paramStringBit.startsWith("bdq:")) { 
+                					Parameter parameter = new Parameter(paramStringBit);
+                					argument = new Argument(parameter, "Default value for " + paramStringBit);
+                					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), parameter.getId());
+                					argument.setValue(defaultValue);
+                					if (!defaultValue.equals("DEFAULT")) { 
+                						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
+                					}
+                				} else { 
+                					argument = new Argument("Default value for " + paramStringBit);
+                					logger.log(Level.INFO, argument.getLabel());
+                					logger.log(Level.INFO, argument.getId());
+                				}
+                				if (argument!=null) { 
+                					specification.addArgument(argument);
+                				}
+                			}
+                		} else { 
+                			if (paramString.startsWith("bdq:")) { 
+                				Parameter parameter = new Parameter(paramString);
+                				argument = new Argument(parameter, "Default value for " + paramString);
+            					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), parameter.getId());
+            					argument.setValue(defaultValue);
+            					if (!defaultValue.equals("DEFAULT")) { 
+            						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
+            					}                			} else { 
+                				argument = new Argument("Default value for " + paramString);
+                				logger.log(Level.INFO, argument.getLabel());
+                				logger.log(Level.INFO, argument.getId());
+                			}	
+                			if (argument!=null) { 
+                				specification.addArgument(argument);
+                			}
+                		}
                 	}
                 }
                 logger.log(Level.INFO, test.getSpecificationGuid());
@@ -945,6 +994,45 @@ public class TestUtil {
         }
     	
     	return ieGuidMapLoad;
+    }
+    
+    /**
+     * Given a parameter and an authoritesDefaults string, attempt to parse the default value for the specified
+     * parameter from the authorities defaults string.
+     *
+     * Expects each part of the authorities default string to start with a pattern of parameter default = "defaultvalue"
+     * for example: 
+     * bdq:sourceAuthority default = "The Getty Thesaurus of Geographic Names (TGN)"
+     * 
+     * @param authoritiesDefaults from which to find a default value for the specified parameter
+     * @param parameter the parameter for which to find a default
+     * @return the default value or the string DEFAULT if the parse is not successfull.
+     */
+    public static String parseDefaultFromAuthoritiesDefaultsForPatameter(String authoritiesDefaults, String parameter) { 
+    	// bdq:sourceAuthority default = "The Getty Thesaurus of Geographic Names (TGN)"
+    	String retval = "DEFAULT";
+    	try { 
+    		if (authoritiesDefaults.contains(parameter)) { 
+    			String pattern = ".*" + parameter + " +default *= *\"(.*)\".*";
+    			logger.log(Level.INFO, pattern);
+    			Pattern p = Pattern.compile(pattern);
+    			Matcher m = p.matcher(authoritiesDefaults);
+    			logger.log(Level.INFO, Boolean.toString(m.matches()));
+    			if (m.matches()) { 
+    				logger.log(Level.INFO, m.group(0));
+    				logger.log(Level.INFO, m.group(1));
+    				String defaultValue = m.group(1);
+    				if (defaultValue!=null) { 
+    					retval = defaultValue;
+    				}
+    			} 
+    		}
+    	} catch (Exception e) { 
+    		logger.log(Level.SEVERE, e.getMessage());
+    		logger.log(Level.SEVERE, authoritiesDefaults);
+    		logger.log(Level.SEVERE, parameter);
+    	}
+    	return retval;
     }
     
 }

@@ -44,6 +44,7 @@ public class Specification {
     private String authoritiesDefaults;
     
     private List<String> examples;
+    private List<Argument> arguments;
 
     /**
      * <p>Constructor for Specification.</p>
@@ -54,6 +55,7 @@ public class Specification {
     
     protected void init() { 
     	this.examples = new ArrayList<String>();
+    	this.arguments = new ArrayList<Argument>();
     }
 
     /**
@@ -199,6 +201,31 @@ public class Specification {
 			}
 		} else { 
 			this.examples.add(example);
+		}
+	}
+	
+	/**
+	 * @return the arguments
+	 */
+	@RDF("bdqffdq:hasArgument")
+	public List<Argument> getArguments() {
+		if (arguments !=null && arguments.size()==0) {
+			return null;
+		} else { 
+			return arguments;
+		}
+	}
+	
+	/**
+	 * Add a parameter to the specification.
+	 * @param argument to add 
+	 */
+	public void addArgument(Argument argument) { 
+		if (this.arguments==null) { 
+			init();
+		}
+		if (argument.getLabel()!=null && argument.getLabel().length()>0) { 
+			this.arguments.add(argument);
 		}
 	}
 }
