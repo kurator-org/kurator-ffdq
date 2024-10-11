@@ -209,7 +209,7 @@ public class Specification {
 	 */
 	@RDF("bdqffdq:hasArgument")
 	public List<Argument> getArguments() {
-		if (arguments !=null && arguments.size()==0) {
+		if (arguments !=null || arguments.size()==0) {
 			return null;
 		} else { 
 			return arguments;
