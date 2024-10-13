@@ -444,7 +444,7 @@ public class TestUtil {
                         //if (test.getSpecificationGuid()!=null) { 
                         //	cd.setId(test.getSpecificationGuid());
                         //}
-                        cd.setPrefLabel(test.getPrefLabel());
+                        cd.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         //cd.setPrefLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         model.save(cd);
@@ -486,7 +486,7 @@ public class TestUtil {
                         cc.setDimension(dimension);
                         cc.setLabel(test.getLabel());
                         //cc.setPrefLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
-                        cc.setPrefLabel(test.getPrefLabel());
+                        cc.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         cc.setComment(test.getDescription());
                         //if (test.getContextualizedGuid()!=null) { 
                         //	cc.setId(test.getContextualizedGuid());
@@ -532,7 +532,7 @@ public class TestUtil {
                         ce.setDimension(dimension);
                         ce.setId(test.getGuidTDWGNamespace());
                         ce.setLabel(test.getLabel());
-                        ce.setPrefLabel(test.getPrefLabel());
+                        ce.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         //ce.setPrefLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
                         ce.setComment(test.getDescription());
                         //if (test.getSpecificationGuid()!=null) { 
@@ -576,7 +576,7 @@ public class TestUtil {
                         ci.setDimension(dimension);
                         ci.setId(test.getGuidTDWGNamespace());
                         ci.setLabel(test.getLabel());
-                        ci.setPrefLabel(test.getPrefLabel());
+                        ci.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         //ci.setPrefLabel(test.getDescription() + " Criterion for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
                         //if (test.getSpecificationGuid()!=null) { 
