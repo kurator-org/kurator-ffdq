@@ -77,6 +77,7 @@ public class AssertionTest {
     private Class cls;
     private Method method;
     private List<TestParam> parameters;
+	private String prefLabel;
 
     /**
      * <p>Constructor for AssertionTest.</p>
@@ -730,6 +731,25 @@ public class AssertionTest {
 	 */
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	/**
+	 * Obtain the skos:prefLabel
+	 * 
+	 * @return the prefLabel
+ 	 */
+	public String getPrefLabel() { 
+		return this.prefLabel;
+	}
+	
+	/**
+	 * Add a skos:prefLabel
+	 * 
+	 * @param prefLabel new value to set
+	 */
+	public void setPrefLabel(String prefLabel) {
+		// TODO Auto-generated method stub
+		this.prefLabel = prefLabel;
 	}
 
 }

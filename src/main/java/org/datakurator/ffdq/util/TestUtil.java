@@ -440,11 +440,12 @@ public class TestUtil {
                         cd.setReferences(test.getReferences());
                         cd.setNote(test.getNote());
                         cd.setId(test.getGuidTDWGNamespace());
-                        cd.setPrefLabel(test.getLabel());
+                        cd.setLabel(test.getLabel());
                         //if (test.getSpecificationGuid()!=null) { 
                         //	cd.setId(test.getSpecificationGuid());
                         //}
-                        cd.setLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
+                        cd.setPrefLabel(test.getPrefLabel());
+                        //cd.setPrefLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         model.save(cd);
                         // Define a measurement method, a specification tied to a dimension in context
@@ -483,8 +484,9 @@ public class TestUtil {
                         cc.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         cc.setDimension(dimension);
-                        cc.setPrefLabel(test.getLabel());
-                        cc.setLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
+                        cc.setLabel(test.getLabel());
+                        //cc.setPrefLabel(test.getDescription() + " Validation for " + resourceType.getLabel());
+                        cc.setPrefLabel(test.getPrefLabel());
                         cc.setComment(test.getDescription());
                         //if (test.getContextualizedGuid()!=null) { 
                         //	cc.setId(test.getContextualizedGuid());
@@ -529,8 +531,9 @@ public class TestUtil {
                         dimension = new Dimension(test.getDimension());
                         ce.setDimension(dimension);
                         ce.setId(test.getGuidTDWGNamespace());
-                        ce.setPrefLabel(test.getLabel());
-                        ce.setLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
+                        ce.setLabel(test.getLabel());
+                        ce.setPrefLabel(test.getPrefLabel());
+                        //ce.setPrefLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
                         ce.setComment(test.getDescription());
                         //if (test.getSpecificationGuid()!=null) { 
                         //	ce.setId(test.getSpecificationGuid());
@@ -572,8 +575,9 @@ public class TestUtil {
                         dimension = new Dimension(test.getDimension());
                         ci.setDimension(dimension);
                         ci.setId(test.getGuidTDWGNamespace());
-                        ci.setPrefLabel(test.getLabel());
-                        ci.setLabel(test.getDescription() + " Criterion for " + resourceType.getLabel());
+                        ci.setLabel(test.getLabel());
+                        ci.setPrefLabel(test.getPrefLabel());
+                        //ci.setPrefLabel(test.getDescription() + " Criterion for " + resourceType.getLabel());
                         ci.setComment(test.getDescription());
                         //if (test.getSpecificationGuid()!=null) { 
                         //	ci.setId(test.getSpecificationGuid());
@@ -825,6 +829,7 @@ public class TestUtil {
                 }
 
                 String label = record.get(CSV_HEADER_LABEL);
+                String prefLabel = record.get(CSV_HEADER_PREFLABEL);
                 String historyNumber = record.get(CSV_HISTORY_NUMBER);
                 String version = record.get(CSV_HEADER_VERSION);
                 String description = record.get(CSV_HEADER_DESCRIPTION);
@@ -863,6 +868,7 @@ public class TestUtil {
                 test.setHistoryNumber(historyNumber);
                 test.setReferences(references);
                 test.setNote(note);
+                test.setPrefLabel(prefLabel);
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.
