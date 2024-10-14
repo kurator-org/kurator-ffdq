@@ -7,6 +7,8 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.datakurator.ffdq.model.*;
 import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.model.context.Measure;
@@ -42,8 +44,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,8 +54,10 @@ import java.util.regex.Pattern;
  * @version $Id: $Id
  */
 public class TestUtil {
-    private final static Logger logger = Logger.getLogger(TestUtil.class.getName());
 
+	
+	private static final Log logger = LogFactory.getLog(Argument.class);
+	
     private final static String CSV_HEADER_LABEL;
     private final static String CSV_HEADER_GUID;
     private final static String CSV_HEADER_PREFLABEL;
@@ -238,7 +240,7 @@ public class TestUtil {
             			}
             			includeUseCasesFromFile = true;
             		} catch (IOException e) { 
-            			logger.warning(e.getMessage());
+            			logger.error(e.getMessage());
             		}
             	}
             }
@@ -262,7 +264,7 @@ public class TestUtil {
             
             for (AssertionTest test : tests) {
             	
-            	logger.log(Level.INFO, test.getGuid());
+            	logger.debug(test.getGuid());
 
                 // Define elementary concepts first
             	String specificationLabel = "Specification for: " + test.getLabel();
@@ -270,7 +272,7 @@ public class TestUtil {
                 Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, specificationDescription.trim(), test.getSpecification(), test.getAuthoritiesDefaults());
                 specification.addExamples(test.getExamples());
                 if (test.getSpecificationGuid()==null) { 
-                	logger.log(Level.WARNING, "Missing Specification GUID for " + test.getLabel());
+                	logger.error("Missing Specification GUID for " + test.getLabel());
                 	if (doOutputMissingGuidList) {
                 		// produce lines suitable for addition to guid file to output
                 		Specification tempS = new Specification();
@@ -293,6 +295,7 @@ public class TestUtil {
                 		Argument argument = null;
                 		String paramString = ip.next();
                 		if (paramString.contains(",")) { 
+                			System.out.println("Line 298: " + paramString);
                 			String[] bits = paramString.split(",");
                 			for (int bi=0; bi<bits.length; bi++) {
                 				String paramStringBit = bits[bi].trim();
@@ -305,9 +308,12 @@ public class TestUtil {
                 						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
                 					}
                 				} else { 
-                					argument = new Argument("Default value for " + paramStringBit);
-                					logger.log(Level.INFO, argument.getLabel());
-                					logger.log(Level.INFO, argument.getId());
+                					System.out.println("Line 311: " + paramStringBit);
+                					if (paramStringBit!=null && paramStringBit.length()>0) { 
+                						argument = new Argument("Default value for " + paramStringBit);
+                						logger.debug(argument.getLabel());
+                						logger.debug(argument.getId());
+                					}
                 				}
                 				if (argument!=null) { 
                 					specification.addArgument(argument);
@@ -315,16 +321,22 @@ public class TestUtil {
                 			}
                 		} else { 
                 			if (paramString.startsWith("bdq:")) { 
+                				System.out.println("Line 323: " + paramString);
                 				Parameter parameter = new Parameter(paramString);
                 				argument = new Argument(parameter, "Default value for " + paramString);
             					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), parameter.getId());
             					argument.setValue(defaultValue);
             					if (!defaultValue.equals("DEFAULT")) { 
             						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
-            					}                			} else { 
-                				argument = new Argument("Default value for " + paramString);
-                				logger.log(Level.INFO, argument.getLabel());
-                				logger.log(Level.INFO, argument.getId());
+            					}                		
+                			} else { 
+                				if (paramString!=null && paramString.length()>0) { 
+                					argument = new Argument("Default value for " + paramString);
+               						String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), paramString);
+               						argument.setValue(defaultValue);
+                					logger.debug(argument.getLabel());
+                					logger.debug(argument.getId());
+                				}
                 			}	
                 			if (argument!=null) { 
                 				specification.addArgument(argument);
@@ -332,7 +344,7 @@ public class TestUtil {
                 		}
                 	}
                 }
-                logger.log(Level.INFO, test.getSpecificationGuid());
+                logger.debug(test.getSpecificationGuid());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
                 InformationElement informationElement = new InformationElement();
@@ -799,7 +811,7 @@ public class TestUtil {
         				}
         			}
         		} catch (IOException e) { 
-        			logger.warning(e.getMessage());
+        			logger.error(e.getMessage());
         		}
         	}
         }
@@ -848,12 +860,12 @@ public class TestUtil {
                 	informationElement = record.get(CSV_HEADER_INFO_ELEMENT);
                 }
                 String actedUpon = record.get(CSV_HEADER_INFO_ELEMENT_ACTEDUPON);
-                logger.log(Level.INFO, CSV_HEADER_INFO_ELEMENT_ACTEDUPON);                
-                logger.log(Level.INFO, actedUpon);                
+                logger.debug(CSV_HEADER_INFO_ELEMENT_ACTEDUPON);                
+                logger.debug(actedUpon);                
                 String consulted = record.get(CSV_HEADER_INFO_ELEMENT_CONSULTED);
                 String testParameters = record.get(CSV_HEADER_TEST_PARMETERS);
-                logger.log(Level.FINE, assertionType);
-                logger.log(Level.FINE, label);
+                logger.debug(assertionType);
+                logger.debug(label);
                 String references =  record.get(CSV_HEADER_REFERENCES);
                 String note = record.get(CSV_HEADER_NOTE);
                 
@@ -872,10 +884,10 @@ public class TestUtil {
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.
-            	logger.log(Level.WARNING, "Unsupported Type, skipping test #" + record.getRecordNumber());
-            	logger.log(Level.WARNING, e.getMessage(), e);
+            	logger.error("Unsupported Type, skipping test #" + record.getRecordNumber());
+            	logger.error(e.getMessage(), e);
             } catch (IllegalArgumentException e) {
-            	logger.log(Level.INFO, e.getMessage(), e);
+            	logger.error(e.getMessage(), e);
                 throw new RuntimeException("Could not find column header in input csv, the config.properties file might have incorrect mappings.", e);
             }
         }
@@ -994,7 +1006,7 @@ public class TestUtil {
         				} 
         			}
         		} catch (IOException e) { 
-        			logger.warning(e.getMessage());
+        			logger.error(e.getMessage());
         		}
         	}
         }
@@ -1019,14 +1031,14 @@ public class TestUtil {
     	String retval = "DEFAULT";
     	try { 
     		if (authoritiesDefaults.contains(parameter)) { 
-    			String pattern = ".*" + parameter + " +default *= *\"(.*)\".*";
-    			logger.log(Level.INFO, pattern);
+    			String pattern = ".*" + parameter + " +default *= *\"([^\"]*)\".*";
+    			logger.debug(pattern);
     			Pattern p = Pattern.compile(pattern);
     			Matcher m = p.matcher(authoritiesDefaults);
-    			logger.log(Level.INFO, Boolean.toString(m.matches()));
+    			logger.debug(Boolean.toString(m.matches()));
     			if (m.matches()) { 
-    				logger.log(Level.INFO, m.group(0));
-    				logger.log(Level.INFO, m.group(1));
+    				logger.debug(m.group(0));
+    				logger.debug(m.group(1));
     				String defaultValue = m.group(1);
     				if (defaultValue!=null) { 
     					retval = defaultValue;
@@ -1034,9 +1046,9 @@ public class TestUtil {
     			} 
     		}
     	} catch (Exception e) { 
-    		logger.log(Level.SEVERE, e.getMessage());
-    		logger.log(Level.SEVERE, authoritiesDefaults);
-    		logger.log(Level.SEVERE, parameter);
+    		logger.error(e.getMessage());
+    		logger.error(authoritiesDefaults);
+    		logger.error(parameter);
     	}
     	return retval;
     }
