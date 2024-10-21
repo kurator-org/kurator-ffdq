@@ -78,8 +78,10 @@ public class TestUtil {
     private final static String CSV_HEADER_USECASES;
     private final static String CSV_HEADER_EXAMPLES;
     private final static String CSV_HISTORY_NUMBER;
+    private final static String CSV_HISTORY_NOTE_URL;
     private final static String CSV_HEADER_REFERENCES;
     private final static String CSV_HEADER_NOTE;
+    private final static String CSV_HEADER_ISSUED;
 
     static {
         Properties properties = new Properties();
@@ -106,8 +108,10 @@ public class TestUtil {
             CSV_HEADER_USECASES = properties.getProperty("csv.header.useCases");
             CSV_HEADER_EXAMPLES = properties.getProperty("csv.header.examples");
             CSV_HISTORY_NUMBER = properties.getProperty("csv.header.historyNumber"); 
+            CSV_HISTORY_NOTE_URL = properties.getProperty("csv.header.historyNoteUrl");
             CSV_HEADER_REFERENCES = properties.getProperty("csv.header.references");
             CSV_HEADER_NOTE = properties.getProperty("csv.header.note");
+            CSV_HEADER_ISSUED = properties.getProperty("csv.header.issued");
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -448,10 +452,12 @@ public class TestUtil {
                         // Define a dimension in the context of resource type and info elements
                         Dimension dimension = Dimension.fromString(test.getDimension());
                         Measure cd = new Measure(dimension, informationElement, actedUpon, consulted, resourceType);
-                        cd.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
+                        cd.setHistoryNote(test.getHistoryNoteUrl());
                         cd.setReferences(test.getReferences());
                         cd.setNote(test.getNote());
-                        cd.setId(test.getGuidTDWGNamespace());
+                        cd.setIsVersionOf(test.getGuidTDWGNamespace());
+                        cd.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        cd.setIssued(test.getIssued());
                         cd.setLabel(test.getLabel());
                         //if (test.getSpecificationGuid()!=null) { 
                         //	cd.setId(test.getSpecificationGuid());
@@ -491,7 +497,7 @@ public class TestUtil {
                         // Define a criterion in the context of resource type and info elements
                         Criterion criterion = Criterion.fromString(test.getCriterion());
                         Validation cc = new Validation(criterion, informationElement, actedUpon, consulted, resourceType);
-                        cc.setHistoryNote("https://github.com/tdwg/bdq/issues/" + test.getHistoryNumber());
+                        cc.setHistoryNote(test.getHistoryNoteUrl());
                         cc.setReferences(test.getReferences());
                         cc.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
@@ -503,7 +509,9 @@ public class TestUtil {
                         //if (test.getContextualizedGuid()!=null) { 
                         //	cc.setId(test.getContextualizedGuid());
                         //}
-                        cc.setId(test.getGuidTDWGNamespace());
+                        cc.setIsVersionOf(test.getGuidTDWGNamespace());
+                        cc.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        cc.setIssued(test.getIssued());
                         model.save(cc);
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
@@ -542,7 +550,9 @@ public class TestUtil {
                         ce.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         ce.setDimension(dimension);
-                        ce.setId(test.getGuidTDWGNamespace());
+                        ce.setIsVersionOf(test.getGuidTDWGNamespace());
+                        ce.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        ce.setIssued(test.getIssued());
                         ce.setLabel(test.getLabel());
                         ce.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         //ce.setPrefLabel(test.getDescription() +  "Amedment for " + resourceType.getLabel());
@@ -586,7 +596,9 @@ public class TestUtil {
                         ci.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         ci.setDimension(dimension);
-                        ci.setId(test.getGuidTDWGNamespace());
+                        ci.setIsVersionOf(test.getGuidTDWGNamespace());
+                        ci.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        ci.setIssued(test.getIssued());
                         ci.setLabel(test.getLabel());
                         ci.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         //ci.setPrefLabel(test.getDescription() + " Criterion for " + resourceType.getLabel());
@@ -868,6 +880,8 @@ public class TestUtil {
                 logger.debug(label);
                 String references =  record.get(CSV_HEADER_REFERENCES);
                 String note = record.get(CSV_HEADER_NOTE);
+                String historyNoteUrl = record.get(CSV_HISTORY_NOTE_URL);
+                String issued = record.get(CSV_HEADER_ISSUED);
                 
                 List<String> useCaseNames = new ArrayList<String>();
                 if (useCasesForTestString!=null && useCasesForTestString.length()>0) { 
@@ -881,6 +895,8 @@ public class TestUtil {
                 test.setReferences(references);
                 test.setNote(note);
                 test.setPrefLabel(prefLabel);
+                test.setHistoryNoteUrl(historyNoteUrl);
+                test.setIssued(issued);
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.

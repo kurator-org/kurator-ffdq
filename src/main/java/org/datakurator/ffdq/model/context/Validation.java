@@ -32,7 +32,11 @@ import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
 
+import jdk.internal.net.http.common.Log;
+
+import java.net.URI;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
@@ -156,7 +160,9 @@ public class Validation extends DataQualityNeed  {
     	}
     }
 
-    /**
+
+
+	/**
      * <p>getInformationElements.</p>
      *
      * @return a {@link org.datakurator.ffdq.model.InformationElement} object.
@@ -350,4 +356,6 @@ public class Validation extends DataQualityNeed  {
 	public String getNote() {
 		return note;
 	}
+
+
 }

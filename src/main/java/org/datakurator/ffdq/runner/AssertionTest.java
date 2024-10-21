@@ -64,7 +64,8 @@ public class AssertionTest {
     private String examples;  // list of examples
     private String references;   // dcterms:bibliographicCitation, string.  (dcterms:references for resource iri)
     private String note;    // skos:note
-
+    private String issued; // dcterms:issued for DataQualityNeed 
+    
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
     // guid for AmendmentAssertion/Measurement/IssueAssertion/ValidationAssertion Method
@@ -78,6 +79,7 @@ public class AssertionTest {
     private Method method;
     private List<TestParam> parameters;
 	private String prefLabel;
+	private String historyNoteUrl;
 
     /**
      * <p>Constructor for AssertionTest.</p>
@@ -750,6 +752,37 @@ public class AssertionTest {
 	public void setPrefLabel(String prefLabel) {
 		// TODO Auto-generated method stub
 		this.prefLabel = prefLabel;
+	}
+
+	/**
+	 * Set the historyNoteUrl 
+	 * @param historyNoteUrl value to set
+	 */
+	public void setHistoryNoteUrl(String historyNoteUrl) { 
+		this.historyNoteUrl = historyNoteUrl; 
+	}
+	
+	/**
+	 * Get the uri for the issue that serves as the rationale management for this test.
+	 * 
+	 * @return the historyNoteUrl
+	 */
+	public String getHistoryNoteUrl() {
+		return historyNoteUrl;
+	}
+
+	/**
+	 * @return the issued
+	 */
+	public String getIssued() {
+		return issued;
+	}
+
+	/**
+	 * @param issued the issued to set
+	 */
+	public void setIssued(String issued) {
+		this.issued = issued;
 	}
 
 }

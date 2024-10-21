@@ -3,8 +3,12 @@
  */
 package org.datakurator.ffdq.model.context;
 
+import java.net.URI;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 
 /**
@@ -21,6 +25,37 @@ public class DataQualityNeed {
 	protected String historyNote;
 	protected String references;
 	protected String note;
+	protected List<String> historyNotes;
+	protected String issued;
+    protected String isVersionOf;
+    
+    /**
+	 * @return the isVersionOf
+	 */
+	public String getIsVersionOf() {
+		return isVersionOf;
+	}
+    
+    /**
+	 * @return the isVersionOf as a URI
+	 */
+    @RDF("dcterms:isVersionOf")
+	public URI getIsVersionOfURI() {
+    	try { 
+    		URI uri = new URI(isVersionOf);
+    		return uri;
+    	} catch (Exception e) { 
+    		return null;
+    	}
+	}
+
+	/**
+	 * @param isVersionOf the isVersionOf to set
+	 */
+	public void setIsVersionOf(String isVersionOf) {
+		this.isVersionOf = isVersionOf;
+	}
+    
 
 	/**
 	 * @param historyNote the historyNote to set
@@ -43,6 +78,20 @@ public class DataQualityNeed {
 		this.note = note;
 	}
 	
+	/**
+	 * @return the issued
+	 */
+	@RDF("dcterms:issued")
+	public String getIssued() {
+		return issued;
+	}
+
+	/**
+	 * @param issued the issued to set
+	 */
+	public void setIssued(String issued) {
+		this.issued = issued;
+	}
 	
 
 }
