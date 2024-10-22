@@ -82,6 +82,7 @@ public class TestUtil {
     private final static String CSV_HEADER_REFERENCES;
     private final static String CSV_HEADER_NOTE;
     private final static String CSV_HEADER_ISSUED;
+    private final static String CSV_HISTORY_NOTE_SOURCE;
 
     static {
         Properties properties = new Properties();
@@ -109,6 +110,7 @@ public class TestUtil {
             CSV_HEADER_EXAMPLES = properties.getProperty("csv.header.examples");
             CSV_HISTORY_NUMBER = properties.getProperty("csv.header.historyNumber"); 
             CSV_HISTORY_NOTE_URL = properties.getProperty("csv.header.historyNoteUrl");
+            CSV_HISTORY_NOTE_SOURCE= properties.getProperty("csv.header.historyNoteSource");
             CSV_HEADER_REFERENCES = properties.getProperty("csv.header.references");
             CSV_HEADER_NOTE = properties.getProperty("csv.header.note");
             CSV_HEADER_ISSUED = properties.getProperty("csv.header.issued");
@@ -471,6 +473,9 @@ public class TestUtil {
                         if (test.getMethodGuid()!=null) { 
                         	measurementMethod.setId(test.getMethodGuid());
                         }
+                        if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
+                        	measurementMethod.setHistoryNote(test.getHistoryNoteSource());
+                        }
                         if (iuc!=null) { 
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
@@ -517,6 +522,9 @@ public class TestUtil {
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
                         if (test.getMethodGuid()!=null) { 
                         	validationMethod.setId(test.getMethodGuid());
+                        }
+                        if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
+                        	validationMethod.setHistoryNote(test.getHistoryNoteSource());
                         }
                         if (iuc!=null) { 
                         	while (iuc.hasNext()) { 
@@ -566,6 +574,9 @@ public class TestUtil {
                         if (test.getMethodGuid()!=null) {
                         	amendmentMethod.setId(test.getMethodGuid());
                         }
+                        if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
+                        	amendmentMethod.setHistoryNote(test.getHistoryNoteSource());
+                        }
                         if (iuc!=null) { 
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
@@ -608,9 +619,12 @@ public class TestUtil {
                         //}
                         model.save(ci);
                         // Define an amendment method, a specification tied to a criterion in context
-                        IssueMethod problemMethod = new IssueMethod(specification, ci);
+                        IssueMethod issueMethod = new IssueMethod(specification, ci);
                         if (test.getMethodGuid()!=null) { 
-                        	problemMethod.setId(test.getMethodGuid());
+                        	issueMethod.setId(test.getMethodGuid());
+                        }
+                        if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
+                        	issueMethod.setHistoryNote(test.getHistoryNoteSource());
                         }
                         if (iuc!=null) { 
                        		while (iuc.hasNext()) { 
@@ -631,7 +645,7 @@ public class TestUtil {
                         		useCaseIssuePolicyMap.put(useCase, pol);
                        		}
                         }
-                        model.save(problemMethod);
+                        model.save(issueMethod);
                         break;
                 }
             }
@@ -896,6 +910,7 @@ public class TestUtil {
                 test.setNote(note);
                 test.setPrefLabel(prefLabel);
                 test.setHistoryNoteUrl(historyNoteUrl);
+                test.setHistoryNoteSource(record.get(CSV_HISTORY_NOTE_SOURCE));
                 test.setIssued(issued);
                 tests.add(test);
             } catch (UnsupportedTypeException e) {

@@ -1,6 +1,6 @@
 
 /**
- * AssertionMethod.java
+ * DataQualityMethod.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -30,12 +30,17 @@ import org.datakurator.ffdq.model.Specification;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
+    "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+    "skos = http://www.w3.org/2004/02/skos/core#",
+    "dcterms = http://purl.org/dc/terms/",
+    "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
-@RDFBean("bdqffdq:AssertionMethod")
-public class AssertionMethod {
+@RDFBean("bdqffdq:DataQualityMethod")
+public class DataQualityMethod {
     protected String id = "urn:uuid:" + UUID.randomUUID();
     protected Specification specification;
+    
+    protected String historyNote;
 
     /**
      * <p>Getter for the field <code>id</code>.</p>
@@ -76,5 +81,20 @@ public class AssertionMethod {
     public void setSpecification(Specification specification) {
         this.specification = specification;
     }
+
+	/**
+	 * @return the historyNote
+	 */
+	@RDF("skos:historyNote")
+	public String getHistoryNote() {
+		return historyNote;
+	}
+
+	/**
+	 * @param historyNote the historyNote to set
+	 */
+	public void setHistoryNote(String historyNote) {
+		this.historyNote = historyNote;
+	}
 
 }

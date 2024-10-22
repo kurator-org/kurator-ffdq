@@ -4,7 +4,7 @@
 package org.datakurator.ffdq.model.context;
 
 import java.net.URI;
-import java.util.List;
+import java.time.LocalDate;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +25,6 @@ public class DataQualityNeed {
 	protected String historyNote;
 	protected String references;
 	protected String note;
-	protected List<String> historyNotes;
 	protected String issued;
     protected String isVersionOf;
     
@@ -84,6 +83,23 @@ public class DataQualityNeed {
 	@RDF("dcterms:issued")
 	public String getIssued() {
 		return issued;
+	}
+	
+	/**
+	 * @return the issued as a date
+	 */
+	public LocalDate getIssuedDate() {
+		// TODO: Add support for xmls:date from LocalDate to RDFBeans
+		// Serialization with @RDF("dcterms:issued") throws exception: 
+		// Caused by: org.cyberborean.rdfbeans.exceptions.RDFBeanException: Unsupported class [java.time.LocalDate] of value 2024-09-18
+		// at org.cyberborean.rdfbeans.RDFBeanManager.toRdf(RDFBeanManager.java:725)
+		LocalDate retval = null;
+		try { 
+			retval = LocalDate.parse(issued);
+		} catch (Exception e) { 
+			logger.debug(e.getMessage());
+		}
+		return retval;
 	}
 
 	/**

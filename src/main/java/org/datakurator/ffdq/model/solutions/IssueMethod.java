@@ -36,7 +36,7 @@ import java.util.UUID;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:IssueMethod")
-public class IssueMethod {
+public class IssueMethod extends DataQualityMethod  {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Specification specification;

@@ -65,6 +65,7 @@ public class AssertionTest {
     private String references;   // dcterms:bibliographicCitation, string.  (dcterms:references for resource iri)
     private String note;    // skos:note
     private String issued; // dcterms:issued for DataQualityNeed 
+    private String historyNoteSource; // skos:historyNote for Source, on bdqffdq:DataQualityMethod
     
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
@@ -302,10 +303,13 @@ public class AssertionTest {
     }
 
     /**
+     * Unused.  
+     * 
      * <p>Getter for the field <code>criterionLabel</code>.</p>
      *
      * @return a {@link java.lang.String} object.
      */
+    @Deprecated 
     public String getCriterionLabel() {
 		return criterionLabel;
 	}
@@ -315,6 +319,7 @@ public class AssertionTest {
 	 *
 	 * @param criterionLabel a {@link java.lang.String} object.
 	 */
+    @Deprecated
 	public void setCriterionLabel(String criterionLabel) {
 		this.criterionLabel = criterionLabel;
 	}
@@ -783,6 +788,20 @@ public class AssertionTest {
 	 */
 	public void setIssued(String issued) {
 		this.issued = issued;
+	}
+
+	/**
+	 * @return the historyNoteSource
+	 */
+	public String getHistoryNoteSource() {
+		return historyNoteSource;
+	}
+
+	/**
+	 * @param historyNoteSource the historyNoteSource to set
+	 */
+	public void setHistoryNoteSource(String historyNoteSource) {
+		this.historyNoteSource = historyNoteSource;
 	}
 
 }

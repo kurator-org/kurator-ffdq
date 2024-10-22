@@ -33,7 +33,7 @@ import org.datakurator.ffdq.model.context.Measure;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:MeasurementMethod")
-public class MeasurementMethod extends AssertionMethod {
+public class MeasurementMethod extends DataQualityMethod {
     private Measure cd;
 
     /**

@@ -33,7 +33,7 @@ import org.datakurator.ffdq.model.context.Validation;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:ValidationMethod")
-public class ValidationMethod extends AssertionMethod {
+public class ValidationMethod extends DataQualityMethod {
     private Validation cc;
 
     /**

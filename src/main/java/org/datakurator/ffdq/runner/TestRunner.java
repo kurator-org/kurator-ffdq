@@ -37,7 +37,7 @@ import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
-import org.datakurator.ffdq.model.solutions.AssertionMethod;
+import org.datakurator.ffdq.model.solutions.DataQualityMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
@@ -250,7 +250,7 @@ public class TestRunner {
             test.setResourceType(AssertionTest.SINGLE_RECORD);
 
             // Get the assertion method from the model and add metadata to the test
-            AssertionMethod assertionMethod = model.findMethodForSpecification(guid);
+            DataQualityMethod assertionMethod = model.findMethodForSpecification(guid);
 
             ResourceType resourceType;
             InformationElement informationElement;

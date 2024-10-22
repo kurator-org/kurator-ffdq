@@ -21,7 +21,7 @@ import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.datakurator.ffdq.model.report.Assertion;
-import org.datakurator.ffdq.model.solutions.AssertionMethod;
+import org.datakurator.ffdq.model.solutions.DataQualityMethod;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.TupleQueryResult;
@@ -69,9 +69,9 @@ public class FFDQModel extends BaseModel {
      * <p>findMethodForSpecification.</p>
      *
      * @param testGuid a {@link java.lang.String} object.
-     * @return a {@link org.datakurator.ffdq.model.solutions.AssertionMethod} object.
+     * @return a {@link org.datakurator.ffdq.model.solutions.DataQualityMethod} object.
      */
-    public AssertionMethod findMethodForSpecification(String testGuid) {
+    public DataQualityMethod findMethodForSpecification(String testGuid) {
         String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "SELECT ?method WHERE { " +
                 "{ ?method a ffdq:MeasurementMethod } UNION " +
@@ -79,7 +79,7 @@ public class FFDQModel extends BaseModel {
                 "{ ?method a ffdq:AmendmentMethod } . " +
                 "?method ffdq:hasSpecification <" + testGuid + "> }";
 
-        return (AssertionMethod) findOne(AssertionMethod.class, sparql, "method");
+        return (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
     }
 
     /**

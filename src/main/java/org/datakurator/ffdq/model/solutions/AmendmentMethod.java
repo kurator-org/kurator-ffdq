@@ -33,7 +33,7 @@ import org.datakurator.ffdq.model.context.Amendment;
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:AmendmentMethod")
-public class AmendmentMethod extends AssertionMethod {
+public class AmendmentMethod extends DataQualityMethod {
     private Amendment ce;
 
     /**
