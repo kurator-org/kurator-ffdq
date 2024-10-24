@@ -30,8 +30,6 @@ import org.datakurator.ffdq.runner.AssertionTest;
 import org.datakurator.ffdq.runner.UnsupportedTypeException;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
-import jdk.jfr.internal.LogLevel;
-
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -278,7 +276,7 @@ public class TestUtil {
                 Specification specification = new Specification(test.getSpecificationGuid(), specificationLabel, specificationDescription.trim(), test.getSpecification(), test.getAuthoritiesDefaults());
                 specification.addExamples(test.getExamples());
                 if (test.getSpecificationGuid()==null) { 
-                	logger.error("Missing Specification GUID for " + test.getLabel());
+                	logger.error("Missing Specification GUID for " + test.getLabel() + " " + test.getGuid());
                 	if (doOutputMissingGuidList) {
                 		// produce lines suitable for addition to guid file to output
                 		Specification tempS = new Specification();

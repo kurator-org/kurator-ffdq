@@ -28,6 +28,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+/**
+ * This utility class helps provide a mapping between a list of tests 
+ * in the form of a bdqcore term-version file and the org.datakurator.ffdq.model 
+ * classes.
+ */
 public class AssertionTest {
     /** Constant <code>MEASURE="MEASURE"</code> */
     public static final String MEASURE = "MEASURE";
@@ -798,10 +804,17 @@ public class AssertionTest {
 	}
 
 	/**
+	 * Set the history note source, prefixing the provided text 
+	 * with "Source :"
+	 * 
 	 * @param historyNoteSource the historyNoteSource to set
 	 */
 	public void setHistoryNoteSource(String historyNoteSource) {
-		this.historyNoteSource = historyNoteSource;
+		if (historyNoteSource!=null && historyNoteSource.length()>0) { 
+			this.historyNoteSource = "Source: " + historyNoteSource;
+		} else {  
+			this.historyNoteSource = historyNoteSource;
+		}
 	}
 
 }
