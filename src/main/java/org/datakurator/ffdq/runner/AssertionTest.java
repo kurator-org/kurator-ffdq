@@ -84,6 +84,7 @@ public class AssertionTest {
     
     private Class cls;
     private Method method;
+    // parameters currently unused, see testParameters.
     private List<TestParam> parameters;
 	private String prefLabel;
 	private String historyNoteUrl;
@@ -582,7 +583,9 @@ public class AssertionTest {
     }
 
     /**
-     * the information elements as inputs to the test *
+     * the information elements as inputs to the test (java parameters for methods)
+     *
+     * see testParameters for bdqffdq:Parameters
      *
      * @return a {@link java.util.List} object.
      */
@@ -591,7 +594,9 @@ public class AssertionTest {
     }
 
     /**
-     * These are the information elements as inputs *
+     * These are the information elements as inputs (java parameters for methods)
+     * 
+     * see testParameters for bdqffdq:Parameters
      *
      * @param parameters a {@link java.util.List} object.
      */

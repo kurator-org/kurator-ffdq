@@ -23,13 +23,16 @@
 package org.datakurator.ffdq.util;
 
 import org.datakurator.ffdq.runner.AssertionTest;
+import org.datakurator.ffdq.runner.TestParam;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 public class JavaClassGenerator {
     private final static Logger logger = Logger.getLogger(JavaClassGenerator.class.getName());
@@ -154,13 +157,14 @@ public class JavaClassGenerator {
      */
     public void checkTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
-            logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " + currGuids.get(test.getGuid()));
+            String line = Integer.toString(currGuids.get(test.getGuid()));
+            logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " + line);
             if (!currVersions.isEmpty()) { 
                 if (currVersions.containsKey(test.getProvidesVersion())) {
                 	logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
                 } else { 
                 	logger.info("Non-current implementation for \"" + test.getLabel() + "\" version \"" + test.getProvidesVersion() + "\" ");
-                	System.out.println("Non-current implementation for \"" + test.getLabel() + "\" current version is \"" + test.getProvidesVersion() + "\" see line: " + currGuids.get(test.getGuid()));
+                	System.out.println("Non-current implementation for \"" + test.getLabel() + "\" current version is \"" + test.getProvidesVersion() + "\" see line: " + line);
                 }
             }
         }
@@ -173,13 +177,14 @@ public class JavaClassGenerator {
      */
     public void addTest(AssertionTest test) {
         if (!currGuids.isEmpty() && currGuids.containsKey(test.getGuid())) {
+        	String line = Integer.toString(currGuids.get(test.getGuid()));
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
-                    currGuids.get(test.getGuid()));
+                    line);
             if (!currVersions.isEmpty()) { 
             	if (currVersions.containsKey(test.getProvidesVersion())) {
             		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
             	} else {
-            		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+            		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + line);
             		outputCodeSB.append("// TODO: Implementation of ").append(test.getLabel());
             		outputCodeSB.append(" is not up to date with current version: ").append(test.getProvidesVersion());
             		outputCodeSB.append(" see line: ").append( currGuids.get(test.getGuid()) );
@@ -267,7 +272,22 @@ public class JavaClassGenerator {
                 	String param = term.split(":")[1];
                 	methodCParams.put(term, param);
                 }
-            }              
+            }   
+            Map<String, String> methodPParams = new HashMap<>();
+            List<String> params = new ArrayList<String>();
+            if (test.getTestParameters()!=null)  {
+            	params = test.getTestParameters();
+            	for (int i = 0; i < params.size(); i++) {
+            		String term = params.get(i);
+                    if (term!=null && term.contains(":")) { 
+                    	String param = term.split(":")[1];
+                    	methodPParams.put(term, param);
+                    } else if (term!=null && term.trim().length()>0) { 
+                    	System.out.println(term);
+                    	methodPParams.put(term, term);
+                    }
+            	}
+            }
            
 
             // Javadoc comment first
@@ -290,6 +310,10 @@ public class JavaClassGenerator {
             	String param = methodCParams.get(key);
                 outputCodeSB.append(indent).append("* @param ").append(param).append(" the provided ").append(key).append(" to evaluate as Consulted.\n");
             }            
+            for (String key : methodPParams.keySet()) {
+            	String param = methodPParams.get(key);
+                outputCodeSB.append(indent).append("* @param ").append(param).append(" the provided parameter ").append(key).append(" use null for default value.\n");
+            }            
             
             if (retTypeJavaDoc!=null) { 
                 outputCodeSB.append(indent).append("* @return ").append(retTypeJavaDoc).append(" to return\n");
@@ -298,17 +322,18 @@ public class JavaClassGenerator {
             outputCodeSB.append(indent).append("").append(descriptorAnnotation).append("\n");
             outputCodeSB.append(indent).append("@Provides(\"").append(test.getGuid()).append("\")\n");
             outputCodeSB.append(indent).append("@ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
-            outputCodeSB.append(indent).append("@Specification(\"").append(test.getSpecification().replace('"', '\'') ).append("\")\n");
+            outputCodeSB.append(indent).append("@Specification(\"").append(test.getSpecification().replace('"', '\'')).append(test.getAuthoritiesDefaults().replace('"', '\'')).append("\")\n");
             outputCodeSB.append(indent).append("public ").append(retType).append(" ").append(methodName).append("(\n");
 
 
             int cnt = 0;
             int auCount = methodAUParams.size();
             int cCount = methodCParams.size();
+            int pCount = methodPParams.size();
             for (String term : methodIEParams.keySet()) {
             	// Untyped InformationElements are annotated with ActedUpon
                 outputCodeSB.append(indent).append(indent).append("@ActedUpon(\"").append(term).append("\") String ").append(methodIEParams.get(term));
-                if ((cnt < ie.size() - 1) || auCount > 0 || cCount > 0) {
+                if ((cnt < ie.size() - 1) || auCount > 0 || cCount > 0 || pCount >0) {
                     outputCodeSB.append(", ");
                 }
                 outputCodeSB.append("\n");
@@ -317,7 +342,7 @@ public class JavaClassGenerator {
             cnt = 0;
             for (String term : methodAUParams.keySet()) {
                 outputCodeSB.append(indent).append(indent).append("@ActedUpon(\"").append(term).append("\") String ").append(methodAUParams.get(term));
-                if ((cnt < actedUpon.size() - 1) || cCount > 0) {
+                if ((cnt < actedUpon.size() - 1) || cCount > 0 || pCount > 0) {
                     outputCodeSB.append(", ");
                 }
                 outputCodeSB.append("\n");
@@ -326,12 +351,21 @@ public class JavaClassGenerator {
             cnt = 0;
             for (String term : methodCParams.keySet()) {
                 outputCodeSB.append(indent).append(indent).append("@Consulted(\"").append(term).append("\") String ").append(methodCParams.get(term));
-                if (cnt < consulted.size() - 1) {
+                if ((cnt < consulted.size() - 1) || pCount > 0) {
                     outputCodeSB.append(", ");
                 }
                 outputCodeSB.append("\n");
                 cnt++;
             }            
+            cnt = 0;
+            for (String term : methodPParams.keySet()) {
+                outputCodeSB.append(indent).append(indent).append("@Parameter(name=\"").append(term).append("\") String ").append(methodPParams.get(term));
+                if (cnt < params.size() - 1) {
+                    outputCodeSB.append(", ");
+                }
+                outputCodeSB.append("\n");
+                cnt++;
+            }   
             
             List<String> specificationWords = java.util.Arrays.asList(test.getSpecification().split("\\s+"));
             List<String> defaultsWords = java.util.Arrays.asList(test.getAuthoritiesDefaults().split("\\s+"));
@@ -363,7 +397,6 @@ public class JavaClassGenerator {
             }
             outputCodeSB.append(indent).append(indent).append("// ").append(defaultsLine.toString()).append("\n");
             outputCodeSB.append("\n");
-            // Test Parameters change the behavior of the test.
             // Test Parameters change the behavior of the test.
             if (test.getTestParameters()!=null && test.getTestParameters().size()>0) { 
             	StringBuilder testParamCommentLines = new StringBuilder();

@@ -953,15 +953,22 @@ public class TestUtil {
     }
 
 	/**
-	 * Test Parameters are not currently structured, this method is a stub
-	 * in case parsing is added.
+	 * Test Parameters are a comma separated list, split into separate strings 
+	 * on commas and return a list of parameters 
 	 * 
 	 * @param testParameters string containing information about testParameters.
-	 * @return
+	 * @return list of parameters
 	 */
     private static List<String> parseTestParametersString(String testParameters) {
 		List<String> result = new ArrayList<String>();
-		result.add(testParameters);
+		if (testParameters!=null && testParameters.contains(",")) { 
+        	String[] bits = testParameters.split(",");
+        	for (int i=0; i< bits.length; i++) { 
+        		result.add(bits[i]);
+        	}
+		} else { 
+			result.add(testParameters);
+		} 
 		return result;
 	}	
 	
