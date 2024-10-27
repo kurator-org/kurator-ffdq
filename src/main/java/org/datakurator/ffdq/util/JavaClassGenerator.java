@@ -322,7 +322,7 @@ public class JavaClassGenerator {
             outputCodeSB.append(indent).append("").append(descriptorAnnotation).append("\n");
             outputCodeSB.append(indent).append("@Provides(\"").append(test.getGuid()).append("\")\n");
             outputCodeSB.append(indent).append("@ProvidesVersion(\"").append(test.getProvidesVersion()).append("\")\n");
-            outputCodeSB.append(indent).append("@Specification(\"").append(test.getSpecification().replace('"', '\'')).append(test.getAuthoritiesDefaults().replace('"', '\'')).append("\")\n");
+            outputCodeSB.append(indent).append("@Specification(\"").append(test.getSpecification().replace('"', '\'')).append(". ") .append(test.getAuthoritiesDefaults().replace('"', '\'')).append("\")\n");
             outputCodeSB.append(indent).append("public ").append(retType).append(" ").append(methodName).append("(\n");
 
 
