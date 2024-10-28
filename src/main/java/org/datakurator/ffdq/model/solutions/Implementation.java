@@ -83,7 +83,7 @@ public class Implementation {
      *
      * @return a {@link org.datakurator.ffdq.model.Specification} object.
      */
-    @RDF("bdqffdq:hasSpecification")
+    @RDF("bdqffdq:usesSpecification")
     public Specification getSpecification() {
         return specification;
     }

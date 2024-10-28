@@ -58,10 +58,10 @@ public class FFDQModel extends BaseModel {
     public Map<String, Specification> findSpecificationsForMechanism(String mechanismGuid) {
         Set<String> guids = new HashSet<>();
 
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
                 "SELECT ?specification " +
-                "WHERE { ?implementation ffdq:implementedBy <" + mechanismGuid + "> . " +
-                "?implementation ffdq:hasSpecification ?specification }";
+                "WHERE { ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
+                "?implementation bdqffdq:usesSpecification ?specification }";
 
         return (Map<String, Specification>) findAll(Specification.class, sparql, "specification");
     }
@@ -75,11 +75,11 @@ public class FFDQModel extends BaseModel {
     public Map<String, DataQualityNeed> findVersionOfTestsForMechanism(String mechanismGuid) {
         Set<String> guids = new HashSet<>();
 
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
         		"PREFIX dcterms: <http://purl.org/dc/terms/> " + 
                 "SELECT ?specification " +
-                "WHERE { optional { ?implementation ffdq:implementedBy <" + mechanismGuid + "> .  " +
-                "?implementation ffdq:hasSpecification ?spec . } . ?spec dcterms:isVersionOf ?specification }";
+                "WHERE { optional { ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> .  " +
+                "?implementation bdqffdq:usesSpecification ?spec . } . ?spec dcterms:isVersionOf ?specification }";
 System.out.println(sparql);
         return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
     }
@@ -91,12 +91,12 @@ System.out.println(sparql);
      * @return a {@link org.datakurator.ffdq.model.solutions.DataQualityMethod} object.
      */
     public DataQualityMethod findMethodForSpecification(String testGuid) {
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "SELECT ?method WHERE { " +
-                "{ ?method a ffdq:MeasurementMethod } UNION " +
-                "{ ?method a ffdq:ValidationMethod } UNION " +
-                "{ ?method a ffdq:AmendmentMethod } . " +
-                "?method ffdq:hasSpecification <" + testGuid + "> }";
+                "{ ?method a bdqffdq:MeasurementMethod } UNION " +
+                "{ ?method a bdqffdq:ValidationMethod } UNION " +
+                "{ ?method a bdqffdq:AmendmentMethod } . " +
+                "?method bdqffdq:hasSpecification <" + testGuid + "> }";
 
         return (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
     }
@@ -142,7 +142,7 @@ System.out.println(sparql);
     public List<DataResource> findDataResources() {
         List<DataResource> dataResources = new ArrayList<>();
 
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT DISTINCT ?dataResource WHERE { " +
                 "?assertion prov:used ?dataResource " +
@@ -171,15 +171,16 @@ System.out.println(sparql);
     public List<String> findFieldsByAssertionType(Class<? extends Assertion> cls) {
         List<String> fields = new ArrayList<>();
 
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
+        // TODO: Needs joins through specification and method
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT DISTINCT ?field WHERE { " +
-                "?assertion a ffdq:" + cls.getSimpleName() + " . " +
+                "?assertion a bdqffdq:" + cls.getSimpleName() + " . " +
                 "{ ?assertion ffdq:dimensionInContext ?context } UNION " +
                 "{ ?assertion ffdq:criterionInContext ?context } UNION " +
                 "{ ?assertion ffdq:enhancementInContext ?context } . " +
-                "?context ffdq:hasInformationElement ?ie . " +
-                "?ie ffdq:composedOf ?field " +
+                "?context bdqffdq:hasInformationElement ?ie . " +
+                "?ie bdqffdq:composedOf ?field " +
         "}";
 
         TupleQueryResult result = executeQuery(sparql);
@@ -202,7 +203,7 @@ System.out.println(sparql);
     public List<URI> listDataResourcesByURI() {
         List<URI> dataResources = new ArrayList<>();
 
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT DISTINCT ?dataResource WHERE { " +
                 "?assertion prov:used ?dataResource " +
@@ -232,11 +233,11 @@ System.out.println(sparql);
      * @return a {@link java.util.List} object.
      */
     public List<Assertion> findAssertionsForDataResource(DataResource dataResource, Class<? extends Assertion> cls) {
-        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT ?assertion ?type WHERE { " +
                 "?assertion prov:used <" + dataResource.getURI() + "> . " +
-                "?assertion a ffdq:" + cls.getSimpleName() + " " +
+                "?assertion a bdqffdq:" + cls.getSimpleName() + " " +
                 "}";
 
 
