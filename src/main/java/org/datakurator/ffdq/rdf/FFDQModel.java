@@ -29,6 +29,7 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Created by lowery on 11/14/17.
@@ -63,6 +64,24 @@ public class FFDQModel extends BaseModel {
                 "?implementation ffdq:hasSpecification ?specification }";
 
         return (Map<String, Specification>) findAll(Specification.class, sparql, "specification");
+    }
+    
+    /**
+     * <p>findSpecificationsForMechanism.</p> include any tests found.
+     *
+     * @param mechanismGuid a {@link java.lang.String} object.
+     * @return a {@link java.util.Map} object.
+     */
+    public Map<String, DataQualityNeed> findVersionOfTestsForMechanism(String mechanismGuid) {
+        Set<String> guids = new HashSet<>();
+
+        String sparql = "PREFIX ffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+        		"PREFIX dcterms: <http://purl.org/dc/terms/> " + 
+                "SELECT ?specification " +
+                "WHERE { optional { ?implementation ffdq:implementedBy <" + mechanismGuid + "> .  " +
+                "?implementation ffdq:hasSpecification ?spec . } . ?spec dcterms:isVersionOf ?specification }";
+System.out.println(sparql);
+        return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
     }
 
     /**

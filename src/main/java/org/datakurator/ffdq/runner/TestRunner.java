@@ -111,9 +111,17 @@ public class TestRunner {
 
                 // Query the BDQFFDQ model for test specifications implemented by the mechanism tied to the DQClass
                 Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
+
+                logger.log(Level.INFO, "Count of definedTests=" + Integer.toString(definedTests.size()));
                 
                 // TODO: Implmement handling of tests as DataQualityNeed subclasses, rather than specifications
-                // Map<String, DataQualityNeed> definedTests = model.findTestsForMechanism(mechanismGuid);
+                // Map<String, DataQualityNeed> definedTests = model.findTestsForMechanism(mechanismGuid);a
+                //Map<String, DataQualityNeed> definedTests = null;
+            	//definedTests = model.findVersionOfTestsForMechanism(mechanismGuid);
+            	//Iterator<String> keys = definedTests.keySet().iterator();
+            	//while (keys.hasNext()) { 
+            		//logger.log(Level.INFO, keys.next());
+            	//}
                 
                 logger.log(Level.INFO, "Specifications found for Mechanism in RDF: " + definedTests.size());
 
@@ -202,6 +210,15 @@ public class TestRunner {
         Set<String> definedGuids = new HashSet<>(definedTests.keySet());
         Set<String> implementedGuids = new HashSet<>(implementedTests.keySet());
 
+        Iterator<String> id = definedGuids.iterator();
+        while (id.hasNext()) { 
+        	logger.log(Level.INFO, "Defined in rdf: " +  id.next());
+        }
+        Iterator<String> ii = implementedGuids.iterator();
+        while (ii.hasNext()) { 
+        	logger.log(Level.INFO, "Implemented in code: " +  ii.next());
+        }
+        
         // Check that all tests defined for the current mechanism in the BDQFFDQ rdf correspond to a DQClass method
         // that implements the test
         if (!implementedGuids.containsAll(definedGuids)) {
@@ -242,8 +259,8 @@ public class TestRunner {
 
             // Add metadata for specification
             if (test.getSpecification() == null) {
-                Specification specification = definedTests.get(guid);
-                test.setSpecification(specification.getLabel());
+            	Specification specification = definedTests.get(guid);
+            	test.setSpecification(specification.getLabel());
             }
 
             // TODO: Assumed to be single record for now
@@ -397,7 +414,8 @@ public class TestRunner {
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
         Options options = new Options();
-        options.addRequiredOption("in", null, true, "Input occurrence tsv data file");
+        options.addRequiredOption("in", null, true, "Input occurrence data file");
+        options.addRequiredOption("informat", null, true, "Input occurrence data file format (tsv or csv)");
         options.addRequiredOption("out", null, true, "Output file for the rdf " +
                 "representation of the dq report");
 
@@ -417,6 +435,7 @@ public class TestRunner {
             // Get option values
             String tsvIn = cmd.getOptionValue("in");
             String rdfIn = cmd.getOptionValue("rdf");
+            String inFormat = cmd.getOptionValue("informat");
 
             String rdfOut = cmd.getOptionValue("out");
 
@@ -466,7 +485,12 @@ public class TestRunner {
 
             // Run tests for each record in the occurrence data input
             Reader reader = new InputStreamReader(new FileInputStream(tsvFile));
-            Iterable<CSVRecord> records = CSVFormat.newFormat('\t').withFirstRecordAsHeader().parse(reader);
+            Iterable<CSVRecord> records = null;
+            if (inFormat.toUpperCase().equals("TSV")) { 
+            	records = CSVFormat.newFormat('\t').withFirstRecordAsHeader().parse(reader);
+            } else { 
+            	records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader);
+            }
 
             for (CSVRecord record : records) {
                 runner.run(record.toMap());

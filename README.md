@@ -116,7 +116,8 @@ Using the options below, run the utility from the directory containing the jar f
 
 * **cls \<arg\>** - Fully qualified name of Java class on the classpath to run tests from
 * **rdf \<arg\>** - Input file containing the rdf representation of the tests
-* **in \<arg\>** - Input occurrence tsv data file
+* **in \<arg\>** - Input occurrence data file
+* **informat \<arg\>** - Input occurrence data file format (csv or tdf) 
 * **out \<arg\>** - Output file for the rdf representation of the dq report
 * **format \<arg\>** - Input/output rdf format (RDFXML, TURTLE, JSON-LD)
 
@@ -131,6 +132,10 @@ Using the query utility mentioned above along with the `postprocess.sparql` quer
 
     ~/kurator-ffdq/query-util.sh -q ~/kurator-ffdq/competencyquestions/sparql/postprocess.sparql -t dq-report.ttl -o result.tsv
     libreoffice result.tsv
+
+TODO: Work in progress, need to match guids for tests (DataQualityNeed subclass instances) to Specifications in model
+
+    sh test-runner.sh -format RDFXML -in ../bdq/tg2/core/TG2_test_validation_data_synthetic_occurrence.csv -out output.rdf -rdf ../bdq/tg2/_review/dist/bdqcore.xml -cls org.filteredpush.qc.date.DwCEventDQ -informat csv &> temp.out
 
 # Annotated DQ Class
 
