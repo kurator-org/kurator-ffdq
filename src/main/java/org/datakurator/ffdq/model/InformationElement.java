@@ -21,7 +21,6 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.apache.commons.math3.analysis.function.Log;
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;

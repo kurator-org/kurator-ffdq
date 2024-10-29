@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
+import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 
 /**
  *  Superclass for "tests"
@@ -17,6 +18,13 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
  * @author mole
  * @version $Id: $Id
  */
+@RDFNamespaces({
+	"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+    "skos = http://www.w3.org/2004/02/skos/core#",
+    "dcterms = http://purl.org/dc/terms/",
+    "xsd= http://www.w3.org/2001/XMLSchema#",
+    "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+})
 @RDFBean("bdqffdq:DataQualityNeed")
 public class DataQualityNeed {
 
@@ -38,7 +46,6 @@ public class DataQualityNeed {
     /**
 	 * @return the isVersionOf as a URI
 	 */
-    @RDF("dcterms:isVersionOf")
 	public URI getIsVersionOfURI() {
     	try { 
     		URI uri = new URI(isVersionOf);
@@ -80,7 +87,6 @@ public class DataQualityNeed {
 	/**
 	 * @return the issued
 	 */
-	@RDF("dcterms:issued")
 	public String getIssued() {
 		return issued;
 	}

@@ -33,6 +33,8 @@ import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.InvertedCriterion;
 import org.datakurator.ffdq.model.ResourceType;
 
+import java.net.URI;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RDFNamespaces({
@@ -313,4 +315,21 @@ public class Issue extends DataQualityNeed  {
 	public String getNote() {
 		return note;
 	}
+	
+    /**
+	 * @return the isVersionOf as a URI
+	 */
+    @RDF("dcterms:isVersionOf")
+	public URI getIsVersionOfURI() {
+    	return super.getIsVersionOfURI();
+	}
+    
+	/**
+	 * @return the issued as a date
+	 */
+	@RDF("dcterms:issued")
+	public LocalDate getIssuedDate() {
+		return super.getIssuedDate();
+	}
+    
 }

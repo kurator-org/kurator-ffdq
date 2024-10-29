@@ -497,7 +497,8 @@ public class TestRunner {
             }
 
             // Write dq report as rdf
-            model.write(RDFFormat.TURTLE, new FileOutputStream(rdfOut),true);
+            boolean includeBindingClass = false;
+            model.write(RDFFormat.TURTLE, new FileOutputStream(rdfOut),includeBindingClass);
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Unable to load dq class!", e);

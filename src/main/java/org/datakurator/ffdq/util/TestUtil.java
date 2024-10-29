@@ -137,7 +137,7 @@ public class TestUtil {
         options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
         options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels.");
         
-        options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD)");
+        options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD, N3, NTRIPLES)");
 
         options.addOption("srcDir", null, true, "The Java sources root directory (e.g. src/main/java)");
         options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
@@ -188,7 +188,7 @@ public class TestUtil {
             if (cmd.hasOption("format")) {
                 String value = cmd.getOptionValue("format");
 
-                switch (value) {
+                switch (value.toUpperCase()) {
                     case "RDFXML":
                         format = RDFFormat.RDFXML;
                         break;
@@ -198,6 +198,15 @@ public class TestUtil {
                     case "JSON-LD":
                         format = RDFFormat.JSONLD;
                         break;
+                    case "NTRIPLES":
+                        format = RDFFormat.NTRIPLES;
+                        break;
+                    case "N3":
+                        format = RDFFormat.N3;
+                        break;
+                    default: 
+                    	logger.debug("Unknown format, defaulting to Turtle.");
+                    	format = RDFFormat.TURTLE;
                 }
             }
 
@@ -299,7 +308,6 @@ public class TestUtil {
                 		Argument argument = null;
                 		String paramString = ip.next();
                 		if (paramString.contains(",")) { 
-                			System.out.println("Line 298: " + paramString);
                 			String[] bits = paramString.split(",");
                 			for (int bi=0; bi<bits.length; bi++) {
                 				String paramStringBit = bits[bi].trim();
@@ -312,7 +320,6 @@ public class TestUtil {
                 						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
                 					}
                 				} else { 
-                					System.out.println("Line 311: " + paramStringBit);
                 					if (paramStringBit!=null && paramStringBit.length()>0) { 
                 						argument = new Argument("Default value for " + paramStringBit);
                 						logger.debug(argument.getLabel());
@@ -325,7 +332,6 @@ public class TestUtil {
                 			}
                 		} else { 
                 			if (paramString.startsWith("bdq:")) { 
-                				System.out.println("Line 323: " + paramString);
                 				Parameter parameter = new Parameter(paramString);
                 				argument = new Argument(parameter, "Default value for " + paramString);
             					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), parameter.getId());

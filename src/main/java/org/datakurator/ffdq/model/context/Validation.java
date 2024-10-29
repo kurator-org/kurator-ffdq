@@ -32,11 +32,10 @@ import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
 import org.datakurator.ffdq.model.ResourceType;
 
-import jdk.internal.net.http.common.Log;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
@@ -161,6 +160,13 @@ public class Validation extends DataQualityNeed  {
     }
 
 
+    /**
+	 * @return the isVersionOf as a URI
+	 */
+    @RDF("dcterms:isVersionOf")
+	public URI getIsVersionOfURI() {
+    	return super.getIsVersionOfURI();
+	}
 
 	/**
      * <p>getInformationElements.</p>
@@ -357,5 +363,11 @@ public class Validation extends DataQualityNeed  {
 		return note;
 	}
 
-
+	/**
+	 * @return the issued as a date
+	 */
+	@RDF("dcterms:issued")
+	public LocalDate getIssuedDate() {
+		return super.getIssuedDate();
+	}
 }

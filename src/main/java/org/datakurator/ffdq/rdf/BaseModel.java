@@ -27,6 +27,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.GraphQuery;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.query.TupleQueryResultHandler;
@@ -35,8 +36,10 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
 import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
@@ -60,10 +63,9 @@ public class BaseModel {
     public BaseModel() {
         // Initialize an in-memory store and the rdf bean manager
         repo = new SailRepository(new MemoryStore());
-        repo.initialize();
 
         conn = repo.getConnection();
-        manager = new RDFBeanManager(conn);
+        manager = new RDFBeanManager(repo);
     }
 
     /**
@@ -72,8 +74,10 @@ public class BaseModel {
      * @param input a {@link java.io.InputStream} object.
      * @param format a {@link org.eclipse.rdf4j.rio.RDFFormat} object.
      * @throws java.io.IOException if any.
+     * @throws RDFParseException 
+     * @throws UnsupportedRDFormatException 
      */
-    public void load(InputStream input, RDFFormat format) throws IOException {
+    public void load(InputStream input, RDFFormat format) throws IOException, UnsupportedRDFormatException, RDFParseException {
         // Load RDF data from file
         Model model = Rio.parse(input, "", format);
         conn.add(model);
