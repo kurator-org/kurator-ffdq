@@ -72,6 +72,7 @@ public class AssertionTest {
     private String note;    // skos:note
     private String issued; // dcterms:issued for DataQualityNeed 
     private String historyNoteSource; // skos:historyNote for Source, on bdqffdq:DataQualityMethod
+    private List<String> argumentGuids;
     
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
@@ -822,4 +823,50 @@ public class AssertionTest {
 		}
 	}
 
+	/**
+	 * Parse a string containing guids for arguments and add to
+	 * argumentGuids list.
+	 * 
+	 * @param string comma separated list of guids to add to ArgumentGuid list.
+	 */
+	public void setArgumentGuids(String string) {
+		if (string!=null && string.trim().length()>0) { 
+			if (argumentGuids==null) { 
+				argumentGuids = new ArrayList<String>();
+			}
+			if (string.contains(",")) { 
+				String[] bits = string.split(",");
+				for (int i=0; i<bits.length; i++) {
+					String bit = bits[i];
+					if (bit.trim().length()>0) {
+						bit = bit.trim();
+						if (!(bit.startsWith("urn:uuid:")||bit.startsWith("http://")||bit.startsWith("https://"))) { 
+							bit = "urn:uuid:" + bit;
+						}
+						argumentGuids.add(bit);
+					}
+				}
+			} else { 
+				string = string.trim();
+				if (!(string.startsWith("urn:uuid:")||string.startsWith("http://")||string.startsWith("https://"))) { 
+					string = "urn:uuid:" + string;
+				}
+				argumentGuids.add(string);
+			}
+		}
+	}
+
+	/**
+	 * Obtain the list of argument guids, if none
+	 * return an empty list.
+	 * 
+	 * @return list of argument guids.
+	 */
+	public List<String> getArgumentGuids() { 
+		if (argumentGuids==null) { 
+			argumentGuids = new ArrayList<String>();
+		}
+		return argumentGuids;
+	}
+	
 }

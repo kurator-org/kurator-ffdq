@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 public class TestUtil {
 
 	
-	private static final Log logger = LogFactory.getLog(Argument.class);
+	private static final Log logger = LogFactory.getLog(TestUtil.class);
 	
     private final static String CSV_HEADER_LABEL;
     private final static String CSV_HEADER_GUID;
@@ -64,6 +64,9 @@ public class TestUtil {
     private final static String CSV_HEADER_CRITERION_LABEL;
     private final static String CSV_HEADER_SPECIFICATION;
     private final static String CSV_HEADER_AUTHORITIESDEFAULTS;
+    private final static String CSV_HEADER_SPECIFICATIONGUID;
+    private final static String CSV_HEADER_METHODGUID;
+    private final static String CSV_HEADER_ARGUMENTGUIDS;
     private final static String CSV_HEADER_ASSERTION;
     private final static String CSV_HEADER_RESOURCE_TYPE;
     private final static String CSV_HEADER_DIMENSION;
@@ -95,6 +98,9 @@ public class TestUtil {
             CSV_HEADER_CRITERION_LABEL = properties.getProperty("csv.header.criterionLabel");
             CSV_HEADER_SPECIFICATION = properties.getProperty("csv.header.specification");
             CSV_HEADER_AUTHORITIESDEFAULTS = properties.getProperty("csv.header.authoritiesDefaults");
+            CSV_HEADER_SPECIFICATIONGUID = properties.getProperty("csv.header.specificationGuid");
+            CSV_HEADER_METHODGUID = properties.getProperty("csv.header.methodGuid");
+            CSV_HEADER_ARGUMENTGUIDS = properties.getProperty("csv.header.argumentGuids");
             CSV_HEADER_ASSERTION = properties.getProperty("csv.header.assertion");
             CSV_HEADER_RESOURCE_TYPE = properties.getProperty("csv.header.resourceType");
             CSV_HEADER_DIMENSION = properties.getProperty("csv.header.dimension");
@@ -302,6 +308,7 @@ public class TestUtil {
                 }
                 List<String> params = test.getTestParameters();
                 if (params!=null) { 
+                	Iterator<String> argumentGuidIterator = test.getArgumentGuids().iterator();
                 	Iterator<String> ip = params.iterator();
                 	if (ip.hasNext()) { 
                 		// TODO: Stable guids for arguments
@@ -326,11 +333,15 @@ public class TestUtil {
                 						logger.debug(argument.getId());
                 					}
                 				}
+                				if (argumentGuidIterator.hasNext()) { 
+                					argument.setId(argumentGuidIterator.next());
+                				}
                 				if (argument!=null) { 
                 					specification.addArgument(argument);
                 				}
                 			}
                 		} else { 
+                			// TODO: Set argument guids from ArgumentGuids column.
                 			if (paramString.startsWith("bdq:")) { 
                 				Parameter parameter = new Parameter(paramString);
                 				argument = new Argument(parameter, "Default value for " + paramString);
@@ -344,10 +355,11 @@ public class TestUtil {
                 					argument = new Argument("Default value for " + paramString);
                						String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), paramString);
                						argument.setValue(defaultValue);
-                					logger.debug(argument.getLabel());
-                					logger.debug(argument.getId());
                 				}
                 			}	
+               				if (argumentGuidIterator.hasNext()) { 
+               					argument.setId(argumentGuidIterator.next());
+               				}
                 			if (argument!=null) { 
                 				specification.addArgument(argument);
                 			}
@@ -825,6 +837,8 @@ public class TestUtil {
         				String method = guidRecord.get("Method").trim();
         				methodMap.put(testGuid, method);
         				String specificationGuid = guidRecord.get("Specification").trim();
+        				logger.info(testGuid);
+        				logger.info(specificationGuid);
         				specificationGuidMap.put(testGuid, specificationGuid);
         				String poliicy = guidRecord.get("Policy").trim();
         				policyMap.put(testGuid, poliicy);
@@ -916,6 +930,7 @@ public class TestUtil {
                 test.setHistoryNoteUrl(historyNoteUrl);
                 test.setHistoryNoteSource(record.get(CSV_HISTORY_NOTE_SOURCE));
                 test.setIssued(issued);
+                test.setArgumentGuids(record.get(CSV_HEADER_ARGUMENTGUIDS));
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.
