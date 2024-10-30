@@ -329,8 +329,6 @@ public class TestUtil {
                 				} else { 
                 					if (paramStringBit!=null && paramStringBit.length()>0) { 
                 						argument = new Argument("Default value for " + paramStringBit);
-                						logger.debug(argument.getLabel());
-                						logger.debug(argument.getId());
                 					}
                 				}
                 				if (argument!=null) { 
@@ -366,7 +364,6 @@ public class TestUtil {
                 		}
                 	}
                 }
-                logger.debug(test.getSpecificationGuid());
                 ResourceType resourceType = ResourceType.fromString(test.getResourceType());
 
                 InformationElement informationElement = new InformationElement();
@@ -837,8 +834,8 @@ public class TestUtil {
         				String method = guidRecord.get("Method").trim();
         				methodMap.put(testGuid, method);
         				String specificationGuid = guidRecord.get("Specification").trim();
-        				logger.info(testGuid);
-        				logger.info(specificationGuid);
+        				//logger.info(testGuid);
+        				//logger.info(specificationGuid);
         				specificationGuidMap.put(testGuid, specificationGuid);
         				String poliicy = guidRecord.get("Policy").trim();
         				policyMap.put(testGuid, poliicy);
