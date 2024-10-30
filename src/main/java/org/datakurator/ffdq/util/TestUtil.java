@@ -333,10 +333,10 @@ public class TestUtil {
                 						logger.debug(argument.getId());
                 					}
                 				}
-                				if (argumentGuidIterator.hasNext()) { 
-                					argument.setId(argumentGuidIterator.next());
-                				}
                 				if (argument!=null) { 
+                					if (argumentGuidIterator.hasNext()) { 
+                						argument.setId(argumentGuidIterator.next());
+                					}
                 					specification.addArgument(argument);
                 				}
                 			}
@@ -357,10 +357,10 @@ public class TestUtil {
                						argument.setValue(defaultValue);
                 				}
                 			}	
-               				if (argumentGuidIterator.hasNext()) { 
-               					argument.setId(argumentGuidIterator.next());
-               				}
                 			if (argument!=null) { 
+                				if (argumentGuidIterator.hasNext()) { 
+                					argument.setId(argumentGuidIterator.next());
+                				}
                 				specification.addArgument(argument);
                 			}
                 		}
