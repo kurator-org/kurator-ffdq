@@ -311,7 +311,7 @@ public class TestUtil {
                 	Iterator<String> argumentGuidIterator = test.getArgumentGuids().iterator();
                 	Iterator<String> ip = params.iterator();
                 	if (ip.hasNext()) { 
-                		// TODO: Stable guids for arguments
+                		// Lookup Stable guids for arguments
                 		Argument argument = null;
                 		String paramString = ip.next();
                 		if (paramString.contains(",")) { 
@@ -339,7 +339,7 @@ public class TestUtil {
                 				}
                 			}
                 		} else { 
-                			// TODO: Set argument guids from ArgumentGuids column.
+                			// Set argument guids from ArgumentGuids column.
                 			if (paramString.startsWith("bdq:")) { 
                 				Parameter parameter = new Parameter(paramString);
                 				argument = new Argument(parameter, "Default value for " + paramString);
@@ -881,6 +881,9 @@ public class TestUtil {
                     throw new IllegalArgumentException("Missing required GUID for test #" + record.getRecordNumber());
                 }
 
+                // TODO: Lookup specification guid and method guid from csv term-version file.
+                
+                
                 String label = record.get(CSV_HEADER_LABEL);
                 String prefLabel = record.get(CSV_HEADER_PREFLABEL);
                 String historyNumber = record.get(CSV_HISTORY_NUMBER);
