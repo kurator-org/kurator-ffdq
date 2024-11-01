@@ -6,7 +6,7 @@
 
     <groupId>org.datakurator</groupId>
     <artifactId>kurator-ffdq</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <name>kurator-ffdq</name>
     <description>Data quality assertion framework. Provides utilities for capturing provenance data and generation of data quality reports using FFDQ.</description>
     <url>http://wiki.datakurator.org/</url>
