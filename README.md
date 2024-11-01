@@ -21,7 +21,7 @@ Available from maven central.
     <dependency>
         <groupId>org.datakurator</groupId>
         <artifactId>kurator-ffdq</artifactId>
-        <version>2.0.2</version>
+        <version>3.0.0</version>
     </dependency>
 
 # Building
@@ -112,7 +112,7 @@ For example, to run the utility on the example data provided in this project use
 
 After generating FFDQ RDF from the spreadsheet of tests and implementing methods tied to test GUIDs in the DQClass, the test runner utility can be used to produce rdf containing report concepts for describing the results.
 
-Using the options below, run the utility from the directory containing the jar files(s) that include the annotated DQ Classes (e.g. event_date_qc-1.0.4-SNAPSHOT.jar)
+Using the options below, run the utility from the directory containing the jar files(s) that include the annotated DQ Classes (e.g. event_date_qc-3.0.5-SNAPSHOT.jar)
 
 * **cls \<arg\>** - Fully qualified name of Java class on the classpath to run tests from
 * **rdf \<arg\>** - Input file containing the rdf representation of the tests
@@ -146,7 +146,7 @@ To use the annotations, in the project that defines the methods and classes corr
         <dependency>
             <groupId>org.datakurator</groupId>
             <artifactId>kurator-ffdq</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>3.0.0</version>
         </dependency>
         
 Provided is a class level annotation that defines an FFDQ Mechanism that implements the test (methods). Example usage of the @Mechanism annotation applied to a class:
