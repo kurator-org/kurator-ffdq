@@ -28,6 +28,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.Specification;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +39,11 @@ import java.util.UUID;
 public class Implementation {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
+    /**
+     * Mechanism implementing this specification.
+     * 
+     * The implementedBy list SHOULD contain only one mechanism.
+     */
     private List<Mechanism> implementedBy;
     private Specification specification;
 
@@ -52,7 +58,7 @@ public class Implementation {
      * <p>Constructor for Implementation.</p>
      *
      * @param specification a {@link org.datakurator.ffdq.model.Specification} object.
-     * @param implementedBy a {@link java.util.List} object.
+     * @param implementedBy a {@link java.util.List} object which should be created with Collections.singletonList(mechanism) 
      */
     public Implementation(Specification specification, List<Mechanism> implementedBy) {
         this.specification = specification;
@@ -108,7 +114,10 @@ public class Implementation {
     }
 
     /**
-     * <p>Setter for the field <code>implementedBy</code>.</p>
+     * Setter for the field implementedBy, specifying the
+     * Mechanism implementing the implementation. 
+     * The provided list of mechanisms should be created with
+     * Collections.singletonList(mechanism). 
      *
      * @param implementedBy a {@link java.util.List} object.
      */

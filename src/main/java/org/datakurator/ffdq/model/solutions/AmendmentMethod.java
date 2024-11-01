@@ -21,9 +21,12 @@
  */
 package org.datakurator.ffdq.model.solutions;
 
+import java.util.List;
+
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.Amendment;
 
@@ -48,7 +51,7 @@ public class AmendmentMethod extends DataQualityMethod {
      * @param contextualizedEnhancement a {@link org.datakurator.ffdq.model.context.Amendment} object.
      */
     public AmendmentMethod(Specification specification, Amendment contextualizedEnhancement) {
-        this.specification = specification;
+        super.specification = specification;
         this.ce = contextualizedEnhancement;
     }
 
@@ -60,6 +63,16 @@ public class AmendmentMethod extends DataQualityMethod {
     @RDF("bdqffdq:forAmendment")
     public Amendment getContextualizedEnhancement() {
         return ce;
+    }
+    
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    @RDFSubject
+    public String getId() {
+        return super.id;
     }
 
     /**
@@ -94,4 +107,31 @@ public class AmendmentMethod extends DataQualityMethod {
     public String getPrefLabel() { 
     	return getLabel();
     }
+    
+	/**
+	 * @return the historyNote
+	 */
+	@RDF("skos:historyNote")
+	public String getHistoryNote() {
+		return super.historyNote;
+	}
+	
+    /**
+     * <p>Getter for the field <code>specification</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.Specification} object.
+     */
+    @RDF("bdqffdq:hasSpecification")
+    public Specification getSpecification() {
+        return super.specification;
+    }
+    
+	/**
+	 * @return any notes
+	 */
+	@RDF("skos:note")
+	public List<String> getNotes() {
+		return super.notes;
+	}
+	
 }

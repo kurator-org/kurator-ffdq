@@ -73,6 +73,9 @@ public class AssertionTest {
     private String issued; // dcterms:issued for DataQualityNeed 
     private String historyNoteSource; // skos:historyNote for Source, on bdqffdq:DataQualityMethod
     private List<String> argumentGuids;
+    private String mechanisms;
+    private String sourceCode;
+    private String issueLabels;
     
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
@@ -867,6 +870,48 @@ public class AssertionTest {
 			argumentGuids = new ArrayList<String>();
 		}
 		return argumentGuids;
+	}
+
+	/**
+	 * @return the mechanisms
+	 */
+	public String getMechanisms() {
+		return mechanisms;
+	}
+
+	/**
+	 * @param mechanisms the mechanisms to set
+	 */
+	public void setMechanisms(String mechanisms) {
+		this.mechanisms = mechanisms;
+	}
+
+	/**
+	 * @return the sourceCode
+	 */
+	public String getSourceCode() {
+		return sourceCode;
+	}
+
+	/**
+	 * @param sourceCode the sourceCode to set
+	 */
+	public void setSourceCode(String sourceCode) {
+		this.sourceCode = sourceCode;
+	}
+
+	/**
+	 * @return the issueLabels
+	 */
+	public String getIssueLabels() {
+		return issueLabels;
+	}
+
+	/**
+	 * @param issueLabels the issueLabels to set
+	 */
+	public void setIssueLabels(String issueLabels) {
+		this.issueLabels = issueLabels;
 	}
 	
 }

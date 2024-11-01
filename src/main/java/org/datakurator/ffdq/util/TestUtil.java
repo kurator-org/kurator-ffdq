@@ -84,6 +84,9 @@ public class TestUtil {
     private final static String CSV_HEADER_NOTE;
     private final static String CSV_HEADER_ISSUED;
     private final static String CSV_HISTORY_NOTE_SOURCE;
+    private final static String CSV_HEADER_MECHANISMS;
+    private final static String CSV_HEADER_SOURCECODE;
+    private final static String CSV_HEADER_ISSUELABELS;
 
     static {
         Properties properties = new Properties();
@@ -118,6 +121,9 @@ public class TestUtil {
             CSV_HEADER_REFERENCES = properties.getProperty("csv.header.references");
             CSV_HEADER_NOTE = properties.getProperty("csv.header.note");
             CSV_HEADER_ISSUED = properties.getProperty("csv.header.issued");
+            CSV_HEADER_MECHANISMS = properties.getProperty("csv.header.mechanisms");
+            CSV_HEADER_SOURCECODE = properties.getProperty("csv.header.sourcecode");
+            CSV_HEADER_ISSUELABELS = properties.getProperty("csv.header.issuelabels");
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -483,13 +489,24 @@ public class TestUtil {
                         model.save(cd);
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
+                        // Add additional metadata properties to the method.
                         if (test.getMethodGuid()!=null) { 
                         	measurementMethod.setId(test.getMethodGuid());
                         }
                         if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
                         	measurementMethod.setHistoryNote(test.getHistoryNoteSource());
                         }
+                        if (test.getMechanisms()!=null && test.getMechanisms().trim().length()>0) { 
+                        	measurementMethod.addNote("Example Implementations: " + test.getMechanisms());
+                        }
+                        if (test.getSourceCode()!=null && test.getSourceCode().trim().length()>0) { 
+                        	measurementMethod.addNote("Example Implementations Source Code: " + test.getSourceCode());
+                        }
+                        if (test.getIssueLabels()!=null && test.getIssueLabels().trim().length()>0) { 
+                        	measurementMethod.addNote(test.getIssueLabels());
+                        }
                         if (iuc!=null) { 
+                            // Iterate through use cases and add policies for any that involve this test.
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
                         		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
@@ -533,13 +550,24 @@ public class TestUtil {
                         model.save(cc);
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
+                        // Add additional metadata properties to the method.
                         if (test.getMethodGuid()!=null) { 
                         	validationMethod.setId(test.getMethodGuid());
                         }
                         if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
                         	validationMethod.setHistoryNote(test.getHistoryNoteSource());
                         }
+                        if (test.getMechanisms()!=null && test.getMechanisms().trim().length()>0) { 
+                        	validationMethod.addNote("Example Implementations: " + test.getMechanisms());
+                        }
+                        if (test.getSourceCode()!=null && test.getSourceCode().trim().length()>0) { 
+                        	validationMethod.addNote("Example Implementations Source Code: " + test.getSourceCode());
+                        }
+                        if (test.getIssueLabels()!=null && test.getIssueLabels().trim().length()>0) { 
+                        	validationMethod.addNote(test.getIssueLabels());
+                        }
                         if (iuc!=null) { 
+                            // Iterate through use cases and add policies for any that involve this test.
                         	while (iuc.hasNext()) { 
                         		String useCaseName = iuc.next();
                         		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
@@ -559,8 +587,6 @@ public class TestUtil {
                         }
                         model.save(validationMethod);
                         break;
-
-
                         
                     case "AMENDMENT":
                         // Define an enhancement in the context of resource type and info elements
@@ -584,13 +610,24 @@ public class TestUtil {
                         model.save(ce);
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
+                        // Add additional metadata properties to the method.
                         if (test.getMethodGuid()!=null) {
                         	amendmentMethod.setId(test.getMethodGuid());
                         }
                         if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
                         	amendmentMethod.setHistoryNote(test.getHistoryNoteSource());
                         }
+                        if (test.getMechanisms()!=null && test.getMechanisms().trim().length()>0) { 
+                        	amendmentMethod.addNote("Example Implementations: " + test.getMechanisms());
+                        }
+                        if (test.getSourceCode()!=null && test.getSourceCode().trim().length()>0) { 
+                        	amendmentMethod.addNote("Example Implementations Source Code: " + test.getSourceCode());
+                        }
+                        if (test.getIssueLabels()!=null && test.getIssueLabels().trim().length()>0) { 
+                        	amendmentMethod.addNote(test.getIssueLabels());
+                        }
                         if (iuc!=null) { 
+                            // Iterate through use cases and add policies for any that involve this test.
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
                         		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
@@ -611,6 +648,7 @@ public class TestUtil {
                         }
                         model.save(amendmentMethod);
                         break;
+                        
                     case "ISSUE":
                         // Define an issue in the context of resource type and information elements
                         criterion = Criterion.fromString(test.getCriterion());
@@ -633,13 +671,24 @@ public class TestUtil {
                         model.save(ci);
                         // Define an amendment method, a specification tied to a criterion in context
                         IssueMethod issueMethod = new IssueMethod(specification, ci);
+                        // Add additional metadata properties to the method.
                         if (test.getMethodGuid()!=null) { 
                         	issueMethod.setId(test.getMethodGuid());
                         }
                         if (test.getHistoryNoteSource()!=null && test.getHistoryNoteSource().length()>0) { 
                         	issueMethod.setHistoryNote(test.getHistoryNoteSource());
                         }
+                        if (test.getMechanisms()!=null && test.getMechanisms().trim().length()>0) { 
+                        	issueMethod.addNote("Example Implementations: " + test.getMechanisms());
+                        }
+                        if (test.getSourceCode()!=null && test.getSourceCode().trim().length()>0) { 
+                        	issueMethod.addNote("Example Implementations Source Code: " + test.getSourceCode());
+                        }
+                        if (test.getIssueLabels()!=null && test.getIssueLabels().trim().length()>0) { 
+                        	issueMethod.addNote(test.getIssueLabels());
+                        }
                         if (iuc!=null) { 
+                            // Iterate through use cases and add policies for any that involve this test.
                        		while (iuc.hasNext()) { 
                        			String useCaseName = iuc.next();
                         		UseCase useCase = ((UseCase)useCaseMap.get(useCaseName));
@@ -931,6 +980,9 @@ public class TestUtil {
                 test.setHistoryNoteSource(record.get(CSV_HISTORY_NOTE_SOURCE));
                 test.setIssued(issued);
                 test.setArgumentGuids(record.get(CSV_HEADER_ARGUMENTGUIDS));
+                test.setMechanisms(record.get(CSV_HEADER_MECHANISMS));
+                test.setSourceCode(record.get(CSV_HEADER_SOURCECODE));
+                test.setIssueLabels(record.get(CSV_HEADER_ISSUELABELS));
                 tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.

@@ -27,6 +27,8 @@ import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
@@ -42,12 +44,13 @@ public class DataQualityMethod {
     
     protected String historyNote;
 
+    protected List<String> notes;
+    
     /**
      * <p>Getter for the field <code>id</code>.</p>
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -68,7 +71,6 @@ public class DataQualityMethod {
      *
      * @return a {@link org.datakurator.ffdq.model.Specification} object.
      */
-    @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
         return specification;
     }
@@ -85,7 +87,6 @@ public class DataQualityMethod {
 	/**
 	 * @return the historyNote
 	 */
-	@RDF("skos:historyNote")
 	public String getHistoryNote() {
 		return historyNote;
 	}
@@ -95,6 +96,26 @@ public class DataQualityMethod {
 	 */
 	public void setHistoryNote(String historyNote) {
 		this.historyNote = historyNote;
+	}
+
+	/**
+	 * @return the notes
+	 */
+	public List<String> getNotes() {
+		return notes;
+	}
+
+	/**
+	 * @param note the note to add to the 
+	 * list of notes
+	 */
+	public void addNote(String note) {
+		if (note!=null && note.length()>0) { 
+			if (this.notes==null) { 
+				this.notes = new ArrayList<String>();
+			}
+			this.notes.add(note);;
+		}
 	}
 
 }

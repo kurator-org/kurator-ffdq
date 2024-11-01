@@ -21,9 +21,12 @@
  */
 package org.datakurator.ffdq.model.solutions;
 
+import java.util.List;
+
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.Validation;
 
@@ -48,7 +51,7 @@ public class ValidationMethod extends DataQualityMethod {
      * @param contextualizedCriterion a {@link org.datakurator.ffdq.model.context.Validation} object.
      */
     public ValidationMethod(Specification specification, Validation contextualizedCriterion) {
-        this.specification = specification;
+        super.specification = specification;
         this.cc = contextualizedCriterion;
     }
 
@@ -62,6 +65,16 @@ public class ValidationMethod extends DataQualityMethod {
         return cc;
     }
 
+    /**
+     * <p>Getter for the field <code>id</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    @RDFSubject
+    public String getId() {
+        return super.id;
+    }
+    
     /**
      * <p>setContextualizedCriterion.</p>
      *
@@ -94,5 +107,31 @@ public class ValidationMethod extends DataQualityMethod {
     public String getPrefLabel() { 
     	return getLabel();
     }
+   
+	/**
+	 * @return the historyNote
+	 */
+	@RDF("skos:historyNote")
+	public String getHistoryNote() {
+		return super.historyNote;
+	}
     
+    /**
+     * <p>Getter for the field <code>specification</code>.</p>
+     *
+     * @return a {@link org.datakurator.ffdq.model.Specification} object.
+     */
+    @RDF("bdqffdq:hasSpecification")
+    public Specification getSpecification() {
+        return super.specification;
+    }
+    
+	/**
+	 * @return any notes
+	 */
+	@RDF("skos:note")
+	public List<String> getNotes() {
+		return super.notes;
+	}
+	
 }

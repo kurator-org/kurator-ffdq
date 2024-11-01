@@ -28,6 +28,7 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.Specification;
 import org.datakurator.ffdq.model.context.Issue;
 
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
@@ -37,9 +38,7 @@ import java.util.UUID;
 })
 @RDFBean("bdqffdq:IssueMethod")
 public class IssueMethod extends DataQualityMethod  {
-    private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Specification specification;
     private Issue ci;
 
     /**
@@ -54,7 +53,7 @@ public class IssueMethod extends DataQualityMethod  {
      * @param ci a {@link org.datakurator.ffdq.model.context.Issue} object.
      */
     public IssueMethod(Specification specification, Issue ci) { 
-    	this.specification = specification;
+    	super.specification = specification;
     	this.ci = ci;
     }
 
@@ -64,7 +63,7 @@ public class IssueMethod extends DataQualityMethod  {
      * @param id a {@link java.lang.String} object.
      */
     public IssueMethod(String id) {
-        this.id = id;
+        super.id = id;
     }
 
     /**
@@ -74,7 +73,7 @@ public class IssueMethod extends DataQualityMethod  {
      */
     @RDFSubject
     public String getId() {
-        return id;
+        return super.id;
     }
 
     /**
@@ -83,7 +82,7 @@ public class IssueMethod extends DataQualityMethod  {
      * @param id a {@link java.lang.String} object.
      */
     public void setId(String id) {
-        this.id = id;
+        super.id = id;
     }
 
     /**
@@ -93,7 +92,7 @@ public class IssueMethod extends DataQualityMethod  {
      */
     @RDF("bdqffdq:hasSpecification")
     public Specification getSpecification() {
-        return specification;
+        return super.specification;
     }
 
     /**
@@ -147,4 +146,20 @@ public class IssueMethod extends DataQualityMethod  {
     public String getPrefLabel() { 
     	return getLabel();
     }
+    
+	/**
+	 * @return the historyNote
+	 */
+	@RDF("skos:historyNote")
+	public String getHistoryNote() {
+		return super.historyNote;
+	}
+	
+	/**
+	 * @return any notes
+	 */
+	@RDF("skos:note")
+	public List<String> getNotes() {
+		return super.notes;
+	}
 }
