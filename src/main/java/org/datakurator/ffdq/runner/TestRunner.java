@@ -35,9 +35,11 @@ import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.model.context.Measure;
 import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
+import org.datakurator.ffdq.model.context.Issue;
 import org.datakurator.ffdq.model.report.*;
 import org.datakurator.ffdq.model.solutions.AmendmentMethod;
 import org.datakurator.ffdq.model.solutions.DataQualityMethod;
+import org.datakurator.ffdq.model.solutions.IssueMethod;
 import org.datakurator.ffdq.model.solutions.MeasurementMethod;
 import org.datakurator.ffdq.model.solutions.ValidationMethod;
 import org.datakurator.ffdq.rdf.FFDQModel;
@@ -66,6 +68,7 @@ public class TestRunner {
     private List<ValidationMethod> validations = new ArrayList<>();
     private List<MeasurementMethod> measures = new ArrayList<>();
     private List<AmendmentMethod> amendments = new ArrayList<>();
+    private List<IssueMethod> issues = new ArrayList<>();
 
     /**
      * <p>Constructor for TestRunner.</p>
@@ -91,49 +94,59 @@ public class TestRunner {
         for (Annotation annotation : cls.getAnnotations()) {
 
             // Find the class level annotation and get the value for mechanism guid
-            if (annotation instanceof org.datakurator.ffdq.annotations.Mechanism) {
+        	if (annotation instanceof org.datakurator.ffdq.annotations.Mechanism) {
 
-            	logger.log(Level.INFO, annotation.toString());
-                       	
-                String mechanismGuid = ((org.datakurator.ffdq.annotations.Mechanism) annotation).value();
-                
-                try { 
-                mechanism = (Mechanism) model.findOne(mechanismGuid, Mechanism.class);
+        		logger.log(Level.INFO, annotation.toString());
 
-                // check to see if the annotation has a label value and override value from rdf if present
-                String mechanismLabel = ((org.datakurator.ffdq.annotations.Mechanism) annotation).label();
-                if (mechanismLabel != null) {
-                    mechanism.setLabel(mechanismLabel);
-                }
-                } catch (Exception e) { 
-                	logger.log(Level.SEVERE, e.getMessage());
-                }
+        		String mechanismGuid = ((org.datakurator.ffdq.annotations.Mechanism) annotation).value();
+       			String mechanismLabel = ((org.datakurator.ffdq.annotations.Mechanism) annotation).label();
 
-                // Query the BDQFFDQ model for test specifications implemented by the mechanism tied to the DQClass
-                Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
+        		try { 
+        			mechanism = (Mechanism) model.findOne(mechanismGuid, Mechanism.class);
 
-                logger.log(Level.INFO, "Count of definedTests=" + Integer.toString(definedTests.size()));
-                
-                // TODO: Implmement handling of tests as DataQualityNeed subclasses, rather than specifications
-                // Map<String, DataQualityNeed> definedTests = model.findTestsForMechanism(mechanismGuid);a
-                //Map<String, DataQualityNeed> definedTests = null;
-            	//definedTests = model.findVersionOfTestsForMechanism(mechanismGuid);
-            	//Iterator<String> keys = definedTests.keySet().iterator();
-            	//while (keys.hasNext()) { 
-            		//logger.log(Level.INFO, keys.next());
-            	//}
-                
-                logger.log(Level.INFO, "Specifications found for Mechanism in RDF: " + definedTests.size());
+        			// check to see if the annotation has a label value and override value from rdf if present
+        			if (mechanismLabel != null) {
+        				mechanism.setLabel(mechanismLabel);
+        			}
+        		} catch (Exception e) { 
+        			mechanism = new Mechanism(mechanismGuid, mechanismLabel);
+        			model.save(mechanism);
+        			logger.log(Level.INFO, "Adding Mechanism instance to model.");
+        			logger.log(Level.WARNING, e.getMessage());
+        		}
 
-                // Process method level annotations and check that test methods in the DQClass are consistent
-                // with Measurement, ValidationAssertion and AmendmentAssertion Methods defined in the RDF
-                processMethods(cls, definedTests);
+        		// TODO: Load defined tests by use case
 
-            }
+        		// Query the BDQFFDQ model for test specifications implemented by the mechanism tied to the DQClass
+        		// Map<String, Specification> definedTests = model.findSpecificationsForMechanism(mechanismGuid);
+
+        		//TODO: don't require the bdqffdq model to specify mechanisms
+        		//definedTests = model.findAllSpecifications();
+
+        		Map<String, DataQualityNeed> definedTests = model.findAllSingleRecordTests("ver");
+
+        		logger.log(Level.INFO, "Count of definedTests=" + Integer.toString(definedTests.size()));
+
+        		// TODO: Implmement handling of tests as DataQualityNeed subclasses, rather than specifications
+        		// Map<String, DataQualityNeed> definedTests = model.findTestsForMechanism(mechanismGuid);a
+        		//Map<String, DataQualityNeed> definedTests = null;
+        		//definedTests = model.findVersionOfTestsForMechanism(mechanismGuid);
+        		//Iterator<String> keys = definedTests.keySet().iterator();
+        		//while (keys.hasNext()) { 
+        		//logger.log(Level.INFO, keys.next());
+        		//}
+
+        		logger.log(Level.INFO, "Specifications found for Mechanism in RDF: " + definedTests.size());
+
+        		// Process method level annotations and check that test methods in the DQClass are consistent
+        		// with Measurement, ValidationAssertion and AmendmentAssertion Methods defined in the RDF
+        		processMethods(cls, definedTests);
+
+        	}
         }
     }
 
-    private void processMethods(Class cls, Map<String, Specification> definedTests) {
+    private void processMethods(Class cls, Map<String, DataQualityNeed> definedTests) {
 
         HashMap<String, AssertionTest> implementedTests = new HashMap<>();
 
@@ -142,6 +155,7 @@ public class TestRunner {
             AssertionTest test = new AssertionTest();
             test.setMethod(javaMethod);
             test.setCls(cls);
+        	logger.log(Level.INFO, javaMethod.getName());
 
             for (Annotation annotation : javaMethod.getAnnotations()) {
 
@@ -229,16 +243,17 @@ public class TestRunner {
 
             for (String guid : missingGuids) {
                 logger.warning("Missing corresponding method in " + cls + " for test \"" +
-                        definedTests.get(guid).getLabel() + "\": " + guid.substring(guid.lastIndexOf(":")+1));
+                        definedTests.get(guid).getIsVersionOf() + "\": " + guid.substring(guid.lastIndexOf(":")+1));
 
                 implementedTests.remove(guid);
             }
         }
+        logger.log(Level.INFO, "Implemented Tests Remaining after removing not found.: " + implementedTests.size());
 
         // Check that all test method in the DQClass have associated metadata in the form of Measurement, ValidationAssertion,
         // and AmendmentAssertion Methods in the BDQFFDQ rdf
         if (!definedGuids.containsAll(implementedGuids)) {
-            logger.warning("Tests declared in Java class via @DQProvides missing corresponding definitions " +
+            logger.warning("Tests declared in Java class via @Provides missing corresponding definitions " +
                     "in the RDF!");
 
             Set<String> missingGuids = new HashSet<>(implementedGuids);
@@ -252,6 +267,7 @@ public class TestRunner {
                 implementedTests.remove(guid);
             }
         }
+        logger.log(Level.INFO, "Implemented Tests Remaining: " + implementedTests.size());
 
         // Include only tests that have both a corresponding implementation in the class and a definition in the rdf
         for (String guid : implementedTests.keySet()) {
@@ -259,78 +275,104 @@ public class TestRunner {
 
             // Add metadata for specification
             if (test.getSpecification() == null) {
-            	Specification specification = definedTests.get(guid);
-            	test.setSpecification(specification.getLabel());
+            	// TODO: lookup specification 
+            	DataQualityNeed specification = definedTests.get(guid);
+            	// Specification specification = definedTests.get(guid);
+            	// test.setSpecification(specification.getLabel());
             }
 
             // TODO: Assumed to be single record for now
             test.setResourceType(AssertionTest.SINGLE_RECORD);
 
             // Get the assertion method from the model and add metadata to the test
-            DataQualityMethod assertionMethod = model.findMethodForSpecification(guid);
-
+            DataQualityMethod assertionMethod = null; 
+            try { 
+            	assertionMethod = model.findMethodForSpecification(guid);
+            } catch (Exception e) { 
+            	logger.log(Level.WARNING, e.getMessage());
+            }
+            
             ResourceType resourceType;
             InformationElement informationElement;
 
-            if (assertionMethod instanceof ValidationMethod) {
+            if (assertionMethod != null) { 
 
-                ValidationMethod validationMethod = (ValidationMethod) assertionMethod;
-                test.setAssertionType(AssertionTest.VALIDATION);
-                validations.add(validationMethod);
+            	if (assertionMethod instanceof ValidationMethod) {
 
-                Validation cc = validationMethod.getValidation();
-                if (test.getDescription() == null) {
-                    test.setDescription(cc.getCriterion().getLabel());
-                }
+            		ValidationMethod validationMethod = (ValidationMethod) assertionMethod;
+            		test.setAssertionType(AssertionTest.VALIDATION);
+            		validations.add(validationMethod);
 
-                test.setResourceType(cc.getResourceType().getLabel());
+            		Validation cc = validationMethod.getValidation();
+            		if (test.getDescription() == null) {
+            			test.setDescription(cc.getCriterion().getLabel());
+            		}
 
-                informationElement = cc.getInformationElements();
+            		test.setResourceType(cc.getResourceType().getLabel());
 
-            } else if (assertionMethod instanceof MeasurementMethod) {
+            		informationElement = cc.getInformationElements();
 
-                MeasurementMethod measurementMethod = (MeasurementMethod) assertionMethod;
-                test.setAssertionType(AssertionTest.MEASURE);
-                measures.add(measurementMethod);
+            	} else if (assertionMethod instanceof MeasurementMethod) {
 
-                Measure cd = measurementMethod.getMeasure();
-                if (test.getDimension() == null) {
-                    test.setDimension(cd.getDimension().getLabel());
-                }
-                test.setResourceType(cd.getResourceType().getLabel());
+            		MeasurementMethod measurementMethod = (MeasurementMethod) assertionMethod;
+            		test.setAssertionType(AssertionTest.MEASURE);
+            		measures.add(measurementMethod);
 
-                informationElement = cd.getInformationElements();
+            		Measure cd = measurementMethod.getMeasure();
+            		if (test.getDimension() == null) {
+            			test.setDimension(cd.getDimension().getLabel());
+            		}
+            		test.setResourceType(cd.getResourceType().getLabel());
 
-            } else if (assertionMethod instanceof AmendmentMethod) {
+            		informationElement = cd.getInformationElements();
 
-                AmendmentMethod amendmentMethod = (AmendmentMethod) assertionMethod;
-                test.setAssertionType(AssertionTest.AMENDMENT);
-                amendments.add(amendmentMethod);
+            	} else if (assertionMethod instanceof AmendmentMethod) {
 
-                Amendment ce = amendmentMethod.getContextualizedEnhancement();
-                if (test.getDescription() == null) {
-                    test.setDescription(ce.getEnhancement().getLabel());
-                }
+            		AmendmentMethod amendmentMethod = (AmendmentMethod) assertionMethod;
+            		test.setAssertionType(AssertionTest.AMENDMENT);
+            		amendments.add(amendmentMethod);
 
-                test.setResourceType(ce.getResourceType().getLabel());
+            		Amendment ce = amendmentMethod.getContextualizedEnhancement();
+            		if (test.getDescription() == null) {
+            			test.setDescription(ce.getEnhancement().getLabel());
+            		}
 
-                informationElement = ce.getInformationElements();
+            		test.setResourceType(ce.getResourceType().getLabel());
 
-            } else {
-                throw new UnsupportedOperationException("Unsupported assertion type: " + assertionMethod.getClass());
-            }
+            		informationElement = ce.getInformationElements();
 
-            // Process parameter level annotations
-            Method method = test.getMethod();
-            try {
-                List<TestParam> params = processParameters(method, informationElement);
-                test.setParameters(params);
-            } catch (Exception e) {
-                throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." +
-                        method.getName(), e);
-            }
+            	} else if (assertionMethod instanceof IssueMethod) {
 
-            tests.put(guid, test);
+            		IssueMethod amendmentMethod = (IssueMethod) assertionMethod;
+            		test.setAssertionType(AssertionTest.AMENDMENT);
+            		issues.add(amendmentMethod);
+
+            		Issue ce = amendmentMethod.getContextualizedIssue();
+            		if (test.getDescription() == null) {
+            			test.setDescription(ce.getCriterion().getLabel());
+            		}
+
+            		test.setResourceType(ce.getResourceType().getLabel());
+
+            		informationElement = ce.getInformationElements();
+
+            	} else {
+            		throw new UnsupportedOperationException("Unsupported assertion type: " + assertionMethod.getClass());
+            	}
+
+            	// Process parameter level annotations
+            	Method method = test.getMethod();
+            	try {
+            		List<TestParam> params = processParameters(method, informationElement);
+            		test.setParameters(params);
+            	} catch (Exception e) {
+            		throw new RuntimeException("Error processing parameters for method: " + cls.getName() + "." +
+            				method.getName(), e);
+            	}
+
+
+            	tests.put(guid, test);
+            } 
         }
     }
 
@@ -604,6 +646,8 @@ public class TestRunner {
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) throws RunnerException {
         Map<String, String> actedUpon = new HashMap<>();
 
+        logger.log(Level.INFO, "invoking test " + test.getLabel());
+        
         for (TestParam param : test.getParameters()) {
             String term = param.getTerm();
             String value = record.get(term);
@@ -613,6 +657,9 @@ public class TestRunner {
 
         try {
             DQResponse response = (DQResponse) test.invoke(instance, record);
+            
+            logger.log(Level.INFO, response.getResultState().toString());
+            
             Result result = new Result();
 
             model.save(response.getResultState());

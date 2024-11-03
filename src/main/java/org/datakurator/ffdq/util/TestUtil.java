@@ -154,6 +154,7 @@ public class TestUtil {
         options.addOption("srcDir", null, true, "The Java sources root directory (e.g. src/main/java)");
         options.addOption("generateClass", null, false, "Generate a new Java class with stub methods for each test");
         options.addOption("appendClass", null, false, "Append to an existing Java class stub methods for new tests");
+        options.addOption("includeBindings", null, false, "Include rdfbean class bindings");
         options.addOption("checkVersion", null, false, "Report on versions in an existing Java class for each test");
         options.addOption("makeGuidList", null, false, "If guidFile is specified and specificationGuid is missing, include new additional guids lists in output.");
 
@@ -177,6 +178,10 @@ public class TestUtil {
             String useCaseFilename = null;
             if (cmd.hasOption("useCaseFile")) {
             	useCaseFilename = cmd.getOptionValue("useCaseFile");
+            }
+            boolean includeBindingClass = false;
+            if (cmd.hasOption("includeBindings")) {
+            	includeBindingClass = true;
             }
             
             boolean doOutputMissingGuidList = false;
@@ -762,7 +767,6 @@ public class TestUtil {
 
             // Write rdf to file
             FileOutputStream out = new FileOutputStream(rdfOut);
-            boolean includeBindingClass = false;
             model.write(format, out, includeBindingClass);
             logger.info("Wrote rdf for tests to: " + new File(rdfOut).getAbsolutePath());
 

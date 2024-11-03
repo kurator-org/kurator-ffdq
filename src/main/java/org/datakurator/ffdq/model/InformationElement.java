@@ -124,11 +124,11 @@ public class InformationElement {
 	}
 
 	/**
-	 * <p>Setter for the field <code>label</code>.</p>
+     * Set the preferred label, currently the rdfs;label.
 	 *
 	 * @param label the label to set
 	 */
-	public void setLabel(String label) {
+	public void setPrefLabel(String label) {
 		this.label = label;
 	}
 	
@@ -141,4 +141,13 @@ public class InformationElement {
     public String getPrefLabel() { 
     	return getLabel();
     }
+    
+	/**
+	 * <p>Setter for the field <code>label</code>.</p>
+	 *
+	 * @param label the label to set
+	 */
+	public void setLabel(String label) {
+		this.label = label;
+	}
 }

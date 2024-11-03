@@ -324,12 +324,36 @@ public class Issue extends DataQualityNeed  {
     	return super.getIsVersionOfURI();
 	}
     
+    /**
+     * Alternate setter for string setter.  
+     * Added to fullfill RDFBeans contract for class.
+     * 
+     * @param baseIRI the IRI
+     */
+	public void setIsVersionOfURI(URI baseIRI) {
+		if (baseIRI != null) { 
+			super.setIsVersionOf(baseIRI.toString());
+		}
+	}
+    
 	/**
 	 * @return the issued as a date
 	 */
 	@RDF("dcterms:issued")
 	public LocalDate getIssuedDate() {
 		return super.getIssuedDate();
+	}
+	
+	/**
+	 * Set issued from a LocalDate.  
+	 * Present as a requirement for RDFBeans support.
+	 * 
+	 * @param localDate to convert into a string and store in issued.
+	 */
+	public void setIssuedDate(LocalDate localDate) { 
+		if (localDate != null) { 
+			super.setIssued(localDate.toString());
+		}
 	}
     
 }

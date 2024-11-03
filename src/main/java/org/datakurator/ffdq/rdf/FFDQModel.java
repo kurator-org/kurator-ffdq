@@ -16,10 +16,15 @@
  */
 package org.datakurator.ffdq.rdf;
 
+import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
+import org.datakurator.ffdq.model.context.Issue;
+import org.datakurator.ffdq.model.context.Measure;
+import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.model.report.Assertion;
 import org.datakurator.ffdq.model.solutions.DataQualityMethod;
 import org.eclipse.rdf4j.model.Model;
@@ -30,6 +35,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by lowery on 11/14/17.
@@ -40,6 +46,8 @@ import java.util.logging.Level;
 public class FFDQModel extends BaseModel {
     private final Vocabulary vocab;
 
+    private final static Logger logger = Logger.getLogger(FFDQModel.class.getName());
+    
     /**
      * <p>Constructor for FFDQModel.</p>
      */
@@ -66,6 +74,23 @@ public class FFDQModel extends BaseModel {
         return (Map<String, Specification>) findAll(Specification.class, sparql, "specification");
     }
     
+    // TODO: Find all specifications for a use case.
+    
+    /**
+     * find all Specifications known to the model.
+     *
+     * @return a {@link java.util.Map} object.
+     */
+    public Map<String, Specification> findAllSpecifications() {
+        Set<String> guids = new HashSet<>();
+
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+                "SELECT ?specification " +
+                "WHERE { ?specification a bdqffdq:Specification }";
+
+        return (Map<String, Specification>) findAll(Specification.class, sparql, "specification");
+    }
+    
     /**
      * <p>findSpecificationsForMechanism.</p> include any tests found.
      *
@@ -80,7 +105,6 @@ public class FFDQModel extends BaseModel {
                 "SELECT ?specification " +
                 "WHERE { optional { ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> .  " +
                 "?implementation bdqffdq:usesSpecification ?spec . } . ?spec dcterms:isVersionOf ?specification }";
-System.out.println(sparql);
         return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
     }
 
@@ -91,14 +115,19 @@ System.out.println(sparql);
      * @return a {@link org.datakurator.ffdq.model.solutions.DataQualityMethod} object.
      */
     public DataQualityMethod findMethodForSpecification(String testGuid) {
+    	DataQualityMethod retval = null;
         String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "SELECT ?method WHERE { " +
                 "{ ?method a bdqffdq:MeasurementMethod } UNION " +
                 "{ ?method a bdqffdq:ValidationMethod } UNION " +
                 "{ ?method a bdqffdq:AmendmentMethod } . " +
                 "?method bdqffdq:hasSpecification <" + testGuid + "> }";
-
-        return (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
+        try { 
+        	retval = (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
+        } catch (RDFBeanException e) { 
+        	logger.log(Level.WARNING, e.getMessage());
+        }
+        return retval;
     }
 
     /**
@@ -132,6 +161,61 @@ System.out.println(sparql);
                 + "?specification bdqffdq:forIssue ?test "
                 + "}";
         return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
+    }
+    
+    /**
+     * find all DataQualityNeeds (Amenement, Validation, Measurement, Issue) defined in the model
+     * 
+     * @param keyMapBy key for the returned map, either test, for the fully qualified name, or
+     * uuid for the bare uuid, or ver for the isVersionOf without the version date. 
+     * 
+     *
+     * @return a {@link java.util.Map} object.
+     */
+    public Map<String, DataQualityNeed> findAllSingleRecordTests(String keyMapBy) {
+    	if (keyMapBy==null) { 
+    		keyMapBy = "test";
+    	}
+    	if (!keyMapBy.equals("test") &&  !keyMapBy.equals("uuid") && ! keyMapBy.equals("ver")) { 
+    		keyMapBy = "test";
+    	}
+    	
+        Set<String> guids = new HashSet<>();
+
+        String id = "test";
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " 
+        		+ "PREFIX dcterms: <http://purl.org/dc/terms/> " 
+                + "SELECT ?test ?uuid ?ver " 
+                + "WHERE { "
+                + "{ "
+                + "  ?test a bdqffdq:Validation . "
+                + "  ?test dcterms:isVersionOf ?ver ."
+                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqcore/terms/','') AS ?uuid ) ."
+                //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
+                + "} UNION { " 
+                + "  ?test a bdqffdq:Amendment . "
+                + "  ?test dcterms:isVersionOf ?ver ."
+                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqcore/terms/','') AS ?uuid ) ."
+                //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
+                + "} UNION { " 
+                + "  ?test a bdqffdq:Measure . "
+                + "  ?test dcterms:isVersionOf ?ver ."
+                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqcore/terms/','') AS ?uuid ) ."
+                //+ "   ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
+                + "} UNION { " 
+                + "  ?test a bdqffdq:Issue . "
+                + "  ?test dcterms:isVersionOf ?ver ."
+                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqcore/terms/','') AS ?uuid ) ."
+                //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
+                + "} "
+                + "}";
+        logger.log(Level.INFO, sparql);
+        Map<String, DataQualityNeed> retval = new HashMap<String,DataQualityNeed>();
+        retval.putAll(findAllMapBy(Validation.class, sparql, id, keyMapBy));
+        retval.putAll(findAllMapBy(Amendment.class, sparql, id, keyMapBy));
+        retval.putAll(findAllMapBy(Measure.class, sparql, id, keyMapBy));
+        retval.putAll(findAllMapBy(Issue.class, sparql, id, keyMapBy));
+        return retval;
     }
     
     /**

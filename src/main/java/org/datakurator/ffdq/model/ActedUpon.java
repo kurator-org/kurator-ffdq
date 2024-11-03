@@ -56,4 +56,23 @@ public class ActedUpon extends InformationElement {
         return composedOf;
     }
 
+    /**
+     * <p>Getter for the field <code>label</code>.</p>
+     *
+     * @return the label
+     */
+    @RDF("rdfs:label")
+	public String getLabel() {
+		return super.label;
+	}
+
+	/**
+	 * <p>Setter for the field <code>label</code>.</p>
+	 *
+	 * @param label the label to set
+	 */
+	public void setLabel(String label) {
+		super.label = label;
+	}
+    
 }
