@@ -227,8 +227,21 @@ FFDQ is a sort of acronym for a conceptual Framework For Data Quality assessment
 
 An example is: https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/java/org/datakurator/data/ffdq/model/report/DataResource.java
 
+# Work in progress
 
-# Updated test generation command with parameters:
+## Work in progress getting data quality reports working again:
+
+Export a copy of the tests with RDFBean class binding axioms in the RDF:
+
+./test-util.sh -config data/tg2_tests.properties -format RDFXML -out TG2_tests.xml -in  data/TG2_tests.csv -guidFile ../bdq/tg2/core/TG2_tests_additional_guids.csv -useCaseFile ../bdq/tg2/core/usecase_test_list.csv -ieGuidFile ../bdq/tg2/core/information_element_guids.csv -includeBindings
+
+Run a test class using the RDF with those bindings.
+
+sh test-runner.sh -format RDFXML -in ../bdq/tg2/core/TG2_test_validation_data_synthetic_occurrence.csv -out output.rdf -rdf TG2_tests.xml -cls org.filteredpush.qc.date.DwCEventDQ -informat csv &> temp.out
+
+## Updated test generation command with parameters:
+
+TODO: Not all needed now, can get additional guids from CSV input.
 
 ./test-util.sh -config data/tg2_tests.properties -format RDFXML -out ../bdq/tg2/core/TG2_tests.xml -in  data/TG2_tests.csv -guidFile ../bdq/tg2/core/TG2_tests_additional_guids.csv -useCaseFile ../bdq/tg2/core/usecase_test_list.csv -ieGuidFile ../bdq/tg2/core/information_element_guids.csv
 

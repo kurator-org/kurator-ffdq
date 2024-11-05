@@ -942,7 +942,9 @@ public class TestUtil {
                 String historyNumber = record.get(CSV_HISTORY_NUMBER);
                 String version = record.get(CSV_HEADER_VERSION);
                 String description = record.get(CSV_HEADER_DESCRIPTION);
-                String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
+                //String criterionLabel = record.get(CSV_HEADER_CRITERION_LABEL);
+                // Construct criterionLabel by stripping first word off of Label.
+                String criterionLabel = label.replaceFirst("^[A-Z]+_", label);
                 String criterion = record.get(CSV_HEADER_CRITERION);
                 String enhancement = record.get(CSV_HEADER_ENHANCEMENT);
                 String specification = record.get(CSV_HEADER_SPECIFICATION);
@@ -967,27 +969,33 @@ public class TestUtil {
                 String note = record.get(CSV_HEADER_NOTE);
                 String historyNoteUrl = record.get(CSV_HISTORY_NOTE_URL);
                 String issued = record.get(CSV_HEADER_ISSUED);
+                String status = record.get("status");
                 
-                List<String> useCaseNames = new ArrayList<String>();
-                if (useCasesForTestString!=null && useCasesForTestString.length()>0) { 
-                	useCaseNames = parseUseCaseString(useCasesForTestString);
+                if (status.equals("recommended")) { 
+                	// only include recommended (current) terms from term-version file
+                	List<String> useCaseNames = new ArrayList<String>();
+                	if (useCasesForTestString!=null && useCasesForTestString.length()>0) { 
+                		useCaseNames = parseUseCaseString(useCasesForTestString);
+                	}
+
+                	AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, authoritiesDefaults, assertionType, resourceType,
+                			dimension, criterion, enhancement, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), 
+                			parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames, examples);
+                	test.setHistoryNumber(historyNumber);
+                	test.setReferences(references);
+                	test.setNote(note);
+                	test.setPrefLabel(prefLabel);
+                	test.setHistoryNoteUrl(historyNoteUrl);
+                	test.setHistoryNoteSource(record.get(CSV_HISTORY_NOTE_SOURCE));
+                	test.setIssued(issued);
+                	test.setArgumentGuids(record.get(CSV_HEADER_ARGUMENTGUIDS));
+                	test.setMechanisms(record.get(CSV_HEADER_MECHANISMS));
+                	test.setSourceCode(record.get(CSV_HEADER_SOURCECODE));
+                	test.setIssueLabels(record.get(CSV_HEADER_ISSUELABELS));
+                	tests.add(test);
+                } else { 
+                	logger.debug("Skipping test " + guid + " with status " + status);
                 }
-                
-                AssertionTest test = new AssertionTest(guid, label, version, description, criterionLabel, specification, authoritiesDefaults, assertionType, resourceType,
-                        dimension, criterion, enhancement, parseInformationElementStr(informationElement), parseInformationElementStr(actedUpon), 
-                        parseInformationElementStr(consulted), parseTestParametersString(testParameters), useCaseNames, examples);
-                test.setHistoryNumber(historyNumber);
-                test.setReferences(references);
-                test.setNote(note);
-                test.setPrefLabel(prefLabel);
-                test.setHistoryNoteUrl(historyNoteUrl);
-                test.setHistoryNoteSource(record.get(CSV_HISTORY_NOTE_SOURCE));
-                test.setIssued(issued);
-                test.setArgumentGuids(record.get(CSV_HEADER_ARGUMENTGUIDS));
-                test.setMechanisms(record.get(CSV_HEADER_MECHANISMS));
-                test.setSourceCode(record.get(CSV_HEADER_SOURCECODE));
-                test.setIssueLabels(record.get(CSV_HEADER_ISSUELABELS));
-                tests.add(test);
             } catch (UnsupportedTypeException e) {
             	// skip record if not supported.
             	logger.error("Unsupported Type, skipping test #" + record.getRecordNumber());

@@ -102,7 +102,7 @@ public class DataQualityDimension {
     public static DataQualityDimension RESOLUTION = new DataQualityDimension("Resolution");
     /** Constant <code>CONSISTENCY</code> */
     public static DataQualityDimension CONSISTENCY = new DataQualityDimension("Consistency");
-    /** Constant <code>LIKELYHOOD</code> */
+    /** Constant <code>LIKELINESS</code> */
     public static DataQualityDimension LIKELYHOOD = new DataQualityDimension("Likelyhood");
     /** Constant <code>VOCAB_MATCH</code> */
     public static DataQualityDimension VOCAB_MATCH = new DataQualityDimension("Vocab Match");
