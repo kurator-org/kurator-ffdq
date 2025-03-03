@@ -25,3 +25,6 @@ data/TG2_supplementary_tests.csv
 data/TG2_multirecord_measure_tests.csv
 results.tsv
 event_date_qc*.jar
+TG2_tests.xml
+output.rdf
+temp.out
