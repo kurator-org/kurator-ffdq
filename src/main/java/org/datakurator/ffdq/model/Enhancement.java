@@ -110,8 +110,8 @@ public class Enhancement {
     public static Enhancement ASSUMEDDEFAULT = new Enhancement("AssumedDefault","https://rs.tdwg.org/bdqenh/terms/AssumedDefault");
     /** Constant <code>CONVERTED</code> */
     public static Enhancement CONVERTED = new Enhancement("Converted","https://rs.tdwg.org/bdqenh/terms/Converted");
-    /** Constant <code>FILLINFROM</code> */
-    public static Enhancement FILLINFROM = new Enhancement("FillInFrom","https://rs.tdwg.org/bdqenh/terms/FillInFrom");
+    /** Constant <code>FILLEDINFROM</code> */
+    public static Enhancement FILLEDINFROM = new Enhancement("FilledInFrom","https://rs.tdwg.org/bdqenh/terms/FilledInFrom");
     /** Constant <code>STANDARDIZED</code> */
     public static Enhancement STANDARDIZED = new Enhancement("Standardized","https://rs.tdwg.org/bdqenh/terms/Standardized");
     /** Constant <code>TRANSPOSED</code> */
@@ -126,10 +126,10 @@ public class Enhancement {
     public static Enhancement fromString(String value) {
         if (value.equalsIgnoreCase(ASSUMEDDEFAULT.getLabel())) return ASSUMEDDEFAULT;
         else if (value.equalsIgnoreCase(CONVERTED.getLabel())) return CONVERTED;
-        else if (value.equalsIgnoreCase(FILLINFROM.getLabel())) return FILLINFROM;
+        else if (value.equalsIgnoreCase(FILLEDINFROM.getLabel())) return FILLEDINFROM;
         else if (value.equalsIgnoreCase(TRANSPOSED.getLabel())) return TRANSPOSED;
         else if (value.equalsIgnoreCase(STANDARDIZED.getLabel())) return STANDARDIZED;
-        else throw new UnsupportedOperationException("Unable to find an bdqenh: term for bdqffdq:Criterion for value: [" + value + "]");
+        else throw new UnsupportedOperationException("Unable to find an bdqenh: term for bdqffdq:Enhancement for value: [" + value + "]");
     }
     
 
