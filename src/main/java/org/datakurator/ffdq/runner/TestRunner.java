@@ -165,8 +165,8 @@ public class TestRunner {
                     if (guid.startsWith("urn:uuid:")){ 
                     	guid = guid.replace("urn:uuid:", "");
                     }
-                    if (!guid.startsWith("https://rs.tdwg.org/bdqcore/terms/")) { 
-                    	guid = "https://rs.tdwg.org/bdqcore/terms/" + guid;
+                    if (!guid.startsWith("https://rs.tdwg.org/bdqtest/terms/")) { 
+                    	guid = "https://rs.tdwg.org/bdqtest/terms/" + guid;
                     }
                     logger.log(Level.INFO, guid);
                     test.setGuid(guid);

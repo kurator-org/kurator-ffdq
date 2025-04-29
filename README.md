@@ -46,7 +46,7 @@ For example:
 
 `./query-util.sh -t competencyquestions/rdf/example.jsonld -q competencyquestions/sparql/results.sparql -o results.tsv`
 
-Example working with the BDQ Core tests (assuming checkout of tdwg/bdq in a directory next to kurator-ffdq):
+Example working with the BDQ Standard tests (assuming checkout of tdwg/bdq in a directory next to kurator-ffdq):
 
 ./query-util.sh -t ../bdq/tg2/core/TG2_tests.ttl -q competencyquestions/sparql/tests_bdqcore.sparql -o results.tsv
 
@@ -135,7 +135,7 @@ Using the query utility mentioned above along with the `postprocess.sparql` quer
 
 TODO: Work in progress, need to match guids for tests (DataQualityNeed subclass instances) to Specifications in model
 
-    sh test-runner.sh -format RDFXML -in ../bdq/tg2/core/TG2_test_validation_data_synthetic_occurrence.csv -out output.rdf -rdf ../bdq/tg2/_review/dist/bdqcore.xml -cls org.filteredpush.qc.date.DwCEventDQ -informat csv &> temp.out
+    sh test-runner.sh -format RDFXML -in ../bdq/tg2/core/TG2_test_validation_data_synthetic_occurrence.csv -out output.rdf -rdf ../bdq/tg2/_review/dist/bdqtest.xml -cls org.filteredpush.qc.date.DwCEventDQ -informat csv &> temp.out
 
 # Annotated DQ Class
 

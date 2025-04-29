@@ -31,7 +31,7 @@ import java.util.Set;
 
 /**
  * This utility class helps provide a mapping between a list of tests 
- * in the form of a bdqcore term-version file and the org.datakurator.ffdq.model 
+ * in the form of a BDQ bdqtest: term-version file and the org.datakurator.ffdq.model 
  * classes.
  */
 public class AssertionTest {
@@ -245,7 +245,7 @@ public class AssertionTest {
     	if (guid==null) { 
     		return guid;
     	} else { 
-    		return "https://rs.tdwg.org/bdqcore/terms/" + guid.replace("urn:uuid:","");
+    		return "https://rs.tdwg.org/bdqtest/terms/" + guid.replace("urn:uuid:","");
     	}
     }
 
