@@ -4,7 +4,7 @@ A library that provides support for using the FFDQ framework for making data qua
 
 [![DOI](https://zenodo.org/badge/72672241.svg)](https://zenodo.org/badge/latestdoi/72672241)
 
-The core of the library provides a set of model classes for serializing/deserializing Java Bean representations of FFDQ concepts to/from rdf in a number of formats. These model classes are located under the `org.datakurator.ffdq.model` packages.
+The core of the library provides a set of model classes for serializing/deserializing Java Bean representations of FFDQ (bdqffdq: in the TDWG BDQ (draft) Standard) concepts to/from rdf in a number of formats. These model classes are located under the `org.datakurator.ffdq.model` packages.
 
 Also provided is a set of utilities that make use of the model classes to generate rdf and run tests implemented in Java. These utilities, listed in order of intended use, are:
 
@@ -21,7 +21,7 @@ Available from maven central.
     <dependency>
         <groupId>org.datakurator</groupId>
         <artifactId>kurator-ffdq</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
     </dependency>
 
 # Building
