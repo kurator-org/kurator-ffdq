@@ -1,6 +1,6 @@
 # kurator-ffdq
 
-A library that provides support for using the FFDQ framework for making data quality assertions.
+A library that provides support for using the TDWG BDQ bdqffdq: framework for making data quality assertions.
 
 [![DOI](https://zenodo.org/badge/72672241.svg)](https://zenodo.org/badge/latestdoi/72672241)
 
