@@ -739,7 +739,7 @@ public class AssertionTest {
 	public void setReferences(String references) {
 		// TODO: Parse into list
 		this.references = references.replace("<ul><li>", "").replace("</li></ul>", "").replaceAll("</li><li>","; ");
-		this.references = this.references.replaceAll("</li> <li>", "; ").replace("</li> </ul>", "");
+		this.references = this.references.replaceAll("</li> <li>", "; ").replace("</li> </ul>", "").replace("<ul> <li>", "");
 	}
 
 	/**
