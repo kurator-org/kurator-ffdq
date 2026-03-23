@@ -256,7 +256,7 @@ public class TestUtil {
             				if (!useCaseMap.containsKey(useCaseLabel)) { 
             					UseCase useCaseInstance = new UseCase();
             					useCaseInstance.setLabel(useCaseLabel);
-            					useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdqffdq/terms/"));
+            					useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdq/terms/"));
             					useCaseMap.put(useCaseLabel, useCaseInstance);
             				}
             				String includedTests = useCaseRecord.get("LabelsOfTestsIncluded");
