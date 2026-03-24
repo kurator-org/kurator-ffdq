@@ -36,6 +36,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +135,123 @@ public class TestUtil {
     private static Map<String,InformationElement> ieMap;
     private static Map<String,String> ieGuidMap;
     
+    /**
+     * Debug/diagnostic summary after loading usecase_test_list.csv:
+     * For each Use Case, report how many test-label tokens were listed, how many match loaded tests,
+     * and show the first few unmatched tokens.
+     *
+     * Call this AFTER you have:
+     *   (a) parsed the tests from TG2_tests.csv into a List<AssertionTest> tests
+     *   (b) loaded the use case file into the map useCaseTestMap (testLabel -> useCaseLabel)
+     */
+    private static void printUseCaseCoverageSummary(
+            Map<String, UseCase> useCaseMap,
+            /* MultiValuedMap<String,String> */ Object useCaseTestMapRaw,
+            List<AssertionTest> tests) {
+    
+        // ---- Adaptation note ----
+        // TestUtil appears to use a MultiValuedMap for useCaseTestMap (e.g., HashSetValuedHashMap).
+        // Since the exact declared type isn't in the snippet, we accept Object and cast below.
+        // If your field is declared as MultiValuedMap<String,String> useCaseTestMap, change the
+        // signature accordingly and remove the cast.
+    
+        @SuppressWarnings("unchecked")
+        final org.apache.commons.collections4.MultiValuedMap<String, String> useCaseTestMap =
+                (org.apache.commons.collections4.MultiValuedMap<String, String>) useCaseTestMapRaw;
+    
+        // 1) Collect the set of test labels that actually exist in TG2_tests.csv (i.e., loaded tests)
+        final Set<String> loadedTestLabels = new LinkedHashSet<>();
+        for (AssertionTest t : tests) {
+            if (t != null && t.getLabel() != null) {
+                loadedTestLabels.add(t.getLabel().trim());
+            }
+        }
+    
+        // 2) Invert useCaseTestMap: useCaseLabel -> tokens (test labels) (preserve order)
+        final Map<String, Set<String>> tokensByUseCase = new LinkedHashMap<>();
+        for (String useCaseLabel : useCaseMap.keySet()) {
+            tokensByUseCase.put(useCaseLabel, new LinkedHashSet<>());
+        }
+    
+        // For each token in the usecase file, add it to each mapped use case.
+        for (String token : useCaseTestMap.keySet()) {
+            if (token == null) { continue; }
+            String testLabelToken = token.trim();
+            if (testLabelToken.isEmpty()) { continue; }
+    
+            for (String useCaseLabel : useCaseTestMap.get(testLabelToken)) {
+                if (useCaseLabel == null) { continue; }
+                String uc = useCaseLabel.trim();
+                // ensure key exists even if useCaseMap was not populated (defensive)
+                tokensByUseCase.computeIfAbsent(uc, k -> new LinkedHashSet<>()).add(testLabelToken);
+            }
+        }
+    
+        // 3) Print summary per use case
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("Use Case coverage summary (usecase_test_list.csv vs TG2_tests.csv)");
+        System.out.println("============================================================");
+        System.out.println("Loaded tests (distinct labels): " + loadedTestLabels.size());
+        System.out.println("Use cases loaded: " + tokensByUseCase.size());
+        System.out.println();
+    
+        // Stable iteration order: whatever order useCaseMap has; if you want alpha, sort keys.
+        for (Map.Entry<String, Set<String>> e : tokensByUseCase.entrySet()) {
+            final String useCaseLabel = e.getKey();
+            final Set<String> tokens = e.getValue();
+    
+            int tokensTotal = tokens.size();
+            int tokensMatched = 0;
+            final List<String> firstUnmatched = new ArrayList<>();
+    
+            for (String tok : tokens) {
+                boolean matched = loadedTestLabels.contains(tok);
+                if (matched) {
+                    tokensMatched++;
+                } else if (firstUnmatched.size() < 10) {
+                    firstUnmatched.add(tok);
+                }
+            }
+    
+            int tokensUnmatched = tokensTotal - tokensMatched;
+    
+            System.out.println("UseCase: " + useCaseLabel);
+            System.out.println("  tokensTotal:     " + tokensTotal);
+            System.out.println("  tokensMatched:   " + tokensMatched);
+            System.out.println("  tokensUnmatched: " + tokensUnmatched);
+    
+            if (!firstUnmatched.isEmpty()) {
+                System.out.println("  firstUnmatched (up to 10): " + firstUnmatched);
+            }
+            System.out.println();
+        }
+    
+        // 4) Optionally: global list of tokens in usecase file that match no loaded test
+        // Useful to quickly spot typos like "DECIMALLATITUDE_NOTEMPTY" missing "VALIDATION_"
+        int globalUnmatchedCount = 0;
+        final List<String> globalFirst20Unmatched = new ArrayList<>();
+        for (String token : useCaseTestMap.keySet()) {
+            if (token == null) { continue; }
+            String tok = token.trim();
+            if (tok.isEmpty()) { continue; }
+    
+            if (!loadedTestLabels.contains(tok)) {
+                globalUnmatchedCount++;
+                if (globalFirst20Unmatched.size() < 20) {
+                    globalFirst20Unmatched.add(tok);
+                }
+            }
+        }
+        System.out.println("Global tokens in usecase file not found in loaded tests: " + globalUnmatchedCount);
+        if (!globalFirst20Unmatched.isEmpty()) {
+            System.out.println("First unmatched tokens (up to 20): " + globalFirst20Unmatched);
+        }
+        System.out.println("============================================================");
+        System.out.println();
+    }
+
+
     /**
      * <p>main.</p>
      *
@@ -283,6 +402,9 @@ public class TestUtil {
             if (guidsProvided) { 
             	tests = addAdditionalGuidsFromFile(additionalGuidFilename, tests);
             }
+
+            // Debug UseCase test coverage summary before we start loading the model, to check how well the use case file matches the test labels in the csv.
+            printUseCaseCoverageSummary(useCaseMap, useCaseTestMap, tests);
 
             // Define a mechanism for the tests
             Mechanism mechanism = new Mechanism(mechanismGuid, mechanismName);
