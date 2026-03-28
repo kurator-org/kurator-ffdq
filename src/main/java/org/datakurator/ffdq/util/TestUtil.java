@@ -264,9 +264,9 @@ public class TestUtil {
         options.addRequiredOption("in", null, true, "Input CSV file containing list of tests");
         options.addRequiredOption("out", null, true, "Output file for the rdf representation of the tests");
         
-        options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships, if not specfied, UseCases column in InputFile will be used, if specified, will override InputFile.");
-        options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
-        options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels.");
+        options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships. Format: \"UseCase\",\"LabelsOfTestsIncluded\" (pipe-delimited test labels). If not specified, UseCases column in InputFile will be used; if specified, will override InputFile.");
+        options.addOption("guidFile", null, true, "Optional Input file containing Method and Specification guids for each test. Format: \"GUID\",\"Label\",\"Method\",\"Specification\"");
+        options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels. Format: \"guid\",\"label\"");
         options.addOption("policyGuidFile", null, true, "Optional Input file containing stable Policy GUIDs keyed by (UseCase, PolicyType). Format: \"UseCase\",\"PolicyType\",\"PolicyGuid\"");
         options.addOption("suggestPolicyGuidUpdates", null, false, "Print suggested CSV lines for missing (UseCase, PolicyType) policy GUID mappings to stdout at end of execution.");
         
@@ -444,11 +444,7 @@ public class TestUtil {
                 		if (tempMG==null) { 
                 			tempMG = "urn:uuid:" + UUID.randomUUID();
                 		}
-                		String tempPG = test.getMethodGuid();
-                		if (tempPG==null) { 
-                			tempPG = "urn:uuid:" + UUID.randomUUID();
-                		}
-                		System.out.println('"' + test.getGuid() + "\",\"" + test.getLabel() + "\",\"" +  tempMG + "\",\"" + tempS.getId() + "\",\"" + tempPG + '"');
+                		System.out.println('"' + test.getGuid() + "\",\"" + test.getLabel() + "\",\"" +  tempMG + "\",\"" + tempS.getId() + '"');
                 	}
                 }
                 List<String> params = test.getTestParameters();
@@ -1058,7 +1054,7 @@ public class TestUtil {
     /**
      * Given a file containing additional guids and a list of tests, add the relevant guids to each test.
      * 
-     * @param additionalGuidFilename file containing guids for method, contexturalized, and policy concepts for each test.
+     * @param additionalGuidFilename file containing guids for method and specification concepts for each test. Format: "GUID","Label","Method","Specification"
      * @param tests a list of AssertionTests to which to add additional guids
      * @return the provided list of tests, with guids added.
      */
@@ -1066,7 +1062,6 @@ public class TestUtil {
 
         Map<String,String> methodMap = new HashMap<String,String>();
         Map<String,String> specificationGuidMap = new HashMap<String,String>();
-        Map<String,String> policyMap = new HashMap<String,String>();
         if (additionalGuidFilename != null && additionalGuidFilename.length()>0) {
         	logger.info(additionalGuidFilename);
         	File guidFile = new File(additionalGuidFilename);
@@ -1083,11 +1078,7 @@ public class TestUtil {
         				String method = guidRecord.get("Method").trim();
         				methodMap.put(testGuid, method);
         				String specificationGuid = guidRecord.get("Specification").trim();
-        				//logger.info(testGuid);
-        				//logger.info(specificationGuid);
         				specificationGuidMap.put(testGuid, specificationGuid);
-        				String poliicy = guidRecord.get("Policy").trim();
-        				policyMap.put(testGuid, poliicy);
         			}
         			for (AssertionTest test : tests) {
         				if (methodMap.containsKey(test.getGuid())) { 
@@ -1095,9 +1086,6 @@ public class TestUtil {
         				}
         				if (specificationGuidMap.containsKey(test.getGuid())) { 
         					test.setSpecificationGuid(specificationGuidMap.get(test.getGuid()));
-        				}
-        				if (policyMap.containsKey(test.getGuid())) { 
-        					test.setPolicyGuid(policyMap.get(test.getGuid()));
         				}
         			}
         		} catch (IOException e) { 
