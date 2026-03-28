@@ -264,9 +264,11 @@ public class TestUtil {
         options.addRequiredOption("in", null, true, "Input CSV file containing list of tests");
         options.addRequiredOption("out", null, true, "Output file for the rdf representation of the tests");
         
-        options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships, if not specfied, UseCases column in InputFile will be used, if specified, will override InputFile.");
-        options.addOption("guidFile", null, true, "Optional Input file containing Method/Contexturalized/Policy guids for each test.");
-        options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels.");
+        options.addOption("useCaseFile", null, true, "Optional Input file containing UseCase-Test relationships. Format: \"UseCase\",\"LabelsOfTestsIncluded\" (pipe-delimited test labels). If not specified, UseCases column in InputFile will be used; if specified, will override InputFile.");
+        options.addOption("guidFile", null, true, "Optional Input file containing Method and Specification guids for each test. Format: \"GUID\",\"Label\",\"Method\",\"Specification\"");
+        options.addOption("ieGuidFile", null, true, "Optional Input file containing guids for each Information Element with their labels. Format: \"guid\",\"label\"");
+        options.addOption("policyGuidFile", null, true, "Optional Input file containing stable Policy GUIDs keyed by (UseCase, PolicyType). Format: \"UseCase\",\"PolicyType\",\"PolicyGuid\"");
+        options.addOption("suggestPolicyGuidUpdates", null, false, "Print suggested CSV lines for missing (UseCase, PolicyType) policy GUID mappings to stdout at end of execution.");
         
         options.addOption("format", null, true, "Output format (RDFXML, TURTLE, JSON-LD, N3, NTRIPLES)");
 
@@ -320,6 +322,16 @@ public class TestUtil {
             	ieGuidsProvided = true;
             }
             ieMap = new HashMap<String,InformationElement>();
+            
+            boolean policyGuidsProvided = false;
+            Map<String, String> policyGuidFileMap = new HashMap<String, String>();
+            if (cmd.hasOption("policyGuidFile")) {
+            	String policyGuidFilename = cmd.getOptionValue("policyGuidFile");
+            	policyGuidFileMap = loadPolicyGuidsFromFile(policyGuidFilename);
+            	policyGuidsProvided = true;
+            }
+            boolean suggestPolicyGuidUpdates = cmd.hasOption("suggestPolicyGuidUpdates");
+            Map<String, String> missingPolicyGuids = new LinkedHashMap<String, String>();
             
             if (cmd.hasOption("format")) {
                 String value = cmd.getOptionValue("format");
@@ -432,11 +444,7 @@ public class TestUtil {
                 		if (tempMG==null) { 
                 			tempMG = "urn:uuid:" + UUID.randomUUID();
                 		}
-                		String tempPG = test.getMethodGuid();
-                		if (tempPG==null) { 
-                			tempPG = "urn:uuid:" + UUID.randomUUID();
-                		}
-                		System.out.println('"' + test.getGuid() + "\",\"" + test.getLabel() + "\",\"" +  tempMG + "\",\"" + tempS.getId() + "\",\"" + tempPG + '"');
+                		System.out.println('"' + test.getGuid() + "\",\"" + test.getLabel() + "\",\"" +  tempMG + "\",\"" + tempS.getId() + '"');
                 	}
                 }
                 List<String> params = test.getTestParameters();
@@ -642,7 +650,18 @@ public class TestUtil {
                         			List<MeasurementPolicy> measPolList = new ArrayList<MeasurementPolicy>();
                         			pol = new MeasurementPolicy();
                         			pol.setUseCase(useCase);
-                        			if (test.getPolicyGuid()!=null) { 
+                        			String policyKey = useCaseName + "|MeasurementPolicy";
+                        			if (policyGuidsProvided) {
+                        				String pguid = policyGuidFileMap.get(policyKey);
+                        				if (pguid != null) {
+                        					pol.setId(pguid);
+                        				} else {
+                        					if (!missingPolicyGuids.containsKey(policyKey)) {
+                        						missingPolicyGuids.put(policyKey, "urn:uuid:" + UUID.randomUUID().toString());
+                        					}
+                        					pol.setId(missingPolicyGuids.get(policyKey));
+                        				}
+                        			} else if (test.getPolicyGuid()!=null) { 
                         				pol.setId(test.getPolicyGuid());
                         			}
                         		} else { 
@@ -702,7 +721,18 @@ public class TestUtil {
                         		if (!useCaseValidationPolicyMap.containsKey(useCase)) {
                         			pol = new ValidationPolicy();
                         			pol.setUseCase(useCase);
-                        			if (test.getPolicyGuid()!=null) { 
+                        			String policyKey = useCaseName + "|ValidationPolicy";
+                        			if (policyGuidsProvided) {
+                        				String pguid = policyGuidFileMap.get(policyKey);
+                        				if (pguid != null) {
+                        					pol.setId(pguid);
+                        				} else {
+                        					if (!missingPolicyGuids.containsKey(policyKey)) {
+                        						missingPolicyGuids.put(policyKey, "urn:uuid:" + UUID.randomUUID().toString());
+                        					}
+                        					pol.setId(missingPolicyGuids.get(policyKey));
+                        				}
+                        			} else if (test.getPolicyGuid()!=null) { 
                         				pol.setId(test.getPolicyGuid());
                         			}
                         		} else { 
@@ -763,7 +793,18 @@ public class TestUtil {
                         			List<AmendmentPolicy> measPolList = new ArrayList<AmendmentPolicy>();
                         			pol = new AmendmentPolicy();
                         			pol.setUseCase(useCase);
-                        			if (test.getPolicyGuid()!=null) { 
+                        			String policyKey = useCaseName + "|AmendmentPolicy";
+                        			if (policyGuidsProvided) {
+                        				String pguid = policyGuidFileMap.get(policyKey);
+                        				if (pguid != null) {
+                        					pol.setId(pguid);
+                        				} else {
+                        					if (!missingPolicyGuids.containsKey(policyKey)) {
+                        						missingPolicyGuids.put(policyKey, "urn:uuid:" + UUID.randomUUID().toString());
+                        					}
+                        					pol.setId(missingPolicyGuids.get(policyKey));
+                        				}
+                        			} else if (test.getPolicyGuid()!=null) { 
                         				pol.setId(test.getPolicyGuid());
                         			}
                         		} else { 
@@ -824,7 +865,18 @@ public class TestUtil {
                         			List<IssuePolicy> measPolList = new ArrayList<IssuePolicy>();
                         			pol = new IssuePolicy();
                         			pol.setUseCase(useCase);
-                        			if (test.getPolicyGuid()!=null) { 
+                        			String policyKey = useCaseName + "|IssuePolicy";
+                        			if (policyGuidsProvided) {
+                        				String pguid = policyGuidFileMap.get(policyKey);
+                        				if (pguid != null) {
+                        					pol.setId(pguid);
+                        				} else {
+                        					if (!missingPolicyGuids.containsKey(policyKey)) {
+                        						missingPolicyGuids.put(policyKey, "urn:uuid:" + UUID.randomUUID().toString());
+                        					}
+                        					pol.setId(missingPolicyGuids.get(policyKey));
+                        				}
+                        			} else if (test.getPolicyGuid()!=null) { 
                         				pol.setId(test.getPolicyGuid());
                         			}
                         		} else { 
@@ -972,6 +1024,24 @@ public class TestUtil {
                 generator.writeOut(new FileOutputStream(javaSrc));
                 logger.info("Wrote java source file for class to: " + javaSrc.getAbsolutePath());
             }
+
+            // Print suggested policy GUID CSV lines for missing mappings if requested
+            if (suggestPolicyGuidUpdates) {
+            	if (!missingPolicyGuids.isEmpty()) {
+            		System.out.println('"' + "UseCase" + "\"," + '"' + "PolicyType" + "\"," + '"' + "PolicyGuid" + '"');
+            		List<String> sortedKeys = new ArrayList<>(missingPolicyGuids.keySet());
+            		Collections.sort(sortedKeys);
+            		for (String key : sortedKeys) {
+            			String[] parts = key.split("\\|", 2);
+            			String useCaseOut = parts[0];
+            			String policyTypeOut = parts[1];
+            			String guid = missingPolicyGuids.get(key);
+            			System.out.println('"' + useCaseOut + "\"," + '"' + policyTypeOut + "\"," + '"' + guid + '"');
+            		}
+            	} else {
+            		logger.info("No missing policy GUID mappings found.");
+            	}
+            }
         } catch (ParseException e) {
             System.out.println("ERROR: " + e.getMessage() + "\n");
 
@@ -984,7 +1054,7 @@ public class TestUtil {
     /**
      * Given a file containing additional guids and a list of tests, add the relevant guids to each test.
      * 
-     * @param additionalGuidFilename file containing guids for method, contexturalized, and policy concepts for each test.
+     * @param additionalGuidFilename file containing guids for method and specification concepts for each test. Format: "GUID","Label","Method","Specification"
      * @param tests a list of AssertionTests to which to add additional guids
      * @return the provided list of tests, with guids added.
      */
@@ -992,7 +1062,6 @@ public class TestUtil {
 
         Map<String,String> methodMap = new HashMap<String,String>();
         Map<String,String> specificationGuidMap = new HashMap<String,String>();
-        Map<String,String> policyMap = new HashMap<String,String>();
         if (additionalGuidFilename != null && additionalGuidFilename.length()>0) {
         	logger.info(additionalGuidFilename);
         	File guidFile = new File(additionalGuidFilename);
@@ -1009,11 +1078,7 @@ public class TestUtil {
         				String method = guidRecord.get("Method").trim();
         				methodMap.put(testGuid, method);
         				String specificationGuid = guidRecord.get("Specification").trim();
-        				//logger.info(testGuid);
-        				//logger.info(specificationGuid);
         				specificationGuidMap.put(testGuid, specificationGuid);
-        				String poliicy = guidRecord.get("Policy").trim();
-        				policyMap.put(testGuid, poliicy);
         			}
         			for (AssertionTest test : tests) {
         				if (methodMap.containsKey(test.getGuid())) { 
@@ -1021,9 +1086,6 @@ public class TestUtil {
         				}
         				if (specificationGuidMap.containsKey(test.getGuid())) { 
         					test.setSpecificationGuid(specificationGuidMap.get(test.getGuid()));
-        				}
-        				if (policyMap.containsKey(test.getGuid())) { 
-        					test.setPolicyGuid(policyMap.get(test.getGuid()));
         				}
         			}
         		} catch (IOException e) { 
@@ -1255,6 +1317,46 @@ public class TestUtil {
         }
     	
     	return ieGuidMapLoad;
+    }
+    
+    /**
+     * Load policy GUIDs from a CSV file keyed by (UseCase, PolicyType).
+     * Expected CSV format with header: "UseCase","PolicyType","PolicyGuid"
+     * 
+     * @param filename path to the policy guid CSV file
+     * @return map with composite key "UseCase|PolicyType" -> PolicyGuid
+     */
+    private static Map<String, String> loadPolicyGuidsFromFile(String filename) {
+    	Map<String, String> map = new HashMap<String, String>();
+    	if (filename != null && filename.length() > 0) {
+    		logger.info("Loading policy GUIDs from file: " + filename);
+    		File guidFile = new File(filename);
+    		logger.info("Policy guid file readable: " + guidFile.canRead());
+    		if (guidFile.canRead()) {
+    			try (FileReader reader = new FileReader(guidFile);
+    					CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+    				Map<String, Integer> headers = csvParser.getHeaderMap();
+    				if (!headers.containsKey("UseCase") || !headers.containsKey("PolicyType") || !headers.containsKey("PolicyGuid")) {
+    					logger.error("Policy guid file missing required columns: UseCase, PolicyType, PolicyGuid. Got: " + headers.keySet());
+    					return map;
+    				}
+    				List<CSVRecord> records = csvParser.getRecords();
+    				for (CSVRecord record : records) {
+    					String useCase = record.get("UseCase").trim();
+    					String policyType = record.get("PolicyType").trim();
+    					String policyGuid = record.get("PolicyGuid").trim();
+    					if (useCase.length() > 0 && policyType.length() > 0 && policyGuid.length() > 0) {
+    						map.put(useCase + "|" + policyType, policyGuid);
+    					}
+    				}
+    			} catch (IOException e) {
+    				logger.error("Error reading policy guid file: " + e.getMessage());
+    			}
+    		} else {
+    			logger.error("Cannot read policy guid file: " + filename);
+    		}
+    	}
+    	return map;
     }
     
     /**
