@@ -150,7 +150,17 @@ public class AssertionTest {
         this.examples = examples;
 
         // Validate
-        if (!Arrays.asList(SINGLE_RECORD, MULTI_RECORD).contains(resourceType.toUpperCase())) {
+        // Normalise by stripping a leading CURIE prefix (e.g. "bdqffdq:") so
+        // that both "SingleRecord" and "bdqffdq:SingleRecord" are accepted.
+        String normalizedResourceType = resourceType;
+        int colonIdx = resourceType.indexOf(':');
+        if (colonIdx > 0
+                && !resourceType.startsWith("http://")
+                && !resourceType.startsWith("https://")
+                && !resourceType.startsWith("urn:")) {
+            normalizedResourceType = resourceType.substring(colonIdx + 1);
+        }
+        if (!Arrays.asList(SINGLE_RECORD, MULTI_RECORD).contains(normalizedResourceType.toUpperCase())) {
             throw new IllegalArgumentException("Invalid value for resource type \"" + resourceType + "\" for test: "
                     + guid);
         }

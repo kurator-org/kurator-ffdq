@@ -25,6 +25,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
 
@@ -69,7 +70,7 @@ public class Enhancement {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "bdqenh:")
+    @RDFSubject(prefix = "https://rs.tdwg.org/bdqenh/terms/")
     public String getId() {
     	if (id.startsWith("https://rs.tdwg.org/bdqenh/terms/")) { 
     		return id.replace("https://rs.tdwg.org/bdqenh/terms/", "");
@@ -124,11 +125,12 @@ public class Enhancement {
      * @return a {@link org.datakurator.ffdq.model.Enhancement} object.
      */
     public static Enhancement fromString(String value) {
-        if (value.equalsIgnoreCase(ASSUMEDDEFAULT.getLabel())) return ASSUMEDDEFAULT;
-        else if (value.equalsIgnoreCase(CONVERTED.getLabel())) return CONVERTED;
-        else if (value.equalsIgnoreCase(FILLEDINFROM.getLabel())) return FILLEDINFROM;
-        else if (value.equalsIgnoreCase(TRANSPOSED.getLabel())) return TRANSPOSED;
-        else if (value.equalsIgnoreCase(STANDARDIZED.getLabel())) return STANDARDIZED;
+        String localName = Namespace.localNameFor(value);
+        if (localName.equalsIgnoreCase(ASSUMEDDEFAULT.getLabel())) return ASSUMEDDEFAULT;
+        else if (localName.equalsIgnoreCase(CONVERTED.getLabel())) return CONVERTED;
+        else if (localName.equalsIgnoreCase(FILLEDINFROM.getLabel())) return FILLEDINFROM;
+        else if (localName.equalsIgnoreCase(TRANSPOSED.getLabel())) return TRANSPOSED;
+        else if (localName.equalsIgnoreCase(STANDARDIZED.getLabel())) return STANDARDIZED;
         else throw new UnsupportedOperationException("Unable to find an bdqenh: term for bdqffdq:Enhancement for value: [" + value + "]");
     }
     

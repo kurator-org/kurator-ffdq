@@ -25,6 +25,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
 
@@ -68,7 +69,7 @@ public class Criterion {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "bdqcrit:")
+    @RDFSubject(prefix = "https://rs.tdwg.org/bdqcrit/terms/")
     public String getId() {
     	if (id.startsWith("https://rs.tdwg.org/bdqcrit/terms/")) { 
     		return id.replace("https://rs.tdwg.org/bdqcrit/terms/", "");
@@ -129,14 +130,15 @@ public class Criterion {
      * @return a {@link org.datakurator.ffdq.model.Criterion} object.
      */
     public static Criterion fromString(String value) {
-        if (value.equalsIgnoreCase(COMPLETE.getLabel())) return COMPLETE;
-        else if (value.equalsIgnoreCase(CONSISTENT.getLabel())) return CONSISTENT;
-        else if (value.equalsIgnoreCase(FOUND.getLabel())) return FOUND;
-        else if (value.equalsIgnoreCase(INRANGE.getLabel())) return INRANGE;
-        else if (value.equalsIgnoreCase(LIKELY.getLabel())) return LIKELY;
-        else if (value.equalsIgnoreCase(NOTEMPTY.getLabel())) return NOTEMPTY;
-        else if (value.equalsIgnoreCase(STANDARD.getLabel())) return STANDARD;
-        else if (value.equalsIgnoreCase(UNAMBIGUOUS.getLabel())) return UNAMBIGUOUS;
+        String localName = Namespace.localNameFor(value);
+        if (localName.equalsIgnoreCase(COMPLETE.getLabel())) return COMPLETE;
+        else if (localName.equalsIgnoreCase(CONSISTENT.getLabel())) return CONSISTENT;
+        else if (localName.equalsIgnoreCase(FOUND.getLabel())) return FOUND;
+        else if (localName.equalsIgnoreCase(INRANGE.getLabel())) return INRANGE;
+        else if (localName.equalsIgnoreCase(LIKELY.getLabel())) return LIKELY;
+        else if (localName.equalsIgnoreCase(NOTEMPTY.getLabel())) return NOTEMPTY;
+        else if (localName.equalsIgnoreCase(STANDARD.getLabel())) return STANDARD;
+        else if (localName.equalsIgnoreCase(UNAMBIGUOUS.getLabel())) return UNAMBIGUOUS;
         else throw new UnsupportedOperationException("Unable to find an bdqcrit: term for bdqffdq:Criterion for value: [" + value + "]");
     }
 

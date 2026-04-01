@@ -25,6 +25,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
 
@@ -48,10 +49,14 @@ public class Dimension {
     /**
      * <p>Constructor for Dimension.</p>
      *
-     * @param label a {@link java.lang.String} object.
+     * @param label a {@link java.lang.String} object.  May be a bare local
+     *              name (e.g., {@code "Conformance"}), a CURIE (e.g.,
+     *              {@code "bdqdim:Conformance"}), or a full IRI.  CURIEs and
+     *              full IRIs are normalised to the bare local name so that the
+     *              resulting RDF subject is a well-formed IRI.
      */
     public Dimension(String label) {
-        this.label = label;
+        this.label = Namespace.localNameFor(label);
     }
 
     /**
@@ -66,7 +71,7 @@ public class Dimension {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "bdqdim:")
+    @RDFSubject(prefix = "https://rs.tdwg.org/bdqdim/terms/")
     public String getId() {
         return label;
     }
@@ -129,17 +134,18 @@ public class Dimension {
      * @return a {@link org.datakurator.ffdq.model.Dimension} object.
      */
     public static Dimension fromString(String value) {
-        if (value.equalsIgnoreCase(VALUE.getLabel())) return VALUE;
-        else if (value.equalsIgnoreCase(VOCAB_MATCH.getLabel())) return VOCAB_MATCH;
-        else if (value.equalsIgnoreCase(CONFORMANCE.getLabel())) return CONFORMANCE;
-        else if (value.equalsIgnoreCase(CONSISTENCY.getLabel())) return CONSISTENCY;
-        else if (value.equalsIgnoreCase(RESOLUTION.getLabel())) return RESOLUTION;
-        else if (value.equalsIgnoreCase(LIKELYNESS.getLabel())) return LIKELYNESS;
-        else if (value.equalsIgnoreCase(COMPLETENESS.getLabel())) return COMPLETENESS;
-        else if (value.equalsIgnoreCase(ACCURACY.getLabel())) return ACCURACY;
-        else if (value.equalsIgnoreCase(PRECISION.getLabel())) return PRECISION;
-        else if (value.equalsIgnoreCase(UNIQUENESS.getLabel())) return UNIQUENESS;
-        else if (value.equalsIgnoreCase(RELIABILITY.getLabel())) return RELIABILITY;
+        String localName = Namespace.localNameFor(value);
+        if (localName.equalsIgnoreCase(VALUE.getLabel())) return VALUE;
+        else if (localName.equalsIgnoreCase(VOCAB_MATCH.getLabel())) return VOCAB_MATCH;
+        else if (localName.equalsIgnoreCase(CONFORMANCE.getLabel())) return CONFORMANCE;
+        else if (localName.equalsIgnoreCase(CONSISTENCY.getLabel())) return CONSISTENCY;
+        else if (localName.equalsIgnoreCase(RESOLUTION.getLabel())) return RESOLUTION;
+        else if (localName.equalsIgnoreCase(LIKELYNESS.getLabel())) return LIKELYNESS;
+        else if (localName.equalsIgnoreCase(COMPLETENESS.getLabel())) return COMPLETENESS;
+        else if (localName.equalsIgnoreCase(ACCURACY.getLabel())) return ACCURACY;
+        else if (localName.equalsIgnoreCase(PRECISION.getLabel())) return PRECISION;
+        else if (localName.equalsIgnoreCase(UNIQUENESS.getLabel())) return UNIQUENESS;
+        else if (localName.equalsIgnoreCase(RELIABILITY.getLabel())) return RELIABILITY;
         else throw new UnsupportedOperationException("Unable to find an ffdq:Dimension for value: [" + value + "]");
     }
 }
