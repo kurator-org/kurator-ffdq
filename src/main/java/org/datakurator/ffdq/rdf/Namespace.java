@@ -141,4 +141,66 @@ public class Namespace {
             throw new RuntimeException("Invalid information element \"" + value + "\". Must be of the form prefix:term ");
         }
     }
+
+    /**
+     * Expand a CURIE-form string to a full IRI.  If the value is already a
+     * full IRI (starts with {@code http://}, {@code https://}, or
+     * {@code urn:}) it is returned unchanged.  If the value is a CURIE whose
+     * prefix is registered in the namespace map, it is expanded.  Bare local
+     * names (no colon, or unrecognised prefix) are returned unchanged.
+     *
+     * @param value a CURIE like {@code bdqffdq:SingleRecord}, a full IRI, or
+     *              a bare local name
+     * @return the expanded full IRI, or the original value if no expansion
+     *         was possible
+     */
+    public static String expandCurie(String value) {
+        if (value == null || value.isEmpty()) return value;
+        if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("urn:")) {
+            return value;
+        }
+        int colonIdx = value.indexOf(':');
+        if (colonIdx > 0) {
+            String prefix = value.substring(0, colonIdx);
+            String term = value.substring(colonIdx + 1);
+            String nsUri = nsPrefixes.get(prefix);
+            if (nsUri != null) {
+                return nsUri + term;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Extract the local name from a full IRI, a CURIE whose prefix is
+     * registered in the namespace map, or a bare local name.
+     *
+     * <p>Examples:
+     * <ul>
+     *   <li>{@code "bdqdim:Conformance"} &rarr; {@code "Conformance"}</li>
+     *   <li>{@code "https://rs.tdwg.org/bdqdim/terms/Conformance"} &rarr; {@code "Conformance"}</li>
+     *   <li>{@code "Conformance"} &rarr; {@code "Conformance"}</li>
+     * </ul>
+     *
+     * @param value a full IRI, CURIE, or bare local name
+     * @return the local name portion
+     */
+    public static String localNameFor(String value) {
+        if (value == null || value.isEmpty()) return value;
+        if (value.startsWith("http://") || value.startsWith("https://")) {
+            int idx = Math.max(value.lastIndexOf('/'), value.lastIndexOf('#'));
+            if (idx >= 0 && idx < value.length() - 1) {
+                return value.substring(idx + 1);
+            }
+            return value;
+        }
+        int colonIdx = value.indexOf(':');
+        if (colonIdx > 0) {
+            String prefix = value.substring(0, colonIdx);
+            if (nsPrefixes.containsKey(prefix)) {
+                return value.substring(colonIdx + 1);
+            }
+        }
+        return value;
+    }
 }

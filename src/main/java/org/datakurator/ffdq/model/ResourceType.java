@@ -25,6 +25,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ public class ResourceType {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "bdqffdq:")
+    @RDFSubject(prefix = "https://rs.tdwg.org/bdqffdq/terms/")
     public String getId() {
         return label;
     }
@@ -101,8 +102,9 @@ public class ResourceType {
      * @return a {@link org.datakurator.ffdq.model.ResourceType} object.
      */
     public static ResourceType fromString(String value) {
-        if (value.equalsIgnoreCase(SINGLE_RECORD.label)) return SINGLE_RECORD;
-        else if (value.equalsIgnoreCase(MULTI_RECORD.label)) return MULTI_RECORD;
+        String localName = Namespace.localNameFor(value);
+        if (localName.equalsIgnoreCase(SINGLE_RECORD.label)) return SINGLE_RECORD;
+        else if (localName.equalsIgnoreCase(MULTI_RECORD.label)) return MULTI_RECORD;
         else throw new UnsupportedOperationException("Unable to find an ffdq:ResourceType for value: " + value);
     }
 
