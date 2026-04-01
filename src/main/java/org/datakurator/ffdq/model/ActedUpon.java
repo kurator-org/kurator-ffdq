@@ -20,7 +20,8 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
  */
 @RDFNamespaces({
     "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-     "rdfs = http://www.w3.org/2000/01/rdf-schema#"
+    "skos = http://www.w3.org/2004/02/skos/core#",
+    "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:ActedUpon")
 public class ActedUpon extends InformationElement {
