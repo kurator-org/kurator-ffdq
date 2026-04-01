@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.Namespace;
 
 @RDFNamespaces({
     "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
@@ -23,7 +24,7 @@ public class Parameter {
 	private String id;
 	
 	public Parameter (String id) { 
-		this.id = id;
+		this.id = Namespace.expandCurie(id);
 	}
 	
     /**
