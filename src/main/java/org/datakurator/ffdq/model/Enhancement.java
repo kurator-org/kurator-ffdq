@@ -29,8 +29,8 @@ import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import java.util.UUID;
 
 @RDFNamespaces({
-        "bdqffdq = http://rs.tdwg.org/bdqffdq/terms/",
-        "bdqenh = http://rs.tdwg.org/bdqenh/terms/",
+        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "bdqenh = https://rs.tdwg.org/bdqenh/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Enhancement")
