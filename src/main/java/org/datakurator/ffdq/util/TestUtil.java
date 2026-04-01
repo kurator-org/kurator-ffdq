@@ -462,7 +462,7 @@ public class TestUtil {
                 				if (paramStringBit.startsWith("bdq:")) { 
                 					Parameter parameter = new Parameter(paramStringBit);
                 					argument = new Argument(parameter, "Default value for " + paramStringBit);
-                					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), parameter.getId());
+                					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), paramStringBit);
                 					argument.setValue(defaultValue);
                 					if (!defaultValue.equals("DEFAULT")) { 
                 						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
@@ -484,7 +484,7 @@ public class TestUtil {
                 			if (paramString.startsWith("bdq:")) { 
                 				Parameter parameter = new Parameter(paramString);
                 				argument = new Argument(parameter, "Default value for " + paramString);
-            					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), parameter.getId());
+            					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), paramString);
             					argument.setValue(defaultValue);
             					if (!defaultValue.equals("DEFAULT")) { 
             						argument.setLabel(argument.getLabel() + ":" + '"' + defaultValue + '"');
