@@ -251,12 +251,11 @@ public class BaseModel {
                         .thenComparing(s -> s.getPredicate().stringValue())
                         .thenComparing(s -> s.getObject().stringValue()));
                 writer.startRDF();
-                // Emit namespace declarations; skip the reserved "none" placeholder
-                // (same filter as Namespace.getNamespacePrefixes()).
-                for (Map.Entry<String, String> entry : Namespace.nsPrefixes.entrySet()) {
-                    if (!entry.getKey().equals("none")) {
-                        writer.handleNamespace(entry.getKey(), entry.getValue());
-                    }
+                // Re-emit exactly the namespace prefix bindings that the SPARQL execution
+                // produced (these mirror the PREFIX declarations in the query, including
+                // rdf:, rdfs:, owl:, xsd: and any others that the engine supplies).
+                for (Map.Entry<String, String> entry : collector.getNamespaces().entrySet()) {
+                    writer.handleNamespace(entry.getKey(), entry.getValue());
                 }
                 for (Statement stmt : statements) {
                     writer.handleStatement(stmt);
