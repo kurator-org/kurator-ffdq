@@ -47,10 +47,10 @@ public class Namespace {
     public static final String BDQENH = "https://rs.tdwg.org/bdqenh/terms/";  // enhancements   
     /** Constant <code>BDQCRIT="https://rs.tdwg.org/bdqcrit/terms/"</code> */
     public static final String BDQCRIT = "https://rs.tdwg.org/bdqcrit/terms/";  // criteria   
-    /** Constant <code>BDQFFDQ="https://rs.tdwg.org/bdqffdq/terms"</code> */
-    public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms";   // ontology
-    /** Constant <code>BDQTEST="https://rs.tdwg.org/bdqtest/terms"</code> */
-    public static final String BDQTEST = "https://rs.tdwg.org/bdqtest/terms";   // tests
+    /** Constant <code>BDQFFDQ="https://rs.tdwg.org/bdqffdq/terms/"</code> */
+    public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms/";   // ontology
+    /** Constant <code>BDQTEST="https://rs.tdwg.org/bdqtest/terms/"</code> */
+    public static final String BDQTEST = "https://rs.tdwg.org/bdqtest/terms/";   // tests
 
     /** Constant <code>NONE="http://datakurator.org/none/"</code> */
     public static final String NONE = "http://datakurator.org/none/";
@@ -90,6 +90,7 @@ public class Namespace {
         nsPrefixes.put("bdqenh", BDQENH);
         nsPrefixes.put("bdqtest", BDQTEST);
         nsPrefixes.put("skos", SKOS);
+        nsPrefixes.put("bdqffdq", BDQFFDQ);
 
         nsPrefixes.put("dwcloud", NONE);
         nsPrefixes.put("none", NONE);
