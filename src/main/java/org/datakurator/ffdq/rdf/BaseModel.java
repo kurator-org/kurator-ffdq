@@ -26,6 +26,7 @@ import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.GraphQuery;
@@ -47,7 +48,10 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -227,16 +231,40 @@ public class BaseModel {
      */
     public void write(RDFFormat format, OutputStream out, boolean includeBindingClass) {
         RDFWriter writer = Rio.createWriter(format, out);
+        String query;
+        if (includeBindingClass) {
+            query = "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " + Namespace.getNamespacePrefixes() +
+                    "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o } ";
+        } else {
+            query = "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " + Namespace.getNamespacePrefixes() +
+                    "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ";
+        }
         try (RepositoryConnection conn = repo.getConnection()) {
-        	if (includeBindingClass) { 
-        		conn.prepareGraphQuery(QueryLanguage.SPARQL,
-                    "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " + Namespace.getNamespacePrefixes() + 
-                            "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o } ").evaluate(writer);
-        	} else { 
-        		conn.prepareGraphQuery(QueryLanguage.SPARQL,
-                     "PREFIX rdfbeans: <http://viceversatech.com/rdfbeans/2.0/> " + Namespace.getNamespacePrefixes() + 
-                        "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ").evaluate(writer);
-        	} 
+            if (RDFFormat.RDFXML.equals(format)) {
+                // For RDF/XML: collect all statements and sort by subject, predicate, then
+                // object to guarantee that statements about the same subject are emitted in
+                // a single contiguous <rdf:Description rdf:about="..."> block.
+                StatementCollector collector = new StatementCollector();
+                conn.prepareGraphQuery(QueryLanguage.SPARQL, query).evaluate(collector);
+                List<Statement> statements = new ArrayList<>(collector.getStatements());
+                statements.sort(Comparator.comparing((Statement s) -> s.getSubject().stringValue())
+                        .thenComparing(s -> s.getPredicate().stringValue())
+                        .thenComparing(s -> s.getObject().stringValue()));
+                writer.startRDF();
+                // Emit namespace declarations; skip the reserved "none" placeholder
+                // (same filter as Namespace.getNamespacePrefixes()).
+                for (Map.Entry<String, String> entry : Namespace.nsPrefixes.entrySet()) {
+                    if (!entry.getKey().equals("none")) {
+                        writer.handleNamespace(entry.getKey(), entry.getValue());
+                    }
+                }
+                for (Statement stmt : statements) {
+                    writer.handleStatement(stmt);
+                }
+                writer.endRDF();
+            } else {
+                conn.prepareGraphQuery(QueryLanguage.SPARQL, query).evaluate(writer);
+            }
         }
     }
 
