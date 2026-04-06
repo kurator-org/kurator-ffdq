@@ -5,12 +5,15 @@ package org.datakurator.ffdq.model.context;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.datakurator.ffdq.model.BibliographicResource;
 
 /**
  *  Superclass for "tests"
@@ -32,6 +35,7 @@ public class DataQualityNeed {
 	
 	protected String historyNote;
 	protected String references;
+	protected List<BibliographicResource> citationResources = new ArrayList<BibliographicResource>();
 	protected String note;
 	protected String issued;
     protected String isVersionOf;
@@ -75,6 +79,22 @@ public class DataQualityNeed {
 	 */
 	public void setReferences(String references) {
 		this.references = references;
+	}
+
+	/**
+	 * @return the citation resources
+	 */
+	public List<BibliographicResource> getCitationResources() {
+		return citationResources;
+	}
+
+	/**
+	 * @param citationResources the list of BibliographicResource instances to set
+	 */
+	public void setCitationResources(List<BibliographicResource> citationResources) {
+		if (citationResources != null) {
+			this.citationResources = citationResources;
+		}
 	}
 
 	/**

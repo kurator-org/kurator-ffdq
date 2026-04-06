@@ -1,5 +1,7 @@
 package org.datakurator.ffdq.util;
 
+import org.datakurator.ffdq.model.BibliographicResource;
+import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.rdf.FFDQModel;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.junit.Test;
@@ -270,26 +272,90 @@ public class CitationUtilsTest {
     }
 
     // -----------------------------------------------------------------------
-    // addBibliographicResourcesToModel – RDF graph assertions
+    // buildCitationResources – list structure
     // -----------------------------------------------------------------------
 
     @Test
-    public void testAddBibliographicResourcesToModel_referencesAndResourceNodes() {
+    public void testBuildCitationResources_returnsList() {
+        Map<String, String> guidMap = new LinkedHashMap<String, String>();
+        List<BibliographicResource> resources = CitationUtils.buildCitationResources(
+                Arrays.asList("Citation A", "Citation B"), guidMap);
+        assertEquals(2, resources.size());
+        assertEquals(2, guidMap.size());
+    }
+
+    @Test
+    public void testBuildCitationResources_eachResourceHasCitationText() {
+        Map<String, String> guidMap = new LinkedHashMap<String, String>();
+        List<BibliographicResource> resources = CitationUtils.buildCitationResources(
+                Arrays.asList("My citation text"), guidMap);
+        assertEquals(1, resources.size());
+        assertEquals("My citation text", resources.get(0).getBibliographicCitation());
+    }
+
+    @Test
+    public void testBuildCitationResources_eachResourceHasStableUri() {
+        Map<String, String> guidMap = new LinkedHashMap<String, String>();
+        List<BibliographicResource> r1 = CitationUtils.buildCitationResources(
+                Arrays.asList("Stable citation"), guidMap);
+        List<BibliographicResource> r2 = CitationUtils.buildCitationResources(
+                Arrays.asList("Stable citation"), guidMap);
+        assertEquals("Same citation must produce same URI across calls",
+                r1.get(0).getId(), r2.get(0).getId());
+    }
+
+    @Test
+    public void testBuildCitationResources_nullInputReturnsEmptyList() {
+        Map<String, String> guidMap = new LinkedHashMap<String, String>();
+        List<BibliographicResource> resources =
+                CitationUtils.buildCitationResources(null, guidMap);
+        assertNotNull(resources);
+        assertTrue(resources.isEmpty());
+        assertTrue(guidMap.isEmpty());
+    }
+
+    @Test
+    public void testBuildCitationResources_emptyInputReturnsEmptyList() {
+        Map<String, String> guidMap = new LinkedHashMap<String, String>();
+        List<BibliographicResource> resources = CitationUtils.buildCitationResources(
+                java.util.Collections.<String>emptyList(), guidMap);
+        assertNotNull(resources);
+        assertTrue(resources.isEmpty());
+    }
+
+    // -----------------------------------------------------------------------
+    // RDF graph assertions using @RDF-annotated BibliographicResource
+    // -----------------------------------------------------------------------
+
+    /**
+     * Helper: create a minimal Validation with the given ID and citation
+     * resources, save it to the model, and return the model.
+     */
+    private FFDQModel saveValidationWithCitations(
+            String needUri, List<String> citations, Map<String, String> guidMap) {
         FFDQModel model = new FFDQModel();
+        Validation v = new Validation();
+        v.setId(needUri);
+        List<BibliographicResource> resources =
+                CitationUtils.buildCitationResources(citations, guidMap);
+        v.setCitationResources(resources);
+        model.save(v);
+        return model;
+    }
+
+    @Test
+    public void testRdf_referencesTriplesPresentOnNeed() {
         String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000001";
-        List<String> citations = Arrays.asList("Citation One", "Citation Two");
         Map<String, String> guidMap = new LinkedHashMap<String, String>();
 
-        CitationUtils.addBibliographicResourcesToModel(needUri, citations, guidMap, model);
+        FFDQModel model = saveValidationWithCitations(
+                needUri, Arrays.asList("Citation One", "Citation Two"), guidMap);
 
-        // The map should now have two entries
-        assertEquals(2, guidMap.size());
+        assertEquals("guidMap must contain 2 entries", 2, guidMap.size());
 
-        // Check dcterms:references triples
-        String sparqlReferences =
-                "PREFIX dcterms: <http://purl.org/dc/terms/> "
+        String sparql = "PREFIX dcterms: <http://purl.org/dc/terms/> "
                 + "SELECT ?resource WHERE { <" + needUri + "> dcterms:references ?resource }";
-        TupleQueryResult result = model.executeQuery(sparqlReferences);
+        TupleQueryResult result = model.executeQuery(sparql);
         int count = 0;
         while (result.hasNext()) {
             result.next();
@@ -299,18 +365,15 @@ public class CitationUtilsTest {
     }
 
     @Test
-    public void testAddBibliographicResourcesToModel_bibliographicCitationOnResource() {
-        FFDQModel model = new FFDQModel();
+    public void testRdf_bibliographicCitationOnResourceNode() {
         String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000002";
         String citationText = "Unique citation for resource test";
         Map<String, String> guidMap = new LinkedHashMap<String, String>();
 
-        CitationUtils.addBibliographicResourcesToModel(
-                needUri, Arrays.asList(citationText), guidMap, model);
+        FFDQModel model = saveValidationWithCitations(
+                needUri, Arrays.asList(citationText), guidMap);
 
-        // Verify that the resource node has dcterms:bibliographicCitation
-        String sparql =
-                "PREFIX dcterms: <http://purl.org/dc/terms/> "
+        String sparql = "PREFIX dcterms: <http://purl.org/dc/terms/> "
                 + "SELECT ?citation WHERE { "
                 + "<" + needUri + "> dcterms:references ?res . "
                 + "?res dcterms:bibliographicCitation ?citation }";
@@ -321,17 +384,14 @@ public class CitationUtilsTest {
     }
 
     @Test
-    public void testAddBibliographicResourcesToModel_bibliographicCitationNotOnNeed() {
-        FFDQModel model = new FFDQModel();
+    public void testRdf_bibliographicCitationNotDirectlyOnNeed() {
         String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000003";
         Map<String, String> guidMap = new LinkedHashMap<String, String>();
 
-        CitationUtils.addBibliographicResourcesToModel(
-                needUri, Arrays.asList("Some citation"), guidMap, model);
+        FFDQModel model = saveValidationWithCitations(
+                needUri, Arrays.asList("Some citation"), guidMap);
 
-        // Verify that the Need itself does NOT have dcterms:bibliographicCitation
-        String sparql =
-                "PREFIX dcterms: <http://purl.org/dc/terms/> "
+        String sparql = "PREFIX dcterms: <http://purl.org/dc/terms/> "
                 + "SELECT ?citation WHERE { "
                 + "<" + needUri + "> dcterms:bibliographicCitation ?citation }";
         TupleQueryResult result = model.executeQuery(sparql);
@@ -341,16 +401,14 @@ public class CitationUtilsTest {
     }
 
     @Test
-    public void testAddBibliographicResourcesToModel_resourceTypeIsBibliographicResource() {
-        FFDQModel model = new FFDQModel();
+    public void testRdf_resourceTypedAsBibliographicResource() {
         String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000004";
         Map<String, String> guidMap = new LinkedHashMap<String, String>();
 
-        CitationUtils.addBibliographicResourcesToModel(
-                needUri, Arrays.asList("Type check citation"), guidMap, model);
+        FFDQModel model = saveValidationWithCitations(
+                needUri, Arrays.asList("Type check citation"), guidMap);
 
-        String sparql =
-                "PREFIX dcterms: <http://purl.org/dc/terms/> "
+        String sparql = "PREFIX dcterms: <http://purl.org/dc/terms/> "
                 + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
                 + "SELECT ?res WHERE { "
                 + "<" + needUri + "> dcterms:references ?res . "
@@ -361,24 +419,32 @@ public class CitationUtilsTest {
     }
 
     @Test
-    public void testAddBibliographicResourcesToModel_sharedCitationSharesNode() {
-        FFDQModel model = new FFDQModel();
+    public void testRdf_sharedCitationUsesSharedNode() {
         String needUri1 = "urn:uuid:test-need-00000000-0000-0000-0000-000000000005";
         String needUri2 = "urn:uuid:test-need-00000000-0000-0000-0000-000000000006";
         String sharedCitation = "Shared citation text for both needs";
         Map<String, String> guidMap = new LinkedHashMap<String, String>();
 
-        CitationUtils.addBibliographicResourcesToModel(
-                needUri1, Arrays.asList(sharedCitation), guidMap, model);
-        CitationUtils.addBibliographicResourcesToModel(
-                needUri2, Arrays.asList(sharedCitation), guidMap, model);
+        // Save both needs to the same model so we can cross-query them
+        FFDQModel model = new FFDQModel();
+
+        Validation v1 = new Validation();
+        v1.setId(needUri1);
+        v1.setCitationResources(
+                CitationUtils.buildCitationResources(Arrays.asList(sharedCitation), guidMap));
+        model.save(v1);
+
+        Validation v2 = new Validation();
+        v2.setId(needUri2);
+        v2.setCitationResources(
+                CitationUtils.buildCitationResources(Arrays.asList(sharedCitation), guidMap));
+        model.save(v2);
 
         // Both Needs reference the same citation URI
         String sharedUri = guidMap.get(CitationUtils.normalizeCitation(sharedCitation));
         assertNotNull(sharedUri);
 
-        String sparql =
-                "PREFIX dcterms: <http://purl.org/dc/terms/> "
+        String sparql = "PREFIX dcterms: <http://purl.org/dc/terms/> "
                 + "SELECT ?need WHERE { ?need dcterms:references <" + sharedUri + "> }";
         TupleQueryResult result = model.executeQuery(sparql);
         int count = 0;
@@ -387,25 +453,5 @@ public class CitationUtilsTest {
             count++;
         }
         assertEquals("Both Need instances should reference the same citation node", 2, count);
-    }
-
-    @Test
-    public void testAddBibliographicResourcesToModel_nullCitationsIsNoop() {
-        FFDQModel model = new FFDQModel();
-        String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000007";
-        Map<String, String> guidMap = new LinkedHashMap<String, String>();
-        // Should not throw
-        CitationUtils.addBibliographicResourcesToModel(needUri, null, guidMap, model);
-        assertTrue(guidMap.isEmpty());
-    }
-
-    @Test
-    public void testAddBibliographicResourcesToModel_emptyCitationsIsNoop() {
-        FFDQModel model = new FFDQModel();
-        String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000008";
-        Map<String, String> guidMap = new LinkedHashMap<String, String>();
-        CitationUtils.addBibliographicResourcesToModel(
-                needUri, java.util.Collections.<String>emptyList(), guidMap, model);
-        assertTrue(guidMap.isEmpty());
     }
 }

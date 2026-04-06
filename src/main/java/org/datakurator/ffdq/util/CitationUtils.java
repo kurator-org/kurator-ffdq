@@ -22,12 +22,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.datakurator.ffdq.rdf.BaseModel;
-import org.datakurator.ffdq.rdf.Namespace;
-import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.datakurator.ffdq.model.BibliographicResource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -276,57 +271,37 @@ public class CitationUtils {
     }
 
     /**
-     * Add {@code dcterms:references} and {@code dcterms:BibliographicResource}
-     * statements to the RDF model for a DataQualityNeed instance.
+     * Build a list of {@link BibliographicResource} instances from a list of
+     * citation strings, assigning stable UUID URIs from the given mapping.
      *
-     * <p>For each citation string the following triples are added:
-     * <ul>
-     *   <li>{@code <needUri> dcterms:references <citationUri>}</li>
-     *   <li>{@code <citationUri> a dcterms:BibliographicResource}</li>
-     *   <li>{@code <citationUri> dcterms:bibliographicCitation "citation text"}</li>
-     * </ul>
+     * <p>For each citation string, the existing URI is reused if the mapping
+     * contains the normalized citation; otherwise a new {@code urn:uuid:...} URI
+     * is minted and added to the mapping. The returned {@code BibliographicResource}
+     * instances can be set directly on a DataQualityNeed subclass via
+     * {@code setCitationResources()}, and will be serialized into the RDF model
+     * as {@code dcterms:references} / {@code dcterms:BibliographicResource} nodes
+     * by the normal RDFBeans annotation mechanism.
      *
-     * <p>The citation URI is looked up (or created) in {@code citationGuidMap}
-     * so that the same URI is reused for identical citation strings across
-     * multiple Need instances.
-     *
-     * @param needUri         the URI string of the DataQualityNeed instance
-     * @param citations       list of individual citation strings
+     * @param citations       list of individual citation strings; null or empty
+     *                        returns an empty list
      * @param citationGuidMap mutable map from normalized citation to UUID URN
-     * @param model           the RDF model to which the statements are added
+     * @return list of {@link BibliographicResource} instances; never null
      */
-    public static void addBibliographicResourcesToModel(
-            String needUri,
+    public static List<BibliographicResource> buildCitationResources(
             List<String> citations,
-            Map<String, String> citationGuidMap,
-            BaseModel model) {
+            Map<String, String> citationGuidMap) {
 
-        if (needUri == null || needUri.isEmpty()
-                || citations == null || citations.isEmpty()) {
-            return;
+        List<BibliographicResource> resources = new ArrayList<BibliographicResource>();
+
+        if (citations == null || citations.isEmpty()) {
+            return resources;
         }
-
-        ValueFactory vf = SimpleValueFactory.getInstance();
-
-        IRI needIRI = vf.createIRI(needUri);
-        IRI dctermsReferences = vf.createIRI(Namespace.DCTERMS + "references");
-        IRI rdfType = vf.createIRI(
-                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-        IRI dctermsClass = vf.createIRI(Namespace.DCTERMS + "BibliographicResource");
-        IRI dctermsBiblioCitation = vf.createIRI(
-                Namespace.DCTERMS + "bibliographicCitation");
-
-        List<Statement> statements = new ArrayList<Statement>();
 
         for (String citation : citations) {
-            String citationUri = getOrCreateCitationUri(citation, citationGuidMap);
-            IRI citationIRI = vf.createIRI(citationUri);
-            statements.add(vf.createStatement(needIRI, dctermsReferences, citationIRI));
-            statements.add(vf.createStatement(citationIRI, rdfType, dctermsClass));
-            statements.add(vf.createStatement(
-                    citationIRI, dctermsBiblioCitation, vf.createLiteral(citation)));
+            String uri = getOrCreateCitationUri(citation, citationGuidMap);
+            resources.add(new BibliographicResource(uri, citation));
         }
 
-        model.addStatements(statements);
+        return resources;
     }
 }

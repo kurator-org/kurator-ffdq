@@ -633,11 +633,10 @@ public class TestUtil {
                         cd.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
                         //cd.setPrefLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
-                        model.save(cd);
-                        // Add dcterms:references to BibliographicResource nodes for citations
-                        CitationUtils.addBibliographicResourcesToModel(cd.getId(),
+                        cd.setCitationResources(CitationUtils.buildCitationResources(
                         		CitationUtils.parseReferences(test.getReferences()),
-                        		citationGuidMap, model);
+                        		citationGuidMap));
+                        model.save(cd);
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
                         // Add additional metadata properties to the method.
@@ -709,11 +708,10 @@ public class TestUtil {
                         cc.setIsVersionOf(test.getGuidTDWGNamespace());
                         cc.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
                         cc.setIssued(test.getIssued());
-                        model.save(cc);
-                        // Add dcterms:references to BibliographicResource nodes for citations
-                        CitationUtils.addBibliographicResourcesToModel(cc.getId(),
+                        cc.setCitationResources(CitationUtils.buildCitationResources(
                         		CitationUtils.parseReferences(test.getReferences()),
-                        		citationGuidMap, model);
+                        		citationGuidMap));
+                        model.save(cc);
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
                         // Add additional metadata properties to the method.
@@ -784,11 +782,10 @@ public class TestUtil {
                         //if (test.getSpecificationGuid()!=null) { 
                         //	ce.setId(test.getSpecificationGuid());
                         //}
-                        model.save(ce);
-                        // Add dcterms:references to BibliographicResource nodes for citations
-                        CitationUtils.addBibliographicResourcesToModel(ce.getId(),
+                        ce.setCitationResources(CitationUtils.buildCitationResources(
                         		CitationUtils.parseReferences(test.getReferences()),
-                        		citationGuidMap, model);
+                        		citationGuidMap));
+                        model.save(ce);
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         // Add additional metadata properties to the method.
@@ -860,11 +857,10 @@ public class TestUtil {
                         //if (test.getSpecificationGuid()!=null) { 
                         //	ci.setId(test.getSpecificationGuid());
                         //}
-                        model.save(ci);
-                        // Add dcterms:references to BibliographicResource nodes for citations
-                        CitationUtils.addBibliographicResourcesToModel(ci.getId(),
+                        ci.setCitationResources(CitationUtils.buildCitationResources(
                         		CitationUtils.parseReferences(test.getReferences()),
-                        		citationGuidMap, model);
+                        		citationGuidMap));
+                        model.save(ci);
                         // Define an amendment method, a specification tied to a criterion in context
                         IssueMethod issueMethod = new IssueMethod(specification, ci);
                         // Add additional metadata properties to the method.

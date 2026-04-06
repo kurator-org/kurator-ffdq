@@ -26,6 +26,7 @@ import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
 import org.datakurator.ffdq.model.ActedUpon;
+import org.datakurator.ffdq.model.BibliographicResource;
 import org.datakurator.ffdq.model.Consulted;
 import org.datakurator.ffdq.model.Criterion;
 import org.datakurator.ffdq.model.Dimension;
@@ -35,6 +36,7 @@ import org.datakurator.ffdq.model.ResourceType;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RDFNamespaces({
@@ -305,6 +307,23 @@ public class Issue extends DataQualityNeed  {
 	 */
 	public String getReferences() {
 		return references;
+	}
+
+	/**
+	 * @return the BibliographicResource instances referenced by this Need
+	 */
+	@RDF("dcterms:references")
+	public List<BibliographicResource> getCitationResources() {
+		return super.citationResources;
+	}
+
+	/**
+	 * Setter for RDFBeans round-trip support.
+	 *
+	 * @param citationResources the BibliographicResource instances to set
+	 */
+	public void setCitationResources(List<BibliographicResource> citationResources) {
+		super.setCitationResources(citationResources);
 	}
 	
 	/**

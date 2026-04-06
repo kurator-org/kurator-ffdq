@@ -111,22 +111,6 @@ public class BaseModel {
     }
 
     /**
-     * Add raw RDF statements directly to the repository.
-     *
-     * <p>Use this method to insert statements that cannot be expressed through
-     * the RDFBeans annotation mechanism (e.g. BibliographicResource nodes linked
-     * via {@code dcterms:references}).
-     *
-     * @param statements list of statements to add; null or empty list is a no-op
-     */
-    public void addStatements(List<Statement> statements) {
-        if (statements == null || statements.isEmpty()) {
-            return;
-        }
-        conn.add(statements);
-    }
-
-    /**
      * <p>findOne.</p>
      *
      * @param guid a {@link java.lang.String} object.
