@@ -20,6 +20,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.QuoteMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.datakurator.ffdq.model.BibliographicResource;
@@ -161,8 +162,9 @@ public class CitationUtils {
     /**
      * Load a citation-to-UUID mapping from a CSV file.
      *
-     * <p>The CSV format is two columns with no header row:
-     * {@code "normalized citation text","urn:uuid:..."}
+     * <p>The CSV format is two quoted columns with a header row:
+     * {@code "guid","citation"} followed by data rows such as
+     * {@code "urn:uuid:...","normalized citation text"}
      *
      * <p>If {@code filePath} is null/empty or the file does not yet exist,
      * an empty map is returned and a message is logged.
@@ -187,16 +189,14 @@ public class CitationUtils {
         try {
             Reader reader = new InputStreamReader(
                     new FileInputStream(file), StandardCharsets.UTF_8);
-            CSVParser parser = CSVFormat.DEFAULT.parse(reader);
+            CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader);
             try {
                 for (CSVRecord record : parser) {
-                    if (record.size() >= 2) {
-                        String citation = record.get(0);
-                        String uri = record.get(1);
-                        if (citation != null && !citation.isEmpty()
-                                && uri != null && !uri.isEmpty()) {
-                            map.put(citation, uri);
-                        }
+                    String guid = record.get("guid");
+                    String citation = record.get("citation");
+                    if (guid != null && !guid.isEmpty()
+                            && citation != null && !citation.isEmpty()) {
+                        map.put(citation, guid);
                     }
                 }
             } finally {
@@ -215,8 +215,11 @@ public class CitationUtils {
     /**
      * Save a citation-to-UUID mapping to a CSV file.
      *
-     * <p>The CSV format is two columns with no header row:
-     * {@code "normalized citation text","urn:uuid:..."}
+     * <p>The CSV format is two quoted columns with a header row:
+     * {@code "guid","citation"} followed by data rows such as
+     * {@code "urn:uuid:...","normalized citation text"}
+     * All fields are always enclosed in double quotes; any double-quote
+     * characters within a field are escaped by doubling them per RFC 4180.
      *
      * <p>If {@code filePath} is null or empty, this method returns without writing.
      *
@@ -231,10 +234,12 @@ public class CitationUtils {
         try {
             Writer writer = new OutputStreamWriter(
                     new FileOutputStream(filePath), StandardCharsets.UTF_8);
-            CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT);
+            CSVPrinter printer = new CSVPrinter(writer,
+                    CSVFormat.DEFAULT.withQuoteMode(QuoteMode.ALL));
             try {
+                printer.printRecord("guid", "citation");
                 for (Map.Entry<String, String> entry : map.entrySet()) {
-                    printer.printRecord(entry.getKey(), entry.getValue());
+                    printer.printRecord(entry.getValue(), entry.getKey());
                 }
             } finally {
                 printer.close();

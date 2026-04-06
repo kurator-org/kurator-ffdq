@@ -6,7 +6,11 @@ import org.datakurator.ffdq.rdf.FFDQModel;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -269,6 +273,43 @@ public class CitationUtilsTest {
         String uri2 = CitationUtils.getOrCreateCitationUri("My stable citation", map2);
 
         assertEquals("UUID must be stable across save/load cycles", uri1, uri2);
+    }
+
+    @Test
+    public void testSaveCitationGuidMap_fileFormatHasHeaderGuidFirst() throws Exception {
+        File tempFile = File.createTempFile("citation-format", ".csv");
+        tempFile.deleteOnExit();
+
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("ISO 3166 Country Codes. https://www.iso.org/", "urn:uuid:aaaabbbb-1111-2222-3333-ccccddddeeee");
+        map.put("Citation with a \"quoted\" word.", "urn:uuid:ffffffff-5555-6666-7777-888899990000");
+
+        CitationUtils.saveCitationGuidMap(map, tempFile.getAbsolutePath());
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(tempFile), StandardCharsets.UTF_8));
+        try {
+            // First line must be the header
+            String header = reader.readLine();
+            assertEquals("Header row must be \"guid\",\"citation\"",
+                    "\"guid\",\"citation\"", header);
+
+            // First data row: guid first, citation text second; both double-quoted
+            String row1 = reader.readLine();
+            assertNotNull("Expected first data row", row1);
+            assertTrue("First data row must start with the quoted UUID",
+                    row1.startsWith("\"urn:uuid:aaaabbbb-1111-2222-3333-ccccddddeeee\""));
+            assertTrue("First data row must contain the quoted citation text",
+                    row1.contains("\"ISO 3166 Country Codes. https://www.iso.org/\""));
+
+            // Second data row: embedded quotes must be escaped by doubling
+            String row2 = reader.readLine();
+            assertNotNull("Expected second data row", row2);
+            assertTrue("Embedded quotes must be escaped by doubling (RFC 4180)",
+                    row2.contains("\"\"quoted\"\""));
+        } finally {
+            reader.close();
+        }
     }
 
     // -----------------------------------------------------------------------

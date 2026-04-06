@@ -280,7 +280,7 @@ public class TestUtil {
         options.addOption("makeGuidList", null, false, "If guidFile is specified and specificationGuid is missing, include new additional guids lists in output.");
 
         options.addOption("generatePython", null, false, "Generate a new Python class with stub methods for each test");
-        options.addOption("citationGuidFile", null, true, "Optional CSV file mapping citation strings to stable UUID URNs. Loaded on startup if it exists, updated and saved at end of run. Format: two columns, no header: \"citation text\",\"urn:uuid:...\"");
+        options.addOption("citationGuidFile", null, true, "Optional CSV file mapping citation strings to stable UUID URNs. Loaded on startup if it exists, updated and saved at end of run. Format: header row \"guid\",\"citation\" followed by data rows with guid (urn:uuid:...) first, citation text second; all values double-quoted.");
         
         try {
             CommandLineParser parser = new DefaultParser();
