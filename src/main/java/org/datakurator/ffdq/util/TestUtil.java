@@ -1390,9 +1390,7 @@ public class TestUtil {
     	try (Writer writer = new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8);
     			CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT.withQuoteMode(QuoteMode.ALL))) {
     		printer.printRecord("UseCase", "PolicyType", "PolicyGuid");
-    		List<String> sortedKeys = new ArrayList<>(map.keySet());
-    		Collections.sort(sortedKeys);
-    		for (String key : sortedKeys) {
+    		for (String key : map.keySet()) {
     			String[] parts = key.split("\\|", 2);
     			String useCaseOut = parts[0];
     			String policyTypeOut = parts[1];
