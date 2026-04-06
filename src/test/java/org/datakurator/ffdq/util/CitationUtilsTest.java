@@ -225,7 +225,7 @@ public class CitationUtilsTest {
         original.put("Citation Alpha", "urn:uuid:11111111-1111-1111-1111-111111111111");
         original.put("Citation Beta",  "urn:uuid:22222222-2222-2222-2222-222222222222");
 
-        CitationUtils.saveCitationGuidMap(original, tempFile.getAbsolutePath());
+        CitationUtils.saveCitationGuidMap(original, tempFile.getAbsolutePath(), 0);
 
         Map<String, String> loaded = CitationUtils.loadCitationGuidMap(tempFile.getAbsolutePath());
         assertEquals(2, loaded.size());
@@ -255,7 +255,7 @@ public class CitationUtilsTest {
         // Should not throw
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("Citation", "urn:uuid:test");
-        CitationUtils.saveCitationGuidMap(map, null);
+        CitationUtils.saveCitationGuidMap(map, null, 0);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class CitationUtilsTest {
         // First run: mint new UUID
         Map<String, String> map1 = CitationUtils.loadCitationGuidMap(tempFile.getAbsolutePath());
         String uri1 = CitationUtils.getOrCreateCitationUri("My stable citation", map1);
-        CitationUtils.saveCitationGuidMap(map1, tempFile.getAbsolutePath());
+        CitationUtils.saveCitationGuidMap(map1, tempFile.getAbsolutePath(), 0);
 
         // Second run: load the file and verify the same UUID is returned
         Map<String, String> map2 = CitationUtils.loadCitationGuidMap(tempFile.getAbsolutePath());
@@ -284,7 +284,7 @@ public class CitationUtilsTest {
         map.put("ISO 3166 Country Codes. https://www.iso.org/", "urn:uuid:aaaabbbb-1111-2222-3333-ccccddddeeee");
         map.put("Citation with a \"quoted\" word.", "urn:uuid:ffffffff-5555-6666-7777-888899990000");
 
-        CitationUtils.saveCitationGuidMap(map, tempFile.getAbsolutePath());
+        CitationUtils.saveCitationGuidMap(map, tempFile.getAbsolutePath(), 0);
 
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(tempFile), StandardCharsets.UTF_8));

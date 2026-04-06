@@ -329,18 +329,22 @@ public class TestUtil {
             boolean policyGuidsProvided = false;
             String policyGuidFilename = null;
             Map<String, String> policyGuidFileMap = new LinkedHashMap<String, String>();
+            int initialPolicyGuidCount = 0;
             if (cmd.hasOption("policyGuidFile")) {
             	policyGuidFilename = cmd.getOptionValue("policyGuidFile");
             	policyGuidFileMap = loadPolicyGuidsFromFile(policyGuidFilename);
+            	initialPolicyGuidCount = policyGuidFileMap.size();
             	policyGuidsProvided = true;
             }
 
             // Load citation UUID mapping
             String citationGuidFilename = null;
             Map<String, String> citationGuidMap = new LinkedHashMap<String, String>();
+            int initialCitationGuidCount = 0;
             if (cmd.hasOption("citationGuidFile")) {
             	citationGuidFilename = cmd.getOptionValue("citationGuidFile");
             	citationGuidMap = CitationUtils.loadCitationGuidMap(citationGuidFilename);
+            	initialCitationGuidCount = citationGuidMap.size();
             } else {
             	logger.warn("No --citationGuidFile specified; citation UUID URIs will not be "
             			+ "persisted across runs. Use --citationGuidFile to enable stable citation URIs.");
@@ -954,12 +958,12 @@ public class TestUtil {
 
             // Save citation UUID mappings if a mapping file was specified
             if (citationGuidFilename != null) {
-            	CitationUtils.saveCitationGuidMap(citationGuidMap, citationGuidFilename);
+            	CitationUtils.saveCitationGuidMap(citationGuidMap, citationGuidFilename, initialCitationGuidCount);
             }
 
             // Save policy GUID mappings if a mapping file was specified
             if (policyGuidFilename != null) {
-            	savePolicyGuidsToFile(policyGuidFileMap, policyGuidFilename);
+            	savePolicyGuidsToFile(policyGuidFileMap, policyGuidFilename, initialPolicyGuidCount);
             }
 
             // Write rdf to file
@@ -1379,12 +1383,24 @@ public class TestUtil {
      * The key stored in the map is {@code "UseCase|PolicyType"}.
      *
      * <p>If {@code filePath} is null or empty, this method returns without writing.
+     * If the map contains no new entries compared to {@code previousSize}, the
+     * file is not overwritten and an informational message is logged instead.
      *
-     * @param map      the mapping to write; must not be null
-     * @param filePath path to the output CSV file; null or empty is allowed
+     * @param map          the mapping to write; must not be null
+     * @param filePath     path to the output CSV file; null or empty is allowed
+     * @param previousSize the number of entries that were in the map before this
+     *                     run (i.e. loaded from the existing file); used to
+     *                     determine whether any new entries were added
      */
-    private static void savePolicyGuidsToFile(Map<String, String> map, String filePath) {
+    private static void savePolicyGuidsToFile(Map<String, String> map, String filePath,
+    		int previousSize) {
     	if (filePath == null || filePath.trim().isEmpty()) {
+    		return;
+    	}
+    	int newCount = map.size() - previousSize;
+    	if (newCount <= 0) {
+    		logger.info("Policy GUID mappings unchanged (" + map.size()
+    				+ " entries); file not overwritten: " + filePath);
     		return;
     	}
     	try (Writer writer = new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8);
@@ -1396,7 +1412,8 @@ public class TestUtil {
     			String policyTypeOut = parts[1];
     			printer.printRecord(useCaseOut, policyTypeOut, map.get(key));
     		}
-    		logger.info("Saved " + map.size() + " policy GUID mappings to " + filePath);
+    		logger.info("Saved " + map.size() + " policy GUID mappings (" + newCount
+    				+ " new) to " + filePath);
     	} catch (IOException e) {
     		logger.error("Could not save policy GUID map to " + filePath + ": " + e.getMessage(), e);
     	}

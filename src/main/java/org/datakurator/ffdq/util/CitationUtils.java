@@ -222,12 +222,25 @@ public class CitationUtils {
      * characters within a field are escaped by doubling them per RFC 4180.
      *
      * <p>If {@code filePath} is null or empty, this method returns without writing.
+     * If the map contains no new entries compared to {@code previousSize}, the
+     * file is not overwritten and an informational message is logged instead.
      *
-     * @param map      the mapping to write; must not be null
-     * @param filePath path to the output CSV file; null or empty is allowed
+     * @param map          the mapping to write; must not be null
+     * @param filePath     path to the output CSV file; null or empty is allowed
+     * @param previousSize the number of entries that were in the map before this
+     *                     run (i.e. loaded from the existing file); used to
+     *                     determine whether any new entries were added
      */
-    public static void saveCitationGuidMap(Map<String, String> map, String filePath) {
+    public static void saveCitationGuidMap(Map<String, String> map, String filePath,
+            int previousSize) {
         if (filePath == null || filePath.trim().isEmpty()) {
+            return;
+        }
+
+        int newCount = map.size() - previousSize;
+        if (newCount <= 0) {
+            logger.info("Citation UUID mappings unchanged (" + map.size()
+                    + " entries); file not overwritten: " + filePath);
             return;
         }
 
@@ -250,7 +263,8 @@ public class CitationUtils {
                     + ": " + e.getMessage(), e);
         }
 
-        logger.info("Saved " + map.size() + " citation UUID mappings to " + filePath);
+        logger.info("Saved " + map.size() + " citation UUID mappings (" + newCount
+                + " new) to " + filePath);
     }
 
     /**
