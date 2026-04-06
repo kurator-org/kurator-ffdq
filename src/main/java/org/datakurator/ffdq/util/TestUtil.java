@@ -1387,27 +1387,21 @@ public class TestUtil {
     	if (filePath == null || filePath.trim().isEmpty()) {
     		return;
     	}
-    	try {
-    		Writer writer = new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8);
-    		CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT.withQuoteMode(QuoteMode.ALL));
-    		try {
-    			printer.printRecord("UseCase", "PolicyType", "PolicyGuid");
-    			List<String> sortedKeys = new ArrayList<>(map.keySet());
-    			Collections.sort(sortedKeys);
-    			for (String key : sortedKeys) {
-    				String[] parts = key.split("\\|", 2);
-    				String useCaseOut = parts[0];
-    				String policyTypeOut = parts[1];
-    				printer.printRecord(useCaseOut, policyTypeOut, map.get(key));
-    			}
-    		} finally {
-    			printer.close();
-    			writer.close();
+    	try (Writer writer = new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8);
+    			CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT.withQuoteMode(QuoteMode.ALL))) {
+    		printer.printRecord("UseCase", "PolicyType", "PolicyGuid");
+    		List<String> sortedKeys = new ArrayList<>(map.keySet());
+    		Collections.sort(sortedKeys);
+    		for (String key : sortedKeys) {
+    			String[] parts = key.split("\\|", 2);
+    			String useCaseOut = parts[0];
+    			String policyTypeOut = parts[1];
+    			printer.printRecord(useCaseOut, policyTypeOut, map.get(key));
     		}
+    		logger.info("Saved " + map.size() + " policy GUID mappings to " + filePath);
     	} catch (IOException e) {
     		logger.error("Could not save policy GUID map to " + filePath + ": " + e.getMessage(), e);
     	}
-    	logger.info("Saved " + map.size() + " policy GUID mappings to " + filePath);
     }
     
     /**
