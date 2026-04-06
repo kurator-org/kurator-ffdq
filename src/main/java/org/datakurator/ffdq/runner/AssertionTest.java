@@ -744,10 +744,16 @@ public class AssertionTest {
 	}
 
 	/**
-	 * @param references the references to set; stored as-is (HTML list format preserved for CitationUtils.parseReferences)
+	 * Set the bibliographic references for this test.
+	 *
+	 * <p>The value is stored as-is so that {@link org.datakurator.ffdq.util.CitationUtils#parseReferences}
+	 * can split the expected {@code <ul><li>…</li></ul>} HTML list format into individual
+	 * citation strings. Null is treated as an empty string.
+	 *
+	 * @param references the references value from the CSV (HTML list format expected); may be null
 	 */
 	public void setReferences(String references) {
-		this.references = references;
+		this.references = (references != null) ? references : "";
 	}
 
 	/**
