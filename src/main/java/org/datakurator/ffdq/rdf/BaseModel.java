@@ -240,27 +240,30 @@ public class BaseModel {
                     "CONSTRUCT {?s ?p ?o } WHERE {?s ?p ?o . MINUS { ?s rdfbeans:bindingClass ?o } } ";
         }
         try (RepositoryConnection conn = repo.getConnection()) {
-            // Collect all statements and sort by subject, predicate, then object to
-            // guarantee deterministic output ordering across runs. For RDF/XML this also
-            // ensures that statements about the same subject are emitted in a single
-            // contiguous <rdf:Description rdf:about="..."> block.
-            StatementCollector collector = new StatementCollector();
-            conn.prepareGraphQuery(QueryLanguage.SPARQL, query).evaluate(collector);
-            List<Statement> statements = new ArrayList<>(collector.getStatements());
-            statements.sort(Comparator.comparing((Statement s) -> s.getSubject().stringValue())
-                    .thenComparing(s -> s.getPredicate().stringValue())
-                    .thenComparing(s -> s.getObject().stringValue()));
-            writer.startRDF();
-            // Re-emit exactly the namespace prefix bindings that the SPARQL execution
-            // produced (these mirror the PREFIX declarations in the query, including
-            // rdf:, rdfs:, owl:, xsd: and any others that the engine supplies).
-            for (Map.Entry<String, String> entry : collector.getNamespaces().entrySet()) {
-                writer.handleNamespace(entry.getKey(), entry.getValue());
+            if (RDFFormat.RDFXML.equals(format)) {
+                // For RDF/XML: collect all statements and sort by subject, predicate, then
+                // object to guarantee that statements about the same subject are emitted in
+                // a single contiguous <rdf:Description rdf:about="..."> block.
+                StatementCollector collector = new StatementCollector();
+                conn.prepareGraphQuery(QueryLanguage.SPARQL, query).evaluate(collector);
+                List<Statement> statements = new ArrayList<>(collector.getStatements());
+                statements.sort(Comparator.comparing((Statement s) -> s.getSubject().stringValue())
+                        .thenComparing(s -> s.getPredicate().stringValue())
+                        .thenComparing(s -> s.getObject().stringValue()));
+                writer.startRDF();
+                // Re-emit exactly the namespace prefix bindings that the SPARQL execution
+                // produced (these mirror the PREFIX declarations in the query, including
+                // rdf:, rdfs:, owl:, xsd: and any others that the engine supplies).
+                for (Map.Entry<String, String> entry : collector.getNamespaces().entrySet()) {
+                    writer.handleNamespace(entry.getKey(), entry.getValue());
+                }
+                for (Statement stmt : statements) {
+                    writer.handleStatement(stmt);
+                }
+                writer.endRDF();
+            } else {
+                conn.prepareGraphQuery(QueryLanguage.SPARQL, query).evaluate(writer);
             }
-            for (Statement stmt : statements) {
-                writer.handleStatement(stmt);
-            }
-            writer.endRDF();
         }
     }
 

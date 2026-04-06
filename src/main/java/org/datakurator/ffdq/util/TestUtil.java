@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -908,10 +909,9 @@ public class TestUtil {
                 }
             }
 
-            Set<UseCase> keys = useCaseMeasurementPolicyMap.keySet();
-            Iterator<UseCase> i = keys.iterator();
-            while (i.hasNext()) { 
-            	UseCase key = i.next();
+            List<UseCase> sortedMeasureKeys = new ArrayList<>(useCaseMeasurementPolicyMap.keySet());
+            sortedMeasureKeys.sort(Comparator.comparing(UseCase::getSubject));
+            for (UseCase key : sortedMeasureKeys) {
             	if (useCaseMeasurementPolicyMap.containsKey(key)) { 
             		MeasurementPolicy measurementPolicy = useCaseMeasurementPolicyMap.get(key);
             		if (measurementPolicy!=null) { 
@@ -920,10 +920,9 @@ public class TestUtil {
             	}
             }   
             
-            keys = useCaseValidationPolicyMap.keySet();
-            i = keys.iterator();
-            while (i.hasNext()) { 
-            	UseCase key = i.next();
+            List<UseCase> sortedValidationKeys = new ArrayList<>(useCaseValidationPolicyMap.keySet());
+            sortedValidationKeys.sort(Comparator.comparing(UseCase::getSubject));
+            for (UseCase key : sortedValidationKeys) {
             	if (useCaseValidationPolicyMap.containsKey(key)) { 
             		ValidationPolicy validationPolicy = useCaseValidationPolicyMap.get(key);
             		if (validationPolicy!=null) { 
@@ -932,10 +931,9 @@ public class TestUtil {
             	}
             }      
             
-            keys = useCaseAmendmentPolicyMap.keySet();
-            i = keys.iterator();
-            while (i.hasNext()) { 
-            	UseCase key = i.next();
+            List<UseCase> sortedAmendmentKeys = new ArrayList<>(useCaseAmendmentPolicyMap.keySet());
+            sortedAmendmentKeys.sort(Comparator.comparing(UseCase::getSubject));
+            for (UseCase key : sortedAmendmentKeys) {
             	if (useCaseAmendmentPolicyMap.containsKey(key)) { 
             		AmendmentPolicy policy = useCaseAmendmentPolicyMap.get(key);
             		if (policy!=null) { 
@@ -944,10 +942,9 @@ public class TestUtil {
             	}
             } 
             
-            keys = useCaseIssuePolicyMap.keySet();
-            i = keys.iterator();
-            while (i.hasNext()) { 
-            	UseCase key = i.next();
+            List<UseCase> sortedIssueKeys = new ArrayList<>(useCaseIssuePolicyMap.keySet());
+            sortedIssueKeys.sort(Comparator.comparing(UseCase::getSubject));
+            for (UseCase key : sortedIssueKeys) {
             	if (useCaseIssuePolicyMap.containsKey(key)) { 
             		IssuePolicy policy = useCaseIssuePolicyMap.get(key);
             		if (policy!=null) { 
