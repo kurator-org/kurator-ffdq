@@ -309,7 +309,6 @@ public class Amendment extends DataQualityNeed {
 	/**
 	 * @return the references as a string
 	 */
-	@RDF("dcterms:bibliographicCitation")
 	public String getReferences() {
 		return references;
 	}

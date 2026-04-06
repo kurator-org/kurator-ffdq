@@ -280,6 +280,7 @@ public class TestUtil {
         options.addOption("makeGuidList", null, false, "If guidFile is specified and specificationGuid is missing, include new additional guids lists in output.");
 
         options.addOption("generatePython", null, false, "Generate a new Python class with stub methods for each test");
+        options.addOption("citationGuidFile", null, true, "Optional CSV file mapping citation strings to stable UUID URNs. Loaded on startup if it exists, updated and saved at end of run. Format: two columns, no header: \"citation text\",\"urn:uuid:...\"");
         
         try {
             CommandLineParser parser = new DefaultParser();
@@ -332,6 +333,17 @@ public class TestUtil {
             }
             boolean suggestPolicyGuidUpdates = cmd.hasOption("suggestPolicyGuidUpdates");
             Map<String, String> missingPolicyGuids = new LinkedHashMap<String, String>();
+
+            // Load citation UUID mapping
+            String citationGuidFilename = null;
+            Map<String, String> citationGuidMap = new LinkedHashMap<String, String>();
+            if (cmd.hasOption("citationGuidFile")) {
+            	citationGuidFilename = cmd.getOptionValue("citationGuidFile");
+            	citationGuidMap = CitationUtils.loadCitationGuidMap(citationGuidFilename);
+            } else {
+            	logger.warn("No --citationGuidFile specified; citation UUID URIs will not be "
+            			+ "persisted across runs. Use --citationGuidFile to enable stable citation URIs.");
+            }
             
             if (cmd.hasOption("format")) {
                 String value = cmd.getOptionValue("format");
@@ -622,6 +634,10 @@ public class TestUtil {
                         //cd.setPrefLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         model.save(cd);
+                        // Add dcterms:references to BibliographicResource nodes for citations
+                        CitationUtils.addBibliographicResourcesToModel(cd.getId(),
+                        		CitationUtils.parseReferences(test.getReferences()),
+                        		citationGuidMap, model);
                         // Define a measurement method, a specification tied to a dimension in context
                         MeasurementMethod measurementMethod = new MeasurementMethod(specification, cd);
                         // Add additional metadata properties to the method.
@@ -694,6 +710,10 @@ public class TestUtil {
                         cc.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
                         cc.setIssued(test.getIssued());
                         model.save(cc);
+                        // Add dcterms:references to BibliographicResource nodes for citations
+                        CitationUtils.addBibliographicResourcesToModel(cc.getId(),
+                        		CitationUtils.parseReferences(test.getReferences()),
+                        		citationGuidMap, model);
                         // Define a validation method, a specification tied to a criterion in context
                         ValidationMethod validationMethod = new ValidationMethod(specification, cc);
                         // Add additional metadata properties to the method.
@@ -765,6 +785,10 @@ public class TestUtil {
                         //	ce.setId(test.getSpecificationGuid());
                         //}
                         model.save(ce);
+                        // Add dcterms:references to BibliographicResource nodes for citations
+                        CitationUtils.addBibliographicResourcesToModel(ce.getId(),
+                        		CitationUtils.parseReferences(test.getReferences()),
+                        		citationGuidMap, model);
                         // Define an amendment method, a specification tied to a criterion in context
                         AmendmentMethod amendmentMethod = new AmendmentMethod(specification, ce);
                         // Add additional metadata properties to the method.
@@ -837,6 +861,10 @@ public class TestUtil {
                         //	ci.setId(test.getSpecificationGuid());
                         //}
                         model.save(ci);
+                        // Add dcterms:references to BibliographicResource nodes for citations
+                        CitationUtils.addBibliographicResourcesToModel(ci.getId(),
+                        		CitationUtils.parseReferences(test.getReferences()),
+                        		citationGuidMap, model);
                         // Define an amendment method, a specification tied to a criterion in context
                         IssueMethod issueMethod = new IssueMethod(specification, ci);
                         // Add additional metadata properties to the method.
@@ -938,6 +966,11 @@ public class TestUtil {
             		}
             	}
             } 
+
+            // Save citation UUID mappings if a mapping file was specified
+            if (citationGuidFilename != null) {
+            	CitationUtils.saveCitationGuidMap(citationGuidMap, citationGuidFilename);
+            }
 
             // Write rdf to file
             FileOutputStream out = new FileOutputStream(rdfOut);

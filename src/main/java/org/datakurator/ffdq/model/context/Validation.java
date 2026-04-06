@@ -362,7 +362,6 @@ public class Validation extends DataQualityNeed  {
 	/**
 	 * @return the references as a string
 	 */
-	@RDF("dcterms:bibliographicCitation")
 	public String getReferences() {
 		return references;
 	}
@@ -397,3 +396,4 @@ public class Validation extends DataQualityNeed  {
 	
 	
 }
+
