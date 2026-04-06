@@ -405,7 +405,7 @@ public class CitationUtilsTest {
         String needUri = "urn:uuid:test-need-00000000-0000-0000-0000-000000000008";
         Map<String, String> guidMap = new LinkedHashMap<String, String>();
         CitationUtils.addBibliographicResourcesToModel(
-                needUri, Arrays.asList(new String[0]), guidMap, model);
+                needUri, java.util.Collections.<String>emptyList(), guidMap, model);
         assertTrue(guidMap.isEmpty());
     }
 }
