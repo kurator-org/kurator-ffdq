@@ -1398,7 +1398,7 @@ public class TestUtil {
     		return;
     	}
     	int newCount = map.size() - previousSize;
-    	if (newCount <= 0) {
+    	if (newCount == 0) {
     		logger.info("Policy GUID mappings unchanged (" + map.size()
     				+ " entries); file not overwritten: " + filePath);
     		return;

@@ -238,7 +238,7 @@ public class CitationUtils {
         }
 
         int newCount = map.size() - previousSize;
-        if (newCount <= 0) {
+        if (newCount == 0) {
             logger.info("Citation UUID mappings unchanged (" + map.size()
                     + " entries); file not overwritten: " + filePath);
             return;
