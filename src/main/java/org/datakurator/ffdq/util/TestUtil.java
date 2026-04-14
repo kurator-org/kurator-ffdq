@@ -637,7 +637,7 @@ public class TestUtil {
                         //	cd.setId(test.getSpecificationGuid());
                         //}
                         cd.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
-                        //cd.setPrefLabel(test.getDescription() + " MeasureAssertion of " + test.getDimension() +  " for " + resourceType.getLabel());
+                        //cd.setPrefLabel(test.getDescription() + " MeasureResponse of " + test.getDimension() +  " for " + resourceType.getLabel());
                         cd.setComment(test.getDescription());
                         cd.setCitationResources(CitationUtils.buildCitationResources(
                         		CitationUtils.parseReferences(test.getReferences()),

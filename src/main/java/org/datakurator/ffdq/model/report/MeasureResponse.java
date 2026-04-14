@@ -1,6 +1,6 @@
 
 /**
- *  ValidationAssertion.java
+ *  MeasureResponse.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -25,7 +25,7 @@ import org.cyberborean.rdfbeans.annotations.RDF;
 import org.cyberborean.rdfbeans.annotations.RDFBean;
 import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.cyberborean.rdfbeans.annotations.RDFSubject;
-import org.datakurator.ffdq.model.context.Validation;
+import org.datakurator.ffdq.model.context.Measure;
 
 import java.util.UUID;
 
@@ -33,12 +33,12 @@ import java.util.UUID;
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:ValidationAssertion")
-public class ValidationAssertion extends Assertion {
+@RDFBean("bdqffdq:MeasureResponse")
+public class MeasureResponse extends Response {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
-    private Validation criterion;
-    private AmendmentAssertion informedBy;
+    private Measure dimension;
+    private AmendmentResponse informedBy;
 
     /**
      * <p>Getter for the field <code>id</code>.</p>
@@ -60,40 +60,40 @@ public class ValidationAssertion extends Assertion {
     }
 
     /**
-     * <p>Getter for the field <code>criterion</code>.</p>
+     * <p>Getter for the field <code>dimension</code>.</p>
      *
-     * @return a {@link org.datakurator.ffdq.model.context.Validation} object.
+     * @return a {@link org.datakurator.ffdq.model.context.Measure} object.
      */
-    @RDF("bdqffdq:criterionInContext")
-    public Validation getCriterion() {
-        return criterion;
+    @RDF("bdqffdq:dimensionInContext")
+    public Measure getDimension() {
+        return dimension;
     }
 
     /**
-     * <p>Setter for the field <code>criterion</code>.</p>
+     * <p>Setter for the field <code>dimension</code>.</p>
      *
-     * @param criterion a {@link org.datakurator.ffdq.model.context.Validation} object.
+     * @param dimension a {@link org.datakurator.ffdq.model.context.Measure} object.
      */
-    public void setCriterion(Validation criterion) {
-        this.criterion = criterion;
+    public void setDimension(Measure dimension) {
+        this.dimension = dimension;
     }
 
     /**
      * <p>Getter for the field <code>informedBy</code>.</p>
      *
-     * @return a {@link org.datakurator.ffdq.model.report.AmendmentAssertion} object.
+     * @return a {@link org.datakurator.ffdq.model.report.AmendmentResponse} object.
      */
     @RDF("prov:wasInformedBy")
-    public AmendmentAssertion getInformedBy() {
+    public AmendmentResponse getInformedBy() {
         return informedBy;
     }
 
     /**
      * <p>Setter for the field <code>informedBy</code>.</p>
      *
-     * @param informedBy a {@link org.datakurator.ffdq.model.report.AmendmentAssertion} object.
+     * @param informedBy a {@link org.datakurator.ffdq.model.report.AmendmentResponse} object.
      */
-    public void setInformedBy(AmendmentAssertion informedBy) {
+    public void setInformedBy(AmendmentResponse informedBy) {
         this.informedBy = informedBy;
     }
 }

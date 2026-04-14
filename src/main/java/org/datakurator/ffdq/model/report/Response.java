@@ -1,6 +1,6 @@
 
 /**
- *  Assertion.java
+ *  Response.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -33,8 +33,8 @@ import java.net.URI;
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:Assertion")
-public abstract class Assertion {
+@RDFBean("bdqffdq:Response")
+public abstract class Response {
     private Specification specification;
     private Mechanism mechanism;
 

@@ -79,11 +79,11 @@ public class AssertionTest {
     
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
-    // guid for AmendmentAssertion/Measurement/IssueAssertion/ValidationAssertion Method
+    // guid for AmendmentResponse/Measurement/IssueResponse/ValidationResponse Method
     private String methodGuid;
     // guid for Contexturalized Enhancement/Dimension/InvertedCriterion/Criterion
     private String specificationGuid;
-    // guid AmendmentAssertion/Measurement/IssueAssertion/ValidationAssertion Policy, 
+    // guid AmendmentResponse/Measurement/IssueResponse/ValidationResponse Policy, 
     private String policyGuid;
     
     private Class cls;

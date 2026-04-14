@@ -174,9 +174,9 @@ public class XLSXPostProcessor {
 
         for (DataResource dataResource : dataResources) {
             // Get the assertions for each data resource
-            List<Assertion> measures = model.findAssertionsForDataResource(dataResource, MeasureAssertion.class);
-            List<Assertion> validations = model.findAssertionsForDataResource(dataResource, ValidationAssertion.class);
-            List<Assertion> amendments = model.findAssertionsForDataResource(dataResource, AmendmentAssertion.class);
+            List<Response> measures = model.findAssertionsForDataResource(dataResource, MeasureResponse.class);
+            List<Response> validations = model.findAssertionsForDataResource(dataResource, ValidationResponse.class);
+            List<Response> amendments = model.findAssertionsForDataResource(dataResource, AmendmentResponse.class);
 
             // TODO: add support to postprocessor for issues
 
@@ -265,12 +265,12 @@ public class XLSXPostProcessor {
         return measuresSheet;
     }
 
-    private void initMeasuresSheet(Sheet measuresSheet, List<Assertion> measures, DataResource dataResource) {
+    private void initMeasuresSheet(Sheet measuresSheet, List<Response> measures, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        //List<String> fields = model.findFieldsByAssertionType(MeasureAssertion.class);
+        //List<String> fields = model.findFieldsByAssertionType(MeasureResponse.class);
 
-        for (Assertion assertion : measures) {
-            MeasureAssertion measure = (MeasureAssertion) assertion;
+        for (Response response : measures) {
+            MeasureResponse measure = (MeasureResponse) response;
             String recordId = dataResource.getRecordId();
 
             // Measurement assertion row
@@ -346,29 +346,29 @@ public class XLSXPostProcessor {
         return validationsSheet;
     }
 
-    private void initValidationsSheet(Sheet validationsSheet, Sheet initialValuesSheet, List<Assertion> validations, DataResource dataResource) {
+    private void initValidationsSheet(Sheet validationsSheet, Sheet initialValuesSheet, List<Response> validations, DataResource dataResource) {
         // Get the list of fields actedUpon from the information elements
-        //List<String> fields = model.findFieldsByAssertionType(ValidationAssertion.class);
+        //List<String> fields = model.findFieldsByAssertionType(ValidationResponse.class);
 
         List<Map<String, ValidationState>> allInitialValues = new ArrayList<>();
 
         List<String> allFlags = new ArrayList<>();
 
-        for (Assertion assertion : validations) {
+        for (Response response : validations) {
             // Initialize the validation states for initial and final values
             Map<String, ValidationState> initialValues = new HashMap<>();
 
-            ValidationAssertion validation = (ValidationAssertion) assertion;
+            ValidationResponse validation = (ValidationResponse) response;
             String recordId = dataResource.getRecordId();
 
-            // ValidationAssertion assertion row
+            // ValidationResponse assertion row
             Row validationsRow = validationsSheet.createRow(validationsSheetRowNum++);
 
             // Get the test name from the specification
             Specification specification = validation.getSpecification();
             String test = specification.getLabel();
 
-            // ValidationAssertion result
+            // ValidationResponse result
             Result result = validation.getResult();
 
             // Determine row status from state and value
@@ -520,7 +520,7 @@ public class XLSXPostProcessor {
         return amendmentsSheet;
     }
 
-    private void initAmendmentsSheet(Sheet amendmentsSheet, Sheet finalValuesSheet, List<Assertion> amendments, DataResource dataResource) {
+    private void initAmendmentsSheet(Sheet amendmentsSheet, Sheet finalValuesSheet, List<Response> amendments, DataResource dataResource) {
         Map<String, ValidationState> finalValues = new HashMap<>();
         Map<String, String> prevValues = dataResource.asMap();
 
@@ -535,18 +535,18 @@ public class XLSXPostProcessor {
         // All amendment flags
         List<String> allFlags = new ArrayList<>();
 
-        for (Assertion assertion : amendments) {
-            AmendmentAssertion amendment = (AmendmentAssertion) assertion;
+        for (Response response : amendments) {
+            AmendmentResponse amendment = (AmendmentResponse) response;
             String recordId = dataResource.getRecordId();
 
-            // AmendmentAssertion assertion row
+            // AmendmentResponse assertion row
             Row amendmentsRow = amendmentsSheet.createRow(amendmentsSheetRowNum++);
 
             // Get the test name from the specification
             Specification specification = amendment.getSpecification();
             String test = specification.getLabel();
 
-            // ValidationAssertion result
+            // ValidationResponse result
             Result result = amendment.getResult();
 
             // Determine row status from state and value

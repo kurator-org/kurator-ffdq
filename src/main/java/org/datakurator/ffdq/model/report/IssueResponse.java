@@ -1,6 +1,6 @@
 
 /**
- *  IssueAssertion.java
+ *  IssueResponse.java
  *
  * Copyright 2022 President and Fellows of Harvard College
  *
@@ -33,12 +33,12 @@ import java.util.UUID;
        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
        "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:IssueAssertion")
-public class IssueAssertion extends Assertion {
+@RDFBean("bdqffdq:IssueResponse")
+public class IssueResponse extends Response {
    private String id = "urn:uuid:" + UUID.randomUUID();
 
    private Issue issueInContext;
-   private AmendmentAssertion informedBy;
+   private AmendmentResponse informedBy;
 
    /**
     * <p>Getter for the field <code>id</code>.</p>
@@ -81,19 +81,19 @@ public class IssueAssertion extends Assertion {
    /**
     * <p>Getter for the field <code>informedBy</code>.</p>
     *
-    * @return a {@link org.datakurator.ffdq.model.report.AmendmentAssertion} object.
+    * @return a {@link org.datakurator.ffdq.model.report.AmendmentResponse} object.
     */
    @RDF("prov:wasInformedBy")
-   public AmendmentAssertion getInformedBy() {
+   public AmendmentResponse getInformedBy() {
        return informedBy;
    }
 
    /**
     * <p>Setter for the field <code>informedBy</code>.</p>
     *
-    * @param informedBy a {@link org.datakurator.ffdq.model.report.AmendmentAssertion} object.
+    * @param informedBy a {@link org.datakurator.ffdq.model.report.AmendmentResponse} object.
     */
-   public void setInformedBy(AmendmentAssertion informedBy) {
+   public void setInformedBy(AmendmentResponse informedBy) {
        this.informedBy = informedBy;
    }
 }

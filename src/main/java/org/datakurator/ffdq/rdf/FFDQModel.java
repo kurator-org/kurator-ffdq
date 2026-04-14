@@ -25,7 +25,7 @@ import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.datakurator.ffdq.model.context.Issue;
 import org.datakurator.ffdq.model.context.Measure;
 import org.datakurator.ffdq.model.context.Validation;
-import org.datakurator.ffdq.model.report.Assertion;
+import org.datakurator.ffdq.model.report.Response;
 import org.datakurator.ffdq.model.solutions.DataQualityMethod;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -252,7 +252,7 @@ public class FFDQModel extends BaseModel {
      * @param cls a {@link java.lang.Class} object.
      * @return a {@link java.util.List} object.
      */
-    public List<String> findFieldsByAssertionType(Class<? extends Assertion> cls) {
+    public List<String> findFieldsByAssertionType(Class<? extends Response> cls) {
         List<String> fields = new ArrayList<>();
 
         // TODO: Needs joins through specification and method
@@ -316,7 +316,7 @@ public class FFDQModel extends BaseModel {
      * @param cls a {@link java.lang.Class} object.
      * @return a {@link java.util.List} object.
      */
-    public List<Assertion> findAssertionsForDataResource(DataResource dataResource, Class<? extends Assertion> cls) {
+    public List<Response> findAssertionsForDataResource(DataResource dataResource, Class<? extends Response> cls) {
         String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
                 "PREFIX prov: <http://www.w3.org/ns/prov#> " +
                 "SELECT ?assertion ?type WHERE { " +
@@ -325,9 +325,9 @@ public class FFDQModel extends BaseModel {
                 "}";
 
 
-        Map<String, Assertion> assertions = findAll(cls, sparql, "assertion");
+        Map<String, Response> responses = findAll(cls, sparql, "assertion");
 
-        return new ArrayList<>(assertions.values());
+        return new ArrayList<>(responses.values());
     }
 
     /**

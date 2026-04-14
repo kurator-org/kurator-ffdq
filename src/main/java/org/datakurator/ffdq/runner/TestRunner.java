@@ -139,7 +139,7 @@ public class TestRunner {
         		logger.log(Level.INFO, "Specifications found for Mechanism in RDF: " + definedTests.size());
 
         		// Process method level annotations and check that test methods in the DQClass are consistent
-        		// with Measurement, ValidationAssertion and AmendmentAssertion Methods defined in the RDF
+        		// with Measurement, ValidationResponse and AmendmentResponse Methods defined in the RDF
         		processMethods(cls, definedTests);
 
         	}
@@ -250,8 +250,8 @@ public class TestRunner {
         }
         logger.log(Level.INFO, "Implemented Tests Remaining after removing not found.: " + implementedTests.size());
 
-        // Check that all test method in the DQClass have associated metadata in the form of Measurement, ValidationAssertion,
-        // and AmendmentAssertion Methods in the BDQFFDQ rdf
+        // Check that all test method in the DQClass have associated metadata in the form of Measurement, ValidationResponse,
+        // and AmendmentResponse Methods in the BDQFFDQ rdf
         if (!definedGuids.containsAll(implementedGuids)) {
             logger.warning("Tests declared in Java class via @Provides missing corresponding definitions " +
                     "in the RDF!");
@@ -574,7 +574,7 @@ public class TestRunner {
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                MeasureAssertion measure = new MeasureAssertion();
+                MeasureResponse measure = new MeasureResponse();
 
                 measure.setDimension(dimension);
                 measure.setDataResource(dataResource.getURI());
@@ -593,7 +593,7 @@ public class TestRunner {
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                ValidationAssertion validation = new ValidationAssertion();
+                ValidationResponse validation = new ValidationResponse();
 
                 validation.setCriterion(criterion);
                 validation.setDataResource(dataResource.getURI());
@@ -612,7 +612,7 @@ public class TestRunner {
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                AmendmentAssertion amendment = new AmendmentAssertion();
+                AmendmentResponse amendment = new AmendmentResponse();
 
                 amendment.setEnhancement(enhancement);
                 amendment.setDataResource(dataResource.getURI());

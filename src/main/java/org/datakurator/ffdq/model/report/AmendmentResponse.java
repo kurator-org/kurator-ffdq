@@ -1,6 +1,6 @@
 
 /**
- *  AmendmentAssertion.java
+ *  AmendmentResponse.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -33,8 +33,8 @@ import java.util.UUID;
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "prov = http://www.w3.org/ns/prov#"
 })
-@RDFBean("bdqffdq:AmendmentAssertion")
-public class AmendmentAssertion extends Assertion {
+@RDFBean("bdqffdq:AmendmentResponse")
+public class AmendmentResponse extends Response {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Amendment enhancement;

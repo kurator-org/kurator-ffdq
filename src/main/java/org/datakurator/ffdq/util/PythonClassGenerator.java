@@ -49,7 +49,7 @@ class DwCTG2DQ:
     
     def validationCountrycodeNotstandard(countryCode: {"dwc:countryCode":"ActedUpon"} ) -> DQResponse:
         '''
-          #20 ValidationAssertion SingleRecord Conformance: countrycode notstandard
+          #20 ValidationResponse SingleRecord Conformance: countrycode notstandard
      
           Provides: VALIDATION_COUNTRYCODE_NOTSTANDARD
     
