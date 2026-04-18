@@ -320,7 +320,7 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:comment")
+    @RDF("dcterms:description")
 	public String getComment() {
 		return comment;
 	}

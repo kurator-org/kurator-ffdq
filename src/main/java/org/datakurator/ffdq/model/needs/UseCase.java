@@ -30,6 +30,7 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
+        "dcterms = http://purl.org/dc/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:UseCase")
@@ -100,7 +101,7 @@ public class UseCase {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:comment")
+    @RDF("dcterms:description")
     public String getDescription() {
         return description;
     }

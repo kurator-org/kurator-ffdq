@@ -33,6 +33,7 @@ import java.util.UUID;
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
         "skos = http://www.w3.org/2004/02/skos/core#",
+        "dcterms = http://purl.org/dc/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })
 @RDFBean("bdqffdq:Specification")
@@ -123,7 +124,7 @@ public class Specification {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:comment")
+    @RDF("dcterms:description")
     public String getDescription() {
         return description;
     }
