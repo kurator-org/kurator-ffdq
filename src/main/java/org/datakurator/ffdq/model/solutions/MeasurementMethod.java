@@ -70,7 +70,7 @@ public class MeasurementMethod extends DataQualityMethod {
      *
      * @return a {@link org.datakurator.ffdq.model.context.Measure} object.
      */
-    @RDF("bdqffdq:forMeasurement")
+    @RDF("bdqffdq:forMeasure")
     public Measure getMeasure() {
         return cd;
     }
