@@ -39,8 +39,8 @@ public class Namespace {
     public static final String DC = "http://purl.org/dc/elements/1.1/";
     /** Constant <code>SKOS="http://www.w3.org/2004/02/skos/core#"</code> */
     public static final String SKOS = "http://www.w3.org/2004/02/skos/core#";
-    /** Constant <code>BDQ="https://rs.tdwg.org/bdq/terms/"</code> */
-    public static final String BDQ = "https://rs.tdwg.org/bdq/terms/";   // other bdq terms
+    /** Constant <code>BDQVAL="https://rs.tdwg.org/bdqval/terms/"</code> */
+    public static final String BDQVAL = "https://rs.tdwg.org/bdqval/terms/";   // other bdq terms, the bdqval namespace
     /** Constant <code>BDQDIM="https://rs.tdwg.org/bdqdim/terms/"</code> */
     public static final String BDQDIM = "https://rs.tdwg.org/bdqdim/terms/";  // dimensions   
     /** Constant <code>BDQENH="https://rs.tdwg.org/bdqenh/terms/"</code> */
@@ -84,7 +84,7 @@ public class Namespace {
         nsPrefixes.put("dwciri", DWCIRI);
         nsPrefixes.put("dc", DC);
         
-        nsPrefixes.put("bdq", BDQ);
+        nsPrefixes.put("bdqval", BDQVAL);
         nsPrefixes.put("bdqdim", BDQDIM);
         nsPrefixes.put("bdqcrit", BDQCRIT);
         nsPrefixes.put("bdqenh", BDQENH);

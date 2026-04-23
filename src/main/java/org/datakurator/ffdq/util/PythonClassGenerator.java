@@ -66,7 +66,7 @@ class DwCTG2DQ:
         # is a valid ISO (ISO 3166-1-alpha-2 country codes) value 
         # or is EMPTY; otherwise NOT_COMPLIANT 
         # TODO: Parameters. This test is defined as parameterized.
-        # bdq:sourceAuthority (default = https://restcountries.eu/#api-endpoints-list-of-codes)
+        # bdqval:sourceAuthority (default = https://restcountries.eu/#api-endpoints-list-of-codes)
 
         return result;
 

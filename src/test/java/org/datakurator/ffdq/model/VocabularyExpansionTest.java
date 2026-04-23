@@ -19,7 +19,7 @@ public class VocabularyExpansionTest {
     private static final String BDQDIM  = "https://rs.tdwg.org/bdqdim/terms/";
     private static final String BDQCRIT = "https://rs.tdwg.org/bdqcrit/terms/";
     private static final String BDQENH  = "https://rs.tdwg.org/bdqenh/terms/";
-    private static final String BDQ     = "https://rs.tdwg.org/bdq/terms/";
+    private static final String BDQVAL     = "https://rs.tdwg.org/bdqval/terms/";
 
     // -----------------------------------------------------------------------
     // ResourceType
@@ -228,25 +228,25 @@ public class VocabularyExpansionTest {
     }
 
     // -----------------------------------------------------------------------
-    // Parameter — CURIE-as-IRI fix (bdq: prefix must be expanded)
+    // Parameter — CURIE-as-IRI fix (bdqval: prefix must be expanded)
     // -----------------------------------------------------------------------
 
     @Test
     public void testParameter_constructor_curie() {
-        Parameter p = new Parameter("bdq:sourceAuthority");
-        assertEquals(BDQ + "sourceAuthority", p.getId());
+        Parameter p = new Parameter("bdqval:sourceAuthority");
+        assertEquals(BDQVAL + "sourceAuthority", p.getId());
     }
 
     @Test
     public void testParameter_constructor_fullIri() {
-        Parameter p = new Parameter(BDQ + "sourceAuthority");
-        assertEquals(BDQ + "sourceAuthority", p.getId());
+        Parameter p = new Parameter(BDQVAL + "sourceAuthority");
+        assertEquals(BDQVAL + "sourceAuthority", p.getId());
     }
 
     @Test
     public void testParameter_iriDoesNotContainCurieForm() {
-        Parameter p = new Parameter("bdq:sourceAuthority");
-        assertFalse("Parameter IRI must not be a CURIE literal", p.getId().equals("bdq:sourceAuthority"));
+        Parameter p = new Parameter("bdqval:sourceAuthority");
+        assertFalse("Parameter IRI must not be a CURIE literal", p.getId().equals("bdqval:sourceAuthority"));
         assertTrue("Parameter IRI must be a full IRI", p.getId().startsWith("https://"));
     }
 }

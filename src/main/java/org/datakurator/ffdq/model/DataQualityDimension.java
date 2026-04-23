@@ -30,7 +30,7 @@ import java.util.UUID;
 
 @RDFNamespaces({
         "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "bdq = https://rs.tdwg.org/bdq/terms/",
+        "bdqval = https://rs.tdwg.org/bdqval/terms/",
         "bdqdim = https://rs.tdwg.org/bdqdim/terms/",
         "d = https://rs.tdwg.org/bdqdim/terms/",
         "rdfs = http://www.w3.org/2000/01/rdf-schema#"

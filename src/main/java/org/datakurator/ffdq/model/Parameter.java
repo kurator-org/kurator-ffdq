@@ -12,7 +12,7 @@ import org.datakurator.ffdq.rdf.Namespace;
 
 @RDFNamespaces({
     "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-    "bdq = https://rs.tdwg.org/bdq/terms/",
+    "bdqval = https://rs.tdwg.org/bdqval/terms/",
     "skos = http://www.w3.org/2004/02/skos/core#",
     "rdfs = http://www.w3.org/2000/01/rdf-schema#"
 })

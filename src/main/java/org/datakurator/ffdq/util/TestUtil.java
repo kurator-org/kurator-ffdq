@@ -405,7 +405,7 @@ public class TestUtil {
             				if (!useCaseMap.containsKey(useCaseLabel)) { 
             					UseCase useCaseInstance = new UseCase();
             					useCaseInstance.setLabel(useCaseLabel);
-            					useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdq/terms/"));
+            					useCaseInstance.setSubject(useCaseLabel.replace("bdqval:", "https://rs.tdwg.org/bdqval/terms/"));
             					useCaseMap.put(useCaseLabel, useCaseInstance);
             				}
             				String includedTests = useCaseRecord.get("LabelsOfTestsIncluded");
@@ -477,7 +477,7 @@ public class TestUtil {
                 			String[] bits = paramString.split(",");
                 			for (int bi=0; bi<bits.length; bi++) {
                 				String paramStringBit = bits[bi].trim();
-                				if (paramStringBit.startsWith("bdq:")) { 
+                				if (paramStringBit.startsWith("bdqval:")) { 
                 					Parameter parameter = new Parameter(paramStringBit);
                 					argument = new Argument(parameter, "Default value for " + paramStringBit);
                 					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), paramStringBit);
@@ -499,7 +499,7 @@ public class TestUtil {
                 			}
                 		} else { 
                 			// Set argument guids from ArgumentGuids column.
-                			if (paramString.startsWith("bdq:")) { 
+                			if (paramString.startsWith("bdqval:")) { 
                 				Parameter parameter = new Parameter(paramString);
                 				argument = new Argument(parameter, "Default value for " + paramString);
             					String defaultValue = TestUtil.parseDefaultFromAuthoritiesDefaultsForPatameter(test.getAuthoritiesDefaults(), paramString);
@@ -614,7 +614,7 @@ public class TestUtil {
                 		if (!useCaseMap.containsKey(useCaseLabel)) { 
                 			UseCase useCaseInstance = new UseCase();
                 			useCaseInstance.setLabel(useCaseLabel);
-                			useCaseInstance.setSubject(useCaseLabel.replace("bdq:", "https://rs.tdwg.org/bdq/terms/"));
+                			useCaseInstance.setSubject(useCaseLabel.replace("bdqval:", "https://rs.tdwg.org/bdqval/terms/"));
                 			useCaseMap.put(useCaseLabel, useCaseInstance);
                 		}
                 	}
@@ -1422,14 +1422,14 @@ public class TestUtil {
      *
      * Expects each part of the authorities default string to start with a pattern of parameter default = "defaultvalue"
      * for example: 
-     * bdq:sourceAuthority default = "The Getty Thesaurus of Geographic Names (TGN)"
+     * bdqval:sourceAuthority default = "The Getty Thesaurus of Geographic Names (TGN)"
      * 
      * @param authoritiesDefaults from which to find a default value for the specified parameter
      * @param parameter the parameter for which to find a default
      * @return the default value or the string DEFAULT if the parse is not successfull.
      */
     public static String parseDefaultFromAuthoritiesDefaultsForPatameter(String authoritiesDefaults, String parameter) { 
-    	// bdq:sourceAuthority default = "The Getty Thesaurus of Geographic Names (TGN)"
+    	// bdqval:sourceAuthority default = "The Getty Thesaurus of Geographic Names (TGN)"
     	String retval = "DEFAULT";
     	try { 
     		if (authoritiesDefaults.contains(parameter)) { 
