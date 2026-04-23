@@ -125,7 +125,7 @@ public class ValidationPolicy {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:includesInPolicy")
+    @RDF("bdqffdq:includedInPolicy")
     public List<Validation> getValidations() {
         return validations;
     }

@@ -111,7 +111,7 @@ public class AmendmentPolicy {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:includesInPolicy")
+    @RDF("bdqffdq:includedInPolicy")
     public List<Amendment> getEnhancementInContext() {
         return amendments;
     }

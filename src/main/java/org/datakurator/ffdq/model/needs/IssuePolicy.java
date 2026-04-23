@@ -112,7 +112,7 @@ public class IssuePolicy {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:includesInPolicy")
+    @RDF("bdqffdq:includedInPolicy")
     public List<Issue> getIssues() {
         return issues;
     }
