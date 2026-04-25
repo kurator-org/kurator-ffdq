@@ -76,6 +76,13 @@ public class AssertionTest {
     private String mechanisms;
     private String sourceCode;
     private String issueLabels;
+
+    /**
+     * For MultiRecord Measures: the unversioned upstream test term IRIs that this test
+     * aggregates responses from. Populated from the {@code aggregatesResponsesFrom} CSV column.
+     * Each entry is a full IRI string (e.g., {@code https://rs.tdwg.org/bdqtest/terms/69b2...}).
+     */
+    private List<String> aggregatesResponsesFrom = new ArrayList<>();
     
     // additional strings for classes holding more of the framework structure of the test
     // can be loaded from a file for consistent generation of RDF.
@@ -927,6 +934,25 @@ public class AssertionTest {
 	 */
 	public void setIssueLabels(String issueLabels) {
 		this.issueLabels = issueLabels;
+	}
+
+	/**
+	 * Returns the upstream test term IRIs that this (MultiRecord Measure) test aggregates
+	 * responses from. Populated from the {@code aggregatesResponsesFrom} CSV column.
+	 *
+	 * @return list of upstream test term IRI strings; never null, may be empty
+	 */
+	public List<String> getAggregatesResponsesFrom() {
+		return aggregatesResponsesFrom;
+	}
+
+	/**
+	 * Sets the upstream test term IRIs that this test aggregates responses from.
+	 *
+	 * @param aggregatesResponsesFrom list of IRI strings; may be empty or null (treated as empty)
+	 */
+	public void setAggregatesResponsesFrom(List<String> aggregatesResponsesFrom) {
+		this.aggregatesResponsesFrom = (aggregatesResponsesFrom != null) ? aggregatesResponsesFrom : new ArrayList<>();
 	}
 	
 }
