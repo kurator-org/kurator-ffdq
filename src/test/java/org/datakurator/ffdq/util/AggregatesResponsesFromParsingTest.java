@@ -97,7 +97,7 @@ public class AggregatesResponsesFromParsingTest {
     }
 
     @Test
-    public void testSplitSemantics_whitespaceTrimed() {
+    public void testSplitSemantics_whitespaceTrimmed() {
         String cell = "  " + IRI_COUNTRY_FOUND + " , " + IRI_OTHER + "  ";
         List<String> result = splitAggregatesResponsesFrom(cell);
         assertEquals(2, result.size());
