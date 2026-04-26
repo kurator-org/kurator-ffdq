@@ -438,6 +438,16 @@ public class TestUtil {
             // Debug UseCase test coverage summary before we start loading the model, to check how well the use case file matches the test labels in the csv.
             printUseCaseCoverageSummary(useCaseMap, useCaseTestMap, tests);
 
+            // Build IRI-to-label map to resolve upstream test labels from aggregatesResponsesFrom IRIs.
+            // Used when constructing ActedUpon labels for MultiRecord Measures.
+            Map<String, String> testIriToLabelMap = new HashMap<>();
+            for (AssertionTest t : tests) {
+                String iri = t.getGuidTDWGNamespace();
+                if (iri != null && t.getLabel() != null) {
+                    testIriToLabelMap.put(iri, t.getLabel());
+                }
+            }
+
             // Define a mechanism for the tests
             Mechanism mechanism = new Mechanism(mechanismGuid, mechanismName);
 
@@ -554,14 +564,19 @@ public class TestUtil {
                 		separator = ", ";
                 	}
                 }
-                // When aggregatesResponsesFrom values are present, include them in the label
-                // key to ensure distinct ActedUpon instances for different upstream tests.
+                // When aggregatesResponsesFrom values are present, include a human-readable
+                // CURIE-form label (bdqtest:<testLabel>.Response) in the label key to ensure
+                // distinct ActedUpon instances for different upstream tests.
                 List<String> arfs = test.getAggregatesResponsesFrom();
                 if (arfs != null && !arfs.isEmpty()) {
                     for (String arf : arfs) {
                         String trimmedArf = arf.trim();
                         if (!trimmedArf.isEmpty()) {
-                            label.append(" aggregatesResponsesFrom ").append(trimmedArf);
+                            String arfTestLabel = testIriToLabelMap.get(trimmedArf);
+                            String arfCurie = (arfTestLabel != null)
+                                    ? "bdqtest:" + arfTestLabel + ".Response"
+                                    : trimmedArf + ".Response";
+                            label.append(" for ").append(arfCurie);
                         }
                     }
                 }
@@ -581,6 +596,7 @@ public class TestUtil {
                         // For MultiRecord Measures, this links the ActedUpon node to the upstream
                         // test(s) whose responses are being aggregated (bdqffdq:aggregatesResponsesFrom).
                         if (arfs != null && !arfs.isEmpty()) {
+                            List<String> arfTestLabels = new ArrayList<>();
                             for (String arf : arfs) {
                                 String trimmedArf = arf.trim();
                                 if (!trimmedArf.isEmpty()) {
@@ -589,7 +605,17 @@ public class TestUtil {
                                     } catch (IllegalArgumentException e) {
                                         logger.error("Invalid aggregatesResponsesFrom URI: " + trimmedArf);
                                     }
+                                    String arfTestLabel = testIriToLabelMap.get(trimmedArf);
+                                    if (arfTestLabel != null) {
+                                        arfTestLabels.add(arfTestLabel);
+                                    }
                                 }
+                            }
+                            // Set skos:note describing the aggregation, using the upstream test label(s).
+                            if (!arfTestLabels.isEmpty()) {
+                                String noteLabels = String.join(", ", arfTestLabels);
+                                actedUpon.setNote("Aggregated Response outcomes produced by "
+                                        + noteLabels + " across a MultiRecord.");
                             }
                         }
                 		ieMap.put(label.toString(), actedUpon);

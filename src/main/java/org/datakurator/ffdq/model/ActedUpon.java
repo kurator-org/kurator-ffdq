@@ -99,6 +99,33 @@ public class ActedUpon extends InformationElement {
     }
 
     /**
+     * A human-readable note for this ActedUpon node.
+     * For MultiRecord aggregation nodes this is set to describe which upstream test's
+     * response outcomes are being aggregated, e.g.
+     * {@code "Aggregated Response outcomes produced by VALIDATION_COUNTRY_FOUND across a MultiRecord."}.
+     */
+    private String note;
+
+    /**
+     * Returns the {@code skos:note} for this ActedUpon node.
+     *
+     * @return the note string, or null if not set
+     */
+    @RDF("skos:note")
+    public String getNote() {
+        return note;
+    }
+
+    /**
+     * Sets the {@code skos:note} for this ActedUpon node.
+     *
+     * @param note the note string to set
+     */
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    /**
      * <p>Getter for the field <code>label</code>.</p>
      *
      * @return the label

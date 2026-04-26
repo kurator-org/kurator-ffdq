@@ -106,4 +106,24 @@ public class ActedUponAggregatesResponsesFromTest {
                 au2.getAggregatesResponsesFrom().isEmpty());
         assertEquals(1, au1.getAggregatesResponsesFrom().size());
     }
+
+    /**
+     * A freshly-created ActedUpon should have a null note by default.
+     */
+    @Test
+    public void testNote_initiallyNull() {
+        ActedUpon au = new ActedUpon();
+        assertNull(au.getNote());
+    }
+
+    /**
+     * setNote / getNote should store and return the note string.
+     */
+    @Test
+    public void testNote_setAndGet() {
+        ActedUpon au = new ActedUpon();
+        String expectedNote = "Aggregated Response outcomes produced by VALIDATION_COUNTRY_FOUND across a MultiRecord.";
+        au.setNote(expectedNote);
+        assertEquals(expectedNote, au.getNote());
+    }
 }
