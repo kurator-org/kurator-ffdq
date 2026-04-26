@@ -61,6 +61,15 @@ public class TestUtil {
 
 	
 	private static final Log logger = LogFactory.getLog(TestUtil.class);
+
+    /**
+     * Format string for the {@code skos:note} on an {@link ActedUpon} node that aggregates
+     * upstream test responses. Placeholder {@code {0}} is the comma-separated list of
+     * upstream test labels (e.g., {@code "VALIDATION_COUNTRY_FOUND"}).
+     * Example result: {@code "Aggregated Response outcomes produced by VALIDATION_COUNTRY_FOUND across a MultiRecord."}
+     */
+    public static final String NOTE_AGGREGATED_RESPONSE_FORMAT =
+            "Aggregated Response outcomes produced by {0} across a MultiRecord.";
 	
     private final static String CSV_HEADER_LABEL;
     private final static String CSV_HEADER_GUID;
@@ -93,6 +102,7 @@ public class TestUtil {
     private final static String CSV_HEADER_MECHANISMS;
     private final static String CSV_HEADER_SOURCECODE;
     private final static String CSV_HEADER_ISSUELABELS;
+    private final static String CSV_HEADER_AGGREGATES_RESPONSES_FROM;
 
     static {
         Properties properties = new Properties();
@@ -130,6 +140,7 @@ public class TestUtil {
             CSV_HEADER_MECHANISMS = properties.getProperty("csv.header.mechanisms");
             CSV_HEADER_SOURCECODE = properties.getProperty("csv.header.sourcecode");
             CSV_HEADER_ISSUELABELS = properties.getProperty("csv.header.issuelabels");
+            CSV_HEADER_AGGREGATES_RESPONSES_FROM = properties.getProperty("csv.header.aggregatesResponsesFrom");
             
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize properties from file config.properties", e);
@@ -436,6 +447,16 @@ public class TestUtil {
             // Debug UseCase test coverage summary before we start loading the model, to check how well the use case file matches the test labels in the csv.
             printUseCaseCoverageSummary(useCaseMap, useCaseTestMap, tests);
 
+            // Build IRI-to-label map to resolve upstream test labels from aggregatesResponsesFrom IRIs.
+            // Used when constructing ActedUpon labels for MultiRecord Measures.
+            Map<String, String> testIriToLabelMap = new HashMap<>();
+            for (AssertionTest t : tests) {
+                String iri = t.getGuidTDWGNamespace();
+                if (iri != null && t.getLabel() != null) {
+                    testIriToLabelMap.put(iri, t.getLabel());
+                }
+            }
+
             // Define a mechanism for the tests
             Mechanism mechanism = new Mechanism(mechanismGuid, mechanismName);
 
@@ -552,6 +573,22 @@ public class TestUtil {
                 		separator = ", ";
                 	}
                 }
+                // When aggregatesResponsesFrom values are present, include a human-readable
+                // CURIE-form label (bdqtest:<testLabel>.Response) in the label key to ensure
+                // distinct ActedUpon instances for different upstream tests.
+                List<String> arfs = test.getAggregatesResponsesFrom();
+                if (arfs != null && !arfs.isEmpty()) {
+                    for (String arf : arfs) {
+                        String trimmedArf = arf.trim();
+                        if (!trimmedArf.isEmpty()) {
+                            String arfTestLabel = testIriToLabelMap.get(trimmedArf);
+                            String arfCurie = (arfTestLabel != null)
+                                    ? "bdqtest:" + arfTestLabel + ".Response"
+                                    : trimmedArf + ".Response";
+                            label.append(" for ").append(arfCurie);
+                        }
+                    }
+                }
                 if (test.getActedUpon().size()>0) { 
                 	actedUpon.setLabel(label.toString());
                 	// Set GUID if provided in list
@@ -563,7 +600,32 @@ public class TestUtil {
                 	// Reuse existing instance
                 	if (ieMap.containsKey(label.toString())) { 
                 		actedUpon = (ActedUpon) ieMap.get(label.toString());
-                	} else { 
+                	} else {
+                        // Set aggregatesResponsesFrom on the new ActedUpon instance before storing.
+                        // For MultiRecord Measures, this links the ActedUpon node to the upstream
+                        // test(s) whose responses are being aggregated (bdqffdq:aggregatesResponsesFrom).
+                        if (arfs != null && !arfs.isEmpty()) {
+                            List<String> arfTestLabels = new ArrayList<>();
+                            for (String arf : arfs) {
+                                String trimmedArf = arf.trim();
+                                if (!trimmedArf.isEmpty()) {
+                                    try {
+                                        actedUpon.addAggregatesResponsesFrom(URI.create(trimmedArf));
+                                    } catch (IllegalArgumentException e) {
+                                        logger.error("Invalid aggregatesResponsesFrom URI: " + trimmedArf);
+                                    }
+                                    String arfTestLabel = testIriToLabelMap.get(trimmedArf);
+                                    if (arfTestLabel != null) {
+                                        arfTestLabels.add(arfTestLabel);
+                                    }
+                                }
+                            }
+                            // Set skos:note describing the aggregation, using the upstream test label(s).
+                            if (!arfTestLabels.isEmpty()) {
+                                String noteLabels = String.join(", ", arfTestLabels);
+                                actedUpon.setNote(NOTE_AGGREGATED_RESPONSE_FORMAT.replace("{0}", noteLabels));
+                            }
+                        }
                 		ieMap.put(label.toString(), actedUpon);
                 	}
                 }
@@ -1161,6 +1223,15 @@ public class TestUtil {
                 String historyNoteUrl = record.get(CSV_HISTORY_NOTE_URL);
                 String issued = record.get(CSV_HEADER_ISSUED);
                 String status = record.get("status");
+                // Read aggregatesResponsesFrom column if present (backwards-compatible)
+                List<String> aggregatesResponsesFrom = new ArrayList<>();
+                if (CSV_HEADER_AGGREGATES_RESPONSES_FROM != null
+                        && record.isMapped(CSV_HEADER_AGGREGATES_RESPONSES_FROM)) {
+                    String arfStr = record.get(CSV_HEADER_AGGREGATES_RESPONSES_FROM);
+                    if (arfStr != null && !arfStr.trim().isEmpty()) {
+                        aggregatesResponsesFrom = parseAggregatesResponsesFromStr(arfStr);
+                    }
+                }
                 
                 if (status.equals("recommended")) { 
                 	// only include recommended (current) terms from term-version file
@@ -1183,6 +1254,7 @@ public class TestUtil {
                 	test.setMechanisms(record.get(CSV_HEADER_MECHANISMS));
                 	test.setSourceCode(record.get(CSV_HEADER_SOURCECODE));
                 	test.setIssueLabels(record.get(CSV_HEADER_ISSUELABELS));
+                	test.setAggregatesResponsesFrom(aggregatesResponsesFrom);
                 	tests.add(test);
                 } else { 
                 	logger.debug("Skipping test " + guid + " with status " + status);
@@ -1288,6 +1360,29 @@ public class TestUtil {
         }
 
         return useCases;
+    }
+    
+    /**
+     * Parse an {@code aggregatesResponsesFrom} cell value into a list of IRI strings.
+     * Supports values separated by commas and/or semicolons; trims whitespace from each token.
+     * Values are expected to be full IRIs (e.g.,
+     * {@code https://rs.tdwg.org/bdqtest/terms/69b2efdc-6269-45a4-aecb-4cb99c2ae134}).
+     *
+     * @param str the cell value from the {@code aggregatesResponsesFrom} CSV column
+     * @return list of trimmed, non-empty IRI strings; never null
+     */
+    private static List<String> parseAggregatesResponsesFromStr(String str) {
+        List<String> result = new ArrayList<>();
+        if (str == null || str.trim().isEmpty()) {
+            return result;
+        }
+        for (String token : str.split("[,;]")) {
+            String trimmed = token.trim();
+            if (!trimmed.isEmpty()) {
+                result.add(trimmed);
+            }
+        }
+        return result;
     }
     
     /**
