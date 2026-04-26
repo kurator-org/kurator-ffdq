@@ -1,5 +1,6 @@
 package org.datakurator.ffdq.model;
 
+import org.datakurator.ffdq.util.TestUtil;
 import org.junit.Test;
 
 import java.net.URI;
@@ -118,11 +119,12 @@ public class ActedUponAggregatesResponsesFromTest {
 
     /**
      * setNote / getNote should store and return the note string.
+     * The note format is defined by {@link TestUtil#NOTE_AGGREGATED_RESPONSE_FORMAT}.
      */
     @Test
     public void testNote_setAndGet() {
         ActedUpon au = new ActedUpon();
-        String expectedNote = "Aggregated Response outcomes produced by VALIDATION_COUNTRY_FOUND across a MultiRecord.";
+        String expectedNote = TestUtil.NOTE_AGGREGATED_RESPONSE_FORMAT.replace("{0}", "VALIDATION_COUNTRY_FOUND");
         au.setNote(expectedNote);
         assertEquals(expectedNote, au.getNote());
     }

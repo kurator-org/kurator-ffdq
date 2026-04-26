@@ -61,6 +61,15 @@ public class TestUtil {
 
 	
 	private static final Log logger = LogFactory.getLog(TestUtil.class);
+
+    /**
+     * Format string for the {@code skos:note} on an {@link ActedUpon} node that aggregates
+     * upstream test responses. Placeholder {@code {0}} is the comma-separated list of
+     * upstream test labels (e.g., {@code "VALIDATION_COUNTRY_FOUND"}).
+     * Example result: {@code "Aggregated Response outcomes produced by VALIDATION_COUNTRY_FOUND across a MultiRecord."}
+     */
+    static final String NOTE_AGGREGATED_RESPONSE_FORMAT =
+            "Aggregated Response outcomes produced by {0} across a MultiRecord.";
 	
     private final static String CSV_HEADER_LABEL;
     private final static String CSV_HEADER_GUID;
@@ -614,8 +623,7 @@ public class TestUtil {
                             // Set skos:note describing the aggregation, using the upstream test label(s).
                             if (!arfTestLabels.isEmpty()) {
                                 String noteLabels = String.join(", ", arfTestLabels);
-                                actedUpon.setNote("Aggregated Response outcomes produced by "
-                                        + noteLabels + " across a MultiRecord.");
+                                actedUpon.setNote(NOTE_AGGREGATED_RESPONSE_FORMAT.replace("{0}", noteLabels));
                             }
                         }
                 		ieMap.put(label.toString(), actedUpon);
