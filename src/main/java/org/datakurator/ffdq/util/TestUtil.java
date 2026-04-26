@@ -68,7 +68,7 @@ public class TestUtil {
      * upstream test labels (e.g., {@code "VALIDATION_COUNTRY_FOUND"}).
      * Example result: {@code "Aggregated Response outcomes produced by VALIDATION_COUNTRY_FOUND across a MultiRecord."}
      */
-    static final String NOTE_AGGREGATED_RESPONSE_FORMAT =
+    public static final String NOTE_AGGREGATED_RESPONSE_FORMAT =
             "Aggregated Response outcomes produced by {0} across a MultiRecord.";
 	
     private final static String CSV_HEADER_LABEL;
