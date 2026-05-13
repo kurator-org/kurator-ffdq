@@ -51,6 +51,8 @@ public class Namespace {
     public static final String BDQFFDQ = "https://rs.tdwg.org/bdqffdq/terms/";   // ontology
     /** Constant <code>BDQTEST="https://rs.tdwg.org/bdqtest/terms/"</code> */
     public static final String BDQTEST = "https://rs.tdwg.org/bdqtest/terms/";   // tests
+    /** Constant <code>BDQUC="https://rs.tdwg.org/bdquc/terms/"</code> */
+    public static final String BDQUC = "https://rs.tdwg.org/bdquc/terms/";   // use cases
 
     /** Constant <code>NONE="http://datakurator.org/none/"</code> */
     public static final String NONE = "http://datakurator.org/none/";
@@ -85,6 +87,7 @@ public class Namespace {
         nsPrefixes.put("dc", DC);
         
         nsPrefixes.put("bdqval", BDQVAL);
+        nsPrefixes.put("bdquc", BDQUC);
         nsPrefixes.put("bdqdim", BDQDIM);
         nsPrefixes.put("bdqcrit", BDQCRIT);
         nsPrefixes.put("bdqenh", BDQENH);

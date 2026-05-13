@@ -416,7 +416,7 @@ public class TestUtil {
             				if (!useCaseMap.containsKey(useCaseLabel)) { 
             					UseCase useCaseInstance = new UseCase();
             					useCaseInstance.setLabel(useCaseLabel);
-            					useCaseInstance.setSubject(useCaseLabel.replace("bdqval:", "https://rs.tdwg.org/bdqval/terms/"));
+            					useCaseInstance.setSubject(useCaseLabel.replace("bdquc:", "https://rs.tdwg.org/bdquc/terms/"));
             					useCaseMap.put(useCaseLabel, useCaseInstance);
             				}
             				String includedTests = useCaseRecord.get("LabelsOfTestsIncluded");
@@ -676,7 +676,7 @@ public class TestUtil {
                 		if (!useCaseMap.containsKey(useCaseLabel)) { 
                 			UseCase useCaseInstance = new UseCase();
                 			useCaseInstance.setLabel(useCaseLabel);
-                			useCaseInstance.setSubject(useCaseLabel.replace("bdqval:", "https://rs.tdwg.org/bdqval/terms/"));
+                			useCaseInstance.setSubject(useCaseLabel.replace("bdquc:", "https://rs.tdwg.org/bdquc/terms/"));
                 			useCaseMap.put(useCaseLabel, useCaseInstance);
                 		}
                 	}
