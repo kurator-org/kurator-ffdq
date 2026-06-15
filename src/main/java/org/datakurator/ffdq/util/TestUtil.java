@@ -539,7 +539,9 @@ public class TestUtil {
                 			if (argument!=null) { 
                 				if (argumentGuidIterator.hasNext()) { 
                 					argument.setId(argumentGuidIterator.next());
-                				}
+                				} else { 
+									logger.error("Not enough argument GUIDs provided for test " + test.getLabel() + ": " + test.getArgumentGuids().size() + " provided but " + params.size() + " parameters.");
+								}
                 				specification.addArgument(argument);
                 			}
                 		}
@@ -1312,8 +1314,8 @@ public class TestUtil {
 		List<String> result = new ArrayList<String>();
 		if (testParameters!=null && testParameters.contains(",")) { 
         	String[] bits = testParameters.split(",");
-        	for (int i=0; i< bits.length; i++) { 
-        		result.add(bits[i]);
+			for (String bit : bits) {
+				result.add(bit.trim());
         	}
 		} else { 
 			result.add(testParameters);
