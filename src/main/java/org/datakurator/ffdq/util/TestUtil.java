@@ -490,11 +490,12 @@ public class TestUtil {
                 if (params!=null) { 
                 	Iterator<String> argumentGuidIterator = test.getArgumentGuids().iterator();
                 	Iterator<String> ip = params.iterator();
-                	if (ip.hasNext()) { 
+                	while (ip.hasNext()) { 
                 		// Lookup Stable guids for arguments
                 		Argument argument = null;
                 		String paramString = ip.next();
                 		if (paramString.contains(",")) { 
+                            // This block is likely never used, params is already split by comma.
                 			String[] bits = paramString.split(",");
                 			for (int bi=0; bi<bits.length; bi++) {
                 				String paramStringBit = bits[bi].trim();
