@@ -70,7 +70,7 @@ public class BaseModel {
         repo = new SailRepository(new MemoryStore());
 
         conn = repo.getConnection();
-        manager = new RDFBeanManager(conn);
+        manager = new RDFBeanManager(repo);
     }
 
     /**
@@ -126,7 +126,7 @@ public class BaseModel {
             }
             logger.log(Level.INFO, "Found: " +  r.stringValue());
             return manager.get(r, cls);
-        } catch (RDFBeanException | org.eclipse.rdf4j.RDF4JException e) {
+        } catch (RDFBeanException | org.eclipse.rdf4j.common.exception.RDF4JException e) {
         	logger.log(Level.WARNING, e.getMessage());
             throw new RuntimeException("Could not fetch the rdf bean instance.", e);
         }
@@ -151,7 +151,7 @@ public class BaseModel {
     	Resource r = manager.getResource(id, cls);
     	try {
     	    return manager.get(r, cls);
-    	} catch (org.eclipse.rdf4j.RDF4JException e) {
+    	} catch (org.eclipse.rdf4j.common.exception.RDF4JException e) {
     	    throw new RuntimeException("Could not fetch the rdf bean instance.", e);
     	}
     }
