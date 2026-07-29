@@ -227,9 +227,75 @@ FFDQ is a sort of acronym for a conceptual Framework For Data Quality assessment
 
 An example is: https://github.com/kurator-org/kurator-ffdq/blob/master/src/main/java/org/datakurator/data/ffdq/model/report/DataResource.java
 
-# Work in progress
+# XLSX Report Generation
 
-## Work in progress getting data quality reports working again:
+After running the test runner to produce an RDF report file, you can generate a
+multi-sheet XLSX spreadsheet that summarises data quality results per record.
+
+## Running XLSX generation via test-runner
+
+The `XLSXPostProcessor` class reads the RDF report produced by `test-runner`
+and writes a structured workbook.  The simplest way to invoke it on the
+command line is via the `test-runner.sh` convenience wrapper:
+
+    # 1. Run tests and produce RDF report
+    cd ~/event_date_qc/target
+    ~/kurator-ffdq/test-runner.sh \
+        -cls org.filteredpush.qc.date.DwCEventDQ \
+        -rdf ../conf/DwCEventDQ.ttl \
+        -in ~/Downloads/occurrence.txt \
+        -out dq-report.ttl
+
+    # 2. Post-process the RDF report into an XLSX workbook
+    java -cp kurator-ffdq-<version>-jar-with-dependencies.jar \
+        org.datakurator.postprocess.XLSXPostProcessor \
+        dq-report.ttl \
+        dq-report.xlsx
+
+The workbook contains the following sheets:
+
+| Sheet          | Contents                                                       |
+|----------------|----------------------------------------------------------------|
+| Summary        | High-level counts by test type and status                      |
+| Initial Values | Per-record field values before amendments, colour-coded        |
+| Final Values   | Per-record field values after amendments, with change markers  |
+| Validations    | One row per validation response (Record Id, Test, Status, ...) |
+| Measures       | One row per measure response                                   |
+| Amendments     | One row per amendment response                                 |
+| Issues         | One row per issue response                                     |
+
+## Important requirements for the RDF input
+
+The RDF report **must** have been produced by `test-runner` (or any code that
+uses `FFDQModel.save()` internally).  The report must include the rdfbeans
+binding-class triples that allow Java objects to be deserialised from the RDF.
+Hand-crafted or externally-produced Turtle files without these triples will
+cause deserialization to silently skip rows.
+
+## Known limitations and gaps
+
+* **IssueResponse fields**: `XLSXPostProcessor` now writes an Issues sheet, but
+  field-level colouring for issue responses depends on
+  `fieldsFromIssueContext()`.  Because kurator-ffdq does not yet have full
+  Issue criterion metadata wired into `FFDQModel`, acted-upon fields for issues
+  are currently returned as an empty list, resulting in no coloured cells.
+  Filed as a follow-up item.
+
+* **MultiRecord responses**: MultiRecord `MeasureResponse` and
+  `ValidationResponse` instances are not yet distinguished from SingleRecord
+  responses.  They will appear in the same sheet without special treatment.
+
+* **Large datasets**: `SXSSFWorkbook` (streaming) is used to limit heap usage.
+  However, very large reports (millions of response triples) may still require
+  increased JVM heap via `-Xmx`.
+
+* **rdfbeans 2.2 compatibility shim**: This version includes
+  `src/main/java/org/eclipse/rdf4j/RDF4JException.java` as a compile-time shim
+  bridging rdfbeans 2.2 (compiled against rdf4j 2.x) and the rdf4j 5.x runtime
+  used elsewhere.  Remove this shim when upgrading to a rdfbeans release that
+  supports rdf4j 4+ directly.
+
+
 
 Export a copy of the tests with RDFBean class binding axioms in the RDF:
 
