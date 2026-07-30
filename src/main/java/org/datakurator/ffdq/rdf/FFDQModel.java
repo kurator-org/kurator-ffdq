@@ -226,10 +226,12 @@ public class FFDQModel extends BaseModel {
     public List<DataResource> findDataResources() {
         List<DataResource> dataResources = new ArrayList<>();
 
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
-                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+        // bdqffdq:appliesTo links each Response to its DataResource (stored by TestRunner via
+        // Response.setDataResource()).  The trailing slash on the prefix is required so that
+        // e.g. bdqffdq:ValidationResponse expands to the correct full IRI.
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
                 "SELECT DISTINCT ?dataResource WHERE { " +
-                "?assertion prov:used ?dataResource " +
+                "?assertion bdqffdq:appliesTo ?dataResource " +
                 "}";
 
         TupleQueryResult result = executeQuery(sparql);
@@ -317,10 +319,12 @@ public class FFDQModel extends BaseModel {
      * @return a {@link java.util.List} object.
      */
     public List<Response> findAssertionsForDataResource(DataResource dataResource, Class<? extends Response> cls) {
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
-                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
-                "SELECT ?assertion ?type WHERE { " +
-                "?assertion prov:used <" + dataResource.getURI() + "> . " +
+        // Use bdqffdq:appliesTo (not prov:used) – that is the predicate TestRunner stores.
+        // The trailing slash on bdqffdq: is required so bdqffdq:ValidationResponse (etc.)
+        // expands to the correct full IRI <https://rs.tdwg.org/bdqffdq/terms/ValidationResponse>.
+        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+                "SELECT ?assertion WHERE { " +
+                "?assertion bdqffdq:appliesTo <" + dataResource.getURI() + "> . " +
                 "?assertion a bdqffdq:" + cls.getSimpleName() + " " +
                 "}";
 

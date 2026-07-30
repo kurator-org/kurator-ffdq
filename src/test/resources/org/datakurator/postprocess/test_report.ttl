@@ -1,0 +1,104 @@
+@prefix bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dwc:     <http://rs.tdwg.org/dwc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# ---------------------------------------------------------------------------
+# Data Resource
+# ---------------------------------------------------------------------------
+
+<urn:uuid:dataresource-001>
+    rdf:type             bdqffdq:DataResource ;
+    dwc:eventDate        "2023-06-15" ;
+    dwc:decimalLatitude  "42.3601" ;
+    dwc:decimalLongitude "-71.0589" ;
+    dwc:occurrenceID     "TEST-REC-001" .
+
+# ---------------------------------------------------------------------------
+# Specifications
+# ---------------------------------------------------------------------------
+
+<urn:uuid:spec-validation-001>
+    rdf:type   bdqffdq:Specification ;
+    rdfs:label "VALIDATION_EVENTDATE_NOTEMPTY" .
+
+<urn:uuid:spec-measure-001>
+    rdf:type   bdqffdq:Specification ;
+    rdfs:label "MEASURE_EVENTDATE_COMPLETENESS" .
+
+<urn:uuid:spec-amendment-001>
+    rdf:type   bdqffdq:Specification ;
+    rdfs:label "AMENDMENT_EVENTDATE_STANDARDIZED" .
+
+# ---------------------------------------------------------------------------
+# Result states (type = http://rs.tdwg.org/bdqffdq/terms/ResponseStatus, the
+# URI used by ffdq-api's ResultState @RDFBean annotation with HTTP namespace)
+# ---------------------------------------------------------------------------
+
+<urn:uuid:state-run-has-result>
+    rdf:type   <http://rs.tdwg.org/bdqffdq/terms/ResponseStatus> ;
+    rdfs:label "RUN_HAS_RESULT" .
+
+<urn:uuid:state-no-change>
+    rdf:type   <http://rs.tdwg.org/bdqffdq/terms/ResponseStatus> ;
+    rdfs:label "NO_CHANGE" .
+
+# ---------------------------------------------------------------------------
+# Entity values (type = prov:Entity, value stored as prov:value —
+# matching the ffdq-api Entity @RDFBean("prov:Entity") / @RDF("prov:value") annotations)
+# ---------------------------------------------------------------------------
+
+<urn:uuid:entity-compliant>
+    rdf:type   prov:Entity ;
+    prov:value "COMPLIANT" .
+
+<urn:uuid:entity-complete>
+    rdf:type   prov:Entity ;
+    prov:value "1.0" .
+
+# ---------------------------------------------------------------------------
+# Results
+# ---------------------------------------------------------------------------
+
+<urn:uuid:result-validation-001>
+    rdf:type          bdqffdq:Result ;
+    bdqffdq:hasState  <urn:uuid:state-run-has-result> ;
+    bdqffdq:hasValue  <urn:uuid:entity-compliant> ;
+    rdfs:comment      "eventDate is present and not empty." .
+
+<urn:uuid:result-measure-001>
+    rdf:type          bdqffdq:Result ;
+    bdqffdq:hasState  <urn:uuid:state-run-has-result> ;
+    bdqffdq:hasValue  <urn:uuid:entity-complete> ;
+    rdfs:comment      "eventDate completeness is 1.0." .
+
+<urn:uuid:result-amendment-001>
+    rdf:type          bdqffdq:Result ;
+    bdqffdq:hasState  <urn:uuid:state-no-change> ;
+    rdfs:comment      "eventDate is already in standard form." .
+
+# ---------------------------------------------------------------------------
+# Responses — bdqffdq:appliesTo links each response to its DataResource.
+# This is how TestRunner (via Response.setDataResource()) stores the link,
+# and is what FFDQModel.findDataResources() / findAssertionsForDataResource()
+# now queries for.
+# ---------------------------------------------------------------------------
+
+<urn:uuid:validation-response-001>
+    rdf:type              bdqffdq:ValidationResponse ;
+    bdqffdq:appliesTo     <urn:uuid:dataresource-001> ;
+    prov:hadPlan          <urn:uuid:spec-validation-001> ;
+    prov:generated        <urn:uuid:result-validation-001> .
+
+<urn:uuid:measure-response-001>
+    rdf:type              bdqffdq:MeasureResponse ;
+    bdqffdq:appliesTo     <urn:uuid:dataresource-001> ;
+    prov:hadPlan          <urn:uuid:spec-measure-001> ;
+    prov:generated        <urn:uuid:result-measure-001> .
+
+<urn:uuid:amendment-response-001>
+    rdf:type              bdqffdq:AmendmentResponse ;
+    bdqffdq:appliesTo     <urn:uuid:dataresource-001> ;
+    prov:hadPlan          <urn:uuid:spec-amendment-001> ;
+    prov:generated        <urn:uuid:result-amendment-001> .
