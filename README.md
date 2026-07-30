@@ -289,12 +289,6 @@ cause deserialization to silently skip rows.
   However, very large reports (millions of response triples) may still require
   increased JVM heap via `-Xmx`.
 
-* **rdfbeans 2.2 compatibility shim**: This version includes
-  `src/main/java/org/eclipse/rdf4j/RDF4JException.java` as a compile-time shim
-  bridging rdfbeans 2.2 (compiled against rdf4j 2.x) and the rdf4j 5.x runtime
-  used elsewhere.  Remove this shim when upgrading to a rdfbeans release that
-  supports rdf4j 4+ directly.
-
 
 
 Export a copy of the tests with RDFBean class binding axioms in the RDF:
