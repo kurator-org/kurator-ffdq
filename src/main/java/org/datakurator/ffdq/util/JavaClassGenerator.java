@@ -125,7 +125,7 @@ public class JavaClassGenerator {
                 }
                 if (line.contains("@ProvidesVersion(")) {
                     String guid = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
-                    currVersions.put(guid, lineNum + 1);
+                    currVersions.put(versionLookupKey(guid), lineNum + 1);
                     if (logVersions) { 
                     	logger.info(guid);
                     }
@@ -151,6 +151,19 @@ public class JavaClassGenerator {
     }
 
     /**
+     * Key for comparing an implementation's {@code @ProvidesVersion} with a test's version: the
+     * (UUID, date) pair, so that the same version written in another IRI form is recognized, or the
+     * value itself if it names no dated version.
+     *
+     * @param providesVersion a {@code @ProvidesVersion} value
+     * @return the comparison key
+     */
+    private static String versionLookupKey(String providesVersion) {
+        String key = AssertionTest.versionKey(providesVersion);
+        return key == null ? providesVersion : key;
+    }
+
+    /**
      * <p>checkTest.</p>
      *
      * @param test a {@link org.datakurator.ffdq.runner.AssertionTest} object.
@@ -160,8 +173,8 @@ public class JavaClassGenerator {
             String line = Integer.toString(currGuids.get(test.getGuid()));
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " + line);
             if (!currVersions.isEmpty()) { 
-                if (currVersions.containsKey(test.getProvidesVersion())) {
-                	logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+                if (currVersions.containsKey(versionLookupKey(test.getProvidesVersion()))) {
+                	logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(versionLookupKey(test.getProvidesVersion())));
                 } else { 
                 	logger.info("Non-current implementation for \"" + test.getLabel() + "\" version \"" + test.getProvidesVersion() + "\" ");
                 	System.out.println("Non-current implementation for \"" + test.getLabel() + "\" current version is \"" + test.getProvidesVersion() + "\" see line: " + line);
@@ -181,8 +194,8 @@ public class JavaClassGenerator {
             logger.info("Found existing implementation for \"" + test.getLabel() + "\" with guid \"" + test.getGuid() + "\" on line: " +
                     line);
             if (!currVersions.isEmpty()) { 
-            	if (currVersions.containsKey(test.getProvidesVersion())) {
-            		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(test.getProvidesVersion()));
+            	if (currVersions.containsKey(versionLookupKey(test.getProvidesVersion()))) {
+            		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + currVersions.get(versionLookupKey(test.getProvidesVersion())));
             	} else {
             		logger.info("Current implementation for \"" + test.getLabel() + "\" with version \"" + test.getProvidesVersion() + "\" on line: " + line);
             		outputCodeSB.append("// TODO: Implementation of ").append(test.getLabel());

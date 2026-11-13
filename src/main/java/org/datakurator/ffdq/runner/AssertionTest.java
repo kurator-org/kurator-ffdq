@@ -303,14 +303,41 @@ public class AssertionTest {
     }    
     
     /**
-     * <p>getProvidesVersion.</p>
+     * <p>getProvidesVersion: the value for an implementation's {@code @ProvidesVersion}, the IRI of the
+     * version of this test on its DateLastUpdated (the version implementations must match), in
+     * rs.tdwg.org's canonical form {@code https://rs.tdwg.org/bdqtest/terms/version/<uuid>-<date>}.</p>
      *
      * @return a {@link java.lang.String} object.
      */
     public String getProvidesVersion() { 
+    	if (guid==null) { 
+    		return null;
+    	}
     	StringBuilder retval = new StringBuilder();
-    	return retval.append(this.getGuidTDWGNamespace()).append("/").append(this.version).toString();
+    	return retval.append("https://rs.tdwg.org/bdqtest/terms/version/").append(guid.replace("urn:uuid:",""))
+    			.append("-").append(this.version).toString();
     }
+
+    /**
+     * Reduces a test version reference to {@code <uuid>|<date>} (UUID lower-cased), so that versions
+     * written in different forms can be compared: the canonical
+     * {@code https://rs.tdwg.org/bdqtest/terms/version/<uuid>-<date>}, the SDS form
+     * {@code .../terms/<uuid>-<date>}, the older {@code .../terms/<uuid>/<date>} (also under
+     * {@code /bdq/terms/}), and a bare {@code <uuid>-<date>}.
+     *
+     * @param reference a version IRI or identifier
+     * @return the key, or null if the reference does not end in a UUID and a date
+     */
+    public static String versionKey(String reference) {
+    	if (reference == null) {
+    		return null;
+    	}
+    	java.util.regex.Matcher matcher = VERSION_PATTERN.matcher(reference.trim());
+    	return matcher.find() ? matcher.group(1).toLowerCase() + "|" + matcher.group(2) : null;
+    }
+
+    private static final java.util.regex.Pattern VERSION_PATTERN = java.util.regex.Pattern.compile(
+    		"([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})[-/](\\d{4}-\\d{2}-\\d{2})/?$");
     
     /**
      * <p>Getter for the field <code>description</code>.</p>

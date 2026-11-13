@@ -258,8 +258,8 @@ class DwCTG2DQ:
             sb.append("\n");
 
             // Provides = "0493bcfb-652e-4d17-815b-b0cce0742fbe"
-            // ProvidesVersion = "0493bcfb-652e-4d17-815b-b0cce0742fbe/yyyy-mm-dd"
-            sb.append("\t").append("\t").append("Provides = { \"id\":\"").append(test.getGuid()).append("\", \"version\":\"").append(test.getGuidTDWGNamespace()).append("/").append(test.getVersion()).append("\"").append(", \"label\":\"").append(test.getGuid()).append("\" }\n");
+            // ProvidesVersion = "https://rs.tdwg.org/bdqtest/terms/version/0493bcfb-652e-4d17-815b-b0cce0742fbe-yyyy-mm-dd"
+            sb.append("\t").append("\t").append("Provides = { \"id\":\"").append(test.getGuid()).append("\", \"version\":\"").append(test.getProvidesVersion()).append("\"").append(", \"label\":\"").append(test.getGuid()).append("\" }\n");
             
             // result = ComplianceValue();
             sb.append("\t").append("\t").append("result = ").append(retType).append("()").append("\n\n");
