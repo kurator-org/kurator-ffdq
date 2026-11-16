@@ -53,6 +53,7 @@ public class AssertionTest {
     private String historyNumber; // github issue number for rationalle management
     private String label;
     private String version;  // from date test was last updated.
+    private boolean inStandard = true;  // false for a Test not in the BDQ standard, identified by urn:uuid: without resolvable versions
     private String description;
     private String criterionLabel;
     private String specification;
@@ -261,9 +262,50 @@ public class AssertionTest {
     public String getGuidTDWGNamespace()  {
     	if (guid==null) { 
     		return guid;
+    	} else if (!inStandard) {
+    		return "urn:uuid:" + guid.replace("urn:uuid:","");
     	} else { 
     		return "https://rs.tdwg.org/bdqtest/terms/" + guid.replace("urn:uuid:","");
     	}
+    }
+
+    /**
+     * <p>Whether this Test is in the BDQ standard.  Tests not in the standard (e.g. the supplementary
+     * Tests) are identified by {@code urn:uuid:<uuid>} and have no resolvable versions; a Test adopted
+     * into the standard becomes resolvable in rs.tdwg.org with a version history.</p>
+     *
+     * @return true if the Test is in the standard
+     */
+    public boolean isInStandard() {
+    	return inStandard;
+    }
+
+    /**
+     * @param inStandard false for a Test not in the BDQ standard
+     */
+    public void setInStandard(boolean inStandard) {
+    	this.inStandard = inStandard;
+    }
+
+    /**
+     * <p>The IRI of the node for this Test in generated RDF: its version issued on its issued date,
+     * {@code https://rs.tdwg.org/bdqtest/terms/<uuid>-<issued>}, or, for a Test not in the standard,
+     * {@code urn:uuid:<uuid>}.</p>
+     *
+     * @return the IRI
+     */
+    public String getTestNodeIri() {
+    	if (guid==null) {
+    		return null;
+    	}
+    	return inStandard ? getGuidTDWGNamespace() + "-" + issued : getGuidTDWGNamespace();
+    }
+
+    /**
+     * @return the IRI of the Test this node is a version of, or null for a Test not in the standard
+     */
+    public String getTestNodeIsVersionOf() {
+    	return inStandard ? getGuidTDWGNamespace() : null;
     }
 
     /**
@@ -312,6 +354,10 @@ public class AssertionTest {
     public String getProvidesVersion() { 
     	if (guid==null) { 
     		return null;
+    	}
+    	if (!inStandard) {
+    		// Tests not in the standard have no resolvable versions; implementations cite urn:uuid:
+    		return "urn:uuid:" + guid.replace("urn:uuid:","");
     	}
     	StringBuilder retval = new StringBuilder();
     	return retval.append("https://rs.tdwg.org/bdqtest/terms/version/").append(guid.replace("urn:uuid:",""))

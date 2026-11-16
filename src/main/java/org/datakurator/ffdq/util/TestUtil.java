@@ -694,8 +694,8 @@ public class TestUtil {
                         cd.setHistoryNote(test.getHistoryNoteUrl());
                         cd.setReferences(test.getReferences());
                         cd.setNote(test.getNote());
-                        cd.setIsVersionOf(test.getGuidTDWGNamespace());
-                        cd.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        cd.setIsVersionOf(test.getTestNodeIsVersionOf());
+                        cd.setId(test.getTestNodeIri());
                         cd.setIssued(test.getIssued());
                         cd.setLabel(test.getLabel());
                         //if (test.getSpecificationGuid()!=null) { 
@@ -773,8 +773,8 @@ public class TestUtil {
                         //if (test.getContextualizedGuid()!=null) { 
                         //	cc.setId(test.getContextualizedGuid());
                         //}
-                        cc.setIsVersionOf(test.getGuidTDWGNamespace());
-                        cc.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        cc.setIsVersionOf(test.getTestNodeIsVersionOf());
+                        cc.setId(test.getTestNodeIri());
                         cc.setIssued(test.getIssued());
                         cc.setCitationResources(CitationUtils.buildCitationResources(
                         		CitationUtils.parseReferences(test.getReferences()),
@@ -837,8 +837,8 @@ public class TestUtil {
                         ce.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         ce.setDimension(dimension);
-                        ce.setIsVersionOf(test.getGuidTDWGNamespace());
-                        ce.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        ce.setIsVersionOf(test.getTestNodeIsVersionOf());
+                        ce.setId(test.getTestNodeIri());
                         ce.setIssued(test.getIssued());
                         ce.setLabel(test.getLabel());
                         ce.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
@@ -909,8 +909,8 @@ public class TestUtil {
                         ci.setNote(test.getNote());
                         dimension = new Dimension(test.getDimension());
                         ci.setDimension(dimension);
-                        ci.setIsVersionOf(test.getGuidTDWGNamespace());
-                        ci.setId(test.getGuidTDWGNamespace() + "-" + test.getIssued());
+                        ci.setIsVersionOf(test.getTestNodeIsVersionOf());
+                        ci.setId(test.getTestNodeIri());
                         ci.setIssued(test.getIssued());
                         ci.setLabel(test.getLabel());
                         ci.setPrefLabel(test.getPrefLabel() +  " for " + resourceType.getLabel());
@@ -1258,6 +1258,10 @@ public class TestUtil {
                 	test.setSourceCode(record.get(CSV_HEADER_SOURCECODE));
                 	test.setIssueLabels(record.get(CSV_HEADER_ISSUELABELS));
                 	test.setAggregatesResponsesFrom(aggregatesResponsesFrom);
+                	// A Test not in the BDQ standard (its iri is a urn:uuid:) has no resolvable versions.
+                	if (record.isMapped("iri") && record.get("iri").trim().startsWith("urn:uuid:")) {
+                		test.setInStandard(false);
+                	}
                 	tests.add(test);
                 } else { 
                 	logger.debug("Skipping test " + guid + " with status " + status);

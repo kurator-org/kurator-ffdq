@@ -35,4 +35,21 @@ public class AssertionTestVersionTest {
 		assertNull(AssertionTest.versionKey("https://rs.tdwg.org/bdqtest/terms/69b2efdc-6269-45a4-aecb-4cb99c2ae134"));
 		assertNull(AssertionTest.versionKey(null));
 	}
+
+	@Test
+	public void testNotInTheStandardIsIdentifiedByUrnUuid() {
+		// Tests not in the BDQ standard have no resolvable versions: implementations cite urn:uuid:,
+		// and the generated RDF identifies the Test by its urn:uuid:, with no dcterms:isVersionOf.
+		AssertionTest test = new AssertionTest();
+		test.setGuid("urn:uuid:e654f562-44f8-43fd-983b-2aaba4c6dda9");
+		test.setVersion("2024-09-18");
+		test.setIssued("2025-03-05");
+		test.setInStandard(false);
+		assertEquals("urn:uuid:e654f562-44f8-43fd-983b-2aaba4c6dda9", test.getProvidesVersion());
+		assertEquals("urn:uuid:e654f562-44f8-43fd-983b-2aaba4c6dda9", test.getTestNodeIri());
+		assertNull(test.getTestNodeIsVersionOf());
+		test.setInStandard(true);
+		assertEquals("https://rs.tdwg.org/bdqtest/terms/e654f562-44f8-43fd-983b-2aaba4c6dda9-2025-03-05", test.getTestNodeIri());
+		assertEquals("https://rs.tdwg.org/bdqtest/terms/e654f562-44f8-43fd-983b-2aaba4c6dda9", test.getTestNodeIsVersionOf());
+	}
 }
