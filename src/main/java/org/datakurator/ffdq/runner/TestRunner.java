@@ -54,10 +54,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 public class TestRunner {
-    private final static Logger logger = Logger.getLogger(TestRunner.class.getName());
+    private final static Log logger = LogFactory.getLog(TestRunner.class);
 
     private Class cls;
     private FFDQModel model;
@@ -101,7 +101,7 @@ public class TestRunner {
             // Find the class level annotation and get the value for mechanism guid
         	if (annotation instanceof org.datakurator.ffdq.annotations.Mechanism) {
 
-        		logger.log(Level.INFO, annotation.toString());
+        		logger.info(annotation.toString());
 
         		String mechanismGuid = ((org.datakurator.ffdq.annotations.Mechanism) annotation).value();
        			String mechanismLabel = ((org.datakurator.ffdq.annotations.Mechanism) annotation).label();
@@ -111,7 +111,7 @@ public class TestRunner {
         			if (mechanism == null) {
         				mechanism = new Mechanism(mechanismGuid, mechanismLabel);
         				model.save(mechanism);
-        				logger.log(Level.INFO, "Adding Mechanism instance to model.");
+        				logger.info("Adding Mechanism instance to model.");
         			}
 
         			// check to see if the annotation has a label value and override value from rdf if present
@@ -121,8 +121,8 @@ public class TestRunner {
         		} catch (Exception e) { 
         			mechanism = new Mechanism(mechanismGuid, mechanismLabel);
         			model.save(mechanism);
-        			logger.log(Level.INFO, "Adding Mechanism instance to model.");
-        			logger.log(Level.WARNING, e.getMessage());
+        			logger.info("Adding Mechanism instance to model.");
+        			logger.warn(e.getMessage());
         		}
 
         		// TODO: Load defined tests by use case
@@ -135,7 +135,7 @@ public class TestRunner {
 
         		Map<String, DataQualityNeed> definedTests = model.findAllSingleRecordTests("ver");
 
-        		logger.log(Level.INFO, "Count of definedTests=" + Integer.toString(definedTests.size()));
+        		logger.info("Count of definedTests=" + Integer.toString(definedTests.size()));
 
         		// TODO: Implmement handling of tests as DataQualityNeed subclasses, rather than specifications
         		// Map<String, DataQualityNeed> definedTests = model.findTestsForMechanism(mechanismGuid);a
@@ -143,10 +143,10 @@ public class TestRunner {
         		//definedTests = model.findVersionOfTestsForMechanism(mechanismGuid);
         		//Iterator<String> keys = definedTests.keySet().iterator();
         		//while (keys.hasNext()) { 
-        		//logger.log(Level.INFO, keys.next());
+        		//logger.info(keys.next());
         		//}
 
-        		logger.log(Level.INFO, "Specifications found for Mechanism in RDF: " + definedTests.size());
+        		logger.info("Specifications found for Mechanism in RDF: " + definedTests.size());
 
         		// Process method level annotations and check that test methods in the DQClass are consistent
         		// with Measurement, ValidationResponse and AmendmentResponse Methods defined in the RDF
@@ -165,7 +165,7 @@ public class TestRunner {
             AssertionTest test = new AssertionTest();
             test.setMethod(javaMethod);
             test.setCls(cls);
-        	logger.log(Level.INFO, javaMethod.getName());
+        	logger.info(javaMethod.getName());
 
             for (Annotation annotation : javaMethod.getAnnotations()) {
 
@@ -178,7 +178,7 @@ public class TestRunner {
                     if (!guid.startsWith("https://rs.tdwg.org/bdqtest/terms/")) { 
                     	guid = "https://rs.tdwg.org/bdqtest/terms/" + guid;
                     }
-                    logger.log(Level.INFO, guid);
+                    logger.info(guid);
                     test.setGuid(guid);
                     implementedTests.put(guid, test);
                 } else if (annotation instanceof org.datakurator.ffdq.annotations.Measure) {
@@ -236,48 +236,48 @@ public class TestRunner {
 
         Iterator<String> id = definedGuids.iterator();
         while (id.hasNext()) { 
-        	logger.log(Level.INFO, "Defined in rdf: " +  id.next());
+        	logger.info("Defined in rdf: " +  id.next());
         }
         Iterator<String> ii = implementedGuids.iterator();
         while (ii.hasNext()) { 
-        	logger.log(Level.INFO, "Implemented in code: " +  ii.next());
+        	logger.info("Implemented in code: " +  ii.next());
         }
         
         // Check that all tests defined for the current mechanism in the BDQFFDQ rdf correspond to a DQClass method
         // that implements the test
         if (!implementedGuids.containsAll(definedGuids)) {
-            logger.warning("Java class missing implementation for tests defined in RDF!");
+            logger.warn("Java class missing implementation for tests defined in RDF!");
 
             Set<String> missingGuids = new HashSet<>(definedGuids);
             missingGuids.removeAll(implementedGuids);
 
             for (String guid : missingGuids) {
-                logger.warning("Missing corresponding method in " + cls + " for test \"" +
+                logger.warn("Missing corresponding method in " + cls + " for test \"" +
                         definedTests.get(guid).getIsVersionOf() + "\": " + guid.substring(guid.lastIndexOf(":")+1));
 
                 implementedTests.remove(guid);
             }
         }
-        logger.log(Level.INFO, "Implemented Tests Remaining after removing not found.: " + implementedTests.size());
+        logger.info("Implemented Tests Remaining after removing not found.: " + implementedTests.size());
 
         // Check that all test method in the DQClass have associated metadata in the form of Measurement, ValidationResponse,
         // and AmendmentResponse Methods in the BDQFFDQ rdf
         if (!definedGuids.containsAll(implementedGuids)) {
-            logger.warning("Tests declared in Java class via @Provides missing corresponding definitions " +
+            logger.warn("Tests declared in Java class via @Provides missing corresponding definitions " +
                     "in the RDF!");
 
             Set<String> missingGuids = new HashSet<>(implementedGuids);
             missingGuids.removeAll(definedGuids);
 
             for (String guid : missingGuids) {
-                logger.warning("Missing definition in RDF for Java method \"" +
+                logger.warn("Missing definition in RDF for Java method \"" +
                         implementedTests.get(guid).getLabel() + "\" in " + cls + ": " +
                         guid);
 
                 implementedTests.remove(guid);
             }
         }
-        logger.log(Level.INFO, "Implemented Tests Remaining: " + implementedTests.size());
+        logger.info("Implemented Tests Remaining: " + implementedTests.size());
 
         // Include only tests that have both a corresponding implementation in the class and a definition in the rdf
         for (String guid : implementedTests.keySet()) {
@@ -299,7 +299,7 @@ public class TestRunner {
             try { 
             	assertionMethod = model.findMethodForSpecification(guid);
             } catch (Exception e) { 
-            	logger.log(Level.WARNING, e.getMessage());
+            	logger.warn(e.getMessage());
             }
             
             ResourceType resourceType;
@@ -463,7 +463,7 @@ public class TestRunner {
         }
 
         if (!definedParams.containsAll(implementedParams)) {
-            logger.warning("Method parameters annotated with DQParam missing corresponding information elements " +
+            logger.warn("Method parameters annotated with DQParam missing corresponding information elements " +
                     "in RDF!");
 
             Set<URI> missingParams = new HashSet<>(implementedParams);
@@ -473,7 +473,7 @@ public class TestRunner {
                 // Argument variable name
                 TestParam param = testParams.get(uri);
 
-                logger.warning("Missing information element in rdf \"" + uri + "\" for arg " + param.getIndex() +
+                logger.warn("Missing information element in rdf \"" + uri + "\" for arg " + param.getIndex() +
                         " (" + param.getTerm() + ") of method " + cls.getName() + "." + method.getName());
 
                 testParams.remove(uri);
@@ -622,7 +622,7 @@ public class TestRunner {
                     result = invokeTest(test, instance, dataResource.asMap());
                 } catch (RunnerException ex) {
                     // a failing test is reported, and the other tests are still run on the record
-                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                    logger.warn("Test " + test.getLabel() + " failed on record "
                             + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
                     continue;
                 }
@@ -655,7 +655,7 @@ public class TestRunner {
                     result = invokeTest(test, instance, dataResource.asMap());
                 } catch (RunnerException ex) {
                     // a failing test is reported, and the other tests are still run on the record
-                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                    logger.warn("Test " + test.getLabel() + " failed on record "
                             + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
                     continue;
                 }
@@ -688,7 +688,7 @@ public class TestRunner {
                     result = invokeTest(test, instance, dataResource.asMap());
                 } catch (RunnerException ex) {
                     // a failing test is reported, and the other tests are still run on the record
-                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                    logger.warn("Test " + test.getLabel() + " failed on record "
                             + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
                     continue;
                 }
@@ -721,7 +721,7 @@ public class TestRunner {
                     result = invokeTest(test, instance, dataResource.asMap());
                 } catch (RunnerException ex) {
                     // a failing test is reported, and the other tests are still run on the record
-                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                    logger.warn("Test " + test.getLabel() + " failed on record "
                             + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
                     continue;
                 }
@@ -745,16 +745,16 @@ public class TestRunner {
             // This probably indicates that the asserted class or method hasn't been found.
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
         } catch (IllegalArgumentException e) {
-        	logger.warning(e.getMessage());
+        	logger.warn(e.getMessage());
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
 		} catch (InvocationTargetException e) {
-        	logger.warning(e.getMessage());
+        	logger.warn(e.getMessage());
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
 		} catch (NoSuchMethodException e) {
-        	logger.warning(e.getMessage());
+        	logger.warn(e.getMessage());
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
 		} catch (SecurityException e) {
-        	logger.warning(e.getMessage());
+        	logger.warn(e.getMessage());
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
 		}
     }
@@ -762,7 +762,7 @@ public class TestRunner {
     private Result invokeTest(AssertionTest test, Object instance, Map<String, String> record) throws RunnerException {
         Map<String, String> actedUpon = new HashMap<>();
 
-        logger.log(Level.INFO, "invoking test " + test.getLabel());
+        logger.info("invoking test " + test.getLabel());
         
         for (TestParam param : test.getParameters()) {
             String term = param.getTerm();
@@ -774,7 +774,7 @@ public class TestRunner {
         try {
             DQResponse response = (DQResponse) test.invoke(instance, record);
             
-            logger.log(Level.INFO, response.getResultState().toString());
+            logger.info(response.getResultState().toString());
             
             Result result = new Result();
             result.setState(response.getResultState());

@@ -34,8 +34,8 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by lowery on 11/14/17.
@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 public class FFDQModel extends BaseModel {
     private final Vocabulary vocab;
 
-    private final static Logger logger = Logger.getLogger(FFDQModel.class.getName());
+    private final static Log logger = LogFactory.getLog(FFDQModel.class);
     
     /**
      * <p>Constructor for FFDQModel.</p>
@@ -172,7 +172,7 @@ public class FFDQModel extends BaseModel {
         try { 
         	retval = (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
         } catch (RuntimeException e) { 
-        	logger.log(Level.WARNING, e.getMessage());
+        	logger.warn(e.getMessage());
         }
         return retval;
     }
@@ -231,7 +231,7 @@ public class FFDQModel extends BaseModel {
                 + "  BIND(REPLACE(STR(?ver),'" + Namespace.BDQTEST + "','') AS ?uuid ) "
                 //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
                 + "}";
-        logger.log(Level.INFO, sparql);
+        logger.info(sparql);
         Map<String, DataQualityNeed> retval = new HashMap<String,DataQualityNeed>();
         retval.putAll(findAllMapBy(DataQualityNeed.class, sparql, "test", keyMapBy));
         return retval;

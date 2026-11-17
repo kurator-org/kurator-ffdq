@@ -26,8 +26,8 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Data Resource is an instance of data and the target to the DQ assessment and management.
@@ -56,7 +56,7 @@ public class DataResource {
     private Model model;
     private IRI subject;
     
-    private final static Logger logger = Logger.getLogger(DataResource.class.getName());
+    private final static Log logger = LogFactory.getLog(DataResource.class);
 
     /**
      * <p>Constructor for DataResource.</p>
@@ -142,7 +142,7 @@ public class DataResource {
             builder.defaultGraph().add(subject, predicate, object);
 
         	} catch (Exception e) {
-        		logger.log(Level.SEVERE, e.getMessage());
+        		logger.error(e.getMessage());
         	}
         }
 

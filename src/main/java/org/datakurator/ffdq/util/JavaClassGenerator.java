@@ -32,10 +32,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 public class JavaClassGenerator {
-    private final static Logger logger = Logger.getLogger(JavaClassGenerator.class.getName());
+    private final static Log logger = LogFactory.getLog(JavaClassGenerator.class);
 
     private String mechanismGuid;
     private String mechanismName;

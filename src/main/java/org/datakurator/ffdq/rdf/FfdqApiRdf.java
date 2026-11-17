@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -74,7 +75,7 @@ import org.eclipse.rdf4j.model.Value;
  */
 public final class FfdqApiRdf {
 
-    private static final Logger logger = Logger.getLogger(FfdqApiRdf.class.getName());
+    private static final Log logger = LogFactory.getLog(FfdqApiRdf.class);
 
     /** The type of a ResultState: the bdqffdq:ResponseStatus class. */
     public static final String RESPONSE_STATUS = Namespace.BDQFFDQ + "ResponseStatus";
@@ -121,7 +122,7 @@ public final class FfdqApiRdf {
             IRI s = resultStateIri(state);
             if (w.begin(state)) {
                 if (!s.stringValue().startsWith(RESPONSE_STATUS_NS)) {
-                    logger.warning("ResultState " + state.getLabel() + " is not a bdqffdq:ResponseStatus term; written as " + s);
+                    logger.warn("ResultState " + state.getLabel() + " is not a bdqffdq:ResponseStatus term; written as " + s);
                 }
                 w.type(s, RESPONSE_STATUS);
                 w.value(s, "rdfs:label", state.getLabel());

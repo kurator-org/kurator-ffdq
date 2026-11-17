@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Post-processes an {@link FFDQModel} that contains assertion responses and
@@ -69,7 +69,7 @@ import java.util.logging.Logger;
  */
 public class XLSXPostProcessor {
 
-    private static final Logger logger = Logger.getLogger(XLSXPostProcessor.class.getName());
+    private static final Log logger = LogFactory.getLog(XLSXPostProcessor.class);
 
     private final FFDQModel model;
 
@@ -246,7 +246,7 @@ public class XLSXPostProcessor {
             workbook.write(out);
         } finally {
             try { out.close(); } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing output stream", ioe);
+                logger.warn("Error closing output stream", ioe);
             }
             // Dispose temporary files backing this workbook on disk
             workbook.dispose();
@@ -578,8 +578,7 @@ public class XLSXPostProcessor {
                         amendedValues = amended.asMap();
                     }
                 } catch (Exception e) {
-                    logger.log(Level.WARNING,
-                            "Could not retrieve amended data resource for URI: " + uri, e);
+                    logger.warn("Could not retrieve amended data resource for URI: " + uri, e);
                 }
             }
 
@@ -874,6 +873,6 @@ public class XLSXPostProcessor {
 
         XLSXPostProcessor postProcessor = new XLSXPostProcessor(model);
         postProcessor.postprocess(new FileOutputStream(xlsxPath));
-        logger.log(Level.INFO, "XLSX report written to: " + xlsxPath);
+        logger.info("XLSX report written to: " + xlsxPath);
     }
 }

@@ -26,7 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Generate experimental stub methods in python using analogs for java annotations that
@@ -73,7 +74,7 @@ class DwCTG2DQ:
 */
 
 
-    private final static Logger logger = Logger.getLogger(PythonClassGenerator.class.getName());
+    private final static Log logger = LogFactory.getLog(PythonClassGenerator.class);
 
     private String mechanismGuid;
     private String mechanismName;

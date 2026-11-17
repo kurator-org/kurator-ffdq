@@ -54,13 +54,13 @@ import java.util.List;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 public class BaseModel {
     private Repository repo;
     private RepositoryConnection conn;
     
-    private final static Logger logger = Logger.getLogger(BaseModel.class.getName());
+    private final static Log logger = LogFactory.getLog(BaseModel.class);
 
     /**
      * <p>Constructor for BaseModel.</p>
@@ -106,7 +106,7 @@ public class BaseModel {
                 || obj instanceof org.datakurator.ffdq.model.ResponseQualifier) {
             // written as properties of the Response they belong to (bdqffdq:hasResponseStatus,
             // bdqffdq:hasResponseResult, ...), not as resources of their own
-            logger.log(Level.FINE, "Not saved separately, written with its Response: " + obj.getClass().getSimpleName());
+            logger.debug("Not saved separately, written with its Response: " + obj.getClass().getSimpleName());
             return;
         }
         RdfWriter writer = new RdfWriter();
@@ -159,7 +159,7 @@ public class BaseModel {
     protected Object findOne(RdfReader reader, String guid, Class cls) {
         Resource r = resolve(reader, guid);
         if (r == null) {
-            logger.log(Level.INFO, "Resource not found: Class: " + cls + " Guid: " + guid);
+            logger.info("Resource not found: Class: " + cls + " Guid: " + guid);
             return null;
         }
         Object result;
@@ -172,10 +172,10 @@ public class BaseModel {
             throw new RuntimeException("Not an RDF-mapped class: " + cls.getName(), e);
         }
         if (result == null || !cls.isInstance(result)) {
-            logger.log(Level.WARNING, "Not a " + cls.getSimpleName() + ": " + r.stringValue());
+            logger.warn("Not a " + cls.getSimpleName() + ": " + r.stringValue());
             return null;
         }
-        logger.log(Level.INFO, "Found: " + r.stringValue());
+        logger.info("Found: " + r.stringValue());
         return result;
     }
 
@@ -200,8 +200,8 @@ public class BaseModel {
      */
     public Object findOne(Class cls, String sparql, String field) {
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
-        logger.log(Level.INFO, field);
-        logger.log(Level.INFO, sparql);
+        logger.info(field);
+        logger.info(sparql);
         if (!result.hasNext()) {
             return null;
         }
@@ -223,21 +223,21 @@ public class BaseModel {
         RdfReader reader = reader();
 
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
-        logger.log(Level.INFO, field);
-        logger.log(Level.INFO, cls.getCanonicalName());
-        logger.log(Level.INFO, sparql);
+        logger.info(field);
+        logger.info(cls.getCanonicalName());
+        logger.info(sparql);
 
         while (result.hasNext()) {
             BindingSet solution = result.next();
             String id = solution.getValue(field).stringValue();
             
-            logger.log(Level.INFO, "Looking for bean for: " + id);
+            logger.info("Looking for bean for: " + id);
 
             try { 
             	Object rdfBean = findOne(reader, id, cls);
             	rdfBeans.put(id, rdfBean);
             } catch (Exception e) { 
-            	logger.log(Level.WARNING, e.getMessage());
+            	logger.warn(e.getMessage());
             }
         }
 
@@ -260,22 +260,22 @@ public class BaseModel {
         RdfReader reader = reader();
 
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
-        logger.log(Level.INFO, field);
-        logger.log(Level.INFO, cls.getCanonicalName());
-        logger.log(Level.INFO, sparql);
+        logger.info(field);
+        logger.info(cls.getCanonicalName());
+        logger.info(sparql);
 
         while (result.hasNext()) {
             BindingSet solution = result.next();
             String id = solution.getValue(field).stringValue();
             
-            logger.log(Level.INFO, "Looking for bean for: " + id);
+            logger.info("Looking for bean for: " + id);
 
             try { 
             	Object rdfBean = findOne(reader, id, cls);
             	String key = solution.getValue(keyForMap).stringValue();
             	rdfBeans.put(key, rdfBean);
             } catch (Exception e) { 
-            	logger.log(Level.WARNING, e.getMessage());
+            	logger.warn(e.getMessage());
             }
         }
 
