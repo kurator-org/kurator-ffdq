@@ -16,6 +16,8 @@
  */
 package org.datakurator.ffdq.rdf;
 
+import org.eclipse.rdf4j.query.QueryResults;
+import java.util.Iterator;
 import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
@@ -253,7 +255,8 @@ public class FFDQModel extends BaseModel {
                 "?assertion bdqffdq:appliesTo ?dataResource " +
                 "}";
 
-        TupleQueryResult result = executeQuery(sparql);
+        // read the solutions, closing the query result
+        Iterator<BindingSet> result = QueryResults.asList(executeQuery(sparql)).iterator();
 
         while(result.hasNext()) {
             BindingSet bindingSet = result.next();
@@ -297,7 +300,8 @@ public class FFDQModel extends BaseModel {
                 "?ie bdqffdq:composedOf ?field " +
                 "}";
 
-        TupleQueryResult result = executeQuery(sparql);
+        // read the solutions, closing the query result
+        Iterator<BindingSet> result = QueryResults.asList(executeQuery(sparql)).iterator();
 
         while(result.hasNext()) {
             BindingSet bindingSet = result.next();
@@ -322,7 +326,8 @@ public class FFDQModel extends BaseModel {
                 "?assertion bdqffdq:appliesTo ?dataResource " +
                 "}";
 
-        TupleQueryResult result = executeQuery(sparql);
+        // read the solutions, closing the query result
+        Iterator<BindingSet> result = QueryResults.asList(executeQuery(sparql)).iterator();
 
         while(result.hasNext()) {
             BindingSet bindingSet = result.next();

@@ -21,6 +21,8 @@
  */
 package org.datakurator.ffdq.rdf;
 
+import org.eclipse.rdf4j.query.QueryResults;
+import java.util.Iterator;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -125,7 +127,8 @@ public class BaseModel {
      */
     protected RdfReader reader() {
         Model model = new LinkedHashModel();
-        conn.getStatements(null, null, null).forEach(model::add);
+        // QueryResults.asModel reads and closes the statements
+        model.addAll(QueryResults.asModel(conn.getStatements(null, null, null)));
         return new RdfReader(model);
     }
 
@@ -199,7 +202,8 @@ public class BaseModel {
      * @return the object, or null if the query has no solution
      */
     public Object findOne(Class cls, String sparql, String field) {
-        TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+        // read the solutions, closing the query result
+        Iterator<BindingSet> result = QueryResults.asList(conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate()).iterator();
         logger.info(field);
         logger.info(sparql);
         if (!result.hasNext()) {
@@ -222,7 +226,8 @@ public class BaseModel {
         Map rdfBeans = new HashMap();
         RdfReader reader = reader();
 
-        TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+        // read the solutions, closing the query result
+        Iterator<BindingSet> result = QueryResults.asList(conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate()).iterator();
         logger.info(field);
         logger.info(cls.getCanonicalName());
         logger.info(sparql);
@@ -259,7 +264,8 @@ public class BaseModel {
         Map<String, Object> rdfBeans = new HashMap<String, Object>();
         RdfReader reader = reader();
 
-        TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+        // read the solutions, closing the query result
+        Iterator<BindingSet> result = QueryResults.asList(conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate()).iterator();
         logger.info(field);
         logger.info(cls.getCanonicalName());
         logger.info(sparql);
