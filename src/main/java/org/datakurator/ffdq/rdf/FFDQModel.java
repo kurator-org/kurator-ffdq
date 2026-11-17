@@ -56,6 +56,48 @@ public class FFDQModel extends BaseModel {
         this.vocab = Vocabulary.defaultInstance();
     }
 
+    /** Prefixes used in the queries for Tests, Methods, and Specifications. */
+    private static final String TEST_PREFIXES = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> "
+            + "PREFIX dcterms: <http://purl.org/dc/terms/> ";
+
+    /** The Method classes and the properties that relate each Method to its Test. */
+    private static final String METHOD_VALUES = "VALUES (?methodType ?forTest) { "
+            + "(bdqffdq:ValidationMethod bdqffdq:forValidation) "
+            + "(bdqffdq:MeasurementMethod bdqffdq:forMeasure) "
+            + "(bdqffdq:AmendmentMethod bdqffdq:forAmendment) "
+            + "(bdqffdq:IssueMethod bdqffdq:forIssue) } ";
+
+    /**
+     * The IRI of a mechanism (or other resource) given as an IRI, a urn:uuid:, or a bare uuid.
+     *
+     * @param guid the identifier
+     * @return an IRI, in angle brackets for use in SPARQL
+     */
+    private static String iriRef(String guid) {
+        String iri = guid.contains(":") ? guid : "urn:uuid:" + guid;
+        return "<" + iri.replace(">", "%3E") + ">";
+    }
+
+    /**
+     * The IRIs a Test (or Specification) may have, given as an IRI, a urn:uuid:, or a bare uuid: an IRI
+     * stands for itself, and a uuid, urn:uuid:{uuid}, or Test IRI bdqtest:{uuid} for both urn:uuid:{uuid}
+     * and bdqtest:{uuid} (a Test defined only in a library is identified by urn:uuid:{uuid}).
+     *
+     * @param guid the identifier
+     * @return the IRIs, in angle brackets for use in SPARQL, separated by spaces
+     */
+    private static String candidateIriRefs(String guid) {
+        String id = guid.trim();
+        if (id.startsWith("urn:uuid:")) {
+            id = id.substring("urn:uuid:".length());
+        } else if (id.startsWith(Namespace.BDQTEST) && id.indexOf('/', Namespace.BDQTEST.length()) < 0) {
+            id = id.substring(Namespace.BDQTEST.length());
+        } else if (id.contains(":")) {
+            return iriRef(id);
+        }
+        return iriRef("urn:uuid:" + id) + " " + iriRef(Namespace.BDQTEST + id);
+    }
+
     /**
      * <p>findSpecificationsForMechanism.</p>
      *
@@ -63,11 +105,9 @@ public class FFDQModel extends BaseModel {
      * @return a {@link java.util.Map} object.
      */
     public Map<String, Specification> findSpecificationsForMechanism(String mechanismGuid) {
-        Set<String> guids = new HashSet<>();
-
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+        String sparql = TEST_PREFIXES +
                 "SELECT ?specification " +
-                "WHERE { ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
+                "WHERE { ?implementation bdqffdq:implementedBy " + iriRef(mechanismGuid) + " . " +
                 "?implementation bdqffdq:usesSpecification ?specification }";
 
         return (Map<String, Specification>) findAll(Specification.class, sparql, "specification");
@@ -81,9 +121,7 @@ public class FFDQModel extends BaseModel {
      * @return a {@link java.util.Map} object.
      */
     public Map<String, Specification> findAllSpecifications() {
-        Set<String> guids = new HashSet<>();
-
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
+        String sparql = TEST_PREFIXES +
                 "SELECT ?specification " +
                 "WHERE { ?specification a bdqffdq:Specification }";
 
@@ -91,36 +129,45 @@ public class FFDQModel extends BaseModel {
     }
     
     /**
-     * <p>findSpecificationsForMechanism.</p> include any tests found.
+     * Find the Tests (versions of Tests) whose Specifications are used by implementations of a mechanism.
      *
-     * @param mechanismGuid a {@link java.lang.String} object.
-     * @return a {@link java.util.Map} object.
+     * @param mechanismGuid the mechanism, as an IRI, urn:uuid:, or bare uuid
+     * @return the Tests, keyed by their IRIs
      */
     public Map<String, DataQualityNeed> findVersionOfTestsForMechanism(String mechanismGuid) {
-        Set<String> guids = new HashSet<>();
-
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
-        		"PREFIX dcterms: <http://purl.org/dc/terms/> " + 
-                "SELECT ?specification " +
-                "WHERE { optional { ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> .  " +
-                "?implementation bdqffdq:usesSpecification ?spec . } . ?spec dcterms:isVersionOf ?specification }";
-        return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
+        String sparql = TEST_PREFIXES + 
+                "SELECT DISTINCT ?test " +
+                "WHERE { ?implementation bdqffdq:implementedBy " + iriRef(mechanismGuid) + " . " +
+                "?implementation bdqffdq:usesSpecification ?spec . " +
+                METHOD_VALUES +
+                "?method a ?methodType ; bdqffdq:hasSpecification ?spec ; ?forTest ?test . }";
+        return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "test");
     }
 
     /**
-     * <p>findMethodForSpecification.</p>
+     * Find the Method (ValidationMethod, MeasurementMethod, AmendmentMethod, or IssueMethod) for a Test.
      *
-     * @param testGuid a {@link java.lang.String} object.
-     * @return a {@link org.datakurator.ffdq.model.solutions.DataQualityMethod} object.
+     * The Test may be given by its IRI (e.g. https://rs.tdwg.org/bdqtest/terms/{uuid}), by the IRI of a
+     * version of it, by urn:uuid:{uuid} or the bare uuid, or by the IRI of the Method's Specification.
+     * Both the form of the BDQ standard's bdqtest RDF, where a Method refers to the Test
+     * (bdqffdq:forValidation bdqtest:{uuid}), and the form written by kurator-ffdq for libraries, where
+     * a Method refers to a version of the Test (bdqtest:{uuid}-{date} dcterms:isVersionOf bdqtest:{uuid}),
+     * are found.
+     *
+     * @param testGuid the Test
+     * @return the Method, or null if none is found
      */
     public DataQualityMethod findMethodForSpecification(String testGuid) {
     	DataQualityMethod retval = null;
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
-                "SELECT ?method WHERE { " +
-                "{ ?method a bdqffdq:MeasurementMethod } UNION " +
-                "{ ?method a bdqffdq:ValidationMethod } UNION " +
-                "{ ?method a bdqffdq:AmendmentMethod } . " +
-                "?method bdqffdq:hasSpecification <" + testGuid + "> }";
+        String sparql = TEST_PREFIXES +
+                "SELECT DISTINCT ?method WHERE { " +
+                METHOD_VALUES +
+                "VALUES ?given { " + candidateIriRefs(testGuid) + " } " +
+                "?method a ?methodType . " +
+                "{ ?method ?forTest ?given } UNION " +
+                "{ ?method ?forTest ?version . ?version dcterms:isVersionOf ?given } UNION " +
+                "{ ?method bdqffdq:hasSpecification ?given } " +
+                "} ORDER BY ?method";
         try { 
         	retval = (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
         } catch (RuntimeException e) { 
@@ -130,44 +177,34 @@ public class FFDQModel extends BaseModel {
     }
 
     /**
-     * findNeedsForMechanism, given a mechanism, find DataQualityNeeds (Amenement,
-     * Validation, Measurement, Issue that have known implementations and mechanisms
+     * findTestsForMechanism, given a mechanism, find DataQualityNeeds (Amendment,
+     * Validation, Measure, Issue) that have known implementations and mechanisms
      * associating them with a specified mechanism.
      *
-     * @param mechanismGuid a {@link java.lang.String} object.
-     * @return a {@link java.util.Map} object.
+     * @param mechanismGuid the mechanism, as an IRI, urn:uuid:, or bare uuid
+     * @return the Tests, keyed by their IRIs
      */
     public Map<String, DataQualityNeed> findTestsForMechanism(String mechanismGuid) {
-        Set<String> guids = new HashSet<>();
-
-        String sparql = "PREFIX bdqffffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
-                "SELECT ?test " +
-                "WHERE "
-                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
-                "?implementation bdqffdq:hasSpecification ?specification "
-                + "?specification bdqffdq:forValidation ?test "
-                + "} UNION " 
-                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
-                "?implementation bdqffdq:hasSpecification ?specification "
-                + "?specification bdqffdq:forAmendment ?test "
-                + "} UNION " 
-                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
-                "?implementation bdqffdq:hasSpecification ?specification "
-                + "?specification bdqffdq:forMeasure ?test "
-                + "} UNION " 
-                + "{ ?implementation bdqffdq:implementedBy <" + mechanismGuid + "> . " +
-                "?implementation bdqffdq:hasSpecification ?specification "
-                + "?specification bdqffdq:forIssue ?test "
-                + "}";
-        return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "specification");
+        String sparql = TEST_PREFIXES +
+                "SELECT DISTINCT ?test " +
+                "WHERE { ?implementation bdqffdq:implementedBy " + iriRef(mechanismGuid) + " . " +
+                "?implementation bdqffdq:usesSpecification ?specification . " +
+                METHOD_VALUES +
+                "?method a ?methodType ; bdqffdq:hasSpecification ?specification ; ?forTest ?test . }";
+        return (Map<String, DataQualityNeed>) findAll(DataQualityNeed.class, sparql, "test");
     }
     
     /**
-     * find all DataQualityNeeds (Amenement, Validation, Measurement, Issue) defined in the model
+     * find all DataQualityNeeds (Amendment, Validation, Measure, Issue) defined in the model.
+     *
+     * Two forms of Test are found: a Test described under its own IRI (bdqtest:{uuid}, with
+     * dcterms:hasVersion, as in the BDQ standard's bdqtest RDF), and a version of a Test
+     * (bdqtest:{uuid}-{date} dcterms:isVersionOf bdqtest:{uuid}, as kurator-ffdq writes for libraries).
+     * If both are present for a Test, the Test described under its own IRI is used.
      * 
-     * @param keyMapBy key for the returned map, either test, for the fully qualified name, or
-     * uuid for the bare uuid, or ver for the isVersionOf without the version date. 
-     * 
+     * @param keyMapBy key for the returned map, either test, for the IRI of the node read, or
+     * uuid for the bare uuid, or ver for the IRI of the Test (the isVersionOf of a version, without
+     * the version date). 
      *
      * @return a {@link java.util.Map} object.
      */
@@ -178,42 +215,24 @@ public class FFDQModel extends BaseModel {
     	if (!keyMapBy.equals("test") &&  !keyMapBy.equals("uuid") && ! keyMapBy.equals("ver")) { 
     		keyMapBy = "test";
     	}
-    	
-        Set<String> guids = new HashSet<>();
 
-        String id = "test";
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " 
-        		+ "PREFIX dcterms: <http://purl.org/dc/terms/> " 
+        String sparql = TEST_PREFIXES 
                 + "SELECT ?test ?uuid ?ver " 
                 + "WHERE { "
-                + "{ "
-                + "  ?test a bdqffdq:Validation . "
-                + "  ?test dcterms:isVersionOf ?ver ."
-                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqtest/terms/','') AS ?uuid ) ."
+                + "  VALUES ?type { bdqffdq:Validation bdqffdq:Amendment bdqffdq:Measure bdqffdq:Issue } "
+                + "  ?test a ?type . "
+                + "  OPTIONAL { ?test dcterms:isVersionOf ?versionOf } "
+                + "  BIND(COALESCE(?versionOf, ?test) AS ?testIri) "
+                + "  FILTER (!BOUND(?versionOf) || NOT EXISTS { ?versionOf a ?type }) "
+                // a Test identified only by urn:uuid:{uuid} is keyed as the Test IRI bdqtest:{uuid}
+                + "  BIND(IF(STRSTARTS(STR(?testIri), 'urn:uuid:'), "
+                + "     IRI(CONCAT('" + Namespace.BDQTEST + "', STRAFTER(STR(?testIri), 'urn:uuid:'))), ?testIri) AS ?ver) "
+                + "  BIND(REPLACE(STR(?ver),'" + Namespace.BDQTEST + "','') AS ?uuid ) "
                 //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
-                + "} UNION { " 
-                + "  ?test a bdqffdq:Amendment . "
-                + "  ?test dcterms:isVersionOf ?ver ."
-                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqtest/terms/','') AS ?uuid ) ."
-                //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
-                + "} UNION { " 
-                + "  ?test a bdqffdq:Measure . "
-                + "  ?test dcterms:isVersionOf ?ver ."
-                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqtest/terms/','') AS ?uuid ) ."
-                //+ "   ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
-                + "} UNION { " 
-                + "  ?test a bdqffdq:Issue . "
-                + "  ?test dcterms:isVersionOf ?ver ."
-                + "  BIND(REPLACE(STR(?ver),'https://rs.tdwg.org/bdqtest/terms/','') AS ?uuid ) ."
-                //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
-                + "} "
                 + "}";
         logger.log(Level.INFO, sparql);
         Map<String, DataQualityNeed> retval = new HashMap<String,DataQualityNeed>();
-        retval.putAll(findAllMapBy(Validation.class, sparql, id, keyMapBy));
-        retval.putAll(findAllMapBy(Amendment.class, sparql, id, keyMapBy));
-        retval.putAll(findAllMapBy(Measure.class, sparql, id, keyMapBy));
-        retval.putAll(findAllMapBy(Issue.class, sparql, id, keyMapBy));
+        retval.putAll(findAllMapBy(DataQualityNeed.class, sparql, "test", keyMapBy));
         return retval;
     }
     

@@ -62,6 +62,8 @@ public class TestRunner {
     private FFDQModel model;
 
     private Map<String, AssertionTest> tests = new HashMap<>();
+    /** The test implementing each Method found in the RDF (several Methods may share a Specification). */
+    private Map<DataQualityMethod, AssertionTest> testsForMethods = new IdentityHashMap<>();
 
     private Mechanism mechanism;
 
@@ -103,6 +105,11 @@ public class TestRunner {
 
         		try { 
         			mechanism = (Mechanism) model.findOne(mechanismGuid, Mechanism.class);
+        			if (mechanism == null) {
+        				mechanism = new Mechanism(mechanismGuid, mechanismLabel);
+        				model.save(mechanism);
+        				logger.log(Level.INFO, "Adding Mechanism instance to model.");
+        			}
 
         			// check to see if the annotation has a label value and override value from rdf if present
         			if (mechanismLabel != null) {
@@ -310,7 +317,7 @@ public class TestRunner {
 
             		test.setResourceType(cc.getResourceType().getLabel());
 
-            		informationElement = cc.getInformationElements();
+            		informationElement = informationElementsOf(cc.getInformationElements(), cc.getActedUpon(), cc.getConsulted());
 
             	} else if (assertionMethod instanceof MeasurementMethod) {
 
@@ -324,7 +331,7 @@ public class TestRunner {
             		}
             		test.setResourceType(cd.getResourceType().getLabel());
 
-            		informationElement = cd.getInformationElements();
+            		informationElement = informationElementsOf(cd.getInformationElements(), cd.getActedUpon(), cd.getConsulted());
 
             	} else if (assertionMethod instanceof AmendmentMethod) {
 
@@ -339,7 +346,7 @@ public class TestRunner {
 
             		test.setResourceType(ce.getResourceType().getLabel());
 
-            		informationElement = ce.getInformationElements();
+            		informationElement = informationElementsOf(ce.getInformationElements(), ce.getActedUpon(), ce.getConsulted());
 
             	} else if (assertionMethod instanceof IssueMethod) {
 
@@ -354,7 +361,7 @@ public class TestRunner {
 
             		test.setResourceType(ce.getResourceType().getLabel());
 
-            		informationElement = ce.getInformationElements();
+            		informationElement = informationElementsOf(ce.getInformationElements(), ce.getActedUpon(), ce.getConsulted());
 
             	} else {
             		throw new UnsupportedOperationException("Unsupported assertion type: " + assertionMethod.getClass());
@@ -372,8 +379,34 @@ public class TestRunner {
 
 
             	tests.put(guid, test);
+            	testsForMethods.put(assertionMethod, test);
             } 
         }
+    }
+
+    /**
+     * The information elements of a Test: its bdqffdq:hasInformationElement, or, when the RDF gives
+     * them separately (bdqffdq:hasActedUponInformationElement and bdqffdq:hasConsultedInformationElement,
+     * as in the BDQ standard's bdqtest RDF), the information elements acted upon and consulted together.
+     *
+     * @param informationElements the Test's information elements, or null
+     * @param actedUpon the information elements acted upon, or null
+     * @param consulted the information elements consulted, or null
+     * @return the information elements, with an empty composedOf if there are none
+     */
+    static InformationElement informationElementsOf(InformationElement informationElements,
+            InformationElement actedUpon, InformationElement consulted) {
+        InformationElement result = new InformationElement();
+        List<URI> composedOf = new ArrayList<>();
+        for (InformationElement ie : new InformationElement[] { informationElements, actedUpon, consulted }) {
+            if (ie != null && ie.getComposedOf() != null) {
+                for (URI uri : ie.getComposedOf()) {
+                    if (!composedOf.contains(uri)) { composedOf.add(uri); }
+                }
+            }
+        }
+        result.setComposedOf(composedOf);
+        return result;
     }
 
     private List<TestParam> processParameters(Method method, InformationElement informationElement) {
@@ -570,7 +603,7 @@ public class TestRunner {
                 Specification specification = measurementMethod.getSpecification();
                 Measure dimension = measurementMethod.getMeasure();
 
-                AssertionTest test = tests.get(specification.getId());
+                AssertionTest test = testsForMethods.get(measurementMethod);
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
@@ -589,7 +622,7 @@ public class TestRunner {
                 Specification specification = validationMethod.getSpecification();
                 Validation criterion = validationMethod.getValidation();
 
-                AssertionTest test = tests.get(specification.getId());
+                AssertionTest test = testsForMethods.get(validationMethod);
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
@@ -608,7 +641,7 @@ public class TestRunner {
                 Specification specification = amendmentMethod.getSpecification();
                 Amendment enhancement = amendmentMethod.getContextualizedEnhancement();
 
-                AssertionTest test = tests.get(specification.getId());
+                AssertionTest test = testsForMethods.get(amendmentMethod);
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
