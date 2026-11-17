@@ -54,6 +54,14 @@
 
     <dependencies>
         <dependency>
+            <!-- validates report RDF against the BDQ standard's SHACL shapes in the tests (as bdq_workbench
+                 does; RDF4J's ShaclSail does not parse the BDQ shapes) -->
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-shacl</artifactId>
+            <version>5.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
