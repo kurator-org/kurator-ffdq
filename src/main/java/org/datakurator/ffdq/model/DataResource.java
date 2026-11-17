@@ -70,6 +70,7 @@ public class DataResource {
         // Set an rdf type of ffdq:DataResource
         subject = valueFactory.createIRI(uuid);
         builder.defaultGraph().add(subject, RDF.TYPE, "bdqffdq:DataResource");
+        builder.defaultGraph().add(subject, RDF.TYPE, SimpleValueFactory.getInstance().createIRI("http://www.w3.org/ns/prov#Entity"));
 
         this.vocab = vocab;
     }
@@ -127,6 +128,7 @@ public class DataResource {
         // Set an rdf type of ffdq:DataResource
         subject = valueFactory.createIRI(uuid);
         builder.defaultGraph().add(subject, RDF.TYPE, "bdqffdq:DataResource");
+        builder.defaultGraph().add(subject, RDF.TYPE, SimpleValueFactory.getInstance().createIRI("http://www.w3.org/ns/prov#Entity"));
 
         // Add triples from the key value pairs in the map
         for (String term : record.keySet()) {

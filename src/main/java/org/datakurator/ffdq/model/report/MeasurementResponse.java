@@ -21,6 +21,11 @@
  */
 package org.datakurator.ffdq.model.report;
 
+import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.DataQualityNeed;
+import org.datakurator.ffdq.model.solutions.DataQualityMethod;
+import org.datakurator.ffdq.model.solutions.MeasurementMethod;
+
 import org.datakurator.ffdq.rdf.RdfReader;
 import org.datakurator.ffdq.rdf.RdfWriter;
 import org.eclipse.rdf4j.model.IRI;
@@ -105,8 +110,6 @@ public class MeasurementResponse extends Response {
      */
     protected void writeRdfProperties(RdfWriter w, Resource s) {
         super.writeRdfProperties(w, s);
-        w.value(s, "bdqffdq:dimensionInContext", getDimension());
-        w.value(s, "prov:wasInformedBy", getInformedBy());
     }
 
     /** {@inheritDoc} */
@@ -128,8 +131,6 @@ public class MeasurementResponse extends Response {
      */
     protected void readRdfProperties(RdfReader r, Resource s) {
         super.readRdfProperties(r, s);
-        setDimension(r.read(s, "bdqffdq:dimensionInContext", Measure::readRdf));
-        setInformedBy(r.read(s, "prov:wasInformedBy", AmendmentResponse::readRdf));
     }
 
     /**
@@ -148,4 +149,59 @@ public class MeasurementResponse extends Response {
         return o;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed dataQualityNeed() {
+        return getDimension();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void dataQualityNeedFromRdf(DataQualityNeed need) {
+        if (need instanceof Measure) {
+            setDimension((Measure) need);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityMethod newMethod(Specification specification, DataQualityNeed need) {
+        return new MeasurementMethod(specification, (Measure) need);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected String methodType() {
+        return MeasurementMethod.RDF_TYPE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed needOf(DataQualityMethod method) {
+        return method instanceof MeasurementMethod ? ((MeasurementMethod) method).getMeasure() : null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected String oldTestProperty() {
+        return "bdqffdq:dimensionInContext";
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed readNeed(RdfReader r, Resource s) {
+        return Measure.readRdf(r, s);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected AmendmentResponse informedBy() {
+        return getInformedBy();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void informedByFromRdf(AmendmentResponse amendmentResponse) {
+        setInformedBy(amendmentResponse);
+    }
 }

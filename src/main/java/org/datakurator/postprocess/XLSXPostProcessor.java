@@ -563,7 +563,14 @@ public class XLSXPostProcessor {
             Entity    entity   = result != null ? result.getEntity() : null;
 
             Map<String, String> amendedValues = new HashMap<>();
-            if (entity != null && entity.getValue() instanceof URI) {
+            if (entity != null && entity.getValue() instanceof Map) {
+                // the proposed changes, keyed by Information Element (e.g. dwc:eventDate), from the
+                // JSON of bdqffdq:hasResponseResultValue
+                for (Map.Entry<?, ?> e : ((Map<?, ?>) entity.getValue()).entrySet()) {
+                    amendedValues.put(localNameFromKey(String.valueOf(e.getKey())), e.getValue() == null ? null : String.valueOf(e.getValue()));
+                }
+            } else if (entity != null && entity.getValue() instanceof URI) {
+                // reports written before 4.0.0: the amended values are a separate data resource
                 URI uri = (URI) entity.getValue();
                 try {
                     DataResource amended = model.findDataResource(uri);
@@ -726,15 +733,35 @@ public class XLSXPostProcessor {
      * @param context the {@link Measure} context; may be {@code null}.
      * @return non-null list of field names (may be empty).
      */
-    List<String> fieldsFromMeasureContext(Measure context) {
+    /**
+     * The field names (local names) of a Test's information elements: its bdqffdq:hasInformationElement,
+     * or, where the Test gives them separately (as the BDQ standard's Tests do), the information elements
+     * acted upon and consulted.
+     */
+    private List<String> fieldsOf(InformationElement... informationElements) {
         List<String> result = new ArrayList<>();
-        if (context == null || context.getInformationElements() == null) {
-            return result;
-        }
-        for (URI uri : context.getInformationElements().getComposedOf()) {
-            result.add(localNameFromUri(uri));
+        for (InformationElement ie : informationElements) {
+            if (ie != null && ie.getComposedOf() != null) {
+                for (URI uri : ie.getComposedOf()) {
+                    String name = localNameFromUri(uri);
+                    if (!result.contains(name)) {
+                        result.add(name);
+                    }
+                }
+            }
         }
         return result;
+    }
+
+    /** The local name of a key of proposed changes, e.g. eventDate for dwc:eventDate or a term IRI. */
+    private static String localNameFromKey(String key) {
+        int i = Math.max(key.lastIndexOf(':'), Math.max(key.lastIndexOf('/'), key.lastIndexOf('#')));
+        return i >= 0 ? key.substring(i + 1) : key;
+    }
+
+    List<String> fieldsFromMeasureContext(Measure context) {
+        return context == null ? new ArrayList<>()
+                : fieldsOf(context.getInformationElements(), context.getActedUpon(), context.getConsulted());
     }
 
     /**
@@ -744,14 +771,8 @@ public class XLSXPostProcessor {
      * @return non-null list of field names (may be empty).
      */
     List<String> fieldsFromValidationContext(Validation context) {
-        List<String> result = new ArrayList<>();
-        if (context == null || context.getInformationElements() == null) {
-            return result;
-        }
-        for (URI uri : context.getInformationElements().getComposedOf()) {
-            result.add(localNameFromUri(uri));
-        }
-        return result;
+        return context == null ? new ArrayList<>()
+                : fieldsOf(context.getInformationElements(), context.getActedUpon(), context.getConsulted());
     }
 
     /**
@@ -761,14 +782,8 @@ public class XLSXPostProcessor {
      * @return non-null list of field names (may be empty).
      */
     List<String> fieldsFromAmendmentContext(Amendment context) {
-        List<String> result = new ArrayList<>();
-        if (context == null || context.getInformationElements() == null) {
-            return result;
-        }
-        for (URI uri : context.getInformationElements().getComposedOf()) {
-            result.add(localNameFromUri(uri));
-        }
-        return result;
+        return context == null ? new ArrayList<>()
+                : fieldsOf(context.getInformationElements(), context.getActedUpon(), context.getConsulted());
     }
 
     /**
@@ -778,14 +793,8 @@ public class XLSXPostProcessor {
      * @return non-null list of field names (may be empty).
      */
     List<String> fieldsFromIssueContext(Issue context) {
-        List<String> result = new ArrayList<>();
-        if (context == null || context.getInformationElements() == null) {
-            return result;
-        }
-        for (URI uri : context.getInformationElements().getComposedOf()) {
-            result.add(localNameFromUri(uri));
-        }
-        return result;
+        return context == null ? new ArrayList<>()
+                : fieldsOf(context.getInformationElements(), context.getActedUpon(), context.getConsulted());
     }
 
     /**

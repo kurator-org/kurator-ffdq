@@ -21,6 +21,11 @@
  */
 package org.datakurator.ffdq.model.report;
 
+import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.DataQualityNeed;
+import org.datakurator.ffdq.model.solutions.DataQualityMethod;
+import org.datakurator.ffdq.model.solutions.AmendmentMethod;
+
 import org.datakurator.ffdq.rdf.RdfReader;
 import org.datakurator.ffdq.rdf.RdfWriter;
 import org.eclipse.rdf4j.model.IRI;
@@ -84,7 +89,6 @@ public class AmendmentResponse extends Response {
      */
     protected void writeRdfProperties(RdfWriter w, Resource s) {
         super.writeRdfProperties(w, s);
-        w.value(s, "bdqffdq:enhancementInContext", getEnhancement());
     }
 
     /** {@inheritDoc} */
@@ -106,7 +110,6 @@ public class AmendmentResponse extends Response {
      */
     protected void readRdfProperties(RdfReader r, Resource s) {
         super.readRdfProperties(r, s);
-        setEnhancement(r.read(s, "bdqffdq:enhancementInContext", Amendment::readRdf));
     }
 
     /**
@@ -125,4 +128,47 @@ public class AmendmentResponse extends Response {
         return o;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed dataQualityNeed() {
+        return getEnhancement();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void dataQualityNeedFromRdf(DataQualityNeed need) {
+        if (need instanceof Amendment) {
+            setEnhancement((Amendment) need);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityMethod newMethod(Specification specification, DataQualityNeed need) {
+        return new AmendmentMethod(specification, (Amendment) need);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected String methodType() {
+        return AmendmentMethod.RDF_TYPE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed needOf(DataQualityMethod method) {
+        return method instanceof AmendmentMethod ? ((AmendmentMethod) method).getContextualizedEnhancement() : null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected String oldTestProperty() {
+        return "bdqffdq:enhancementInContext";
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed readNeed(RdfReader r, Resource s) {
+        return Amendment.readRdf(r, s);
+    }
 }

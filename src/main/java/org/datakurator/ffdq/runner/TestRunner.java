@@ -52,6 +52,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,6 +72,8 @@ public class TestRunner {
     private List<MeasurementMethod> measures = new ArrayList<>();
     private List<AmendmentMethod> amendments = new ArrayList<>();
     private List<IssueMethod> issues = new ArrayList<>();
+    /** The bdqffdq:DataQualityReport of this run: the Responses of all the Tests run. */
+    private DataQualityReport report = new DataQualityReport();
 
     /**
      * <p>Constructor for TestRunner.</p>
@@ -351,7 +354,7 @@ public class TestRunner {
             	} else if (assertionMethod instanceof IssueMethod) {
 
             		IssueMethod amendmentMethod = (IssueMethod) assertionMethod;
-            		test.setAssertionType(AssertionTest.AMENDMENT);
+            		test.setAssertionType(AssertionTest.ISSUE);
             		issues.add(amendmentMethod);
 
             		Issue ce = amendmentMethod.getContextualizedIssue();
@@ -571,7 +574,8 @@ public class TestRunner {
                 runner.run(record.toMap());
             }
 
-            // Write dq report as rdf
+            // Save the DataQualityReport of the run, then write the model as rdf
+            model.save(runner.getReport());
             boolean includeBindingClass = false;
             model.write(RDFFormat.TURTLE, new FileOutputStream(rdfOut),includeBindingClass);
 
@@ -583,6 +587,13 @@ public class TestRunner {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "java -jar TestRunner.jar", options);
         }
+    }
+
+    /**
+     * @return the bdqffdq:DataQualityReport of this run, containing the Responses of all the Tests run
+     */
+    public DataQualityReport getReport() {
+        return report;
     }
 
     /**
@@ -605,7 +616,9 @@ public class TestRunner {
 
                 AssertionTest test = testsForMethods.get(measurementMethod);
 
+                Instant started = Instant.now();
                 Result result = invokeTest(test, instance, dataResource.asMap());
+                Instant ended = Instant.now();
 
                 MeasurementResponse measure = new MeasurementResponse();
 
@@ -614,8 +627,12 @@ public class TestRunner {
                 measure.setMechanism(mechanism);
                 measure.setSpecification(specification);
                 measure.setResult(result);
+                measure.setMethod(measurementMethod);
+                measure.setStartedAtTime(started);
+                measure.setEndedAtTime(ended);
 
                 model.save(measure);
+                report.addResponse(measure);
             }
 
             for (ValidationMethod validationMethod : validations) {
@@ -624,7 +641,9 @@ public class TestRunner {
 
                 AssertionTest test = testsForMethods.get(validationMethod);
 
+                Instant started = Instant.now();
                 Result result = invokeTest(test, instance, dataResource.asMap());
+                Instant ended = Instant.now();
 
                 ValidationResponse validation = new ValidationResponse();
 
@@ -633,8 +652,12 @@ public class TestRunner {
                 validation.setMechanism(mechanism);
                 validation.setSpecification(specification);
                 validation.setResult(result);
+                validation.setMethod(validationMethod);
+                validation.setStartedAtTime(started);
+                validation.setEndedAtTime(ended);
 
                 model.save(validation);
+                report.addResponse(validation);
             }
 
             for (AmendmentMethod amendmentMethod : amendments) {
@@ -643,7 +666,9 @@ public class TestRunner {
 
                 AssertionTest test = testsForMethods.get(amendmentMethod);
 
+                Instant started = Instant.now();
                 Result result = invokeTest(test, instance, dataResource.asMap());
+                Instant ended = Instant.now();
 
                 AmendmentResponse amendment = new AmendmentResponse();
 
@@ -652,8 +677,37 @@ public class TestRunner {
                 amendment.setMechanism(mechanism);
                 amendment.setSpecification(specification);
                 amendment.setResult(result);
+                amendment.setMethod(amendmentMethod);
+                amendment.setStartedAtTime(started);
+                amendment.setEndedAtTime(ended);
 
                 model.save(amendment);
+                report.addResponse(amendment);
+            }
+
+            for (IssueMethod issueMethod : issues) {
+                Specification specification = issueMethod.getSpecification();
+                Issue issue = issueMethod.getContextualizedIssue();
+
+                AssertionTest test = testsForMethods.get(issueMethod);
+
+                Instant started = Instant.now();
+                Result result = invokeTest(test, instance, dataResource.asMap());
+                Instant ended = Instant.now();
+
+                IssueResponse issueResponse = new IssueResponse();
+
+                issueResponse.setIssueInContext(issue);
+                issueResponse.setDataResource(dataResource.getURI());
+                issueResponse.setMechanism(mechanism);
+                issueResponse.setSpecification(specification);
+                issueResponse.setResult(result);
+                issueResponse.setMethod(issueMethod);
+                issueResponse.setStartedAtTime(started);
+                issueResponse.setEndedAtTime(ended);
+
+                model.save(issueResponse);
+                report.addResponse(issueResponse);
             }
         } catch (RunnerException ex) {
             // This probably results from an exception being thrown by code running in the test method
@@ -694,8 +748,6 @@ public class TestRunner {
             logger.log(Level.INFO, response.getResultState().toString());
             
             Result result = new Result();
-
-            model.save(response.getResultState());
             result.setState(response.getResultState());
 
             if (response.getValue() != null) {
@@ -703,22 +755,17 @@ public class TestRunner {
                 Entity entity = value.getEntity();
 
                 if (value instanceof AmendmentValue) {
-                    // Data Resource id from entity value
-                    URI uri = (URI) entity.getValue();
-
-                    // Load amended values from the data resource into model
-                    Map<String, String> amendedValues = ((AmendmentValue) value).getObject();
-                    DataResource dataResource = new DataResource(uri.toString(), model.getVocab(), amendedValues);
-
-                    model.load(dataResource.asModel());
+                    // the Response.result of an Amendment is its proposed changes, a key:value map
+                    // (written as JSON in bdqffdq:hasResponseResultValue)
+                    entity = new Entity();
+                    entity.setValue(new java.util.TreeMap<>(((AmendmentValue) value).getObject()));
                 }
 
                 result.setEntity(entity);
-                model.save(entity);
             }
 
             result.setComment(response.getComment());
-            model.save(result);
+            result.setQualifiers(response.getQualifiers());
 
             return result;
         } catch (InvocationTargetException e) {

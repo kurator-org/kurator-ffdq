@@ -481,7 +481,8 @@ public class XLSXPostProcessorTest {
 
     /**
      * An IssueResponse saved with its Issue (and the Issue's information elements) is read back from
-     * the model with the Issue attached, so the Issues sheet can color the fields the Issue acts upon.
+     * the model with the Issue attached (reached through the Specification and its IssueMethod, as the
+     * BDQ standard has it), so the Issues sheet can color the fields the Issue acts upon.
      * RDFBeans could not read an Issue back (it had no no-arg constructor); the RDF4J mapping can.
      */
     @Test
@@ -491,8 +492,11 @@ public class XLSXPostProcessorTest {
         issue.setInformationElements(new InformationElement(Arrays.asList(
                 URI.create("http://rs.tdwg.org/dwc/terms/dataGeneralizations"),
                 URI.create("http://rs.tdwg.org/dwc/terms/informationWithheld"))));
+        Specification specification = new Specification();
+        specification.setLabel("Specification for: ISSUE_EXAMPLE");
         IssueResponse response = new IssueResponse();
         response.setDataResource(URI.create("urn:uuid:00000000-0000-0000-0000-0000000000aa"));
+        response.setSpecification(specification);
         response.setIssueInContext(issue);
         model.save(response);
 

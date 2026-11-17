@@ -102,6 +102,13 @@ public class BaseModel {
      * @param obj a {@link java.lang.Object} object.
      */
     public void save(Object obj) {
+        if (obj instanceof org.datakurator.ffdq.model.report.Result || obj instanceof org.datakurator.ffdq.model.Entity
+                || obj instanceof org.datakurator.ffdq.model.ResponseQualifier) {
+            // written as properties of the Response they belong to (bdqffdq:hasResponseStatus,
+            // bdqffdq:hasResponseResult, ...), not as resources of their own
+            logger.log(Level.FINE, "Not saved separately, written with its Response: " + obj.getClass().getSimpleName());
+            return;
+        }
         RdfWriter writer = new RdfWriter();
         if (obj instanceof RdfMapped) {
             ((RdfMapped) obj).writeRdf(writer);

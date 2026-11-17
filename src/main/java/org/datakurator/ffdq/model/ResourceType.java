@@ -153,6 +153,10 @@ public class ResourceType implements RdfMapped {
         ResourceType o = r.remember(s, new ResourceType());
         o.setId(RdfReader.localId(s, "https://rs.tdwg.org/bdqffdq/terms/"));
         o.readRdfProperties(r, s);
+        if (o.getLabel() == null) {
+            // no rdfs:label (e.g. the bdqffdq vocabulary is not loaded): the id is the label
+            o.setLabel(RdfReader.localId(s, "https://rs.tdwg.org/bdqffdq/terms/"));
+        }
         return o;
     }
 

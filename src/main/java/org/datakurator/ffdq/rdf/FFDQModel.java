@@ -276,17 +276,26 @@ public class FFDQModel extends BaseModel {
     public List<String> findFieldsByAssertionType(Class<? extends Response> cls) {
         List<String> fields = new ArrayList<>();
 
-        // TODO: Needs joins through specification and method
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
-                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+        // The Test of a Response is reached as the BDQ standard has it: the Implementation that
+        // bdqffdq:producesResponse the Response bdqffdq:usesSpecification a Specification, which a
+        // Method bdqffdq:hasSpecification, and the Method is bdqffdq:forValidation (etc.) the Test.
+        // Reports written before 4.0.0 linked the Response to the Test directly.
+        String sparql = TEST_PREFIXES +
                 "SELECT DISTINCT ?field WHERE { " +
-                "?assertion a bdqffdq:" + cls.getSimpleName() + " . " +
-                "{ ?assertion ffdq:dimensionInContext ?context } UNION " +
-                "{ ?assertion ffdq:criterionInContext ?context } UNION " +
-                "{ ?assertion ffdq:enhancementInContext ?context } . " +
-                "?context bdqffdq:hasInformationElement ?ie . " +
+                "?assertion a ?type . " +
+                "VALUES ?type { bdqffdq:" + cls.getSimpleName() +
+                (cls == MeasurementResponse.class ? " bdqffdq:MeasureResponse" : "") + " } " +
+                "{ ?implementation bdqffdq:producesResponse ?assertion ; bdqffdq:usesSpecification ?specification . " +
+                "  ?method bdqffdq:hasSpecification ?specification . " +
+                "  VALUES ?forTest { bdqffdq:forValidation bdqffdq:forMeasure bdqffdq:forAmendment bdqffdq:forIssue } " +
+                "  ?method ?forTest ?context . } " +
+                "UNION { VALUES ?oldContext { bdqffdq:criterionInContext bdqffdq:dimensionInContext " +
+                "  bdqffdq:enhancementInContext bdqffdq:hasIssue } ?assertion ?oldContext ?context . } " +
+                "VALUES ?hasIe { bdqffdq:hasInformationElement bdqffdq:hasActedUponInformationElement " +
+                "  bdqffdq:hasConsultedInformationElement } " +
+                "?context ?hasIe ?ie . " +
                 "?ie bdqffdq:composedOf ?field " +
-        "}";
+                "}";
 
         TupleQueryResult result = executeQuery(sparql);
 
@@ -308,10 +317,9 @@ public class FFDQModel extends BaseModel {
     public List<URI> listDataResourcesByURI() {
         List<URI> dataResources = new ArrayList<>();
 
-        String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms> " +
-                "PREFIX prov: <http://www.w3.org/ns/prov#> " +
+        String sparql = TEST_PREFIXES +
                 "SELECT DISTINCT ?dataResource WHERE { " +
-                "?assertion prov:used ?dataResource " +
+                "?assertion bdqffdq:appliesTo ?dataResource " +
                 "}";
 
         TupleQueryResult result = executeQuery(sparql);

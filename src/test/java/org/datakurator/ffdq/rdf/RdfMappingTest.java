@@ -17,6 +17,7 @@
  */
 package org.datakurator.ffdq.rdf;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -129,26 +130,27 @@ public class RdfMappingTest {
     }
 
     /**
-     * A ValidationResponse is written as its RDFBeans annotations wrote it.
+     * A ValidationResponse is written as the BDQ standard has it: status, result, comment, and qualifiers
+     * on the Response; an Implementation that produces it, uses its Specification, and is implemented by
+     * its Mechanism; a Method relating the Specification to the Test; and a PROV-O Activity.
      */
     @Test
-    public void testValidationResponseWrittenAsAnnotated() {
+    public void testValidationResponseWrittenAsBdqffdq() {
         Specification spec = new Specification();
         spec.setId("urn:uuid:11111111-1111-1111-1111-111111111111");
         spec.setLabel("Specification for: VALIDATION_EXAMPLE");
         Mechanism mechanism = new Mechanism("22222222-2222-2222-2222-222222222222", "Example mechanism");
         Validation criterion = new Validation(new Criterion("Standard", "Standard"), new ActedUpon(), new ResourceType("SingleRecord"));
-        criterion.setId(Namespace.BDQTEST + "33333333-3333-3333-3333-333333333333-2025-03-07");
+        criterion.setId(Namespace.BDQTEST + "33333333-3333-3333-3333-333333333333");
 
-        ResultState state = new ResultState("RUN_HAS_RESULT");
-        state.setId("run_has_result");
         Entity entity = new Entity();
-        entity.setId("urn:uuid:44444444-4444-4444-4444-444444444444");
         entity.setValue("COMPLIANT");
         Result result = new Result();
-        result.setState(state);
+        result.setState(ResultState.RUN_HAS_RESULT);
         result.setEntity(entity);
         result.setComment("a comment");
+        result.setQualifiers(java.util.Collections.singletonList(
+                new org.datakurator.ffdq.model.ResponseQualifier("AMBIGUOUS", "1963-03-08/1963-08-03", "day and month may be transposed")));
 
         ValidationResponse response = new ValidationResponse();
         response.setCriterion(criterion);
@@ -156,36 +158,107 @@ public class RdfMappingTest {
         response.setMechanism(mechanism);
         response.setSpecification(spec);
         response.setResult(result);
+        response.setStartedAtTime(java.time.Instant.parse("2026-11-16T12:00:00Z"));
+        response.setEndedAtTime(java.time.Instant.parse("2026-11-16T12:00:01Z"));
 
         RdfWriter w = new RdfWriter();
         Resource s = response.writeRdf(w);
         Model m = w.getModel();
+        IRI specIri = RdfWriter.iri(spec.getId());
+        IRI mechIri = RdfWriter.iri("urn:uuid:22222222-2222-2222-2222-222222222222");
+        IRI record = RdfWriter.iri("urn:uuid:55555555-5555-5555-5555-555555555555");
 
-        assertEquals(response.getId(), s.stringValue());
+        // the Response
         assertTrue(m.contains(s, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "ValidationResponse")));
-        assertTrue(m.contains(RdfWriter.iri(BDQFFDQ + "ValidationResponse"), RDFS.SUBCLASSOF, RdfWriter.iri(BDQFFDQ + "Response")));
-        assertEquals(RdfWriter.iri("urn:uuid:55555555-5555-5555-5555-555555555555"), object(m, s, "bdqffdq:appliesTo"));
-        assertEquals(RdfWriter.iri(spec.getId()), object(m, s, PROV + "hadPlan"));
-        assertEquals(RdfWriter.iri("urn:uuid:22222222-2222-2222-2222-222222222222"), object(m, s, PROV + "wasAttributedTo"));
-        assertEquals(RdfWriter.iri(criterion.getId()), object(m, s, "bdqffdq:criterionInContext"));
-        Resource r = (Resource) object(m, s, PROV + "generated");
-        assertEquals(result.getId(), r.stringValue());
+        assertEquals(record, object(m, s, "bdqffdq:appliesTo"));
+        assertEquals(RdfWriter.iri(BDQFFDQ + "RUN_HAS_RESULT"), object(m, s, "bdqffdq:hasResponseStatus"));
+        assertEquals(RdfWriter.iri(BDQFFDQ + "COMPLIANT"), object(m, s, "bdqffdq:hasResponseResult"));
+        assertNull(object(m, s, "bdqffdq:hasResponseResultValue"));
+        assertEquals(XSD.STRING, literal(m, s, "bdqffdq:hasResponseComment").getDatatype());
+        assertEquals("a comment", literal(m, s, "bdqffdq:hasResponseComment").getLabel());
+        Resource q = (Resource) object(m, s, "bdqffdq:hasResponseQualifier");
+        assertTrue(m.contains(q, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "ResponseQualifier")));
+        assertEquals("AMBIGUOUS", literal(m, q, "rdfs:label").getLabel());
+        assertEquals("1963-03-08/1963-08-03", literal(m, q, "rdf:value").getLabel());
+        // no terms that are not in bdqffdq, and none of the old PROV links
+        for (String old : new String[] { "prov:hadPlan", "prov:wasAttributedTo", "prov:generated", "bdqffdq:criterionInContext" }) {
+            assertNull(old, object(m, s, old));
+        }
+        assertFalse(m.contains(null, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "Result")));
 
-        assertTrue(m.contains(r, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "Result")));
-        assertEquals(XSD.BOOLEAN, literal(m, r, "bdqffdq:hasAmbiguity").getDatatype());
-        assertEquals("a comment", literal(m, r, "rdfs:comment").getLabel());
+        // the Implementation
+        Resource implementation = Models.subject(m.filter(null, RdfWriter.iri(BDQFFDQ + "producesResponse"), s)).orElse(null);
+        assertNotNull(implementation);
+        assertTrue(m.contains(implementation, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "Implementation")));
+        assertEquals(specIri, object(m, implementation, "bdqffdq:usesSpecification"));
+        assertEquals(mechIri, object(m, implementation, "bdqffdq:implementedBy"));
 
-        IRI stateIri = RdfWriter.iri(BDQFFDQ + "RUN_HAS_RESULT");
-        assertEquals(stateIri, object(m, r, "bdqffdq:hasState"));
-        assertTrue(m.contains(stateIri, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "ResponseStatus")));
-        assertEquals("RUN_HAS_RESULT", literal(m, stateIri, "rdfs:label").getLabel());
+        // the Method relating the Specification to the Test
+        Resource method = Models.subject(m.filter(null, RdfWriter.iri(BDQFFDQ + "hasSpecification"), specIri)).orElse(null);
+        assertNotNull(method);
+        assertTrue(m.contains(method, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "ValidationMethod")));
+        assertEquals(RdfWriter.iri(criterion.getId()), object(m, method, "bdqffdq:forValidation"));
 
-        IRI entityIri = RdfWriter.iri(entity.getId());
-        assertEquals(entityIri, object(m, r, "bdqffdq:hasValue"));
-        assertTrue(m.contains(entityIri, RDF.TYPE, RdfWriter.iri(FfdqApiRdf.ENTITY)));
-        assertEquals("COMPLIANT", literal(m, entityIri, PROV + "value").getLabel());
+        // PROV-O
+        Resource activity = (Resource) object(m, s, PROV + "wasGeneratedBy");
+        assertTrue(m.contains(activity, RDF.TYPE, RdfWriter.iri(PROV + "Activity")));
+        assertTrue(m.contains(activity, RdfWriter.iri(PROV + "used"), specIri));
+        assertTrue(m.contains(activity, RdfWriter.iri(PROV + "used"), record));
+        assertEquals(mechIri, object(m, activity, PROV + "wasAssociatedWith"));
+        assertTrue(m.contains(mechIri, RDF.TYPE, RdfWriter.iri(PROV + "SoftwareAgent")));
+        assertEquals(XSD.DATETIME, literal(m, activity, PROV + "startedAtTime").getDatatype());
+        assertEquals("2026-11-16T12:00:00Z", literal(m, activity, PROV + "startedAtTime").getLabel());
 
-        assertTrue(m.contains(RdfWriter.iri("urn:uuid:22222222-2222-2222-2222-222222222222"), RDF.TYPE, RdfWriter.iri(BDQFFDQ + "Mechanism")));
+        // and read back
+        ValidationResponse read = ValidationResponse.readRdf(new RdfReader(m), s);
+        assertEquals(spec.getId(), read.getSpecification().getId());
+        assertEquals(mechanism.getId(), read.getMechanism().getId());
+        assertEquals(criterion.getId(), read.getCriterion().getId());
+        assertEquals("RUN_HAS_RESULT", read.getResult().getState().getLabel());
+        assertEquals("COMPLIANT", read.getResult().getEntity().getValue());
+        assertEquals("a comment", read.getResult().getComment());
+        assertEquals("AMBIGUOUS", read.getResult().getQualifiers().get(0).getLabel());
+        assertTrue(read.getResult().isAmbiguous());
+        assertEquals(java.time.Instant.parse("2026-11-16T12:00:01Z"), read.getEndedAtTime());
+    }
+
+    /**
+     * Literal results: an Amendment's proposed changes as JSON (rdf:JSON), read back as a map; a numeric
+     * Measure as xsd:integer; and an AmendmentResponse has no bdqffdq:hasResponseResult.
+     */
+    @Test
+    public void testLiteralResults() {
+        Entity proposal = new Entity();
+        java.util.Map<String, String> changes = new java.util.LinkedHashMap<>();
+        changes.put("dwc:month", "11");
+        changes.put("dwc:day", "30");
+        proposal.setValue(changes);
+        Result amended = new Result();
+        amended.setState(ResultState.AMENDED);
+        amended.setEntity(proposal);
+        org.datakurator.ffdq.model.report.AmendmentResponse amendment = new org.datakurator.ffdq.model.report.AmendmentResponse();
+        amendment.setResult(amended);
+
+        RdfWriter w = new RdfWriter();
+        Resource s = amendment.writeRdf(w);
+        Literal json = literal(w.getModel(), s, "bdqffdq:hasResponseResultValue");
+        assertEquals(FfdqApiRdf.RDF_JSON, json.getDatatype().stringValue());
+        assertEquals("{\"dwc:day\":\"30\",\"dwc:month\":\"11\"}", json.getLabel());
+        assertNull(object(w.getModel(), s, "bdqffdq:hasResponseResult"));
+        Object readBack = org.datakurator.ffdq.model.report.AmendmentResponse.readRdf(new RdfReader(w.getModel()), s)
+                .getResult().getEntity().getValue();
+        assertEquals(changes, readBack);
+
+        Entity measured = new Entity();
+        measured.setValue("86400");
+        Result measure = new Result();
+        measure.setState(ResultState.RUN_HAS_RESULT);
+        measure.setEntity(measured);
+        org.datakurator.ffdq.model.report.MeasurementResponse measurement = new org.datakurator.ffdq.model.report.MeasurementResponse();
+        measurement.setResult(measure);
+        Resource ms = measurement.writeRdf(w);
+        assertEquals(XSD.INTEGER, literal(w.getModel(), ms, "bdqffdq:hasResponseResultValue").getDatatype());
+        assertTrue(w.getModel().contains(ms, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "MeasurementResponse")));
     }
 
     /**

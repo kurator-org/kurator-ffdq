@@ -21,6 +21,11 @@
  */
 package org.datakurator.ffdq.model.report;
 
+import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.DataQualityNeed;
+import org.datakurator.ffdq.model.solutions.DataQualityMethod;
+import org.datakurator.ffdq.model.solutions.IssueMethod;
+
 import org.datakurator.ffdq.rdf.RdfReader;
 import org.datakurator.ffdq.rdf.RdfWriter;
 import org.eclipse.rdf4j.model.IRI;
@@ -103,8 +108,6 @@ public class IssueResponse extends Response {
      */
     protected void writeRdfProperties(RdfWriter w, Resource s) {
         super.writeRdfProperties(w, s);
-        w.value(s, "bdqffdq:hasIssue", getIssueInContext());
-        w.value(s, "prov:wasInformedBy", getInformedBy());
     }
 
     /** {@inheritDoc} */
@@ -126,8 +129,6 @@ public class IssueResponse extends Response {
      */
     protected void readRdfProperties(RdfReader r, Resource s) {
         super.readRdfProperties(r, s);
-        setIssueInContext(r.read(s, "bdqffdq:hasIssue", Issue::readRdf));
-        setInformedBy(r.read(s, "prov:wasInformedBy", AmendmentResponse::readRdf));
     }
 
     /**
@@ -146,4 +147,59 @@ public class IssueResponse extends Response {
         return o;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed dataQualityNeed() {
+        return getIssueInContext();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void dataQualityNeedFromRdf(DataQualityNeed need) {
+        if (need instanceof Issue) {
+            setIssueInContext((Issue) need);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityMethod newMethod(Specification specification, DataQualityNeed need) {
+        return new IssueMethod(specification, (Issue) need);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected String methodType() {
+        return IssueMethod.RDF_TYPE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed needOf(DataQualityMethod method) {
+        return method instanceof IssueMethod ? ((IssueMethod) method).getContextualizedIssue() : null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected String oldTestProperty() {
+        return "bdqffdq:hasIssue";
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DataQualityNeed readNeed(RdfReader r, Resource s) {
+        return Issue.readRdf(r, s);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected AmendmentResponse informedBy() {
+        return getInformedBy();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void informedByFromRdf(AmendmentResponse amendmentResponse) {
+        setInformedBy(amendmentResponse);
+    }
 }

@@ -209,6 +209,17 @@ public class RdfWriter {
     }
 
     /**
+     * A literal with an explicit datatype.
+     *
+     * @param lexicalForm the lexical form
+     * @param datatype the datatype, as a CURIE (e.g. xsd:integer, rdf:JSON) or IRI
+     * @return the literal
+     */
+    public static Literal typedLiteral(String lexicalForm, String datatype) {
+        return VF.createLiteral(lexicalForm, iri(datatype));
+    }
+
+    /**
      * A typed literal for a date, time, boolean, or number.
      *
      * @param value the value

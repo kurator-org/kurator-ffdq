@@ -179,6 +179,10 @@ public class DataQualityDimension implements RdfMapped {
         DataQualityDimension o = r.remember(s, new DataQualityDimension());
         o.setId(RdfReader.localId(s, "d:"));
         o.readRdfProperties(r, s);
+        if (o.getLabel() == null) {
+            // no rdfs:label (e.g. the bdqffdq vocabulary is not loaded): the id is the label
+            o.setLabel(RdfReader.localId(s, "d:"));
+        }
         return o;
     }
 

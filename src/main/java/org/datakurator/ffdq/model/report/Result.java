@@ -22,18 +22,28 @@
 package org.datakurator.ffdq.model.report;
 
 import org.datakurator.ffdq.rdf.FfdqApiRdf;
-import org.datakurator.ffdq.rdf.RdfMapped;
 import org.datakurator.ffdq.rdf.RdfReader;
-import org.datakurator.ffdq.rdf.RdfWriter;
-import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Resource;
 
 import org.datakurator.ffdq.model.Entity;
+import org.datakurator.ffdq.model.ResponseQualifier;
 import org.datakurator.ffdq.model.ResultState;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class Result implements RdfMapped {
+/**
+ * The outcome of a Test: its Response.status ({@link ResultState}), Response.result (the value of
+ * an {@link Entity}), Response.comment, and Response.qualifiers.
+ *
+ * In RDF these are properties of the {@link Response} (bdqffdq:hasResponseStatus,
+ * bdqffdq:hasResponseResult or bdqffdq:hasResponseResultValue, bdqffdq:hasResponseComment, and
+ * bdqffdq:hasResponseQualifier), as the BDQ standard has them; a Result is not written as a
+ * resource of its own.  {@link #readRdf(RdfReader, Resource)} reads the bdqffdq:Result resources
+ * that kurator-ffdq wrote before 4.0.0.
+ */
+public class Result {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ResultState state;
@@ -41,6 +51,7 @@ public class Result implements RdfMapped {
 
     private String comment;
     private boolean isAmbiguous;
+    private List<ResponseQualifier> qualifiers = new ArrayList<>();
 
     /**
      * <p>Getter for the field <code>id</code>.</p>
@@ -132,50 +143,28 @@ public class Result implements RdfMapped {
         this.comment = comment;
     }
 
-    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
-
-    /** The RDF type of this class. */
-    public static final String RDF_TYPE = "bdqffdq:Result";
-
     /**
-     * Write this object's own properties (and those of its superclasses) as RDF.
-     *
-     * @param w the writer
-     * @param s the subject
+     * @return the Response.qualifiers (bdqffdq:ResponseQualifier) of this result
      */
-    protected void writeRdfProperties(RdfWriter w, Resource s) {
-        w.value(s, "bdqffdq:hasAmbiguity", isAmbiguous());
-        w.value(s, "bdqffdq:hasState", getState());
-        w.value(s, "bdqffdq:hasValue", getEntity());
-        w.value(s, "rdfs:comment", getComment());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Resource writeRdf(RdfWriter w) {
-        IRI s = RdfWriter.subject(getId(), null);
-        if (w.begin(this)) {
-            w.type(s, RDF_TYPE);
-            writeRdfProperties(w, s);
-        }
-        return s;
+    public List<ResponseQualifier> getQualifiers() {
+        return qualifiers;
     }
 
     /**
-     * Read this object's own properties (and those of its superclasses) from RDF.
-     *
-     * @param r the reader
-     * @param s the subject
+     * @param qualifiers the Response.qualifiers of this result
      */
-    protected void readRdfProperties(RdfReader r, Resource s) {
-        this.isAmbiguous = r.bool(s, "bdqffdq:hasAmbiguity");
-        setState(r.read(s, "bdqffdq:hasState", FfdqApiRdf::readResultState));
-        setEntity(r.read(s, "bdqffdq:hasValue", FfdqApiRdf::readEntity));
-        setComment(r.string(s, "rdfs:comment"));
+    public void setQualifiers(List<ResponseQualifier> qualifiers) {
+        this.qualifiers = qualifiers == null ? new ArrayList<>() : new ArrayList<>(qualifiers);
     }
 
+    // ---- RDF: reading the form written before 4.0.0 ----
+
+    /** The RDF type of a Result as kurator-ffdq wrote it before 4.0.0 (not a bdqffdq term). */
+    public static final String OLD_RDF_TYPE = "bdqffdq:Result";
+
     /**
-     * Read a Result from RDF.
+     * Read a Result in the form kurator-ffdq wrote before 4.0.0: a bdqffdq:Result resource with
+     * bdqffdq:hasState, bdqffdq:hasValue, bdqffdq:hasAmbiguity, and rdfs:comment.
      *
      * @param r the reader
      * @param s the subject
@@ -186,8 +175,11 @@ public class Result implements RdfMapped {
         if (cached instanceof Result) { return (Result) cached; }
         Result o = r.remember(s, new Result());
         o.setId(s.stringValue());
-        o.readRdfProperties(r, s);
+        Boolean ambiguous = r.bool(s, "bdqffdq:hasAmbiguity");
+        o.isAmbiguous = ambiguous != null && ambiguous;
+        o.setState(r.read(s, "bdqffdq:hasState", FfdqApiRdf::readResultState));
+        o.setEntity(r.read(s, "bdqffdq:hasValue", FfdqApiRdf::readEntity));
+        o.setComment(r.string(s, "rdfs:comment"));
         return o;
     }
-
 }

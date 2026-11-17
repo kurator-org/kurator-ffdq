@@ -191,6 +191,10 @@ public class Dimension implements RdfMapped {
         Dimension o = r.remember(s, new Dimension());
         o.setId(RdfReader.localId(s, "https://rs.tdwg.org/bdqdim/terms/"));
         o.readRdfProperties(r, s);
+        if (o.getLabel() == null) {
+            // no rdfs:label (e.g. the bdqffdq vocabulary is not loaded): the id is the label
+            o.setLabel(RdfReader.localId(s, "https://rs.tdwg.org/bdqdim/terms/"));
+        }
         return o;
     }
 
