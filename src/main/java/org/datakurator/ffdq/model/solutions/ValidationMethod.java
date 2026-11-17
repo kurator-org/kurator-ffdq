@@ -85,7 +85,7 @@ public class ValidationMethod extends DataQualityMethod {
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
 		labelBuilder.append(this.getClass().getSimpleName()).append(": ");
-		labelBuilder.append(cc.getLabel()).append(" with ");
+		labelBuilder.append(cc.getLabel()).append(" with Specification: ");
 		labelBuilder.append(specification.getLabel());
 		return labelBuilder.toString();
 	}

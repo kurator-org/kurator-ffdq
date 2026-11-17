@@ -85,7 +85,7 @@ public class AmendmentMethod extends DataQualityMethod {
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
 		labelBuilder.append(this.getClass().getSimpleName()).append(": ");
-		labelBuilder.append(ce.getLabel()).append(" with Specification ");
+		labelBuilder.append(ce.getLabel()).append(" with Specification: ");
 		labelBuilder.append(specification.getLabel());
 		return labelBuilder.toString();
 	}
