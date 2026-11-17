@@ -21,23 +21,18 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "skos = http://www.w3.org/2004/02/skos/core#",
-        "dcterms = http://purl.org/dc/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:Specification")
-public class Specification {
+public class Specification implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
     private String description;
@@ -86,7 +81,6 @@ public class Specification {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -105,7 +99,6 @@ public class Specification {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -124,7 +117,6 @@ public class Specification {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("dcterms:description")
     public String getDescription() {
         return description;
     }
@@ -143,7 +135,6 @@ public class Specification {
      *
      * @return the expectedResponse
      */
-    @RDF("bdqffdq:hasExpectedResponse")
 	public String getExpectedResponse() {
 		return expectedResponse;
 	}
@@ -162,7 +153,6 @@ public class Specification {
      *
      * @return the authoritiesDefaults
      */
-    @RDF("bdqffdq:hasAuthoritiesDefaults")
 	public String getAuthoritiesDefaults() {
 		return authoritiesDefaults;
 	}
@@ -179,7 +169,6 @@ public class Specification {
 	/**
 	 * @return the examples
 	 */
-	@RDF("skos:example")
 	public List<String> getExamples() {
 		return examples;
 	}
@@ -208,7 +197,6 @@ public class Specification {
 	/**
 	 * @return the arguments
 	 */
-	@RDF("bdqffdq:hasArgument")
 	public List<Argument> getArguments() {
 		if (arguments == null || arguments.size()==0) {
 			return null;
@@ -229,4 +217,67 @@ public class Specification {
 			this.arguments.add(argument);
 		}
 	}
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Specification";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+        w.value(s, "dcterms:description", getDescription());
+        w.value(s, "bdqffdq:hasExpectedResponse", getExpectedResponse());
+        w.value(s, "bdqffdq:hasAuthoritiesDefaults", getAuthoritiesDefaults());
+        w.values(s, "skos:example", getExamples());
+        w.values(s, "bdqffdq:hasArgument", getArguments());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+        setDescription(r.string(s, "dcterms:description"));
+        setExpectedResponse(r.string(s, "bdqffdq:hasExpectedResponse"));
+        setAuthoritiesDefaults(r.string(s, "bdqffdq:hasAuthoritiesDefaults"));
+        this.examples = new java.util.ArrayList<>(r.strings(s, "skos:example"));
+        this.arguments = new java.util.ArrayList<>(r.readAll(s, "bdqffdq:hasArgument", Argument::readRdf));
+    }
+
+    /**
+     * Read a Specification from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Specification, the same instance each time for the same subject
+     */
+    public static Specification readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Specification) { return (Specification) cached; }
+        Specification o = r.remember(s, new Specification());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

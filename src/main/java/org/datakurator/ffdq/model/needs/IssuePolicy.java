@@ -21,10 +21,12 @@
  */
 package org.datakurator.ffdq.model.needs;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.Issue;
 
@@ -32,12 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:IssuePolicy")
-public class IssuePolicy {
+public class IssuePolicy implements RdfMapped {
 	private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
@@ -72,7 +69,6 @@ public class IssuePolicy {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
        return id;
     }
@@ -93,7 +89,6 @@ public class IssuePolicy {
      *
      * @return a {@link org.datakurator.ffdq.model.needs.UseCase} object.
      */
-    @RDF("bdqffdq:hasUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -112,7 +107,6 @@ public class IssuePolicy {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:includedInPolicy")
     public List<Issue> getIssues() {
         return issues;
     }
@@ -131,7 +125,6 @@ public class IssuePolicy {
      *
      * @return a generated label
      */
-    @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
 		labelBuilder.append("IssuePolicy: (");
@@ -140,4 +133,61 @@ public class IssuePolicy {
 		labelBuilder.append(useCase.getLabel());
 		return labelBuilder.toString();
 	}
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:IssuePolicy";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "bdqffdq:hasUseCase", getUseCase());
+        w.values(s, "bdqffdq:includedInPolicy", getIssues());
+        w.value(s, "rdfs:label", getLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setUseCase(r.read(s, "bdqffdq:hasUseCase", UseCase::readRdf));
+        this.issues = new java.util.ArrayList<>(r.readAll(s, "bdqffdq:includedInPolicy", Issue::readRdf));
+        // rdfs:label: computed by getLabel() from other properties; not read.
+    }
+
+    /**
+     * Read a IssuePolicy from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the IssuePolicy, the same instance each time for the same subject
+     */
+    public static IssuePolicy readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof IssuePolicy) { return (IssuePolicy) cached; }
+        IssuePolicy o = r.remember(s, new IssuePolicy());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

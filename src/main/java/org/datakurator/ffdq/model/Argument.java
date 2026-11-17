@@ -3,23 +3,18 @@
  */
 package org.datakurator.ffdq.model;
 
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
 
-@RDFNamespaces({
-    "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-    "bdqval = https://rs.tdwg.org/bdqval/terms/",
-    "skos = http://www.w3.org/2004/02/skos/core#",
-    "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:Argument")
-public class Argument {
+public class Argument implements RdfMapped {
 
 	private static final Log logger = LogFactory.getLog(Argument.class);
 
@@ -34,6 +29,9 @@ public class Argument {
      * 
      * @param label the label for the Argument
      */
+    /** For {@link #readRdf(RdfReader, Resource)}. */
+    private Argument() { }
+
     public Argument(String label) {
 		this.label = label;
 		this .value = "Default";
@@ -69,7 +67,6 @@ public class Argument {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -88,7 +85,6 @@ public class Argument {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -107,7 +103,6 @@ public class Argument {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("bdqffdq:hasParameter")
     public Parameter getParameter() {
         return parameter;
     }
@@ -124,7 +119,6 @@ public class Argument {
 	/**
 	 * @return the value
 	 */
-    @RDF("bdqffdq:hasArgumentValue")
 	public String getValue() {
 		return value;
 	}
@@ -136,4 +130,61 @@ public class Argument {
 		this.value = value;
 	}
     
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Argument";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+        w.value(s, "bdqffdq:hasParameter", getParameter());
+        w.value(s, "bdqffdq:hasArgumentValue", getValue());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+        setParameter(r.read(s, "bdqffdq:hasParameter", Parameter::readRdf));
+        setValue(r.string(s, "bdqffdq:hasArgumentValue"));
+    }
+
+    /**
+     * Read a Argument from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Argument, the same instance each time for the same subject
+     */
+    public static Argument readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Argument) { return (Argument) cached; }
+        Argument o = r.remember(s, new Argument());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

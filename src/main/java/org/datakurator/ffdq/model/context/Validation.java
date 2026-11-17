@@ -21,10 +21,11 @@
  */
 package org.datakurator.ffdq.model.context;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.ActedUpon;
 import org.datakurator.ffdq.model.BibliographicResource;
 import org.datakurator.ffdq.model.Consulted;
@@ -39,13 +40,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "skos = http://www.w3.org/2004/02/skos/core#",
-        "dcterms = http://purl.org/dc/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:Validation")
 public class Validation extends DataQualityNeed  {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -145,7 +139,6 @@ public class Validation extends DataQualityNeed  {
 	 *
 	 * @return a {@link java.lang.String} object.
 	 */
-	@RDFSubject
     public String getId() {
         return id;
     }
@@ -165,7 +158,6 @@ public class Validation extends DataQualityNeed  {
     /**
 	 * @return the isVersionOf as a URI
 	 */
-    @RDF("dcterms:isVersionOf")
 	public URI getIsVersionOfURI() {
     	return super.getIsVersionOfURI();
 	}
@@ -187,7 +179,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link org.datakurator.ffdq.model.InformationElement} object.
      */
-    @RDF("bdqffdq:hasInformationElement")
     public InformationElement getInformationElements() {
         return ie;
     }
@@ -206,7 +197,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link org.datakurator.ffdq.model.InformationElement} object.
      */
-    @RDF("bdqffdq:hasActedUponInformationElement")
     public InformationElement getActedUpon() {
         return actedUpon;
     }
@@ -225,7 +215,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link org.datakurator.ffdq.model.InformationElement} object.
      */
-    @RDF("bdqffdq:hasConsultedInformationElement")
     public InformationElement getConsulted() {
         return consulted;
     }
@@ -244,7 +233,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link org.datakurator.ffdq.model.ResourceType} object.
      */
-    @RDF("bdqffdq:hasResourceType")
     public ResourceType getResourceType() {
         return rt;
     }
@@ -263,7 +251,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return the dimension
      */
-    @RDF("bdqffdq:hasDataQualityDimension")
 	public Dimension getDimension() {
 		return dimension;
 	}
@@ -282,7 +269,6 @@ public class Validation extends DataQualityNeed  {
 	 *
 	 * @return a {@link org.datakurator.ffdq.model.Criterion} object.
 	 */
-	@RDF("bdqffdq:hasCriterion")
     public Criterion getCriterion() {
         return criterion;
     }
@@ -301,7 +287,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -320,7 +305,6 @@ public class Validation extends DataQualityNeed  {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("dcterms:description")
 	public String getComment() {
 		return comment;
 	}
@@ -339,7 +323,6 @@ public class Validation extends DataQualityNeed  {
 	 *
 	 * @return the prefLabel
 	 */
-	@RDF("skos:prefLabel")
 	public String getPrefLabel() {
 		return prefLabel;
 	}
@@ -356,7 +339,6 @@ public class Validation extends DataQualityNeed  {
 	/**
 	 * @return the historyNote
 	 */
-	@RDF("skos:historyNote")
 	public String getHistoryNote() {
 		return super.historyNote;
 	}
@@ -371,7 +353,6 @@ public class Validation extends DataQualityNeed  {
 	/**
 	 * @return the BibliographicResource instances referenced by this Need
 	 */
-	@RDF("dcterms:references")
 	public List<BibliographicResource> getCitationResources() {
 		return super.citationResources;
 	}
@@ -388,7 +369,6 @@ public class Validation extends DataQualityNeed  {
 	/**
 	 * @return the note
 	 */
-	@RDF("skos:note")
 	public String getNote() {
 		return note;
 	}
@@ -396,7 +376,6 @@ public class Validation extends DataQualityNeed  {
 	/**
 	 * @return the issued as a date
 	 */
-	@RDF("dcterms:issued")
 	public LocalDate getIssuedDate() {
 		return super.getIssuedDate();
 	}
@@ -414,5 +393,86 @@ public class Validation extends DataQualityNeed  {
 	}
 	
 	
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Validation";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        super.writeRdfProperties(w, s);
+        w.value(s, "dcterms:isVersionOf", getIsVersionOfURI());
+        w.value(s, "bdqffdq:hasInformationElement", getInformationElements());
+        w.value(s, "bdqffdq:hasActedUponInformationElement", getActedUpon());
+        w.value(s, "bdqffdq:hasConsultedInformationElement", getConsulted());
+        w.value(s, "bdqffdq:hasResourceType", getResourceType());
+        w.value(s, "bdqffdq:hasDataQualityDimension", getDimension());
+        w.value(s, "bdqffdq:hasCriterion", getCriterion());
+        w.value(s, "rdfs:label", getLabel());
+        w.value(s, "dcterms:description", getComment());
+        w.value(s, "skos:prefLabel", getPrefLabel());
+        w.value(s, "skos:historyNote", getHistoryNote());
+        w.values(s, "dcterms:references", getCitationResources());
+        w.value(s, "skos:note", getNote());
+        w.value(s, "dcterms:issued", getIssuedDate());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE, "bdqffdq:DataQualityNeed");
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        super.readRdfProperties(r, s);
+        setIsVersionOfURI(r.uri(s, "dcterms:isVersionOf"));
+        setInformationElements(r.read(s, "bdqffdq:hasInformationElement", InformationElement::readRdf));
+        setActedUpon(r.read(s, "bdqffdq:hasActedUponInformationElement", InformationElement::readRdf));
+        setConsulted(r.read(s, "bdqffdq:hasConsultedInformationElement", InformationElement::readRdf));
+        setResourceType(r.read(s, "bdqffdq:hasResourceType", ResourceType::readRdf));
+        setDimension(r.read(s, "bdqffdq:hasDataQualityDimension", Dimension::readRdf));
+        setCriterion(r.read(s, "bdqffdq:hasCriterion", Criterion::readRdf));
+        setLabel(r.string(s, "rdfs:label"));
+        setComment(r.string(s, "dcterms:description"));
+        setPrefLabel(r.string(s, "skos:prefLabel"));
+        setHistoryNote(r.string(s, "skos:historyNote"));
+        setCitationResources(new java.util.ArrayList<>(r.readAll(s, "dcterms:references", BibliographicResource::readRdf)));
+        setNote(r.string(s, "skos:note"));
+        setIssuedDate(r.localDate(s, "dcterms:issued"));
+    }
+
+    /**
+     * Read a Validation from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Validation, the same instance each time for the same subject
+     */
+    public static Validation readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Validation) { return (Validation) cached; }
+        Validation o = r.remember(s, new Validation());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }
 

@@ -63,6 +63,14 @@
             <groupId>org.datakurator</groupId>
             <artifactId>ffdq-api</artifactId>
             <version>2.0.2</version>
+            <exclusions>
+                <!-- ffdq-api 2.0.2 declares rdfbeans (an unreleased 2.3-SNAPSHOT) for annotations on two of its
+                     classes; kurator-ffdq maps those classes itself (FfdqApiRdf) and does not use rdfbeans. -->
+                <exclusion>
+                    <groupId>org.cyberborean</groupId>
+                    <artifactId>rdfbeans</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -80,11 +88,6 @@
             <version>1.5</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.cyberborean</groupId>
-            <artifactId>rdfbeans</artifactId>
-            <version>2.3-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-repository-sail</artifactId>

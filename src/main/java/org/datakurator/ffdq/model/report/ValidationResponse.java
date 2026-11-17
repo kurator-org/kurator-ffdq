@@ -21,19 +21,15 @@
  */
 package org.datakurator.ffdq.model.report;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.context.Validation;
 
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "prov = http://www.w3.org/ns/prov#"
-})
-@RDFBean("bdqffdq:ValidationResponse")
 public class ValidationResponse extends Response {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -45,7 +41,6 @@ public class ValidationResponse extends Response {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -64,7 +59,6 @@ public class ValidationResponse extends Response {
      *
      * @return a {@link org.datakurator.ffdq.model.context.Validation} object.
      */
-    @RDF("bdqffdq:criterionInContext")
     public Validation getCriterion() {
         return criterion;
     }
@@ -83,7 +77,6 @@ public class ValidationResponse extends Response {
      *
      * @return a {@link org.datakurator.ffdq.model.report.AmendmentResponse} object.
      */
-    @RDF("prov:wasInformedBy")
     public AmendmentResponse getInformedBy() {
         return informedBy;
     }
@@ -96,4 +89,61 @@ public class ValidationResponse extends Response {
     public void setInformedBy(AmendmentResponse informedBy) {
         this.informedBy = informedBy;
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:ValidationResponse";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        super.writeRdfProperties(w, s);
+        w.value(s, "bdqffdq:criterionInContext", getCriterion());
+        w.value(s, "prov:wasInformedBy", getInformedBy());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE, "bdqffdq:Response");
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        super.readRdfProperties(r, s);
+        setCriterion(r.read(s, "bdqffdq:criterionInContext", Validation::readRdf));
+        setInformedBy(r.read(s, "prov:wasInformedBy", AmendmentResponse::readRdf));
+    }
+
+    /**
+     * Read a ValidationResponse from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the ValidationResponse, the same instance each time for the same subject
+     */
+    public static ValidationResponse readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof ValidationResponse) { return (ValidationResponse) cached; }
+        ValidationResponse o = r.remember(s, new ValidationResponse());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

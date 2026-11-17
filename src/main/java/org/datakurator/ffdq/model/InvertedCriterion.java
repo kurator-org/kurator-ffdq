@@ -21,20 +21,17 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
 @Deprecated
-@RDFBean("bdqffdq:InvertedCriterion")
-public class InvertedCriterion {
+public class InvertedCriterion implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
@@ -57,7 +54,6 @@ public class InvertedCriterion {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -76,7 +72,6 @@ public class InvertedCriterion {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -88,6 +83,59 @@ public class InvertedCriterion {
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:InvertedCriterion";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+    }
+
+    /**
+     * Read a InvertedCriterion from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the InvertedCriterion, the same instance each time for the same subject
+     */
+    public static InvertedCriterion readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof InvertedCriterion) { return (InvertedCriterion) cached; }
+        InvertedCriterion o = r.remember(s, new InvertedCriterion());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
     }
 
 }

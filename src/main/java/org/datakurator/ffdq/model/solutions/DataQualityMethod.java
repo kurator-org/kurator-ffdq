@@ -21,24 +21,18 @@
  */
 package org.datakurator.ffdq.model.solutions;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-    "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-    "skos = http://www.w3.org/2004/02/skos/core#",
-    "dcterms = http://purl.org/dc/terms/",
-    "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:DataQualityMethod")
-public class DataQualityMethod {
+public class DataQualityMethod implements RdfMapped {
     protected String id = "urn:uuid:" + UUID.randomUUID();
     protected Specification specification;
     
@@ -117,5 +111,51 @@ public class DataQualityMethod {
 			this.notes.add(note);;
 		}
 	}
+
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:DataQualityMethod";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+    }
+
+
+    /** {@inheritDoc}  Written by the subclasses (ValidationMethod, IssueMethod, MeasurementMethod, AmendmentMethod). */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        throw new UnsupportedOperationException("A DataQualityMethod is written as one of its subclasses: " + getClass().getName());
+    }
+
+    /**
+     * Read a ValidationMethod, IssueMethod, MeasurementMethod, or AmendmentMethod from RDF, by its rdf:type.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Method, or null if the subject has none of those types
+     */
+    public static DataQualityMethod readRdf(RdfReader r, Resource s) {
+        if (r.hasType(s, ValidationMethod.RDF_TYPE)) { return ValidationMethod.readRdf(r, s); }
+        if (r.hasType(s, IssueMethod.RDF_TYPE)) { return IssueMethod.readRdf(r, s); }
+        if (r.hasType(s, MeasurementMethod.RDF_TYPE)) { return MeasurementMethod.readRdf(r, s); }
+        if (r.hasType(s, AmendmentMethod.RDF_TYPE)) { return AmendmentMethod.readRdf(r, s); }
+        return null;
+    }
 
 }

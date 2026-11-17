@@ -21,10 +21,12 @@
  */
 package org.datakurator.ffdq.model.solutions;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.Specification;
 
@@ -32,11 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
-})
-@RDFBean("bdqffdq:Implementation")
-public class Implementation {
+public class Implementation implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     /**
@@ -70,7 +68,6 @@ public class Implementation {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -89,7 +86,6 @@ public class Implementation {
      *
      * @return a {@link org.datakurator.ffdq.model.Specification} object.
      */
-    @RDF("bdqffdq:usesSpecification")
     public Specification getSpecification() {
         return specification;
     }
@@ -108,7 +104,6 @@ public class Implementation {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:implementedBy")
     public List<Mechanism> getImplementedBy() {
         return implementedBy;
     }
@@ -124,4 +119,59 @@ public class Implementation {
     public void setImplementedBy(List<Mechanism> implementedBy) {
         this.implementedBy = implementedBy;
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Implementation";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "bdqffdq:usesSpecification", getSpecification());
+        w.values(s, "bdqffdq:implementedBy", getImplementedBy());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setSpecification(r.read(s, "bdqffdq:usesSpecification", Specification::readRdf));
+        setImplementedBy(new java.util.ArrayList<>(r.readAll(s, "bdqffdq:implementedBy", Mechanism::readRdf)));
+    }
+
+    /**
+     * Read a Implementation from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Implementation, the same instance each time for the same subject
+     */
+    public static Implementation readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Implementation) { return (Implementation) cached; }
+        Implementation o = r.remember(s, new Implementation());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

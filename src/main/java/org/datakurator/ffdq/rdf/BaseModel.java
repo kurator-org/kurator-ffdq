@@ -21,9 +21,8 @@
  */
 package org.datakurator.ffdq.rdf;
 
-import org.cyberborean.rdfbeans.RDFBeanManager;
-import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.ffdq.model.context.DataQualityNeed;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
@@ -52,13 +51,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 public class BaseModel {
     private Repository repo;
     private RepositoryConnection conn;
-    private RDFBeanManager manager;
     
     private final static Logger logger = Logger.getLogger(BaseModel.class.getName());
 
@@ -66,11 +66,10 @@ public class BaseModel {
      * <p>Constructor for BaseModel.</p>
      */
     public BaseModel() {
-        // Initialize an in-memory store and the rdf bean manager
+        // Initialize an in-memory store
         repo = new SailRepository(new MemoryStore());
 
         conn = repo.getConnection();
-        manager = new RDFBeanManager(repo);
     }
 
     /**
@@ -103,57 +102,105 @@ public class BaseModel {
      * @param obj a {@link java.lang.Object} object.
      */
     public void save(Object obj) {
-        try {
-            manager.add(obj);
-        } catch (RDFBeanException e) {
-            throw new RuntimeException("Could not process the rdf bean instance.", e);
+        RdfWriter writer = new RdfWriter();
+        if (obj instanceof RdfMapped) {
+            ((RdfMapped) obj).writeRdf(writer);
+        } else if (FfdqApiRdf.write(writer, obj) == null) {
+            throw new RuntimeException("Not an RDF-mapped object: " + (obj == null ? "null" : obj.getClass().getName()));
         }
+        conn.add(writer.getModel());
     }
 
     /**
-     * <p>findOne.</p>
+     * A reader over all statements in the model.
      *
-     * @param guid a {@link java.lang.String} object.
-     * @param cls a {@link java.lang.Class} object.
-     * @return a {@link java.lang.Object} object.
+     * @return the reader
+     */
+    protected RdfReader reader() {
+        Model model = new LinkedHashModel();
+        conn.getStatements(null, null, null).forEach(model::add);
+        return new RdfReader(model);
+    }
+
+    /**
+     * The subject for an identifier: the identifier as an IRI, or for a bare UUID (as given in
+     * Mechanism annotations) urn:uuid:{uuid}.
+     *
+     * @param reader the reader
+     * @param guid the identifier
+     * @return the subject, or null if neither is described in the model
+     */
+    private static Resource resolve(RdfReader reader, String guid) {
+        if (guid == null) { return null; }
+        if (guid.contains(":")) {
+            IRI asIri = RdfWriter.iri(guid);
+            if (reader.exists(asIri)) { return asIri; }
+            return null;
+        }
+        IRI urn = RdfWriter.iri("urn:uuid:" + guid);
+        return reader.exists(urn) ? urn : null;
+    }
+
+    /**
+     * Read an object of a class from the model, with the class's readRdf(RdfReader, Resource) method.
+     *
+     * @param reader the reader
+     * @param guid the identifier of the object
+     * @param cls the class
+     * @return the object, or null if there is no object of that class with that identifier
+     */
+    protected Object findOne(RdfReader reader, String guid, Class cls) {
+        Resource r = resolve(reader, guid);
+        if (r == null) {
+            logger.log(Level.INFO, "Resource not found: Class: " + cls + " Guid: " + guid);
+            return null;
+        }
+        Object result;
+        try {
+            Method readRdf = cls.getMethod("readRdf", RdfReader.class, Resource.class);
+            result = readRdf.invoke(null, reader, r);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Could not read " + cls.getName() + " " + guid + ": " + e.getCause(), e.getCause());
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Not an RDF-mapped class: " + cls.getName(), e);
+        }
+        if (result == null || !cls.isInstance(result)) {
+            logger.log(Level.WARNING, "Not a " + cls.getSimpleName() + ": " + r.stringValue());
+            return null;
+        }
+        logger.log(Level.INFO, "Found: " + r.stringValue());
+        return result;
+    }
+
+    /**
+     * Read an object of a class from the model.
+     *
+     * @param guid the identifier of the object (an IRI, or a bare UUID for urn:uuid:{uuid})
+     * @param cls the class
+     * @return the object, or null if there is no object of that class with that identifier
      */
     public Object findOne(String guid, Class cls) {
-        try {
-            Resource r = manager.getResource(guid, cls);
-            if (r == null) { 
-            	logger.log(Level.SEVERE, "Reource not found: Class: " + cls + " Guid: " + guid );
-            	return null;
-            }
-            logger.log(Level.INFO, "Found: " +  r.stringValue());
-            return manager.get(r, cls);
-        } catch (RDFBeanException | org.eclipse.rdf4j.common.exception.RDF4JException e) {
-        	logger.log(Level.WARNING, e.getMessage());
-            throw new RuntimeException("Could not fetch the rdf bean instance.", e);
-        }
+        return findOne(reader(), guid, cls);
     }
 
     /**
-     * <p>findOne.</p>
+     * Read the object of a class identified by the first solution of a SPARQL query.
      *
-     * @param cls a {@link java.lang.Class} object.
-     * @param sparql a {@link java.lang.String} object.
-     * @param field a {@link java.lang.String} object.
-     * @return a {@link java.lang.Object} object.
+     * @param cls the class
+     * @param sparql the query
+     * @param field the query variable that identifies the object
+     * @return the object, or null if the query has no solution
      */
-    public Object findOne(Class cls, String sparql, String field) throws RDFBeanException {
-    	TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
-
-    	BindingSet solution = result.next();
-    	logger.log(Level.INFO, field);
-    	logger.log(Level.INFO, sparql);
-    	String id = solution.getValue(field).stringValue();
-
-    	Resource r = manager.getResource(id, cls);
-    	try {
-    	    return manager.get(r, cls);
-    	} catch (org.eclipse.rdf4j.common.exception.RDF4JException e) {
-    	    throw new RuntimeException("Could not fetch the rdf bean instance.", e);
-    	}
+    public Object findOne(Class cls, String sparql, String field) {
+        TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
+        logger.log(Level.INFO, field);
+        logger.log(Level.INFO, sparql);
+        if (!result.hasNext()) {
+            return null;
+        }
+        BindingSet solution = result.next();
+        String id = solution.getValue(field).stringValue();
+        return findOne(id, cls);
     }
 
     /**
@@ -166,6 +213,7 @@ public class BaseModel {
      */
     public Map findAll(Class cls, String sparql, String field) {
         Map rdfBeans = new HashMap();
+        RdfReader reader = reader();
 
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
         logger.log(Level.INFO, field);
@@ -179,7 +227,7 @@ public class BaseModel {
             logger.log(Level.INFO, "Looking for bean for: " + id);
 
             try { 
-            	Object rdfBean = findOne(id, cls);
+            	Object rdfBean = findOne(reader, id, cls);
             	rdfBeans.put(id, rdfBean);
             } catch (Exception e) { 
             	logger.log(Level.WARNING, e.getMessage());
@@ -202,6 +250,7 @@ public class BaseModel {
      */
     public Map findAllMapBy(Class cls, String sparql, String field, String keyForMap) {
         Map<String, Object> rdfBeans = new HashMap<String, Object>();
+        RdfReader reader = reader();
 
         TupleQueryResult result = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate();
         logger.log(Level.INFO, field);
@@ -215,7 +264,7 @@ public class BaseModel {
             logger.log(Level.INFO, "Looking for bean for: " + id);
 
             try { 
-            	Object rdfBean = findOne(id, cls);
+            	Object rdfBean = findOne(reader, id, cls);
             	String key = solution.getValue(keyForMap).stringValue();
             	rdfBeans.put(key, rdfBean);
             } catch (Exception e) { 

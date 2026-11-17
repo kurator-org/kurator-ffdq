@@ -21,22 +21,19 @@
  */
 package org.datakurator.ffdq.model.report;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.FfdqApiRdf;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.Entity;
 import org.datakurator.ffdq.model.ResultState;
 
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "prov = http://www.w3.org/ns/prov#",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:Result")
-public class Result {
+public class Result implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private ResultState state;
@@ -50,7 +47,6 @@ public class Result {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -69,7 +65,6 @@ public class Result {
      *
      * @return a {@link java.lang.Boolean} object.
      */
-    @RDF("bdqffdq:hasAmbiguity")
     public Boolean isAmbiguous() {
         return isAmbiguous;
     }
@@ -88,7 +83,6 @@ public class Result {
      *
      * @return a {@link org.datakurator.ffdq.model.ResultState} object.
      */
-    @RDF("bdqffdq:hasState")
     public ResultState getState() {
         return state;
     }
@@ -107,7 +101,6 @@ public class Result {
      *
      * @return a {@link org.datakurator.ffdq.model.Entity} object.
      */
-    @RDF("bdqffdq:hasValue")
     public Entity getEntity() {
         return this.value;
     }
@@ -126,7 +119,6 @@ public class Result {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:comment")
     public String getComment() {
         return comment;
     }
@@ -139,4 +131,63 @@ public class Result {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Result";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "bdqffdq:hasAmbiguity", isAmbiguous());
+        w.value(s, "bdqffdq:hasState", getState());
+        w.value(s, "bdqffdq:hasValue", getEntity());
+        w.value(s, "rdfs:comment", getComment());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        this.isAmbiguous = r.bool(s, "bdqffdq:hasAmbiguity");
+        setState(r.read(s, "bdqffdq:hasState", FfdqApiRdf::readResultState));
+        setEntity(r.read(s, "bdqffdq:hasValue", FfdqApiRdf::readEntity));
+        setComment(r.string(s, "rdfs:comment"));
+    }
+
+    /**
+     * Read a Result from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Result, the same instance each time for the same subject
+     */
+    public static Result readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Result) { return (Result) cached; }
+        Result o = r.remember(s, new Result());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

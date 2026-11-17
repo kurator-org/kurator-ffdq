@@ -17,10 +17,12 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 
 import java.util.UUID;
 
@@ -35,11 +37,7 @@ import java.util.UUID;
  * @author mole
  * @version $Id: $Id
  */
-@RDFNamespaces({
-        "dcterms = http://purl.org/dc/terms/"
-})
-@RDFBean("dcterms:BibliographicResource")
-public class BibliographicResource {
+public class BibliographicResource implements RdfMapped {
 
     private String id = "urn:uuid:" + UUID.randomUUID().toString();
     private String bibliographicCitation;
@@ -67,7 +65,6 @@ public class BibliographicResource {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -88,7 +85,6 @@ public class BibliographicResource {
      *
      * @return the citation text
      */
-    @RDF("dcterms:bibliographicCitation")
     public String getBibliographicCitation() {
         return bibliographicCitation;
     }
@@ -101,4 +97,57 @@ public class BibliographicResource {
     public void setBibliographicCitation(String bibliographicCitation) {
         this.bibliographicCitation = bibliographicCitation;
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "dcterms:BibliographicResource";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "dcterms:bibliographicCitation", getBibliographicCitation());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setBibliographicCitation(r.string(s, "dcterms:bibliographicCitation"));
+    }
+
+    /**
+     * Read a BibliographicResource from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the BibliographicResource, the same instance each time for the same subject
+     */
+    public static BibliographicResource readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof BibliographicResource) { return (BibliographicResource) cached; }
+        BibliographicResource o = r.remember(s, new BibliographicResource());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

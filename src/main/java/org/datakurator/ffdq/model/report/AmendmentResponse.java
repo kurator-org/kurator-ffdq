@@ -21,19 +21,15 @@
  */
 package org.datakurator.ffdq.model.report;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.context.Amendment;
 
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "prov = http://www.w3.org/ns/prov#"
-})
-@RDFBean("bdqffdq:AmendmentResponse")
 public class AmendmentResponse extends Response {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
@@ -44,7 +40,6 @@ public class AmendmentResponse extends Response {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -63,7 +58,6 @@ public class AmendmentResponse extends Response {
      *
      * @return a {@link org.datakurator.ffdq.model.context.Amendment} object.
      */
-    @RDF("bdqffdq:enhancementInContext")
     public Amendment getEnhancement() {
         return enhancement;
     }
@@ -76,4 +70,59 @@ public class AmendmentResponse extends Response {
     public void setEnhancement(Amendment enhancement) {
         this.enhancement = enhancement;
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:AmendmentResponse";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        super.writeRdfProperties(w, s);
+        w.value(s, "bdqffdq:enhancementInContext", getEnhancement());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE, "bdqffdq:Response");
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        super.readRdfProperties(r, s);
+        setEnhancement(r.read(s, "bdqffdq:enhancementInContext", Amendment::readRdf));
+    }
+
+    /**
+     * Read a AmendmentResponse from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the AmendmentResponse, the same instance each time for the same subject
+     */
+    public static AmendmentResponse readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof AmendmentResponse) { return (AmendmentResponse) cached; }
+        AmendmentResponse o = r.remember(s, new AmendmentResponse());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

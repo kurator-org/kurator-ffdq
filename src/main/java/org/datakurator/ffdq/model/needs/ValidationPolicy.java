@@ -21,10 +21,12 @@
  */
 package org.datakurator.ffdq.model.needs;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.context.Validation;
 
 import java.util.ArrayList;
@@ -32,13 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "skos = http://www.w3.org/2004/02/skos/core#",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:ValidationPolicy")
-public class ValidationPolicy {
+public class ValidationPolicy implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private UseCase useCase;
@@ -82,7 +78,6 @@ public class ValidationPolicy {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -103,7 +98,6 @@ public class ValidationPolicy {
      *
      * @return a {@link org.datakurator.ffdq.model.needs.UseCase} object.
      */
-    @RDF("bdqffdq:hasUseCase")
     public UseCase getUseCase() {
         return useCase;
     }
@@ -125,7 +119,6 @@ public class ValidationPolicy {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:includedInPolicy")
     public List<Validation> getValidations() {
         return validations;
     }
@@ -144,7 +137,6 @@ public class ValidationPolicy {
      *
      * @return a generated label
      */
-    @RDF("rdfs:label")
 	public String getLabel() {
 		StringBuilder labelBuilder = new StringBuilder();
 		labelBuilder.append("ValidationPolicy: (");
@@ -165,8 +157,66 @@ public class ValidationPolicy {
      *
      * @return a skos:prefLabel
      */
-    @RDF("skos:prefLabel") 
     public String getPrefLabel() { 
     	return getLabel();
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:ValidationPolicy";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "bdqffdq:hasUseCase", getUseCase());
+        w.values(s, "bdqffdq:includedInPolicy", getValidations());
+        w.value(s, "rdfs:label", getLabel());
+        w.value(s, "skos:prefLabel", getPrefLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setUseCase(r.read(s, "bdqffdq:hasUseCase", UseCase::readRdf));
+        this.validations = new java.util.ArrayList<>(r.readAll(s, "bdqffdq:includedInPolicy", Validation::readRdf));
+        // rdfs:label: computed by getLabel() from other properties; not read.
+        // skos:prefLabel: computed by getPrefLabel() from other properties; not read.
+    }
+
+    /**
+     * Read a ValidationPolicy from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the ValidationPolicy, the same instance each time for the same subject
+     */
+    public static ValidationPolicy readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof ValidationPolicy) { return (ValidationPolicy) cached; }
+        ValidationPolicy o = r.remember(s, new ValidationPolicy());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

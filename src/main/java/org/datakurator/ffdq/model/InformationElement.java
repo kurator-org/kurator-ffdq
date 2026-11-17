@@ -21,23 +21,19 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "skos = http://www.w3.org/2004/02/skos/core#",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:InformationElement")
-public class InformationElement {
+public class InformationElement implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
     protected List<URI> composedOf = new ArrayList<>();
     protected String label;
@@ -71,7 +67,6 @@ public class InformationElement {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject()
     public String getId() {
         return id;
     }
@@ -90,7 +85,6 @@ public class InformationElement {
      *
      * @return a {@link java.util.List} object.
      */
-    @RDF("bdqffdq:composedOf")
     public List<URI> getComposedOf() {
         return composedOf;
     }
@@ -118,7 +112,6 @@ public class InformationElement {
      *
      * @return the label
      */
-    @RDF("rdfs:label")
 	public String getLabel() {
 		return label;
 	}
@@ -137,7 +130,6 @@ public class InformationElement {
      *
      * @return a skos:prefLabel
      */
-    @RDF("skos:prefLabel") 
     public String getPrefLabel() { 
     	return getLabel();
     }
@@ -150,4 +142,64 @@ public class InformationElement {
 	public void setLabel(String label) {
 		this.label = label;
 	}
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:InformationElement";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.values(s, "bdqffdq:composedOf", getComposedOf());
+        w.value(s, "rdfs:label", getLabel());
+        w.value(s, "skos:prefLabel", getPrefLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setComposedOf(new java.util.ArrayList<>(r.uris(s, "bdqffdq:composedOf")));
+        setLabel(r.string(s, "rdfs:label"));
+        setPrefLabel(r.string(s, "skos:prefLabel"));
+    }
+
+
+    /**
+     * Read an information element from RDF: an ActedUpon or Consulted by its rdf:type, otherwise an InformationElement.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the information element, the same instance each time for the same subject
+     */
+    public static InformationElement readRdf(RdfReader r, Resource s) {
+        if (r.hasType(s, ActedUpon.RDF_TYPE)) { return ActedUpon.readRdf(r, s); }
+        if (r.hasType(s, Consulted.RDF_TYPE)) { return Consulted.readRdf(r, s); }
+        Object cached = r.cached(s);
+        if (cached instanceof InformationElement) { return (InformationElement) cached; }
+        InformationElement o = r.remember(s, new InformationElement());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

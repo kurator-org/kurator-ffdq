@@ -21,20 +21,17 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
 
-@RDFNamespaces({
-	"rdfs = http://www.w3.org/2000/01/rdf-schema#",
-	"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
-})
-@RDFBean("bdqffdq:ResourceType")
-public class ResourceType {
+public class ResourceType implements RdfMapped {
     /** Constant <code>SINGLE_RECORD</code> */
     public static final ResourceType SINGLE_RECORD = new ResourceType("SingleRecord");
     /** Constant <code>MULTI_RECORD</code> */
@@ -48,7 +45,6 @@ public class ResourceType {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "https://rs.tdwg.org/bdqffdq/terms/")
     public String getId() {
         return label;
     }
@@ -67,7 +63,6 @@ public class ResourceType {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -106,6 +101,59 @@ public class ResourceType {
         if (localName.equalsIgnoreCase(SINGLE_RECORD.label)) return SINGLE_RECORD;
         else if (localName.equalsIgnoreCase(MULTI_RECORD.label)) return MULTI_RECORD;
         else throw new UnsupportedOperationException("Unable to find an ffdq:ResourceType for value: " + value);
+    }
+
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:ResourceType";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), "https://rs.tdwg.org/bdqffdq/terms/");
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+    }
+
+    /**
+     * Read a ResourceType from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the ResourceType, the same instance each time for the same subject
+     */
+    public static ResourceType readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof ResourceType) { return (ResourceType) cached; }
+        ResourceType o = r.remember(s, new ResourceType());
+        o.setId(RdfReader.localId(s, "https://rs.tdwg.org/bdqffdq/terms/"));
+        o.readRdfProperties(r, s);
+        return o;
     }
 
 }

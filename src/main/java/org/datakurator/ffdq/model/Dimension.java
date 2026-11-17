@@ -21,10 +21,12 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
@@ -35,14 +37,7 @@ import java.util.UUID;
  * @author mole
  * @version $Id: $Id
  */
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "bdqval = https://rs.tdwg.org/bdqval/terms/",
-        "bdqdim = https://rs.tdwg.org/bdqdim/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:DataQualityDimension")
-public class Dimension {
+public class Dimension implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
@@ -71,7 +66,6 @@ public class Dimension {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "https://rs.tdwg.org/bdqdim/terms/")
     public String getId() {
         return label;
     }
@@ -90,7 +84,6 @@ public class Dimension {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -148,4 +141,57 @@ public class Dimension {
         else if (localName.equalsIgnoreCase(RELIABILITY.getLabel())) return RELIABILITY;
         else throw new UnsupportedOperationException("Unable to find an ffdq:Dimension for value: [" + value + "]");
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:DataQualityDimension";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), "https://rs.tdwg.org/bdqdim/terms/");
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+    }
+
+    /**
+     * Read a Dimension from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Dimension, the same instance each time for the same subject
+     */
+    public static Dimension readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Dimension) { return (Dimension) cached; }
+        Dimension o = r.remember(s, new Dimension());
+        o.setId(RdfReader.localId(s, "https://rs.tdwg.org/bdqdim/terms/"));
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

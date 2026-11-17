@@ -21,21 +21,17 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.rdf.Namespace;
 
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "bdqcrit = https://rs.tdwg.org/bdqcrit/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:Criterion")
-public class Criterion {
+public class Criterion implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
@@ -69,7 +65,6 @@ public class Criterion {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject(prefix = "https://rs.tdwg.org/bdqcrit/terms/")
     public String getId() {
     	if (id.startsWith("https://rs.tdwg.org/bdqcrit/terms/")) { 
     		return id.replace("https://rs.tdwg.org/bdqcrit/terms/", "");
@@ -92,7 +87,6 @@ public class Criterion {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -140,6 +134,60 @@ public class Criterion {
         else if (localName.equalsIgnoreCase(STANDARD.getLabel())) return STANDARD;
         else if (localName.equalsIgnoreCase(UNAMBIGUOUS.getLabel())) return UNAMBIGUOUS;
         else throw new UnsupportedOperationException("Unable to find an bdqcrit: term for bdqffdq:Criterion for value: [" + value + "]");
+    }
+
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Criterion";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), "https://rs.tdwg.org/bdqcrit/terms/");
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read a Criterion from RDF.
+     *
+     * @param r the reader
+     * @param s the subject (e.g. https://rs.tdwg.org/bdqcrit/terms/Complete)
+     * @return the Criterion, the same instance each time for the same subject
+     */
+    public static Criterion readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Criterion) { return (Criterion) cached; }
+        Criterion o = r.remember(s, new Criterion());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
     }
 
 }

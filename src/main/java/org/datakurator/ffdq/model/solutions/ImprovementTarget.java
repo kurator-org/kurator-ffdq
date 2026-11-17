@@ -21,10 +21,12 @@
  */
 package org.datakurator.ffdq.model.solutions;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.model.context.Measure;
 import org.datakurator.ffdq.model.context.Amendment;
@@ -34,11 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
-})
-@RDFBean("bdqffdq:ImprovementTarget")
-public class ImprovementTarget {
+public class ImprovementTarget implements RdfMapped {
     private Set<Validation> targetedCriterion = new HashSet<>();
     private Set<Issue> targetedIssues = new HashSet<>();
     private Set<Measure> targetedDimensions = new HashSet<>();
@@ -52,7 +50,6 @@ public class ImprovementTarget {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -71,7 +68,6 @@ public class ImprovementTarget {
      *
      * @return a {@link java.util.Set} object.
      */
-    @RDF("bdqffdq:targetedDimension")
     public Set<Measure> getTargetedDimensions() {
         return targetedDimensions;
     }
@@ -81,7 +77,6 @@ public class ImprovementTarget {
      *
      * @return a {@link java.util.Set} object.
      */
-    @RDF("bdqffdq:targetedCriterion")
     public Set<Validation> getContextualizedCriterion() {
         return targetedCriterion;
     }
@@ -91,7 +86,6 @@ public class ImprovementTarget {
      *
      * @return a {@link java.util.Set} object.
      */
-    @RDF("bdqffdq:targetedIssue")
     public Set<Issue> getContextualizedIssue() {
         return targetedIssues;
     }
@@ -101,7 +95,6 @@ public class ImprovementTarget {
      *
      * @return a {@link org.datakurator.ffdq.model.context.Amendment} object.
      */
-    @RDF("bdqffdq:improvedBy")
     public Amendment getImprovedBy() {
         return improvedBy;
     }
@@ -159,6 +152,65 @@ public class ImprovementTarget {
      */
     public void addContextualizedCriterion(Validation cc) {
         targetedCriterion.add(cc);
+    }
+
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:ImprovementTarget";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.values(s, "bdqffdq:targetedDimension", getTargetedDimensions());
+        w.values(s, "bdqffdq:targetedCriterion", getContextualizedCriterion());
+        w.values(s, "bdqffdq:targetedIssue", getContextualizedIssue());
+        w.value(s, "bdqffdq:improvedBy", getImprovedBy());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setTargetedDimensions(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedDimension", Measure::readRdf)));
+        setContextualizedCriterion(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedCriterion", Validation::readRdf)));
+        setContextualizedIssue(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedIssue", Issue::readRdf)));
+        setImprovedBy(r.read(s, "bdqffdq:improvedBy", Amendment::readRdf));
+    }
+
+    /**
+     * Read a ImprovementTarget from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the ImprovementTarget, the same instance each time for the same subject
+     */
+    public static ImprovementTarget readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof ImprovementTarget) { return (ImprovementTarget) cached; }
+        ImprovementTarget o = r.remember(s, new ImprovementTarget());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
     }
 
 }

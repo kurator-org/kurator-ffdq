@@ -16,7 +16,6 @@
  */
 package org.datakurator.ffdq.rdf;
 
-import org.cyberborean.rdfbeans.exceptions.RDFBeanException;
 import org.datakurator.dwcloud.Vocabulary;
 import org.datakurator.ffdq.model.DataResource;
 import org.datakurator.ffdq.model.Specification;
@@ -124,7 +123,7 @@ public class FFDQModel extends BaseModel {
                 "?method bdqffdq:hasSpecification <" + testGuid + "> }";
         try { 
         	retval = (DataQualityMethod) findOne(DataQualityMethod.class, sparql, "method");
-        } catch (RDFBeanException e) { 
+        } catch (RuntimeException e) { 
         	logger.log(Level.WARNING, e.getMessage());
         }
         return retval;

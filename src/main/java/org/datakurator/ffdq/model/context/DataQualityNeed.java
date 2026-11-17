@@ -3,6 +3,11 @@
  */
 package org.datakurator.ffdq.model.context;
 
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.Resource;
+
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,9 +15,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
 import org.datakurator.ffdq.model.BibliographicResource;
 
 /**
@@ -21,15 +23,7 @@ import org.datakurator.ffdq.model.BibliographicResource;
  * @author mole
  * @version $Id: $Id
  */
-@RDFNamespaces({
-	"bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-    "skos = http://www.w3.org/2004/02/skos/core#",
-    "dcterms = http://purl.org/dc/terms/",
-    "xsd= http://www.w3.org/2001/XMLSchema#",
-    "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:DataQualityNeed")
-public class DataQualityNeed {
+public class DataQualityNeed implements RdfMapped {
 
 	private static final Log logger = LogFactory.getLog(DataQualityNeed.class);
 	
@@ -115,10 +109,6 @@ public class DataQualityNeed {
 	 * @return the issued as a date
 	 */
 	public LocalDate getIssuedDate() {
-		// TODO: Add support for xmls:date from LocalDate to RDFBeans
-		// Serialization with @RDF("dcterms:issued") throws exception: 
-		// Caused by: org.cyberborean.rdfbeans.exceptions.RDFBeanException: Unsupported class [java.time.LocalDate] of value 2024-09-18
-		// at org.cyberborean.rdfbeans.RDFBeanManager.toRdf(RDFBeanManager.java:725)
 		LocalDate retval = null;
 		try { 
 			retval = LocalDate.parse(issued);
@@ -135,5 +125,51 @@ public class DataQualityNeed {
 		this.issued = issued;
 	}
 	
+
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:DataQualityNeed";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+    }
+
+
+    /** {@inheritDoc}  Written by the subclasses (Validation, Issue, Measure, Amendment). */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        throw new UnsupportedOperationException("A DataQualityNeed is written as one of its subclasses: " + getClass().getName());
+    }
+
+    /**
+     * Read a Validation, Issue, Measure, or Amendment from RDF, by its rdf:type.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Test, or null if the subject has none of those types
+     */
+    public static DataQualityNeed readRdf(RdfReader r, Resource s) {
+        if (r.hasType(s, Validation.RDF_TYPE)) { return Validation.readRdf(r, s); }
+        if (r.hasType(s, Issue.RDF_TYPE)) { return Issue.readRdf(r, s); }
+        if (r.hasType(s, Measure.RDF_TYPE)) { return Measure.readRdf(r, s); }
+        if (r.hasType(s, Amendment.RDF_TYPE)) { return Amendment.readRdf(r, s); }
+        return null;
+    }
 
 }

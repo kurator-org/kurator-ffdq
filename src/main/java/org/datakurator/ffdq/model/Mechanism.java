@@ -21,19 +21,16 @@
  */
 package org.datakurator.ffdq.model;
 
-import org.cyberborean.rdfbeans.annotations.RDF;
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
-import org.cyberborean.rdfbeans.annotations.RDFSubject;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+
 
 import java.util.UUID;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/",
-        "rdfs = http://www.w3.org/2000/01/rdf-schema#"
-})
-@RDFBean("bdqffdq:Mechanism")
-public class Mechanism {
+public class Mechanism implements RdfMapped {
     private String id = "urn:uuid:" + UUID.randomUUID();
     private String label;
 
@@ -45,11 +42,11 @@ public class Mechanism {
     /**
      * <p>Constructor for Mechanism.</p>
      *
-     * @param id a {@link java.lang.String} object.
+     * @param id the mechanism's uuid, or an IRI (e.g. urn:uuid:{uuid}), which is used as it is.
      * @param label a {@link java.lang.String} object.
      */
     public Mechanism(String id, String label) {
-        this.id = "urn:uuid:" + id;
+        this.id = id.contains(":") ? id : "urn:uuid:" + id;
         this.label = label;
     }
 
@@ -58,7 +55,6 @@ public class Mechanism {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDFSubject
     public String getId() {
         return id;
     }
@@ -77,7 +73,6 @@ public class Mechanism {
      *
      * @return a {@link java.lang.String} object.
      */
-    @RDF("rdfs:label")
     public String getLabel() {
         return label;
     }
@@ -90,4 +85,57 @@ public class Mechanism {
     public void setLabel(String label) {
         this.label = label;
     }
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Mechanism";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+        w.value(s, "rdfs:label", getLabel());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        IRI s = RdfWriter.subject(getId(), null);
+        if (w.begin(this)) {
+            w.type(s, RDF_TYPE);
+            writeRdfProperties(w, s);
+        }
+        return s;
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+        setLabel(r.string(s, "rdfs:label"));
+    }
+
+    /**
+     * Read a Mechanism from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Mechanism, the same instance each time for the same subject
+     */
+    public static Mechanism readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Mechanism) { return (Mechanism) cached; }
+        Mechanism o = r.remember(s, new Mechanism());
+        o.setId(s.stringValue());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

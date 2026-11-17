@@ -21,12 +21,60 @@
  */
 package org.datakurator.ffdq.model.needs;
 
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.Resource;
 
-@RDFNamespaces({
-        "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
-})
-@RDFBean("bdqffdq:Profile")
-public class Profile {
+
+public class Profile implements RdfMapped {
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Profile";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+    }
+
+
+    /** {@inheritDoc}  A Profile has no identifier, and is written as a blank node. */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        Resource s = org.eclipse.rdf4j.model.impl.SimpleValueFactory.getInstance().createBNode();
+        w.type(s, RDF_TYPE);
+        writeRdfProperties(w, s);
+        return s;
+    }
+
+    /**
+     * Read a Profile from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Profile
+     */
+    public static Profile readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Profile) { return (Profile) cached; }
+        Profile o = r.remember(s, new Profile());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }

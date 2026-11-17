@@ -21,13 +21,60 @@
  */
 package org.datakurator.ffdq.model.report;
 
-import org.cyberborean.rdfbeans.annotations.RDFBean;
-import org.cyberborean.rdfbeans.annotations.RDFNamespaces;
+import org.datakurator.ffdq.rdf.RdfMapped;
+import org.datakurator.ffdq.rdf.RdfReader;
+import org.datakurator.ffdq.rdf.RdfWriter;
+import org.eclipse.rdf4j.model.Resource;
 
-@RDFNamespaces({
-       "bdqffdq = https://rs.tdwg.org/bdqffdq/terms/"
-})
 
-@RDFBean("bdqffdq:Report")
-public class Report {
+public class Report implements RdfMapped {
+
+    // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
+
+    /** The RDF type of this class. */
+    public static final String RDF_TYPE = "bdqffdq:Report";
+
+    /**
+     * Write this object's own properties (and those of its superclasses) as RDF.
+     *
+     * @param w the writer
+     * @param s the subject
+     */
+    protected void writeRdfProperties(RdfWriter w, Resource s) {
+    }
+
+    /**
+     * Read this object's own properties (and those of its superclasses) from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     */
+    protected void readRdfProperties(RdfReader r, Resource s) {
+    }
+
+
+    /** {@inheritDoc}  A Report has no identifier, and is written as a blank node. */
+    @Override
+    public Resource writeRdf(RdfWriter w) {
+        Resource s = org.eclipse.rdf4j.model.impl.SimpleValueFactory.getInstance().createBNode();
+        w.type(s, RDF_TYPE);
+        writeRdfProperties(w, s);
+        return s;
+    }
+
+    /**
+     * Read a Report from RDF.
+     *
+     * @param r the reader
+     * @param s the subject
+     * @return the Report
+     */
+    public static Report readRdf(RdfReader r, Resource s) {
+        Object cached = r.cached(s);
+        if (cached instanceof Report) { return (Report) cached; }
+        Report o = r.remember(s, new Report());
+        o.readRdfProperties(r, s);
+        return o;
+    }
+
 }
