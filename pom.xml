@@ -52,7 +52,54 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- not dependencies of kurator-ffdq: the versions of Jackson 2 and the SLF4J API that its
+                 dependencies (RDF4J, JSON-LD) bring -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.22.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>2.0.20</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
+        <dependency>
+            <!-- Jackson 3, for kurator-ffdq's own JSON (the proposed changes of Amendments) -->
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <!-- Logging: kurator-ffdq logs through Apache Commons Logging (and java.util.logging), and passes
+             on no logging implementation or configuration; applications choose them. -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.3.6</version>
+        </dependency>
+        <!-- A logging implementation for the tests and the executable jar only: optional, so not passed
+             on to users. log4j-slf4j2-impl sends the logging of dependencies that use SLF4J (RDF4J) to Log4j. -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.25.5</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>2.25.5</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <!-- validates report RDF against the BDQ standard's SHACL shapes in the tests (as bdq_workbench
                  does; RDF4J's ShaclSail does not parse the BDQ shapes) -->
@@ -60,6 +107,12 @@
             <artifactId>jena-shacl</artifactId>
             <version>5.3.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -92,41 +145,66 @@
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-repository-sail</artifactId>
             <version>5.0.2</version>
+            <exclusions>
+                <!-- duplicates the classes of commons-logging, which kurator-ffdq uses (commons-logging
+                     1.3 finds SLF4J or Log4j by itself) -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-sail-memory</artifactId>
             <version>5.0.2</version>
+            <exclusions>
+                <!-- duplicates the classes of commons-logging, which kurator-ffdq uses (commons-logging
+                     1.3 finds SLF4J or Log4j by itself) -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-rdfxml</artifactId>
             <version>5.0.2</version>
+            <exclusions>
+                <!-- duplicates the classes of commons-logging, which kurator-ffdq uses (commons-logging
+                     1.3 finds SLF4J or Log4j by itself) -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-jsonld</artifactId>
             <version>5.0.2</version>
+            <exclusions>
+                <!-- duplicates the classes of commons-logging, which kurator-ffdq uses (commons-logging
+                     1.3 finds SLF4J or Log4j by itself) -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-queryresultio-text</artifactId>
             <version>5.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.22.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.22.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.22</version>
+            <exclusions>
+                <!-- duplicates the classes of commons-logging, which kurator-ffdq uses (commons-logging
+                     1.3 finds SLF4J or Log4j by itself) -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- for xls postprocessing -->
@@ -141,18 +219,8 @@
             <version>5.4.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.16</version>
-        </dependency>
 
 		<!-- Logging -->
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.2</version>
-		</dependency>
     
     </dependencies>
 
@@ -203,7 +271,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -211,10 +279,38 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <!-- the main artifact is the library jar, with its dependencies declared in its
+                                 pom; the command-line jar with all dependencies is attached as -executable -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>executable</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <!-- module descriptors of the dependencies: not used on the class path -->
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>META-INF/versions/*/module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.datakurator.ffdq.runner.TestRunner</mainClass>
+                                    <manifestEntries>
+                                        <Multi-Release>true</Multi-Release>
+                                    </manifestEntries>
+                                </transformer>
+                                <!-- the executable jar's logging configuration (the library jar has none) -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>log4j2.xml</resource>
+                                    <file>src/main/executable/log4j2.xml</file>
                                 </transformer>
                             </transformers>
                         </configuration>

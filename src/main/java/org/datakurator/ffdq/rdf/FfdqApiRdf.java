@@ -32,9 +32,9 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import org.datakurator.ffdq.model.Entity;
 import org.datakurator.ffdq.model.ResponseQualifier;
 import org.datakurator.ffdq.model.report.Result;
@@ -161,7 +161,7 @@ public final class FfdqApiRdf {
     /** The datatype of JSON literals. */
     public static final String RDF_JSON = "http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON";
 
-    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final JsonMapper JSON = JsonMapper.builder().build();
 
     /**
      * Write a Result as properties of its Response (see the class description).
@@ -220,7 +220,7 @@ public final class FfdqApiRdf {
         if (value instanceof Map) {
             try {
                 return RdfWriter.typedLiteral(JSON.writeValueAsString(new TreeMap<>((Map<?, ?>) value)), RDF_JSON);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 throw new RuntimeException("Could not write the result as JSON: " + value, e);
             }
         }
@@ -266,7 +266,7 @@ public final class FfdqApiRdf {
             if (RDF_JSON.equals(l.getDatatype().stringValue())) {
                 try {
                     value = JSON.readValue(l.getLabel(), new TypeReference<LinkedHashMap<String, String>>() { });
-                } catch (JsonProcessingException e) {
+                } catch (JacksonException e) {
                     value = l.getLabel();
                 }
             }
