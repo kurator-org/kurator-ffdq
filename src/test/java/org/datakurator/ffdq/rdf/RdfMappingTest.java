@@ -173,9 +173,9 @@ public class RdfMappingTest {
         assertEquals(XSD.BOOLEAN, literal(m, r, "bdqffdq:hasAmbiguity").getDatatype());
         assertEquals("a comment", literal(m, r, "rdfs:comment").getLabel());
 
-        IRI stateIri = RdfWriter.iri("http://example.com/ffdq/rs/run_has_result");
+        IRI stateIri = RdfWriter.iri(BDQFFDQ + "RUN_HAS_RESULT");
         assertEquals(stateIri, object(m, r, "bdqffdq:hasState"));
-        assertTrue(m.contains(stateIri, RDF.TYPE, RdfWriter.iri(FfdqApiRdf.RESPONSE_STATUS)));
+        assertTrue(m.contains(stateIri, RDF.TYPE, RdfWriter.iri(BDQFFDQ + "ResponseStatus")));
         assertEquals("RUN_HAS_RESULT", literal(m, stateIri, "rdfs:label").getLabel());
 
         IRI entityIri = RdfWriter.iri(entity.getId());
@@ -208,5 +208,39 @@ public class RdfMappingTest {
         ValidationMethod read2 = (ValidationMethod) DataQualityMethod.readRdf(r, s2);
         assertSame(read1.getSpecification(), read2.getSpecification());
         assertEquals("Shared", read1.getSpecification().getLabel());
+    }
+
+    /**
+     * The ResultStates that are bdqffdq:ResponseStatus terms are written as those terms; any other is
+     * written under the placeholder namespace, so it cannot be mistaken for a BDQ term.
+     */
+    @Test
+    public void testResultStateIris() {
+        for (ResultState state : new ResultState[] { ResultState.RUN_HAS_RESULT, ResultState.AMENDED, ResultState.NOT_AMENDED,
+                ResultState.FILLED_IN, ResultState.INTERNAL_PREREQUISITES_NOT_MET, ResultState.EXTERNAL_PREREQUISITES_NOT_MET }) {
+            assertEquals(BDQFFDQ + state.getLabel(), FfdqApiRdf.resultStateIri(state).stringValue());
+        }
+        assertEquals("http://example.com/ffdq/rs/not_run", FfdqApiRdf.resultStateIri(ResultState.NOT_RUN).stringValue());
+    }
+
+    /**
+     * A ResultState reads back with the label and id ffdq-api gives it, from the bdqffdq term and from
+     * the http://example.com/ffdq/rs/{id} IRIs of earlier reports.
+     */
+    @Test
+    public void testResultStateReadsBack() {
+        RdfWriter w = new RdfWriter();
+        Resource current = (Resource) w.toValue(ResultState.RUN_HAS_RESULT);
+        Resource old = RdfWriter.iri("http://example.com/ffdq/rs/amended");
+        w.getModel().add(old, RDF.TYPE, RdfWriter.iri("http://rs.tdwg.org/bdqffdq/terms/ResponseStatus"));
+        w.getModel().add(old, RDFS.LABEL, RdfWriter.literal("AMENDED"));
+        RdfReader r = new RdfReader(w.getModel());
+
+        ResultState read = FfdqApiRdf.readResultState(r, current);
+        assertEquals(ResultState.RUN_HAS_RESULT, read);
+        assertEquals("RUN_HAS_RESULT", read.getLabel());
+        ResultState readOld = FfdqApiRdf.readResultState(r, old);
+        assertEquals(ResultState.AMENDED, readOld);
+        assertEquals("AMENDED", readOld.getLabel());
     }
 }
