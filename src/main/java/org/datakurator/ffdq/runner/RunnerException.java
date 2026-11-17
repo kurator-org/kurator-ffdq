@@ -29,6 +29,8 @@ public class RunnerException extends Exception {
      * @param e a {@link java.lang.reflect.InvocationTargetException} object.
      */
     public RunnerException(String message, InvocationTargetException e) {
+        // the cause is the exception thrown by the test method
+        super(message, e.getCause() != null ? e.getCause() : e);
     }
 
 }

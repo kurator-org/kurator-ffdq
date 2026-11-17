@@ -617,7 +617,15 @@ public class TestRunner {
                 AssertionTest test = testsForMethods.get(measurementMethod);
 
                 Instant started = Instant.now();
-                Result result = invokeTest(test, instance, dataResource.asMap());
+                Result result;
+                try {
+                    result = invokeTest(test, instance, dataResource.asMap());
+                } catch (RunnerException ex) {
+                    // a failing test is reported, and the other tests are still run on the record
+                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                            + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
+                    continue;
+                }
                 Instant ended = Instant.now();
 
                 MeasurementResponse measure = new MeasurementResponse();
@@ -642,7 +650,15 @@ public class TestRunner {
                 AssertionTest test = testsForMethods.get(validationMethod);
 
                 Instant started = Instant.now();
-                Result result = invokeTest(test, instance, dataResource.asMap());
+                Result result;
+                try {
+                    result = invokeTest(test, instance, dataResource.asMap());
+                } catch (RunnerException ex) {
+                    // a failing test is reported, and the other tests are still run on the record
+                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                            + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
+                    continue;
+                }
                 Instant ended = Instant.now();
 
                 ValidationResponse validation = new ValidationResponse();
@@ -667,7 +683,15 @@ public class TestRunner {
                 AssertionTest test = testsForMethods.get(amendmentMethod);
 
                 Instant started = Instant.now();
-                Result result = invokeTest(test, instance, dataResource.asMap());
+                Result result;
+                try {
+                    result = invokeTest(test, instance, dataResource.asMap());
+                } catch (RunnerException ex) {
+                    // a failing test is reported, and the other tests are still run on the record
+                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                            + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
+                    continue;
+                }
                 Instant ended = Instant.now();
 
                 AmendmentResponse amendment = new AmendmentResponse();
@@ -692,7 +716,15 @@ public class TestRunner {
                 AssertionTest test = testsForMethods.get(issueMethod);
 
                 Instant started = Instant.now();
-                Result result = invokeTest(test, instance, dataResource.asMap());
+                Result result;
+                try {
+                    result = invokeTest(test, instance, dataResource.asMap());
+                } catch (RunnerException ex) {
+                    // a failing test is reported, and the other tests are still run on the record
+                    logger.log(Level.WARNING, "Test " + test.getLabel() + " failed on record "
+                            + dataResource.getRecordId() + ": " + ex.getCause(), ex.getCause());
+                    continue;
+                }
                 Instant ended = Instant.now();
 
                 IssueResponse issueResponse = new IssueResponse();
@@ -709,9 +741,6 @@ public class TestRunner {
                 model.save(issueResponse);
                 report.addResponse(issueResponse);
             }
-        } catch (RunnerException ex) {
-            // This probably results from an exception being thrown by code running in the test method
-            logger.warning(ex.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {
             // This probably indicates that the asserted class or method hasn't been found.
             throw new RuntimeException("Could not instantiate an instance of the DQClass: " + cls.getName(), e);
