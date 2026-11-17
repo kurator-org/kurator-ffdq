@@ -165,7 +165,7 @@ public class TestRunner {
             AssertionTest test = new AssertionTest();
             test.setMethod(javaMethod);
             test.setCls(cls);
-        	logger.info(javaMethod.getName());
+        	logger.debug(javaMethod.getName());
 
             for (Annotation annotation : javaMethod.getAnnotations()) {
 
@@ -178,7 +178,7 @@ public class TestRunner {
                     if (!guid.startsWith("https://rs.tdwg.org/bdqtest/terms/")) { 
                     	guid = "https://rs.tdwg.org/bdqtest/terms/" + guid;
                     }
-                    logger.info(guid);
+                    logger.debug(guid);
                     test.setGuid(guid);
                     implementedTests.put(guid, test);
                 } else if (annotation instanceof org.datakurator.ffdq.annotations.Measure) {
@@ -774,7 +774,9 @@ public class TestRunner {
         try {
             DQResponse response = (DQResponse) test.invoke(instance, record);
             
-            logger.info(response.getResultState().toString());
+            ResultValue shownValue = response.getValue();
+            logger.info(test.getLabel() + ": " + (response.getResultState() == null ? "no status" : response.getResultState().getLabel())
+                    + (shownValue == null ? "" : " " + shownValue.getObject()));
             
             Result result = new Result();
             result.setState(response.getResultState());

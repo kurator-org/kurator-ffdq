@@ -178,7 +178,7 @@ public class BaseModel {
             logger.warn("Not a " + cls.getSimpleName() + ": " + r.stringValue());
             return null;
         }
-        logger.info("Found: " + r.stringValue());
+        logger.debug("Found: " + r.stringValue());
         return result;
     }
 
@@ -204,8 +204,8 @@ public class BaseModel {
     public Object findOne(Class cls, String sparql, String field) {
         // read the solutions, closing the query result
         Iterator<BindingSet> result = QueryResults.asList(conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate()).iterator();
-        logger.info(field);
-        logger.info(sparql);
+        logger.debug(field);
+        logger.debug(sparql);
         if (!result.hasNext()) {
             return null;
         }
@@ -228,15 +228,15 @@ public class BaseModel {
 
         // read the solutions, closing the query result
         Iterator<BindingSet> result = QueryResults.asList(conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate()).iterator();
-        logger.info(field);
-        logger.info(cls.getCanonicalName());
-        logger.info(sparql);
+        logger.debug(field);
+        logger.debug(cls.getCanonicalName());
+        logger.debug(sparql);
 
         while (result.hasNext()) {
             BindingSet solution = result.next();
             String id = solution.getValue(field).stringValue();
             
-            logger.info("Looking for bean for: " + id);
+            logger.debug("Looking for bean for: " + id);
 
             try { 
             	Object rdfBean = findOne(reader, id, cls);
@@ -266,15 +266,15 @@ public class BaseModel {
 
         // read the solutions, closing the query result
         Iterator<BindingSet> result = QueryResults.asList(conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql).evaluate()).iterator();
-        logger.info(field);
-        logger.info(cls.getCanonicalName());
-        logger.info(sparql);
+        logger.debug(field);
+        logger.debug(cls.getCanonicalName());
+        logger.debug(sparql);
 
         while (result.hasNext()) {
             BindingSet solution = result.next();
             String id = solution.getValue(field).stringValue();
             
-            logger.info("Looking for bean for: " + id);
+            logger.debug("Looking for bean for: " + id);
 
             try { 
             	Object rdfBean = findOne(reader, id, cls);

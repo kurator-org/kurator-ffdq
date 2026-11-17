@@ -3,7 +3,7 @@
      test classpath, so this configuration is used in both).  The library logs through Apache Commons
      Logging; with log4j-core on the test classpath, Commons Logging 1.3 sends that to Log4j, and
      log4j-slf4j2-impl sends the logging of dependencies that use SLF4J to the same place.
-     For more detail, set the org.filteredpush level to DEBUG. -->
+     For more detail, set the org.datakurator (or org.filteredpush) level to DEBUG. -->
 <Configuration status="WARN">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
@@ -11,6 +11,7 @@
     </Console>
   </Appenders>
   <Loggers>
+    <Logger name="org.datakurator" level="INFO"/>
     <Logger name="org.filteredpush" level="INFO"/>
     <Root level="WARN">
       <AppenderRef ref="Console"/>

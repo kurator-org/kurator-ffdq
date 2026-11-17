@@ -233,7 +233,7 @@ public class FFDQModel extends BaseModel {
                 + "  BIND(REPLACE(STR(?ver),'" + Namespace.BDQTEST + "','') AS ?uuid ) "
                 //+ "  ?test bdqffdq:hasResourceType bdqffdq:SingleRecord ."
                 + "}";
-        logger.info(sparql);
+        logger.debug(sparql);
         Map<String, DataQualityNeed> retval = new HashMap<String,DataQualityNeed>();
         retval.putAll(findAllMapBy(DataQualityNeed.class, sparql, "test", keyMapBy));
         return retval;
