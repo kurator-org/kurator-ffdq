@@ -478,4 +478,28 @@ public class XLSXPostProcessorTest {
         model.load(is, RDFFormat.TURTLE);
         return model;
     }
+
+    /**
+     * An IssueResponse saved with its Issue (and the Issue's information elements) is read back from
+     * the model with the Issue attached, so the Issues sheet can color the fields the Issue acts upon.
+     * RDFBeans could not read an Issue back (it had no no-arg constructor); the RDF4J mapping can.
+     */
+    @Test
+    public void testIssueResponseRoundTripsWithIssueContext() {
+        FFDQModel model = new FFDQModel();
+        org.datakurator.ffdq.model.context.Issue issue = new org.datakurator.ffdq.model.context.Issue();
+        issue.setInformationElements(new InformationElement(Arrays.asList(
+                URI.create("http://rs.tdwg.org/dwc/terms/dataGeneralizations"),
+                URI.create("http://rs.tdwg.org/dwc/terms/informationWithheld"))));
+        IssueResponse response = new IssueResponse();
+        response.setDataResource(URI.create("urn:uuid:00000000-0000-0000-0000-0000000000aa"));
+        response.setIssueInContext(issue);
+        model.save(response);
+
+        IssueResponse read = (IssueResponse) model.findOne(response.getId(), IssueResponse.class);
+        assertNotNull(read);
+        assertNotNull(read.getIssueInContext());
+        List<String> fields = new XLSXPostProcessor(model).fieldsFromIssueContext(read.getIssueInContext());
+        assertEquals(new HashSet<>(Arrays.asList("dataGeneralizations", "informationWithheld")), new HashSet<>(fields));
+    }
 }

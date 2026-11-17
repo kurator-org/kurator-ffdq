@@ -55,14 +55,16 @@ public class Issue extends DataQualityNeed  {
     
     /**
      * <p>Constructor for Issue.</p>
+     */
+    public Issue() { }
+
+    /**
+     * <p>Constructor for Issue.</p>
      *
      * @param issue a {@link org.datakurator.ffdq.model.Criterion} object.
      * @param ie a {@link org.datakurator.ffdq.model.InformationElement} object.
      * @param rt a {@link org.datakurator.ffdq.model.ResourceType} object.
      */
-    /** For {@link #readRdf(RdfReader, Resource)}. */
-    private Issue() { }
-
     public Issue(Criterion issue, InformationElement ie, ResourceType rt) {
     	this.criterion = issue;
     	this.ie = ie;
