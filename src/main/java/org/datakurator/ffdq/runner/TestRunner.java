@@ -607,7 +607,7 @@ public class TestRunner {
 
                 Result result = invokeTest(test, instance, dataResource.asMap());
 
-                MeasureResponse measure = new MeasureResponse();
+                MeasurementResponse measure = new MeasurementResponse();
 
                 measure.setDimension(dimension);
                 measure.setDataResource(dataResource.getURI());

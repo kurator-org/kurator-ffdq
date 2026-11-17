@@ -32,7 +32,6 @@ import org.datakurator.ffdq.model.Consulted;
 import org.datakurator.ffdq.model.Criterion;
 import org.datakurator.ffdq.model.Dimension;
 import org.datakurator.ffdq.model.InformationElement;
-import org.datakurator.ffdq.model.InvertedCriterion;
 import org.datakurator.ffdq.model.ResourceType;
 
 import java.net.URI;

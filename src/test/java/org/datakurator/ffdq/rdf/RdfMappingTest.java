@@ -18,6 +18,7 @@
 package org.datakurator.ffdq.rdf;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +37,7 @@ import org.datakurator.ffdq.model.Mechanism;
 import org.datakurator.ffdq.model.ResourceType;
 import org.datakurator.ffdq.model.ResultState;
 import org.datakurator.ffdq.model.Specification;
+import org.datakurator.ffdq.model.context.Amendment;
 import org.datakurator.ffdq.model.context.Validation;
 import org.datakurator.ffdq.model.report.Result;
 import org.datakurator.ffdq.model.report.ValidationResponse;
@@ -242,5 +244,33 @@ public class RdfMappingTest {
         ResultState readOld = FfdqApiRdf.readResultState(r, old);
         assertEquals(ResultState.AMENDED, readOld);
         assertEquals("AMENDED", readOld.getLabel());
+    }
+
+    /**
+     * An ImprovementTarget uses the bdqffdq terms (bdqffdq:targetedValidation, bdqffdq:targetedMeasure),
+     * and bdqffdq:improvedBy relates the Amendment (subject) to the ImprovementTarget (object), as the
+     * standard's SHACL shapes require.
+     */
+    @Test
+    public void testImprovementTargetTermsAndDirection() {
+        Amendment amendment = new Amendment();
+        amendment.setId(Namespace.BDQTEST + "amendment");
+        Validation validation = new Validation(new Criterion("Standard", "Standard"), new ActedUpon(), new ResourceType("SingleRecord"));
+        validation.setId(Namespace.BDQTEST + "validation");
+        org.datakurator.ffdq.model.solutions.ImprovementTarget target = new org.datakurator.ffdq.model.solutions.ImprovementTarget();
+        target.setImprovedBy(amendment);
+        target.setContextualizedCriterion(new java.util.HashSet<>(java.util.Collections.singleton(validation)));
+
+        RdfWriter w = new RdfWriter();
+        Resource s = target.writeRdf(w);
+        Model m = w.getModel();
+        assertTrue(m.contains(RdfWriter.iri(amendment.getId()), RdfWriter.iri(BDQFFDQ + "improvedBy"), s));
+        assertFalse(m.contains(s, RdfWriter.iri(BDQFFDQ + "improvedBy"), null));
+        assertTrue(m.contains(s, RdfWriter.iri(BDQFFDQ + "targetedValidation"), RdfWriter.iri(validation.getId())));
+
+        org.datakurator.ffdq.model.solutions.ImprovementTarget read =
+                org.datakurator.ffdq.model.solutions.ImprovementTarget.readRdf(new RdfReader(m), s);
+        assertEquals(amendment.getId(), read.getImprovedBy().getId());
+        assertEquals(1, read.getContextualizedCriterion().size());
     }
 }

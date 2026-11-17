@@ -393,7 +393,7 @@ public class XLSXPostProcessorTest {
 
     /**
      * Builds an {@link FFDQModel} containing one data resource and one each of
-     * ValidationResponse (COMPLIANT), MeasureResponse (COMPLETE / RUN_HAS_RESULT),
+     * ValidationResponse (COMPLIANT), MeasurementResponse (COMPLETE / RUN_HAS_RESULT),
      * and AmendmentResponse (NO_CHANGE) by using the same RDFBeanManager path that
      * the production TestRunner follows.  This guarantees that the rdfbeans
      * binding-class triples are present, so deserialization works reliably.
@@ -432,7 +432,7 @@ public class XLSXPostProcessorTest {
         validationResponse.setResult(validationResult);
         model.save(validationResponse);
 
-        // --- MeasureResponse: COMPLETE / RUN_HAS_RESULT ----------------------
+        // --- MeasurementResponse: COMPLETE / RUN_HAS_RESULT ----------------------
         Entity entityComplete = new Entity();
         entityComplete.setId("urn:uuid:entity-complete-" + UUID.randomUUID());
         // Use a plain String so entity.getValue().toString() == "COMPLETE"
@@ -446,7 +446,7 @@ public class XLSXPostProcessorTest {
         measureResult.setComment("Event date completeness is 1.");
         model.save(measureResult);
 
-        MeasureResponse measureResponse = new MeasureResponse();
+        MeasurementResponse measureResponse = new MeasurementResponse();
         measureResponse.setId("urn:uuid:mr-" + UUID.randomUUID());
         measureResponse.setDataResource(dr.getURI());
         measureResponse.setResult(measureResult);

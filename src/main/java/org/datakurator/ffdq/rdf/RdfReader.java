@@ -131,6 +131,40 @@ public class RdfReader {
     }
 
     /**
+     * The subjects that have a property with a given value (the inverse of
+     * {@link #objects(Resource, String)}), sorted by their string forms.
+     *
+     * @param predicate the predicate, as a CURIE or IRI
+     * @param object the value
+     * @return the subjects
+     */
+    public List<Resource> subjects(String predicate, Value object) {
+        TreeSet<String> order = new TreeSet<>();
+        Map<String, Resource> byString = new HashMap<>();
+        for (Statement st : model.filter(null, RdfWriter.iri(predicate), object)) {
+            String key = st.getSubject().stringValue() + "\u0000" + st.getSubject().toString();
+            order.add(key);
+            byString.put(key, st.getSubject());
+        }
+        List<Resource> result = new ArrayList<>();
+        for (String key : order) { result.add(byString.get(key)); }
+        return result;
+    }
+
+    /**
+     * The first subject that has a property with a given value (in the order of
+     * {@link #subjects(String, Value)}).
+     *
+     * @param predicate the predicate
+     * @param object the value
+     * @return the subject, or null
+     */
+    public Resource subject(String predicate, Value object) {
+        List<Resource> subjects = subjects(predicate, object);
+        return subjects.isEmpty() ? null : subjects.get(0);
+    }
+
+    /**
      * The first value of a property (in the order of {@link #objects(Resource, String)}).
      *
      * @param subject the subject

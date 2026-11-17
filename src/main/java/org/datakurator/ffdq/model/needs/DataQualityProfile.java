@@ -1,6 +1,6 @@
 
 /**
- *  Profile.java
+ *  DataQualityProfile.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -27,12 +27,12 @@ import org.datakurator.ffdq.rdf.RdfWriter;
 import org.eclipse.rdf4j.model.Resource;
 
 
-public class Profile implements RdfMapped {
+public class DataQualityProfile implements RdfMapped {
 
     // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
 
     /** The RDF type of this class. */
-    public static final String RDF_TYPE = "bdqffdq:Profile";
+    public static final String RDF_TYPE = "bdqffdq:DataQualityProfile";
 
     /**
      * Write this object's own properties (and those of its superclasses) as RDF.
@@ -53,7 +53,7 @@ public class Profile implements RdfMapped {
     }
 
 
-    /** {@inheritDoc}  A Profile has no identifier, and is written as a blank node. */
+    /** {@inheritDoc}  A DataQualityProfile has no identifier, and is written as a blank node. */
     @Override
     public Resource writeRdf(RdfWriter w) {
         Resource s = org.eclipse.rdf4j.model.impl.SimpleValueFactory.getInstance().createBNode();
@@ -63,16 +63,16 @@ public class Profile implements RdfMapped {
     }
 
     /**
-     * Read a Profile from RDF.
+     * Read a DataQualityProfile from RDF.
      *
      * @param r the reader
      * @param s the subject
-     * @return the Profile
+     * @return the DataQualityProfile
      */
-    public static Profile readRdf(RdfReader r, Resource s) {
+    public static DataQualityProfile readRdf(RdfReader r, Resource s) {
         Object cached = r.cached(s);
-        if (cached instanceof Profile) { return (Profile) cached; }
-        Profile o = r.remember(s, new Profile());
+        if (cached instanceof DataQualityProfile) { return (DataQualityProfile) cached; }
+        DataQualityProfile o = r.remember(s, new DataQualityProfile());
         o.readRdfProperties(r, s);
         return o;
     }

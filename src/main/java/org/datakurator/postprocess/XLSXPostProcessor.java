@@ -231,7 +231,7 @@ public class XLSXPostProcessor {
         Sheet issuesSheet        = createIssuesSheet(fields);
 
         for (DataResource dataResource : dataResources) {
-            List<Response> measures    = model.findAssertionsForDataResource(dataResource, MeasureResponse.class);
+            List<Response> measures    = model.findAssertionsForDataResource(dataResource, MeasurementResponse.class);
             List<Response> validations = model.findAssertionsForDataResource(dataResource, ValidationResponse.class);
             List<Response> amendments  = model.findAssertionsForDataResource(dataResource, AmendmentResponse.class);
             List<Response> issues      = model.findAssertionsForDataResource(dataResource, IssueResponse.class);
@@ -309,7 +309,7 @@ public class XLSXPostProcessor {
 
     private void initMeasuresSheet(Sheet measuresSheet, List<Response> measures, DataResource dataResource) {
         for (Response response : measures) {
-            MeasureResponse measure = (MeasureResponse) response;
+            MeasurementResponse measure = (MeasurementResponse) response;
             String recordId = dataResource.getRecordId();
 
             Row measuresRow = measuresSheet.createRow(measuresSheetRowNum++);

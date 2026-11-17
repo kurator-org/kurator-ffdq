@@ -1,6 +1,6 @@
 
 /**
- *  Report.java
+ *  DataQualityReport.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -27,12 +27,12 @@ import org.datakurator.ffdq.rdf.RdfWriter;
 import org.eclipse.rdf4j.model.Resource;
 
 
-public class Report implements RdfMapped {
+public class DataQualityReport implements RdfMapped {
 
     // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
 
     /** The RDF type of this class. */
-    public static final String RDF_TYPE = "bdqffdq:Report";
+    public static final String RDF_TYPE = "bdqffdq:DataQualityReport";
 
     /**
      * Write this object's own properties (and those of its superclasses) as RDF.
@@ -53,7 +53,7 @@ public class Report implements RdfMapped {
     }
 
 
-    /** {@inheritDoc}  A Report has no identifier, and is written as a blank node. */
+    /** {@inheritDoc}  A DataQualityReport has no identifier, and is written as a blank node. */
     @Override
     public Resource writeRdf(RdfWriter w) {
         Resource s = org.eclipse.rdf4j.model.impl.SimpleValueFactory.getInstance().createBNode();
@@ -63,16 +63,16 @@ public class Report implements RdfMapped {
     }
 
     /**
-     * Read a Report from RDF.
+     * Read a DataQualityReport from RDF.
      *
      * @param r the reader
      * @param s the subject
-     * @return the Report
+     * @return the DataQualityReport
      */
-    public static Report readRdf(RdfReader r, Resource s) {
+    public static DataQualityReport readRdf(RdfReader r, Resource s) {
         Object cached = r.cached(s);
-        if (cached instanceof Report) { return (Report) cached; }
-        Report o = r.remember(s, new Report());
+        if (cached instanceof DataQualityReport) { return (DataQualityReport) cached; }
+        DataQualityReport o = r.remember(s, new DataQualityReport());
         o.readRdfProperties(r, s);
         return o;
     }

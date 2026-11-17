@@ -167,10 +167,13 @@ public class ImprovementTarget implements RdfMapped {
      * @param s the subject
      */
     protected void writeRdfProperties(RdfWriter w, Resource s) {
-        w.values(s, "bdqffdq:targetedDimension", getTargetedDimensions());
-        w.values(s, "bdqffdq:targetedCriterion", getContextualizedCriterion());
+        w.values(s, "bdqffdq:targetedMeasure", getTargetedDimensions());
+        w.values(s, "bdqffdq:targetedValidation", getContextualizedCriterion());
         w.values(s, "bdqffdq:targetedIssue", getContextualizedIssue());
-        w.value(s, "bdqffdq:improvedBy", getImprovedBy());
+        // bdqffdq:improvedBy relates a bdqffdq:Amendment (subject) to a bdqffdq:ImprovementTarget (object)
+        if (getImprovedBy() != null) {
+            w.getModel().add((Resource) w.toValue(getImprovedBy()), RdfWriter.iri("bdqffdq:improvedBy"), s);
+        }
     }
 
     /** {@inheritDoc} */
@@ -191,10 +194,11 @@ public class ImprovementTarget implements RdfMapped {
      * @param s the subject
      */
     protected void readRdfProperties(RdfReader r, Resource s) {
-        setTargetedDimensions(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedDimension", Measure::readRdf)));
-        setContextualizedCriterion(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedCriterion", Validation::readRdf)));
+        setTargetedDimensions(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedMeasure", Measure::readRdf)));
+        setContextualizedCriterion(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedValidation", Validation::readRdf)));
         setContextualizedIssue(new java.util.LinkedHashSet<>(r.readAll(s, "bdqffdq:targetedIssue", Issue::readRdf)));
-        setImprovedBy(r.read(s, "bdqffdq:improvedBy", Amendment::readRdf));
+        Resource amendment = r.subject("bdqffdq:improvedBy", s);
+        setImprovedBy(amendment == null ? null : Amendment.readRdf(r, amendment));
     }
 
     /**

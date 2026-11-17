@@ -1,6 +1,6 @@
 
 /**
- *  MeasureResponse.java
+ *  MeasurementResponse.java
  *
  * Copyright 2017 President and Fellows of Harvard College
  *
@@ -30,7 +30,7 @@ import org.datakurator.ffdq.model.context.Measure;
 
 import java.util.UUID;
 
-public class MeasureResponse extends Response {
+public class MeasurementResponse extends Response {
     private String id = "urn:uuid:" + UUID.randomUUID();
 
     private Measure dimension;
@@ -93,7 +93,9 @@ public class MeasureResponse extends Response {
     // ---- RDF mapping (explicit RDF4J; replaces the RDFBeans annotations) ----
 
     /** The RDF type of this class. */
-    public static final String RDF_TYPE = "bdqffdq:MeasureResponse";
+    public static final String RDF_TYPE = "bdqffdq:MeasurementResponse";
+    /** The RDF type kurator-ffdq wrote before 4.0.0 (bdqffdq:MeasurementResponse in the BDQ standard). */
+    public static final String OLD_RDF_TYPE = "bdqffdq:MeasureResponse";
 
     /**
      * Write this object's own properties (and those of its superclasses) as RDF.
@@ -131,16 +133,16 @@ public class MeasureResponse extends Response {
     }
 
     /**
-     * Read a MeasureResponse from RDF.
+     * Read a MeasurementResponse from RDF.
      *
      * @param r the reader
      * @param s the subject
-     * @return the MeasureResponse, the same instance each time for the same subject
+     * @return the MeasurementResponse, the same instance each time for the same subject
      */
-    public static MeasureResponse readRdf(RdfReader r, Resource s) {
+    public static MeasurementResponse readRdf(RdfReader r, Resource s) {
         Object cached = r.cached(s);
-        if (cached instanceof MeasureResponse) { return (MeasureResponse) cached; }
-        MeasureResponse o = r.remember(s, new MeasureResponse());
+        if (cached instanceof MeasurementResponse) { return (MeasurementResponse) cached; }
+        MeasurementResponse o = r.remember(s, new MeasurementResponse());
         o.setId(s.stringValue());
         o.readRdfProperties(r, s);
         return o;

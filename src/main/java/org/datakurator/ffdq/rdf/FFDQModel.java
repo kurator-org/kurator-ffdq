@@ -24,6 +24,7 @@ import org.datakurator.ffdq.model.context.DataQualityNeed;
 import org.datakurator.ffdq.model.context.Issue;
 import org.datakurator.ffdq.model.context.Measure;
 import org.datakurator.ffdq.model.context.Validation;
+import org.datakurator.ffdq.model.report.MeasurementResponse;
 import org.datakurator.ffdq.model.report.Response;
 import org.datakurator.ffdq.model.solutions.DataQualityMethod;
 import org.eclipse.rdf4j.model.Model;
@@ -343,7 +344,10 @@ public class FFDQModel extends BaseModel {
         String sparql = "PREFIX bdqffdq: <https://rs.tdwg.org/bdqffdq/terms/> " +
                 "SELECT ?assertion WHERE { " +
                 "?assertion bdqffdq:appliesTo <" + dataResource.getURI() + "> . " +
-                "?assertion a bdqffdq:" + cls.getSimpleName() + " " +
+                "?assertion a ?type . " +
+                "VALUES ?type { bdqffdq:" + cls.getSimpleName() +
+                // reports written before 4.0.0 used bdqffdq:MeasureResponse
+                (cls == MeasurementResponse.class ? " bdqffdq:MeasureResponse" : "") + " } " +
                 "}";
 
 

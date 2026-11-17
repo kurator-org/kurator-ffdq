@@ -143,7 +143,7 @@ public abstract class Response implements RdfMapped {
 
 
     /**
-     * Read a ValidationResponse, IssueResponse, MeasureResponse, or AmendmentResponse from RDF, by its rdf:type.
+     * Read a ValidationResponse, IssueResponse, MeasurementResponse, or AmendmentResponse from RDF, by its rdf:type.
      *
      * @param r the reader
      * @param s the subject
@@ -152,7 +152,7 @@ public abstract class Response implements RdfMapped {
     public static Response readRdf(RdfReader r, Resource s) {
         if (r.hasType(s, ValidationResponse.RDF_TYPE)) { return ValidationResponse.readRdf(r, s); }
         if (r.hasType(s, IssueResponse.RDF_TYPE)) { return IssueResponse.readRdf(r, s); }
-        if (r.hasType(s, MeasureResponse.RDF_TYPE)) { return MeasureResponse.readRdf(r, s); }
+        if (r.hasType(s, MeasurementResponse.RDF_TYPE) || r.hasType(s, MeasurementResponse.OLD_RDF_TYPE)) { return MeasurementResponse.readRdf(r, s); }
         if (r.hasType(s, AmendmentResponse.RDF_TYPE)) { return AmendmentResponse.readRdf(r, s); }
         return null;
     }
