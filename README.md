@@ -21,7 +21,7 @@ Available from maven central.
     <dependency>
         <groupId>org.datakurator</groupId>
         <artifactId>kurator-ffdq</artifactId>
-        <version>3.2.0</version>
+        <version>4.0.0</version>
     </dependency>
 
 # Building
