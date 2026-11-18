@@ -139,13 +139,13 @@ TODO: Work in progress, need to match guids for tests (DataQualityNeed subclass 
 
 # Annotated DQ Class
 
-The higher level use of the framework makes use of Java annotations defined in the org.datakurator.ffdq.annotations package.
+The higher level use of the framework makes use of Java annotations defined in the org.datakurator.ffdq.annotations package of ffdq-api.
 
 To use the annotations, in the project that defines the methods and classes corresponding to a set of assertion tests, add the dependency via maven to your pom.xml file
 
         <dependency>
             <groupId>org.datakurator</groupId>
-            <artifactId>kurator-ffdq</artifactId>
+            <artifactId>ffdq-api</artifactId>
             <version>3.0.0</version>
         </dependency>
         
