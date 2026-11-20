@@ -279,9 +279,10 @@
                         </goals>
                         <configuration>
                             <!-- the main artifact is the library jar, with its dependencies declared in its
-                                 pom; the command-line jar with all dependencies is attached as -executable -->
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>executable</shadedClassifierName>
+                                 pom; the command-line jar with all dependencies is written to target/ as
+                                 -executable.jar, not attached, so it is not installed or deployed to Maven
+                                 Central (the release workflow attaches it to the GitHub release) -->
+                            <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-executable.jar</outputFile>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
                                 <filter>
