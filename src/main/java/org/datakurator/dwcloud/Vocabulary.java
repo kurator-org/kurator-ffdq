@@ -29,12 +29,22 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 public class Vocabulary {
     private static final String VOCAB_PROPERTY = "org.datakurator.dwcloud.vocab";
     private static final String ID_TERM_PROPERTY = "org.datakurator.dwcloud.idTerm";
+
+    /** Current Darwin Core terms bundled with this library (from rs.tdwg.org), the fallback
+     * for terms the darwin_cloud vocabulary does not list. */
+    private static final String DWC_TERMS_RESOURCE = "/org/datakurator/dwcloud/dwc_terms.txt";
+    private static final String DWC_NAMESPACE = "http://rs.tdwg.org/dwc/terms/";
+    private static final Set<String> CURRENT_DWC_TERMS = loadCurrentDwcTerms();
 
     private Map<String, Integer> header;
 
@@ -148,21 +158,69 @@ public class Vocabulary {
      * @return a {@link java.net.URI} object.
      */
     public URI getURI(String term) {
-        URI uri;
-
-        if (term.equalsIgnoreCase("id")) {
-            uri = Namespace.resolvePrefixedTerm(idTerm);
-        } else if (term.contains(":")){
-            uri = mapping.get(term.split(":")[1]);
-        } else {
-            uri = mapping.get(term);
-        }
-
+        URI uri = findURI(term);
         if (uri != null) {
             return uri;
         } else {
             throw new RuntimeException("Unable to map term \"" + term + "\" in input data to a uri");
         }
+    }
+
+    /**
+     * <p>Find the IRI of a term, or null if it cannot be mapped.</p>
+     *
+     * <p>The term is looked up, by its local name, in the darwin_cloud vocabulary; failing that,
+     * a bare local name that is a current Darwin Core term (bundled list, from rs.tdwg.org) is
+     * resolved in the Darwin Core namespace, and a prefixed term (e.g. oa:hasTarget) is
+     * resolved with its prefix's namespace, if the prefix is known.</p>
+     *
+     * @param term a term name, bare (e.g. "pathway") or prefixed (e.g. "dwc:pathway")
+     * @return the term's IRI, or null if it cannot be mapped
+     */
+    public URI findURI(String term) {
+        if (term == null || term.isEmpty()) {
+            return null;
+        }
+        if (term.equalsIgnoreCase("id")) {
+            return Namespace.resolvePrefixedTerm(idTerm);
+        }
+        boolean prefixed = term.contains(":");
+        String localName = prefixed ? term.substring(term.indexOf(':') + 1) : term;
+        URI uri = mapping.get(localName);
+        if (uri != null) {
+            return uri;
+        }
+        if (!prefixed || term.startsWith("dwc:")) {
+            if (CURRENT_DWC_TERMS.contains(localName)) {
+                return URI.create(DWC_NAMESPACE + localName);
+            }
+            return null;
+        }
+        try {
+            return Namespace.resolvePrefixedTerm(term);
+        } catch (RuntimeException e) {
+            // unknown prefix
+            return null;
+        }
+    }
+
+    private static Set<String> loadCurrentDwcTerms() {
+        Set<String> terms = new HashSet<>();
+        try (InputStream in = Vocabulary.class.getResourceAsStream(DWC_TERMS_RESOURCE)) {
+            if (in != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (!line.isEmpty() && !line.startsWith("#")) {
+                        terms.add(line);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read " + DWC_TERMS_RESOURCE, e);
+        }
+        return Collections.unmodifiableSet(terms);
     }
 
     /**

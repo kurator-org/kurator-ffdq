@@ -58,6 +58,9 @@ public class DataResource {
     
     private final static Log logger = LogFactory.getLog(DataResource.class);
 
+    /** Terms already reported as unmappable, so each is reported once, not once per record. */
+    private static final Set<String> reportedUnmappedTerms = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     /**
      * <p>Constructor for DataResource.</p>
      *
@@ -133,17 +136,21 @@ public class DataResource {
         // Add triples from the key value pairs in the map
         for (String term : record.keySet()) {
 
-        	try { 
-            URI uri = vocab.getURI(term);  // Lookup the term uri via dwcloud vocab
+            URI uri = vocab.findURI(term);  // Lookup the term uri via dwcloud vocab
+            if (uri == null) {
+                if (reportedUnmappedTerms.add(term)) {
+                    logger.warn("Term \"" + term + "\" in the input data is not a known term; its values are left out of the data resource.");
+                }
+                continue;
+            }
 
             IRI predicate = valueFactory.createIRI(uri.toString());
             String object = record.get(term);
+            if (object == null) {
+                continue;
+            }
 
             builder.defaultGraph().add(subject, predicate, object);
-
-        	} catch (Exception e) {
-        		logger.error(e.getMessage());
-        	}
         }
 
         this.vocab = vocab;

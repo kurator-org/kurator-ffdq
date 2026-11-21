@@ -136,6 +136,11 @@ public class Namespace {
 
             if (uri != null) {
                 try {
+                    // Append the local name: URI.resolve would drop the last path segment of a
+                    // namespace ending in '#' (oa:hasTarget became http://www.w3.org/ns/hasTarget).
+                    if (uri.endsWith("#") || uri.endsWith("/")) {
+                        return new URI(uri + term);
+                    }
                     return new URI(uri).resolve(term);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException("Invalid namespace uri for information element \"" + value + ": " + uri);
